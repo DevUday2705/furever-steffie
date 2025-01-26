@@ -22,6 +22,7 @@ const SelectedFabric = () => {
 
   const handleOrder = () => {
     updateSelections("size", size);
+    updateSelections("cart", [...selections.cart, { ...fabric, qty: 1 }]);
     navigate("/order-form");
   };
 

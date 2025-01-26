@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const CartNav = () => {
   const { selections, updateSelections } = useContext(AppContext);
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const handleUpdateQty = (item, actionType) => {
     updateSelections(
       "cart",
@@ -27,6 +29,11 @@ const CartNav = () => {
       "cart",
       selections.cart.filter((item) => item.id !== itemId)
     );
+  };
+
+  const handleCheckout = () => {
+    setIsOpen(false);
+    navigate("/order-form");
   };
 
   const calculateTotal = () => {
@@ -151,7 +158,10 @@ const CartNav = () => {
                       🎉 Hurrey! You unlocked free shipping!
                     </motion.div>
                   )}
-                  <button className="w-full cursor-pointer bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors">
+                  <button
+                    onClick={handleCheckout}
+                    className="w-full cursor-pointer bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
+                  >
                     Checkout
                   </button>
                 </div>

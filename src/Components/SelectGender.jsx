@@ -23,15 +23,15 @@ const SelectGender = () => {
         <motion.div
           variants={itemVariants}
           onClick={() => handleSelection("gender", "male")}
-          className="p-10 cursor-pointer text-center border rounded-2xl"
+          className="p-8 cursor-pointer text-center border rounded-2xl"
         >
-          <img src="/images/male.png" className="h-20" />
+          <img src="/images/male.png" className="h-20 w-full object-cover" />
           <p className="text-2xl font-medium mt-5">Male</p>
         </motion.div>
         <motion.div
           variants={itemVariants}
           onClick={() => handleSelection("gender", "female")}
-          className="p-10 cursor-pointer text-center border rounded-2xl"
+          className="p-8 cursor-pointer text-center border rounded-2xl"
         >
           <img src="/images/female.png" className="h-20" />
           <p className="text-2xl font-medium mt-5">Female</p>

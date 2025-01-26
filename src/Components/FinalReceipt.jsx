@@ -90,13 +90,15 @@ const FinalReceipt = () => {
         </h1>
       </div>
       <h1 className="my-5 text-lg font-medium">Fabric/Design Details</h1>
-      <div className="flex items-start gap-5">
-        <img className="w-24 rounded-md" src={fabric.img} alt={fabric.name} />
-        <div>
-          <p className="text-slate-800 font-medium">{fabric.name}</p>
-          <p className="font-medium text-green-600">Rs.{fabric.price}/-</p>
+      {selections?.cart?.map((fabric) => (
+        <div className="flex items-start gap-5">
+          <img className="w-24 rounded-md" src={fabric.img} alt={fabric.name} />
+          <div>
+            <p className="text-slate-800 font-medium">{fabric.name}</p>
+            <p className="font-medium text-green-600">Rs.{fabric.price}/-</p>
+          </div>
         </div>
-      </div>
+      ))}
       <div className="bg-amber-100 mt-2 text-sm p-2 rounded-md text-slate-800">
         <p className="font-medium mb-1">Important Information About Delivery</p>
         <p>
@@ -107,7 +109,7 @@ const FinalReceipt = () => {
           made.
         </p>
       </div>
-      <div className="absolute left-0 top-0">
+      <div className="absolute flex items-center justify-center">
         <Lottie options={defaultOptions} height={400} width={400} />
       </div>
       <button
