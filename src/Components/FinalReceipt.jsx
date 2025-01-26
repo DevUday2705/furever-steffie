@@ -45,8 +45,11 @@ const FinalReceipt = () => {
   return (
     <div
       ref={receiptRef}
-      className="border my-10 border-gray-300 rounded-lg p-4 max-w-md mx-auto bg-white shadow-md"
+      className="border my-10 relative border-gray-300 rounded-lg p-4 max-w-md mx-auto bg-white shadow-md"
     >
+      <div className="absolute -left-5 ">
+        <Lottie options={defaultOptions} height={400} width={400} />
+      </div>
       <h1 className="text-lg font-semibold text-center border-b pb-2 mb-4">
         Customer Receipt
       </h1>
@@ -109,9 +112,7 @@ const FinalReceipt = () => {
           made.
         </p>
       </div>
-      <div className="absolute flex items-center justify-center">
-        <Lottie options={defaultOptions} height={400} width={400} />
-      </div>
+
       <button
         onClick={handlePrint}
         className="w-full py-3 exclude cursor-pointer bg-black text-xl mt-5 text-white rounded-md"
