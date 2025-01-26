@@ -91,7 +91,7 @@ const FinalReceipt = () => {
       </div>
       <h1 className="my-5 text-lg font-medium">Fabric/Design Details</h1>
       {selections?.cart?.map((fabric) => (
-        <div className="flex items-start gap-5">
+        <div className="flex mb-2 items-start gap-5">
           <img className="w-24 rounded-md" src={fabric.img} alt={fabric.name} />
           <div>
             <p className="text-slate-800 font-medium">{fabric.name}</p>
