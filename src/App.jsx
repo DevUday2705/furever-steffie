@@ -9,14 +9,16 @@ import ModernOptions from "./Components/ModernOptions";
 import Cart from "./Components/Cart";
 import CartNav from "./Components/CartNav";
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
-        <img src="/images/logo.jpg" className="h-8" alt="logo" />
+        <Link to="/">
+          <img src="/images/logo.jpg" className="h-8" alt="logo" />
+        </Link>
         <CartNav />
       </nav>
       <div className="px-10 max-w-md mx-auto">
