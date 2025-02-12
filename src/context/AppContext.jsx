@@ -10,10 +10,10 @@ export const AppProvider = ({ children }) => {
     gender: "",
     style: "",
     pet: "",
-    id: "",
-    size: "xs",
-    cart: [],
     customerData: {},
+    variant: null,
+    price: "",
+    size: "",
   });
 
   // Function to update selections

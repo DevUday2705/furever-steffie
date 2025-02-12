@@ -19,7 +19,7 @@ const App = () => {
         <Link to="/">
           <img src="/images/logo.jpg" className="h-8" alt="logo" />
         </Link>
-        <CartNav />
+        {/* <CartNav /> */}
       </nav>
       <div className="px-10 max-w-md mx-auto">
         <Routes>

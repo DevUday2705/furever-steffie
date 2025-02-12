@@ -31,7 +31,7 @@ const FabricOptions = () => {
             <div className="h-64 w-full">
               <img
                 className="h-full w-full object-cover rounded-2xl"
-                src={item.img}
+                src={item.image}
                 alt={item.id}
               />
             </div>

@@ -11,12 +11,12 @@ const CartNav = () => {
     updateSelections(
       "cart",
       actionType === "add"
-        ? selections.cart.map((cartItem) =>
+        ? selections?.cart.map((cartItem) =>
             cartItem.id === item.id
               ? { ...cartItem, qty: cartItem.qty + 1 }
               : cartItem
           )
-        : selections.cart.map((cartItem) =>
+        : selections?.cart.map((cartItem) =>
             cartItem.id === item.id
               ? { ...cartItem, qty: Math.max(1, cartItem.qty - 1) }
               : cartItem
@@ -27,7 +27,7 @@ const CartNav = () => {
   const handleRemoveFromCart = (itemId) => {
     updateSelections(
       "cart",
-      selections.cart.filter((item) => item.id !== itemId)
+      selections?.cart.filter((item) => item.id !== itemId)
     );
   };
 
@@ -37,7 +37,7 @@ const CartNav = () => {
   };
 
   const calculateTotal = () => {
-    return selections.cart
+    return selections?.cart
       .reduce((total, item) => total + parseFloat(item.price) * item.qty, 0)
       .toFixed(2);
   };
@@ -50,11 +50,6 @@ const CartNav = () => {
         className="h-8 cursor-pointer"
         alt="logo"
       />
-      {selections.cart.length > 0 && (
-        <div className="absolute -top-1 -right-1 bg-black text-white h-5 w-5 text-sm flex items-center justify-center rounded-full">
-          {selections.cart.length}
-        </div>
-      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -88,7 +83,7 @@ const CartNav = () => {
               </div>
 
               {/* Cart Items */}
-              {selections.cart.length === 0 ? (
+              {selections?.cart.length === 0 ? (
                 <div className="text-center text-gray-500 mt-10">
                   Your cart is empty
                 </div>
@@ -138,7 +133,7 @@ const CartNav = () => {
               )}
 
               {/* Cart Summary */}
-              {selections.cart.length > 0 && (
+              {selections?.cart.length > 0 && (
                 <div className="mt-6">
                   <div className="flex justify-between mb-4">
                     <span className="font-semibold">Total</span>

@@ -1,53 +1,81 @@
-export const traditionalOptions = [
-    {
-        id: 1,
-        name: "Golden Paw Kurta",
-        price: "799",
-        img: "/images/1.webp",
-    },
-    {
-        id: 2,
-        name: "Sunny Tail Kurta",
-        price: "799",
-        img: "/images/2.webp",
-    },
-    {
-        id: 3,
-        name: "Furever Sunshine",
-        price: "799",
-        img: "/images/3.webp",
-    },
-    {
-        id: 4,
-        name: "Lemon Glow Kurta",
-        price: "799",
-        img: "/images/4.webp",
-    },
-    {
-        id: 5,
-        name: "Sunbeam Chic",
-        price: "799",
-        img: "/images/5.webp",
-    },
-    {
-        id: 6,
-        name: "Woof Attire",
-        price: "799",
-        img: "/images/6.webp",
-    },
-    {
-        id: 7,
-        name: "Pawfect Yellow",
-        price: "799",
-        img: "/images/7.webp",
-    },
-    {
-        id: 8,
-        name: "Bright Pup Kurta",
-        price: "799",
-        img: "/images/8.webp",
-    },
-];
+export const traditionalOptions = [{
+    id: 1,
+    name: "Golden Paw Kurta",
+    price: "799",
+    image: "/images/1/1.jpg",
+    description: "Traditional ethnic wear with modern twist",
+    variants: [
+        {
+            id: "1-2",
+            name: "Pure Cotton",
+            image: "/images/1/2.jpg",
+            price: "999",
+            sizes: [
+                { size: "S", inStock: true, price: "999" },
+                { size: "M", inStock: true, price: "999" },
+                { size: "L", inStock: true, price: "1049" },
+                { size: "XL", inStock: true, price: "1049" }
+            ]
+        },
+        {
+            id: "1-3",
+            name: "Silk Blend",
+            image: "/images/1/3.jpg",
+            price: "1299",
+            sizes: [
+                { size: "S", inStock: true, price: "1299" },
+                { size: "M", inStock: true, price: "1299" },
+                { size: "L", inStock: true, price: "1349" },
+                { size: "XL", inStock: true, price: "1349" }
+            ]
+        }
+    ],
+    sizes: [
+        { size: "S", inStock: true, price: "799" },
+        { size: "M", inStock: true, price: "799" },
+        { size: "L", inStock: true, price: "849" },
+        { size: "XL", inStock: false, price: "849" }
+    ],
+},
+{
+    id: 2,
+    name: "Royal Sherwani",
+    price: "999",
+    image: "/images/2/1.jpg",
+    description: "Elegant ethnic sherwani for special occasions",
+    variants: [
+        {
+            id: "2-2",
+            name: "Premium Cotton",
+            image: "/images/2/2.jpg",
+            price: "1199",
+            sizes: [
+                { size: "S", inStock: true, price: "1199" },
+                { size: "M", inStock: true, price: "1199" },
+                { size: "L", inStock: true, price: "1249" },
+                { size: "XL", inStock: true, price: "1249" }
+            ]
+        },
+        {
+            id: "2-3",
+            name: "Brocade Blend",
+            image: "/images/2/3.jpg",
+            price: "1499",
+            sizes: [
+                { size: "S", inStock: true, price: "1499" },
+                { size: "M", inStock: true, price: "1499" },
+                { size: "L", inStock: false, price: "1549" },
+                { size: "XL", inStock: true, price: "1549" }
+            ]
+        }
+    ],
+    sizes: [
+        { size: "S", inStock: true, price: "999" },
+        { size: "M", inStock: true, price: "999" },
+        { size: "L", inStock: true, price: "1049" },
+        { size: "XL", inStock: true, price: "1049" }
+    ],
+}]
 
 
 export const containerVariants = {

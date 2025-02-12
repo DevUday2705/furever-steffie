@@ -3,12 +3,15 @@ import { useAppContext } from "../hooks/useAppContext";
 import { traditionalOptions } from "../constants/constant";
 import { toPng } from "html-to-image";
 import confetti from "../../public/animation/confetti.json";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
 import Lottie from "react-lottie";
 const FinalReceipt = () => {
   const { selections } = useAppContext();
   const receiptRef = useRef(null);
   const { id } = useParams();
+
+  const product = traditionalOptions.find((p) => p.id == selections.id);
 
   const handlePrint = () => {
     if (receiptRef.current) {
@@ -30,10 +33,7 @@ const FinalReceipt = () => {
         });
     }
   };
-  console.log(selections);
-  const fabric = traditionalOptions.filter(
-    (item) => item.id == selections.id
-  )[0];
+
   const defaultOptions = {
     loop: false,
     autoplay: true,
@@ -42,6 +42,7 @@ const FinalReceipt = () => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
+
   return (
     <div
       ref={receiptRef}
@@ -50,11 +51,13 @@ const FinalReceipt = () => {
       <div className="absolute -left-5 ">
         <Lottie options={defaultOptions} height={400} width={400} />
       </div>
-      <h1 className="text-lg font-semibold text-center border-b pb-2 mb-4">
-        Customer Receipt
+      <h1 className="text-lg flex items-center justify-between font-bold uppercase text-center border-b pb-2 mb-4">
+        <span>Customer Receipt</span>
+        <span>1</span>
       </h1>
+      <div></div>
       <h1 className="mb-5 text-lg font-medium">Customer Details</h1>
-      <div className="grid text-sm text-slate-800 grid-cols-[150px_auto] gap-y-2">
+      <div className="grid text-sm text-slate-800 grid-cols-[150px_auto] gap-y-2 ">
         <h1 className="font-medium">Name:</h1>
         <h1 className="font-semibold text-slate-800">
           {selections.customerData.fullName}
@@ -74,9 +77,33 @@ const FinalReceipt = () => {
         <h1 className="font-semibold text-slate-800">
           {selections.customerData.alternateNumber}
         </h1>
+        <h1 className="font-medium">Ordered On:</h1>
+
+        <h1 className="font-semibold text-slate-800">
+          {new Date()
+            .toLocaleString("en-IN", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour12: false,
+            })
+            .replace(",", "")}
+        </h1>
+        <h1 className="font-medium">Expected Delivery:</h1>
+
+        <h1 className="font-semibold text-red-600">
+          {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleString(
+            "en-IN",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          )}
+        </h1>
       </div>
       <h1 className="my-5 text-lg font-medium">Pet Measurements</h1>
-      <div className="grid text-sm text-slate-800 grid-cols-[150px_auto] gap-y-2">
+      <div className="grid text-sm text-slate-800 grid-cols-[150px_auto] gap-y-2 pb-5 border-b">
         <h1 className="font-medium">Neck:</h1>
         <h1 className="font-semibold text-slate-800">
           {selections.customerData.neck} Inches
@@ -92,27 +119,40 @@ const FinalReceipt = () => {
           {selections.customerData.length} Inches
         </h1>
       </div>
-      <h1 className="my-5 text-lg font-medium">Fabric/Design Details</h1>
-      {selections?.cart?.map((fabric) => (
-        <div className="flex mb-2 items-start gap-5">
-          <img className="w-24 rounded-md" src={fabric.img} alt={fabric.name} />
-          <div>
-            <p className="text-slate-800 font-medium">{fabric.name}</p>
-            <p className="font-medium text-green-600">Rs.{fabric.price}/-</p>
-          </div>
+
+      <div className="flex my-2 mt-5 items-start gap-5">
+        <img
+          className="w-24 rounded-md"
+          src={selections?.variant?.image}
+          alt={product?.variant?.name}
+        />
+        <div>
+          <p className="text-slate-800 font-medium">
+            {selections?.variant?.name}
+          </p>
+          <p className="text-slate-800 font-medium">{selections?.size}</p>
+          <p className="font-medium text-green-600">Rs.{selections?.price}/-</p>
         </div>
-      ))}
+      </div>
+
       <div className="bg-amber-100 mt-2 text-sm p-2 rounded-md text-slate-800">
         <p className="font-medium mb-1">Important Information About Delivery</p>
         <p>
-          Once the order is placed, The outfit gets stitched within a day or two
-          and then dispatched to courier services, It usually gets delivered
-          within 2-3 days all over India. So, you can expect to get the order
-          delivered within 5-6 days (Stitching + Shipping) after the payment is
-          made.
+          You can expect to get your order stitched and delivered within 5-6
+          days after payment.
         </p>
       </div>
-
+      <h1 className="mt-2 flex items-center">
+        Need help? Drop me a message on Whatsapp{" "}
+        <a
+          href="https://wa.me/918828145667"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center cursor-pointer shrink-0 justify-center w-8 h-8 rounded-full hover:bg-green-600 transition-colors"
+        >
+          <img src="/images/wa.png" className="h-10 w-full shrink-0" />
+        </a>
+      </h1>
       <button
         onClick={handlePrint}
         className="w-full py-3 exclude cursor-pointer bg-black text-xl mt-5 text-white rounded-md"
