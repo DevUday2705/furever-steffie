@@ -9,21 +9,21 @@ const MobileHeroCarousel = () => {
   const slides = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8",
+      image: "/images/hero-1.jpeg",
       title: "Summer Collection",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1445205170230-053b83016050",
+      image: "/images/hero-2.jpeg",
       title: "Autumn Essentials",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b",
+      image: "/images/hero-3.jpeg",
       title: "Premium Basics",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
