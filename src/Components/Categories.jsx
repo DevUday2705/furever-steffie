@@ -11,7 +11,7 @@ const Categories = () => {
     {
       id: 1,
       name: "Tuxedo",
-      description: "Classic & Modern Fits",
+      description: "Classic Fits",
       image: "/images/cat-1.jpeg",
     },
     {
