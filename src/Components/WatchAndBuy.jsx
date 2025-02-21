@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 const WatchAndBuy = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState({});
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [constraints, setConstraints] = useState({ left: 0, right: 0 });
   const dragX = useMotionValue(0);
 
   const products = [
@@ -37,8 +37,31 @@ const WatchAndBuy = () => {
 
   const videoRefs = useRef({});
   const containerRef = useRef(null);
+  const carouselRef = useRef(null);
+
+  // Calculate drag constraints based on container and carousel width
+  const updateConstraints = () => {
+    if (containerRef.current && carouselRef.current) {
+      const containerWidth = containerRef.current.offsetWidth;
+      const carouselWidth = carouselRef.current.scrollWidth;
+      const maxDrag = containerWidth - carouselWidth;
+
+      setConstraints({
+        left: Math.min(maxDrag, 0), // Ensure we don't allow drag if content fits
+        right: 0,
+      });
+
+      // Reset position if we're beyond the new constraints
+      if (currentIndex > products.length - Math.floor(containerWidth / 200)) {
+        setCurrentIndex(
+          Math.max(0, products.length - Math.floor(containerWidth / 200))
+        );
+      }
+    }
+  };
 
   useEffect(() => {
+    // Initialize videos
     products.forEach((product) => {
       if (videoRefs.current[product.id]) {
         videoRefs.current[product.id].play();
@@ -46,9 +69,16 @@ const WatchAndBuy = () => {
       }
     });
 
-    if (containerRef.current) {
-      setContainerWidth(containerRef.current.offsetWidth);
-    }
+    // Initial constraint calculation
+    updateConstraints();
+
+    // Update constraints on resize
+    const handleResize = () => {
+      updateConstraints();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleVideoPlay = (productId) => {
@@ -62,8 +92,12 @@ const WatchAndBuy = () => {
   };
 
   const nextSlide = () => {
-    if (currentIndex < products.length - 2) {
-      setCurrentIndex(currentIndex + 1);
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const visibleItems = Math.floor(containerWidth / 200); // Approximate item width
+    const maxIndex = Math.max(0, products.length - visibleItems);
+
+    if (currentIndex < maxIndex) {
+      setCurrentIndex(Math.min(currentIndex + 1, maxIndex));
     }
   };
 
@@ -76,16 +110,18 @@ const WatchAndBuy = () => {
   const handleDragEnd = (_, info) => {
     const threshold = 50;
     if (Math.abs(info.velocity.x) > threshold) {
-      if (info.velocity.x > 0) {
+      if (info.velocity.x > 0 && currentIndex > 0) {
         prevSlide();
-      } else {
+      } else if (info.velocity.x < 0 && currentIndex < products.length - 2) {
         nextSlide();
       }
     }
   };
 
+  const containerWidth = containerRef.current?.offsetWidth || 0;
+  const visibleItems = Math.floor(containerWidth / 200);
   const isAtStart = currentIndex === 0;
-  const isAtEnd = currentIndex >= products.length - 2;
+  const isAtEnd = currentIndex >= Math.max(0, products.length - visibleItems);
   return (
     <section className="py-8 bg-gray-50">
       <div className="container mx-auto px-4" ref={containerRef}>
@@ -97,11 +133,11 @@ const WatchAndBuy = () => {
               onClick={prevSlide}
               disabled={isAtStart}
               className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 
-              ${
-                isAtStart
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
+            ${
+              isAtStart
+                ? "opacity-50 cursor-not-allowed bg-gray-50"
+                : "hover:bg-gray-50 cursor-pointer"
+            }`}
             >
               <ChevronLeft
                 className={`w-4 h-4 ${
@@ -113,11 +149,11 @@ const WatchAndBuy = () => {
               onClick={nextSlide}
               disabled={isAtEnd}
               className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200
-              ${
-                isAtEnd
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
+            ${
+              isAtEnd
+                ? "opacity-50 cursor-not-allowed bg-gray-50"
+                : "hover:bg-gray-50 cursor-pointer"
+            }`}
             >
               <ChevronRight
                 className={`w-4 h-4 ${
@@ -131,17 +167,15 @@ const WatchAndBuy = () => {
         {/* Video Carousel */}
         <div className="relative overflow-hidden">
           <motion.div
+            ref={carouselRef}
             className="flex gap-3"
             style={{ x: dragX }}
             drag="x"
-            dragConstraints={{
-              left: -containerWidth * (products.length - 2),
-              right: 0,
-            }}
+            dragConstraints={constraints}
             dragElastic={0.1}
             onDragEnd={handleDragEnd}
             animate={{
-              x: `-${currentIndex * 100}%`,
+              x: `-${currentIndex * (containerWidth / visibleItems)}px`,
             }}
             transition={{
               type: "spring",
