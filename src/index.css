@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@import "@fontsource/hind-vadodara";
+
+body {
+  font-family: "Hind Vadodara", sans-serif;
+}
