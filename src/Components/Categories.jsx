@@ -12,25 +12,25 @@ const Categories = () => {
       id: 1,
       name: "Tuxedo",
       description: "Classic & Modern Fits",
-      image: "https://images.unsplash.com/photo-1555069519-127aadedf1ee",
+      image: "/images/cat-1.jpeg",
     },
     {
       id: 2,
       name: "Sherwani",
       description: "Traditional Elegance",
-      image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f",
+      image: "/images/cat-2.jpeg",
     },
     {
       id: 3,
       name: "Kurta",
       description: "Contemporary Styles",
-      image: "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0",
+      image: "/images/cat-3.jpeg",
     },
     {
       id: 4,
       name: "Bandana",
       description: "Trendy Accessories",
-      image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083",
+      image: "/images/cat-4.jpeg",
     },
   ];
 
