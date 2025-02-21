@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useAnimation, useDragControls } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Categories = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const controls = useAnimation();
+  const dragControls = useDragControls();
 
   const categories = [
     {
@@ -33,20 +35,38 @@ const Categories = () => {
   ];
 
   const nextSlide = () => {
-    if (currentIndex < categories.length - 1) {
+    if (currentIndex < categories.length - 2) {
       setCurrentIndex(currentIndex + 1);
+      controls.start({ x: `-${(currentIndex + 1) * 50}%` });
     }
   };
 
   const prevSlide = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+      controls.start({ x: `-${(currentIndex - 1) * 50}%` });
     }
   };
 
-  // Check if we're at the boundaries
+  const handleDragEnd = (event, info) => {
+    const swipeThreshold = 50;
+    if (Math.abs(info.offset.x) > swipeThreshold) {
+      if (info.offset.x > 0 && currentIndex > 0) {
+        prevSlide();
+      } else if (info.offset.x < 0 && currentIndex < categories.length - 2) {
+        nextSlide();
+      } else {
+        // Snap back if at the ends
+        controls.start({ x: `-${currentIndex * 50}%` });
+      }
+    } else {
+      // Snap back if swipe wasn't strong enough
+      controls.start({ x: `-${currentIndex * 50}%` });
+    }
+  };
+
   const isAtStart = currentIndex === 0;
-  const isAtEnd = currentIndex === categories.length - 1;
+  const isAtEnd = currentIndex === categories.length - 2;
 
   return (
     <section className="py-12 bg-white">
@@ -93,10 +113,18 @@ const Categories = () => {
         {/* Carousel Container */}
         <div className="relative overflow-hidden">
           <motion.div
-            className="flex gap-4"
-            animate={{
-              x: `-${currentIndex * 100}%`,
+            className="flex gap-4 cursor-grab active:cursor-grabbing"
+            animate={controls}
+            initial={{ x: 0 }}
+            drag="x"
+            dragControls={dragControls}
+            dragConstraints={{
+              left: -((categories.length - 2) * 50),
+              right: 0,
             }}
+            dragElastic={0.1}
+            dragMomentum={false}
+            onDragEnd={handleDragEnd}
             transition={{
               type: "spring",
               stiffness: 300,
@@ -106,7 +134,7 @@ const Categories = () => {
             {categories.map((category, index) => (
               <motion.div
                 key={category.id}
-                className="min-w-full md:min-w-[60%] lg:min-w-[40%]"
+                className="min-w-[calc(50%-8px)]" // Exactly 2 slides with gap consideration
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
@@ -150,10 +178,13 @@ const Categories = () => {
 
         {/* Mobile Pagination Dots */}
         <div className="flex justify-center gap-2 mt-6 md:hidden">
-          {categories.map((_, index) => (
+          {[...Array(categories.length - 1)].map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => {
+                setCurrentIndex(index);
+                controls.start({ x: `-${index * 50}%` });
+              }}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                 index === currentIndex ? "bg-black w-4" : "bg-gray-300"
               }`}
