@@ -123,7 +123,7 @@ const WatchAndBuy = () => {
   const isAtStart = currentIndex === 0;
   const isAtEnd = currentIndex >= Math.max(0, products.length - visibleItems);
   return (
-    <section className="py-8 bg-gray-50">
+    <section className="pb-8 bg-gray-50">
       <div className="container mx-auto px-4" ref={containerRef}>
         {/* Section Header */}
         <div className="flex justify-between items-center mb-6">
