@@ -1,4 +1,5 @@
 import SelectPet from "./Components/SelectPet";
+import MobileHeroCarousel from "./Components/MobileHeroCarousel";
 import SelectGender from "./Components/SelectGender";
 import SelectStyle from "./Components/SelectStyle";
 import FabricOptions from "./Components/FabricOptions";
@@ -11,19 +12,17 @@ import CartNav from "./Components/CartNav";
 
 import { Routes, Route, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import Home from "./Components/Home";
 
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
-        <Link to="/">
-          <img src="/images/logo.jpg" className="h-8" alt="logo" />
-        </Link>
         {/* <CartNav /> */}
       </nav>
-      <div className="px-10 max-w-md mx-auto">
+      <div className="max-w-md mx-auto">
         <Routes>
-          <Route path="/" element={<SelectPet />} />
+          <Route path="/" element={<Home />} />
           <Route path="/gender" element={<SelectGender />} />
           <Route path="/style" element={<SelectStyle />} />
           <Route path="/traditional" element={<FabricOptions />} />
