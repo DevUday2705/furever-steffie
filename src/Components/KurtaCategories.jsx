@@ -17,25 +17,25 @@ const KurtaCategories = () => {
   const categories = [
     {
       id: 1,
-      name: "Solid Kurtas",
+      name: "Solid",
       description: "Timeless elegance in pure colors",
       image: "/images/kur-1.webp",
     },
     {
       id: 2,
-      name: "Printed Fabric",
+      name: "Printed",
       description: "Bold patterns & modern designs",
       image: "/images/kur-2.jpg",
     },
     {
       id: 3,
-      name: "Brocade Fabric",
+      name: "Brocade",
       description: "Rich traditional patterns",
       image: "/images/kur-3.avif",
     },
     {
       id: 4,
-      name: "Full Work Fabric",
+      name: "Full Work",
       description: "Intricately detailed designs",
       image: "/images/kur-4.jpg",
     },
@@ -192,9 +192,7 @@ const KurtaCategories = () => {
 
                   <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform group-hover:translate-y-[-8px] transition-transform duration-300">
                     <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
-                    <p className="text-gray-200 text-sm mb-4 opacity-90">
-                      {category.description}
-                    </p>
+
                     <motion.button
                       className="inline-flex items-center bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
                              transform opacity-0 group-hover:opacity-100 translate-y-4 
@@ -202,7 +200,7 @@ const KurtaCategories = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Explore Collection
+                      Explore
                     </motion.button>
                   </div>
                 </div>
