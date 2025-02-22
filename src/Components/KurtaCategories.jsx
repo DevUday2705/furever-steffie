@@ -84,85 +84,59 @@ const KurtaCategories = () => {
 
   return (
     <div className="bg-white">
-      {/* Hero Section with Carousel */}
-      <section className="pt-8 ">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Explore Kurta Styles
-            </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={scrollPrev}
-                disabled={!canScrollPrev}
-                className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 
-              ${
-                !canScrollPrev
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
-              >
-                <ChevronLeft
-                  className={`w-5 h-5 ${
-                    !canScrollPrev ? "text-gray-400" : "text-gray-600"
-                  }`}
-                />
-              </button>
-              <button
-                onClick={scrollNext}
-                disabled={!canScrollNext}
-                className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200
-              ${
-                !canScrollNext
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
-              >
-                <ChevronRight
-                  className={`w-5 h-5 ${
-                    !canScrollNext ? "text-gray-400" : "text-gray-600"
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
+      <section className="relative h-[500px] overflow-hidden rounded-lg">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="/images/kur-1.webp"
+            alt="Kurta Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
+        </div>
 
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-6">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  className="min-w-[300px] sm:min-w-[400px] flex-shrink-0"
-                >
-                  <motion.div
-                    className="relative group cursor-pointer rounded-2xl overflow-hidden"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="relative h-[200px] sm:h-[450px]">
-                      <img
-                        src={category.image}
-                        alt={category.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-xl font-bold mb-1">
-                        {category.name}
-                      </h3>
-                      <p className="text-gray-200 text-sm">
-                        {category.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                </div>
-              ))}
-            </div>
+        {/* Content */}
+        <div className="container mx-auto px-4 h-full">
+          <div className="relative h-full flex flex-col justify-end pb-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-2xl text-white"
+            >
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                Kurta Collection
+              </h1>
+              <p className="text-lg md:text-xl text-gray-200 mb-8">
+                Explore our handcrafted kurtas, blending tradition with modern
+                elegance.
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-black px-8 py-3 rounded-full text-sm font-medium inline-flex items-center 
+                         hover:bg-gray-100 transition-colors duration-200"
+              >
+                Explore Collection
+              </motion.button>
+            </motion.div>
           </div>
         </div>
-      </section>
 
+        {/* Optional: Design Elements */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-b from-white/10 to-transparent blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 1 }}
+          className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-t from-black/20 to-transparent blur-3xl"
+        />
+      </section>
       {/* Featured Categories Grid */}
       <section className="py-5 bg-gray-50">
         <div className="container mx-auto px-4">

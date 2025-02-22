@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Categories = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -92,7 +93,9 @@ const Categories = () => {
     },
     [emblaApi]
   );
-
+  const generateSlug = (name) => {
+    return name.toLowerCase().replace(/\s+/g, "-");
+  };
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
@@ -143,7 +146,10 @@ const Categories = () => {
                 key={category.id}
                 className="min-w-[calc(50%-8px)] w-[calc(50%-8px)] flex-shrink-0"
               >
-                <div className="relative group cursor-pointer">
+                <Link
+                  to={`/${generateSlug(category.name)}`}
+                  className="block relative group cursor-pointer"
+                >
                   <div className="relative h-[300px] rounded-2xl overflow-hidden">
                     <img
                       src={category.image}
@@ -164,17 +170,17 @@ const Categories = () => {
                       {category.description}
                     </p>
 
-                    <motion.button
-                      className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
+                    <motion.span
+                      className="inline-block bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
                                opacity-0 group-hover:opacity-100 transform translate-y-4 
                                group-hover:translate-y-0 transition-all duration-300"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       Shop Now
-                    </motion.button>
+                    </motion.span>
                   </motion.div>
-                </div>
+                </Link>
               </div>
             ))}
           </div>
