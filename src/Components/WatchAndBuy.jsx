@@ -1,19 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion, useMotionValue } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { motion } from "framer-motion";
 
 const WatchAndBuy = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    dragFree: true,
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
   const [isPlaying, setIsPlaying] = useState({});
-  const [constraints, setConstraints] = useState({ left: 0, right: 0 });
-  const dragX = useMotionValue(0);
+  const videoRefs = useRef({});
 
   const products = [
     {
       id: 1,
       name: "Classic Black Tuxedo",
       price: 12999,
-      video: "/videos/vid-1.mp4", // This would be your actual video path
+      video: "/videos/vid-1.mp4",
     },
     {
       id: 2,
@@ -35,50 +42,42 @@ const WatchAndBuy = () => {
     },
   ];
 
-  const videoRefs = useRef({});
-  const containerRef = useRef(null);
-  const carouselRef = useRef(null);
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
-  // Calculate drag constraints based on container and carousel width
-  const updateConstraints = () => {
-    if (containerRef.current && carouselRef.current) {
-      const containerWidth = containerRef.current.offsetWidth;
-      const carouselWidth = carouselRef.current.scrollWidth;
-      const maxDrag = containerWidth - carouselWidth;
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
-      setConstraints({
-        left: Math.min(maxDrag, 0), // Ensure we don't allow drag if content fits
-        right: 0,
-      });
-
-      // Reset position if we're beyond the new constraints
-      if (currentIndex > products.length - Math.floor(containerWidth / 200)) {
-        setCurrentIndex(
-          Math.max(0, products.length - Math.floor(containerWidth / 200))
-        );
-      }
-    }
-  };
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
 
   useEffect(() => {
-    // Initialize videos
+    if (!emblaApi) return;
+
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  // Initialize videos
+  useEffect(() => {
     products.forEach((product) => {
       if (videoRefs.current[product.id]) {
         videoRefs.current[product.id].play();
         setIsPlaying((prev) => ({ ...prev, [product.id]: true }));
       }
     });
-
-    // Initial constraint calculation
-    updateConstraints();
-
-    // Update constraints on resize
-    const handleResize = () => {
-      updateConstraints();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleVideoPlay = (productId) => {
@@ -91,73 +90,42 @@ const WatchAndBuy = () => {
     }
   };
 
-  const nextSlide = () => {
-    const containerWidth = containerRef.current?.offsetWidth || 0;
-    const visibleItems = Math.floor(containerWidth / 200); // Approximate item width
-    const maxIndex = Math.max(0, products.length - visibleItems);
-
-    if (currentIndex < maxIndex) {
-      setCurrentIndex(Math.min(currentIndex + 1, maxIndex));
-    }
-  };
-
-  const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  const handleDragEnd = (_, info) => {
-    const threshold = 50;
-    if (Math.abs(info.velocity.x) > threshold) {
-      if (info.velocity.x > 0 && currentIndex > 0) {
-        prevSlide();
-      } else if (info.velocity.x < 0 && currentIndex < products.length - 2) {
-        nextSlide();
-      }
-    }
-  };
-
-  const containerWidth = containerRef.current?.offsetWidth || 0;
-  const visibleItems = Math.floor(containerWidth / 200);
-  const isAtStart = currentIndex === 0;
-  const isAtEnd = currentIndex >= Math.max(0, products.length - visibleItems);
   return (
     <section className="pb-8 bg-gray-50">
-      <div className="container mx-auto px-4" ref={containerRef}>
+      <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Watch & Buy</h2>
           <div className="flex gap-2">
             <button
-              onClick={prevSlide}
-              disabled={isAtStart}
+              onClick={scrollPrev}
+              disabled={!canScrollPrev}
               className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 
-            ${
-              isAtStart
-                ? "opacity-50 cursor-not-allowed bg-gray-50"
-                : "hover:bg-gray-50 cursor-pointer"
-            }`}
+                ${
+                  !canScrollPrev
+                    ? "opacity-50 cursor-not-allowed bg-gray-50"
+                    : "hover:bg-gray-50 cursor-pointer"
+                }`}
             >
               <ChevronLeft
                 className={`w-4 h-4 ${
-                  isAtStart ? "text-gray-400" : "text-gray-600"
+                  !canScrollPrev ? "text-gray-400" : "text-gray-600"
                 }`}
               />
             </button>
             <button
-              onClick={nextSlide}
-              disabled={isAtEnd}
+              onClick={scrollNext}
+              disabled={!canScrollNext}
               className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200
-            ${
-              isAtEnd
-                ? "opacity-50 cursor-not-allowed bg-gray-50"
-                : "hover:bg-gray-50 cursor-pointer"
-            }`}
+                ${
+                  !canScrollNext
+                    ? "opacity-50 cursor-not-allowed bg-gray-50"
+                    : "hover:bg-gray-50 cursor-pointer"
+                }`}
             >
               <ChevronRight
                 className={`w-4 h-4 ${
-                  isAtEnd ? "text-gray-400" : "text-gray-600"
+                  !canScrollNext ? "text-gray-400" : "text-gray-600"
                 }`}
               />
             </button>
@@ -165,28 +133,12 @@ const WatchAndBuy = () => {
         </div>
 
         {/* Video Carousel */}
-        <div className="relative overflow-hidden">
-          <motion.div
-            ref={carouselRef}
-            className="flex gap-3"
-            style={{ x: dragX }}
-            drag="x"
-            dragConstraints={constraints}
-            dragElastic={0.1}
-            onDragEnd={handleDragEnd}
-            animate={{
-              x: `-${currentIndex * (containerWidth / visibleItems)}px`,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 30,
-            }}
-          >
+        <div className="relative overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-3">
             {products.map((product) => (
               <motion.div
                 key={product.id}
-                className="min-w-[160px] sm:min-w-[180px] md:min-w-[200px]"
+                className="min-w-[160px] sm:min-w-[180px] md:min-w-[200px] flex-grow-0 flex-shrink-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -230,7 +182,7 @@ const WatchAndBuy = () => {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
