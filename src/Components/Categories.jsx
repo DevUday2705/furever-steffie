@@ -19,25 +19,25 @@ const Categories = () => {
       id: 1,
       name: "Tuxedo",
       description: "Classic Fits",
-      image: "/images/cat-1.jpeg",
+      image: "/images/cat-1.webp",
     },
     {
       id: 2,
       name: "Sherwani",
       description: "Traditional Elegance",
-      image: "/images/cat-2.jpeg",
+      image: "/images/cat-2.webp",
     },
     {
       id: 3,
       name: "Kurta",
       description: "Contemporary Styles",
-      image: "/images/cat-3.jpeg",
+      image: "/images/cat-3.webp",
     },
     {
       id: 4,
       name: "Bandana",
       description: "Trendy Accessories",
-      image: "/images/cat-4.jpeg",
+      image: "/images/cat-4.webp",
     },
   ];
 
