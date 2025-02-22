@@ -156,7 +156,7 @@ const KurtaCategories = () => {
                 className="group cursor-pointer"
                 variants={item}
               >
-                <div className="relative h-[400px] rounded-2xl overflow-hidden">
+                <div className="relative h-[300px] rounded-2xl overflow-hidden">
                   <img
                     src={category.image}
                     alt={category.name}
