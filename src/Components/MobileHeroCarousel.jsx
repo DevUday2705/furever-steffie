@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 const MobileHeroCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const slides = [
     {
@@ -29,142 +29,77 @@ const MobileHeroCarousel = () => {
       cta: "View Collection",
     },
   ];
-  const slideVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        x: { type: "spring", stiffness: 200, damping: 25 },
-        opacity: { duration: 0.4 },
-      },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%",
-      opacity: 0,
-      transition: {
-        x: { type: "spring", stiffness: 200, damping: 25 },
-        opacity: { duration: 0.4 },
-      },
-    }),
-  };
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
-  const contentVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 0.3,
-      },
-    },
-  };
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
-  const dragConstraints = {
-    left: 0,
-    right: 0,
-  };
-
-  const paginate = (newDirection) => {
-    setDirection(newDirection);
-    setCurrentIndex((prevIndex) => {
-      let nextIndex = prevIndex + newDirection;
-      if (nextIndex < 0) nextIndex = slides.length - 1;
-      if (nextIndex >= slides.length) nextIndex = 0;
-      return nextIndex;
-    });
-  };
-
-  const handleDragEnd = (_, info) => {
-    const threshold = 50;
-    if (Math.abs(info.offset.x) > threshold) {
-      if (info.offset.x > 0) {
-        paginate(-1);
-      } else {
-        paginate(1);
-      }
-    }
-  };
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      paginate(1);
+    if (!emblaApi) return;
+
+    onSelect();
+    emblaApi.on("select", onSelect);
+
+    // Auto-play
+    const autoplayInterval = setInterval(() => {
+      emblaApi.scrollNext();
     }, 5000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => {
+      emblaApi.off("select", onSelect);
+      clearInterval(autoplayInterval);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <section className="w-full bg-gray-900 rounded-md">
-      <div className="relative w-full h-[60vh] overflow-hidden">
-        <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.div
-            key={currentIndex}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            drag="x"
-            dragConstraints={dragConstraints}
-            dragElastic={0.7}
-            onDragEnd={handleDragEnd}
-            className="absolute w-full h-full"
-          >
-            <div className="relative w-full h-full">
-              <motion.img
-                src={slides[currentIndex].image}
-                alt={slides[currentIndex].title}
-                className="w-full h-full object-cover rounded-md"
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8 }}
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-md" />
-
-              <motion.div
-                variants={contentVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="absolute bottom-0 left-0 right-0 p-6 rounded-md"
-                key={`content-${currentIndex}`}
-              >
-                <h2 className="text-3xl font-bold mb-2 text-white">
-                  {slides[currentIndex].title}
-                </h2>
-                <p className="text-base mb-4 text-gray-200">
-                  {slides[currentIndex].subtitle}
-                </p>
-                <button className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
-                  {slides[currentIndex].cta}
-                </button>
-              </motion.div>
+      <div className="relative w-full h-[60vh] overflow-hidden" ref={emblaRef}>
+        <div className="flex h-full touch-pan-y">
+          {slides.map((slide) => (
+            <div
+              key={slide.id}
+              className="flex-[0_0_100%] min-w-0 relative h-full transition-opacity duration-300"
+            >
+              <div className="relative w-full h-full">
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-full h-full object-cover rounded-md"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-md" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 rounded-md">
+                  <h2 className="text-3xl font-bold mb-2 text-white">
+                    {slide.title}
+                  </h2>
+                  <p className="text-base mb-4 text-gray-200">
+                    {slide.subtitle}
+                  </p>
+                  <button className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+                    {slide.cta}
+                  </button>
+                </div>
+              </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          ))}
+        </div>
 
         <button
           className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white z-10"
-          onClick={() => paginate(-1)}
+          onClick={scrollPrev}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white z-10"
-          onClick={() => paginate(1)}
+          onClick={scrollNext}
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -173,12 +108,9 @@ const MobileHeroCarousel = () => {
           {slides.map((_, index) => (
             <button
               key={index}
-              onClick={() => {
-                setDirection(index > currentIndex ? 1 : -1);
-                setCurrentIndex(index);
-              }}
+              onClick={() => emblaApi?.scrollTo(index)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-white w-4" : "bg-white/50"
+                index === selectedIndex ? "bg-white w-4" : "bg-white/50"
               }`}
             />
           ))}
