@@ -9,21 +9,21 @@ const MobileHeroCarousel = () => {
   const slides = [
     {
       id: 1,
-      image: "/images/hero-1.jpeg",
+      image: "/images/hero-1.webp",
       title: "Summer Collection",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
     },
     {
       id: 2,
-      image: "/images/hero-2.jpeg",
+      image: "/images/hero-2.webp",
       title: "Autumn Essentials",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
     },
     {
       id: 3,
-      image: "/images/hero-3.jpeg",
+      image: "/images/hero-3.webp",
       title: "Premium Basics",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
