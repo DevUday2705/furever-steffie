@@ -40,6 +40,12 @@ const Categories = () => {
       description: "Trendy Accessories",
       image: "/images/cat-4.webp",
     },
+    {
+      id: 5,
+      name: "Bow Tie",
+      description: "Suit Up!",
+      image: "/images/cat-5.webp",
+    },
   ];
 
   const scrollPrev = useCallback(() => {
