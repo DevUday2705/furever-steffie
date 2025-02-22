@@ -1,11 +1,18 @@
-import React, { useState } from "react";
-import { motion, useAnimation, useDragControls } from "framer-motion";
+import React, { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Categories = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const controls = useAnimation();
-  const dragControls = useDragControls();
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: true,
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
 
   const categories = [
     {
@@ -34,39 +41,33 @@ const Categories = () => {
     },
   ];
 
-  const nextSlide = () => {
-    if (currentIndex < categories.length - 2) {
-      setCurrentIndex(currentIndex + 1);
-      controls.start({ x: `-${(currentIndex + 1) * 50}%` });
-    }
-  };
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
-  const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      controls.start({ x: `-${(currentIndex - 1) * 50}%` });
-    }
-  };
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
-  const handleDragEnd = (event, info) => {
-    const swipeThreshold = 50;
-    if (Math.abs(info.offset.x) > swipeThreshold) {
-      if (info.offset.x > 0 && currentIndex > 0) {
-        prevSlide();
-      } else if (info.offset.x < 0 && currentIndex < categories.length - 2) {
-        nextSlide();
-      } else {
-        // Snap back if at the ends
-        controls.start({ x: `-${currentIndex * 50}%` });
-      }
-    } else {
-      // Snap back if swipe wasn't strong enough
-      controls.start({ x: `-${currentIndex * 50}%` });
-    }
-  };
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
 
-  const isAtStart = currentIndex === 0;
-  const isAtEnd = currentIndex === categories.length - 2;
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <section className="py-12 bg-white">
@@ -76,34 +77,34 @@ const Categories = () => {
           <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
           <div className="flex gap-2">
             <button
-              onClick={prevSlide}
-              disabled={isAtStart}
+              onClick={scrollPrev}
+              disabled={!canScrollPrev}
               className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 
-                ${
-                  isAtStart
-                    ? "opacity-50 cursor-not-allowed bg-gray-50"
-                    : "hover:bg-gray-50 cursor-pointer"
-                }`}
+              ${
+                !canScrollPrev
+                  ? "opacity-50 cursor-not-allowed bg-gray-50"
+                  : "hover:bg-gray-50 cursor-pointer"
+              }`}
             >
               <ChevronLeft
                 className={`w-5 h-5 ${
-                  isAtStart ? "text-gray-400" : "text-gray-600"
+                  !canScrollPrev ? "text-gray-400" : "text-gray-600"
                 }`}
               />
             </button>
             <button
-              onClick={nextSlide}
-              disabled={isAtEnd}
+              onClick={scrollNext}
+              disabled={!canScrollNext}
               className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200
-                ${
-                  isAtEnd
-                    ? "opacity-50 cursor-not-allowed bg-gray-50"
-                    : "hover:bg-gray-50 cursor-pointer"
-                }`}
+              ${
+                !canScrollNext
+                  ? "opacity-50 cursor-not-allowed bg-gray-50"
+                  : "hover:bg-gray-50 cursor-pointer"
+              }`}
             >
               <ChevronRight
                 className={`w-5 h-5 ${
-                  isAtEnd ? "text-gray-400" : "text-gray-600"
+                  !canScrollNext ? "text-gray-400" : "text-gray-600"
                 }`}
               />
             </button>
@@ -111,33 +112,12 @@ const Categories = () => {
         </div>
 
         {/* Carousel Container */}
-        <div className="relative overflow-hidden">
-          <motion.div
-            className="flex gap-4 cursor-grab active:cursor-grabbing"
-            animate={controls}
-            initial={{ x: 0 }}
-            drag="x"
-            dragControls={dragControls}
-            dragConstraints={{
-              left: -((categories.length - 2) * 50),
-              right: 0,
-            }}
-            dragElastic={0.1}
-            dragMomentum={false}
-            onDragEnd={handleDragEnd}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 30,
-            }}
-          >
+        <div className="relative overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-4 cursor-grab active:cursor-grabbing">
             {categories.map((category, index) => (
-              <motion.div
+              <div
                 key={category.id}
-                className="min-w-[calc(50%-8px)]" // Exactly 2 slides with gap consideration
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
+                className="min-w-[calc(50%-8px)] flex-grow-0 flex-shrink-0"
               >
                 <div className="relative group cursor-pointer">
                   <div className="relative h-[300px] rounded-2xl overflow-hidden">
@@ -162,8 +142,8 @@ const Categories = () => {
 
                     <motion.button
                       className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
-                               opacity-0 group-hover:opacity-100 transform translate-y-4 
-                               group-hover:translate-y-0 transition-all duration-300"
+                             opacity-0 group-hover:opacity-100 transform translate-y-4 
+                             group-hover:translate-y-0 transition-all duration-300"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -171,9 +151,9 @@ const Categories = () => {
                     </motion.button>
                   </motion.div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
 
         {/* Mobile Pagination Dots */}
@@ -181,12 +161,9 @@ const Categories = () => {
           {[...Array(categories.length - 1)].map((_, index) => (
             <button
               key={index}
-              onClick={() => {
-                setCurrentIndex(index);
-                controls.start({ x: `-${index * 50}%` });
-              }}
+              onClick={() => emblaApi?.scrollTo(index)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-black w-4" : "bg-gray-300"
+                index === selectedIndex ? "bg-black w-4" : "bg-gray-300"
               }`}
             />
           ))}
