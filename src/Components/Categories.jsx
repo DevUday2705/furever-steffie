@@ -52,7 +52,13 @@ const Categories = () => {
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
+    // Get the current scroll progress
+    const progress = emblaApi.scrollProgress();
+    // Calculate the selected index based on progress
+    // For 4 items showing 2 at a time, progress will be 0, 0.5, or 1
+    // Multiply by 2 to get 0, 1 for our dot index
+    const index = Math.round(progress * 2);
+    setSelectedIndex(index);
     setCanScrollPrev(emblaApi.canScrollPrev());
     setCanScrollNext(emblaApi.canScrollNext());
   }, [emblaApi]);
@@ -63,12 +69,23 @@ const Categories = () => {
     onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    emblaApi.on("scroll", onSelect);
 
     return () => {
       emblaApi.off("select", onSelect);
       emblaApi.off("reInit", onSelect);
+      emblaApi.off("scroll", onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  const scrollTo = useCallback(
+    (index) => {
+      if (!emblaApi) return;
+      // Convert dot index to slide index (multiply by 2 since we show 2 slides at a time)
+      emblaApi.scrollTo(index * 2);
+    },
+    [emblaApi]
+  );
 
   return (
     <section className="py-12 bg-white">
@@ -157,16 +174,14 @@ const Categories = () => {
           </div>
         </div>
 
-        {/* Mobile Pagination Dots */}
+        {/* Pagination Dots */}
         <div className="flex justify-center gap-2 mt-6">
           {[...Array(Math.ceil(categories.length / 2))].map((_, index) => (
             <button
               key={index}
-              onClick={() => emblaApi?.scrollTo(index * 2)}
+              onClick={() => scrollTo(index)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                Math.floor(selectedIndex / 2) === index
-                  ? "bg-black w-4"
-                  : "bg-gray-300"
+                selectedIndex === index ? "bg-black w-4" : "bg-gray-300"
               }`}
             />
           ))}
