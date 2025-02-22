@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 
 const Categories = () => {
@@ -75,16 +75,16 @@ const Categories = () => {
         {/* Section Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
-          <div className="flex gap-2">
+          <div className="hidden md:flex gap-2">
             <button
               onClick={scrollPrev}
               disabled={!canScrollPrev}
               className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 
-              ${
-                !canScrollPrev
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
+            ${
+              !canScrollPrev
+                ? "opacity-50 cursor-not-allowed bg-gray-50"
+                : "hover:bg-gray-50 cursor-pointer"
+            }`}
             >
               <ChevronLeft
                 className={`w-5 h-5 ${
@@ -96,11 +96,11 @@ const Categories = () => {
               onClick={scrollNext}
               disabled={!canScrollNext}
               className={`w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200
-              ${
-                !canScrollNext
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50 cursor-pointer"
-              }`}
+            ${
+              !canScrollNext
+                ? "opacity-50 cursor-not-allowed bg-gray-50"
+                : "hover:bg-gray-50 cursor-pointer"
+            }`}
             >
               <ChevronRight
                 className={`w-5 h-5 ${
@@ -113,14 +113,14 @@ const Categories = () => {
 
         {/* Carousel Container */}
         <div className="relative overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-4 cursor-grab active:cursor-grabbing">
-            {categories.map((category, index) => (
+          <div className="flex gap-4">
+            {categories.map((category) => (
               <div
                 key={category.id}
-                className="min-w-[calc(50%-8px)] flex-grow-0 flex-shrink-0"
+                className="min-w-[280px] md:min-w-[calc(50%-8px)] w-full flex-shrink-0"
               >
                 <div className="relative group cursor-pointer">
-                  <div className="relative h-[300px] rounded-2xl overflow-hidden">
+                  <div className="relative h-[400px] md:h-[300px] rounded-2xl overflow-hidden">
                     <img
                       src={category.image}
                       alt={category.name}
@@ -158,7 +158,7 @@ const Categories = () => {
 
         {/* Mobile Pagination Dots */}
         <div className="flex justify-center gap-2 mt-6 md:hidden">
-          {[...Array(categories.length - 1)].map((_, index) => (
+          {categories.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
