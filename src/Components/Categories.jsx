@@ -17,6 +17,12 @@ const Categories = () => {
 
   const categories = [
     {
+      id: 3,
+      name: "Kurta",
+      description: "Contemporary Styles",
+      image: "/images/cat-1.jpg",
+    },
+    {
       id: 1,
       name: "Tuxedo",
       description: "Classic Fits",
@@ -27,12 +33,6 @@ const Categories = () => {
       name: "Sherwani",
       description: "Traditional Elegance",
       image: "/images/cat-2.webp",
-    },
-    {
-      id: 3,
-      name: "Kurta",
-      description: "Contemporary Styles",
-      image: "/images/cat-3.webp",
     },
     {
       id: 4,

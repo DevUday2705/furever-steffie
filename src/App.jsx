@@ -7,6 +7,7 @@ import SelectedFabric from "./Components/SelectedFabric";
 import OrderForm from "./Components/OrderForm";
 import FinalReceipt from "./Components/FinalReceipt";
 import ModernOptions from "./Components/ModernOptions";
+import KurtaCategories from "./Components/KurtaCategories";
 import Cart from "./Components/Cart";
 import CartNav from "./Components/CartNav";
 
@@ -23,6 +24,7 @@ const App = () => {
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/kurta" element={<KurtaCategories />} />
           <Route path="/gender" element={<SelectGender />} />
           <Route path="/style" element={<SelectStyle />} />
           <Route path="/traditional" element={<FabricOptions />} />
