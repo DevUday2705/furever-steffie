@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, Check, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 import { productData } from "../constants/constant";
 // This would normally be fetched from an API
 
@@ -18,12 +18,6 @@ const ProductDetail = () => {
 
   // Images based on beaded/non-beaded selection
   const [images, setImages] = useState([]);
-
-  // Option validation state
-  const [validationMessages, setValidationMessages] = useState({
-    beaded: "",
-    fullSet: "",
-  });
 
   useEffect(() => {
     // Simulate API fetch for product details
@@ -66,48 +60,6 @@ const ProductDetail = () => {
     }
   }, [isBeaded, product]);
 
-  // Handle option validation based on multiple conditions
-  useEffect(() => {
-    if (!product) return;
-
-    const newValidationMessages = {
-      beaded: "",
-      fullSet: "",
-    };
-
-    // Enforce rules based on conditions:
-
-    // For Solid Kurtas Category - If Full Set selected, then Simple should be disabled
-    if (product.category === "solid-kurta" && isFullSet && !isBeaded) {
-      setIsBeaded(true); // Auto-select beaded option
-      newValidationMessages.beaded =
-        "For Full Set, you must select Hand Work option. Simple is not available.";
-    }
-
-    // For Full Work Kurta category - Simple option is never available
-    if (product.category === "full-work-kurta" && !isBeaded) {
-      setIsBeaded(true); // Auto-select beaded option
-      newValidationMessages.beaded =
-        "This product is only available with Hand Work option.";
-    }
-
-    // For Premium category - Kurta Only option is not available
-    if (product.category === "premium" && !isFullSet) {
-      setIsFullSet(true); // Auto-select full set
-      newValidationMessages.fullSet =
-        "Premium designs are only available as Full Set.";
-    }
-
-    // For Festive category - If Simple selected, Full Set is not available
-    if (product.category === "festive" && !isBeaded && isFullSet) {
-      setIsFullSet(false); // Auto-select kurta only
-      newValidationMessages.fullSet =
-        "Simple option is only available as Kurta Only.";
-    }
-
-    setValidationMessages(newValidationMessages);
-  }, [isBeaded, isFullSet, product]);
-
   // Calculate price based on all selections
   const calculatePrice = () => {
     if (!product) return 0;
@@ -128,43 +80,10 @@ const ProductDetail = () => {
     return price;
   };
 
-  // Check if beaded/simple option should be disabled
-  const isSimpleDisabled = () => {
-    if (!product) return false;
-
-    // Case 1: If product is in "full work kurta" category
-    if (product.category === "full-work-kurtas") {
-      return true;
-    }
-
-    // Case 2: If product is in solid kurta category and full set is selected
-    if (product.category === "solid-kurtas" && isFullSet) {
-      return true;
-    }
-
-    return false;
-  };
-
-  // Check if full set/kurta only option should be disabled
-  const isKurtaOnlyDisabled = () => {
-    if (!product) return false;
-    // lOGIC TO MAKE KURTA ONLY DISABLED
-    return false;
-  };
-
-  // Check if full set option should be disabled
-  const isFullSetDisabled = () => {
-    if (!product) return false;
-
-    // lOGIC TO MAKE FULL SET DISABLED
-
-    return false;
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
       </div>
     );
   }
@@ -176,10 +95,13 @@ const ProductDetail = () => {
           <h2 className="text-2xl font-bold text-gray-800">
             Product Not Found
           </h2>
-          <p className="mt-2 text-gray-800">
+          <p className="mt-2 text-gray-600">
             The product you're looking for doesn't exist.
           </p>
-          <Link to="/" className="mt-4 inline-block text-gray-800 font-medium">
+          <Link
+            to="/"
+            className="mt-4 inline-block text-purple-600 font-medium"
+          >
             Return to Home
           </Link>
         </div>
@@ -191,7 +113,24 @@ const ProductDetail = () => {
     navigate(-1); // Go back to previous page in history
   };
 
-  console.log(isSimpleDisabled(), product);
+  const isSimpleDisabled = () => {
+    // Case 1: If product is in "full work kurta" category
+    if (product.category === "full-work-kurta") {
+      return true;
+    }
+
+    // Case 2: If product is in solid kurta category and full set is selected
+    if (product.category === "solid-kurta" && isFullSet) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isKurtaOnlyDisabled = () => {
+    // Add your business logic here if needed
+    return false;
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -200,7 +139,7 @@ const ProductDetail = () => {
         <div className="container mx-auto px-3 py-3">
           <button
             onClick={handleGoBack}
-            className="inline-flex items-center text-gray-800"
+            className="inline-flex items-center text-gray-600"
           >
             <ChevronLeft size={18} />
             <span className="ml-1 text-sm">Back</span>
@@ -217,7 +156,7 @@ const ProductDetail = () => {
                 key={currentImage}
                 src={images[currentImage]}
                 alt={product.name}
-                className="absolute w-full h-full object-cover"
+                className="absolute w-full h-full object-cover rounded-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -249,7 +188,7 @@ const ProductDetail = () => {
 
           {/* Product Info */}
           <div className="p-4">
-            <div className="text-xs font-medium text-gray-800">
+            <div className="text-xs font-medium text-gray-600">
               {product.subcategory}
             </div>
             <h1 className="text-xl font-bold text-gray-800 mt-1">
@@ -263,7 +202,7 @@ const ProductDetail = () => {
             </div>
 
             <div className="mt-3">
-              <p className="text-sm text-gray-800">{product.description}</p>
+              <p className="text-sm text-gray-600">{product.description}</p>
             </div>
 
             {/* Options */}
@@ -283,32 +222,16 @@ const ProductDetail = () => {
                     Hand Work
                   </button>
                   <button
-                    onClick={() => !isSimpleDisabled() && setIsBeaded(false)}
+                    onClick={() => setIsBeaded(false)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isBeaded
                         ? "bg-gray-100 text-gray-800 border border-gray-800"
                         : "bg-gray-100 text-gray-800 border border-gray-200"
-                    } ${
-                      isSimpleDisabled()
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
                     }`}
                   >
                     Simple
                   </button>
                 </div>
-
-                {/* Validation message for beaded/simple option */}
-                {validationMessages.beaded && (
-                  <div className="mt-1.5 flex items-start">
-                    <div className="flex-shrink-0 mt-0.5 text-amber-500">
-                      <AlertTriangle size={14} />
-                    </div>
-                    <p className="ml-1.5 text-xs text-amber-600">
-                      {validationMessages.beaded}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Set Type Selection */}
@@ -318,48 +241,26 @@ const ProductDetail = () => {
                 </h3>
                 <div className="mt-1 flex space-x-2">
                   <button
-                    onClick={() =>
-                      !isKurtaOnlyDisabled() && setIsFullSet(false)
-                    }
+                    onClick={() => setIsFullSet(false)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isFullSet
-                        ? "bg-white text-gray-800 border border-gray-800"
-                        : "bg-white text-gray-800 border border-gray-200"
-                    } ${
-                      isKurtaOnlyDisabled()
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
+                        ? "bg-gray-100 text-gray-800 border border-gray-800"
+                        : "bg-gray-100 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Kurta
                   </button>
                   <button
-                    onClick={() => !isFullSetDisabled() && setIsFullSet(true)}
+                    onClick={() => setIsFullSet(true)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       isFullSet
-                        ? "bg-white text-gray-800 border border-gray-800"
-                        : "bg-white text-gray-800 border border-gray-200"
-                    } ${
-                      isFullSetDisabled()
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
+                        ? "bg-gray-100 text-gray-800 border border-gray-800"
+                        : "bg-gray-100 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Full Set
                   </button>
                 </div>
-
-                {/* Validation message for full set/kurta option */}
-                {validationMessages.fullSet && (
-                  <div className="mt-1.5 flex items-start">
-                    <div className="flex-shrink-0 mt-0.5 text-amber-500">
-                      <AlertTriangle size={14} />
-                    </div>
-                    <p className="ml-1.5 text-xs text-amber-600">
-                      {validationMessages.fullSet}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Size Selection */}
@@ -376,7 +277,7 @@ const ProductDetail = () => {
                       className={`flex items-center justify-center py-1.5 text-xs font-medium rounded-md ${
                         selectedSize === size
                           ? "bg-gray-800 text-white"
-                          : "bg-white text-gray-800"
+                          : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {size}
@@ -410,6 +311,8 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Quantity */}
             </div>
           </div>
         </div>
