@@ -134,16 +134,13 @@ const ProductDetail = () => {
 
     // Case 1: If product is in "full work kurta" category
     if (product.category === "full-work-kurtas") {
+      setIsBeaded(true);
       return true;
     }
 
     // Case 2: If product is in solid kurta category and full set is selected
     if (product.category === "solid-kurtas" && isFullSet) {
-      return true;
-    }
-
-    // Case 3: If product is in premium category
-    if (product.category === "premium") {
+      setIsBeaded(true);
       return true;
     }
 
@@ -153,17 +150,7 @@ const ProductDetail = () => {
   // Check if full set/kurta only option should be disabled
   const isKurtaOnlyDisabled = () => {
     if (!product) return false;
-
-    // Case 1: If product is in premium category
-    if (product.category === "premium") {
-      return true;
-    }
-
-    // Case 2: For festive category with simple option
-    if (product.category === "festive" && !isBeaded) {
-      return true;
-    }
-
+    // lOGIC TO MAKE KURTA ONLY DISABLED
     return false;
   };
 
@@ -171,10 +158,7 @@ const ProductDetail = () => {
   const isFullSetDisabled = () => {
     if (!product) return false;
 
-    // For festive category - If Simple selected, Full Set is not available
-    if (product.category === "festive" && !isBeaded) {
-      return true;
-    }
+    // lOGIC TO MAKE FULL SET DISABLED
 
     return false;
   };
@@ -294,7 +278,7 @@ const ProductDetail = () => {
                     onClick={() => setIsBeaded(true)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       isBeaded
-                        ? "bg-gray-100 text-gray-800 border border-gray-300"
+                        ? "bg-gray-100 text-gray-800 border border-gray-800"
                         : "bg-gray-100 text-gray-800 border border-gray-200"
                     }`}
                   >
@@ -304,7 +288,7 @@ const ProductDetail = () => {
                     onClick={() => !isSimpleDisabled() && setIsBeaded(false)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isBeaded
-                        ? "bg-gray-100 text-gray-800 border border-gray-300"
+                        ? "bg-gray-100 text-gray-800 border border-gray-800"
                         : "bg-gray-100 text-gray-800 border border-gray-200"
                     } ${
                       isSimpleDisabled()
@@ -341,8 +325,8 @@ const ProductDetail = () => {
                     }
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isFullSet
-                        ? "bg-gray-100 text-gray-800 border border-gray-300"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-white text-gray-800 border border-gray-800"
+                        : "bg-white text-gray-800 border border-gray-200"
                     } ${
                       isKurtaOnlyDisabled()
                         ? "opacity-50 cursor-not-allowed"
@@ -355,8 +339,8 @@ const ProductDetail = () => {
                     onClick={() => !isFullSetDisabled() && setIsFullSet(true)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       isFullSet
-                        ? "bg-gray-100 text-gray-800 border border-gray-300"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-white text-gray-800 border border-gray-800"
+                        : "bg-white text-gray-800 border border-gray-200"
                     } ${
                       isFullSetDisabled()
                         ? "opacity-50 cursor-not-allowed"
@@ -394,7 +378,7 @@ const ProductDetail = () => {
                       className={`flex items-center justify-center py-1.5 text-xs font-medium rounded-md ${
                         selectedSize === size
                           ? "bg-gray-800 text-white"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-white text-gray-800"
                       }`}
                     >
                       {size}
