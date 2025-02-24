@@ -134,13 +134,11 @@ const ProductDetail = () => {
 
     // Case 1: If product is in "full work kurta" category
     if (product.category === "full-work-kurtas") {
-      setIsBeaded(true);
       return true;
     }
 
     // Case 2: If product is in solid kurta category and full set is selected
     if (product.category === "solid-kurtas" && isFullSet) {
-      setIsBeaded(true);
       return true;
     }
 

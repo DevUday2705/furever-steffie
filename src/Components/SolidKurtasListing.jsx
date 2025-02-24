@@ -111,7 +111,7 @@ const SolidKurtasListing = () => {
 
                     <div className="mt-2 flex justify-end">
                       <motion.span
-                        className="text-purple-600 font-medium text-xs"
+                        className="text-gray-600 font-medium text-xs"
                         whileHover={{ x: 2 }}
                       >
                         View Details →
