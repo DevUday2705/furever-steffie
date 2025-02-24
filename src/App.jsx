@@ -1,5 +1,3 @@
-import SelectPet from "./Components/SelectPet";
-import MobileHeroCarousel from "./Components/MobileHeroCarousel";
 import SelectGender from "./Components/SelectGender";
 import SelectStyle from "./Components/SelectStyle";
 import FabricOptions from "./Components/FabricOptions";
@@ -8,12 +6,16 @@ import OrderForm from "./Components/OrderForm";
 import FinalReceipt from "./Components/FinalReceipt";
 import ModernOptions from "./Components/ModernOptions";
 import KurtaCategories from "./Components/KurtaCategories";
+import SolidKurtasListing from "./Components/SolidKurtasListing";
+import ProductDetail from "./Components/ProductDetail";
 import Cart from "./Components/Cart";
-import CartNav from "./Components/CartNav";
 
 import { Routes, Route, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home";
+import PrintedKurtasListing from "./Components/PrintedKurtasListing";
+import BrocadeKurtasListing from "./Components/BrocadeKurtasListing";
+import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
 
 const App = () => {
   return (
@@ -25,6 +27,11 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/kurta" element={<KurtaCategories />} />
+          <Route path="/solid-kurtas" element={<SolidKurtasListing />} />
+          <Route path="/printed-kurtas" element={<PrintedKurtasListing />} />
+          <Route path="/brocade-kurtas" element={<BrocadeKurtasListing />} />
+          <Route path="/full-work-kurtas" element={<FullWorkKurtasListing />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/gender" element={<SelectGender />} />
           <Route path="/style" element={<SelectStyle />} />
           <Route path="/traditional" element={<FabricOptions />} />

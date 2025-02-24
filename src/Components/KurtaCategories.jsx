@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const KurtaCategories = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -20,24 +21,28 @@ const KurtaCategories = () => {
       name: "Solid",
       description: "Timeless elegance in pure colors",
       image: "/images/kur-1.webp",
+      url: "/solid-kurtas",
     },
     {
       id: 2,
       name: "Printed",
       description: "Bold patterns & modern designs",
       image: "/images/kur-2.jpg",
+      url: "/printed-kurtas",
     },
     {
       id: 3,
       name: "Brocade",
       description: "Rich traditional patterns",
       image: "/images/kur-3.avif",
+      url: "/brocade-kurtas",
     },
     {
       id: 4,
       name: "Full Work",
       description: "Intricately detailed designs",
       image: "/images/kur-4.jpg",
+      url: "/full-work-kurtas",
     },
   ];
 
@@ -72,14 +77,23 @@ const KurtaCategories = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: 0.2, // Increased from 0.1 for smoother staggering
+        duration: 0.8,
+        ease: "easeOut",
       },
     },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8, // Increased duration
+        ease: "easeOut", // Smoother easing function
+      },
+    },
   };
 
   return (
@@ -99,9 +113,12 @@ const KurtaCategories = () => {
         <div className="container mx-auto px-4 h-full">
           <div className="relative h-full flex flex-col justify-end pb-10">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{
+                duration: 1.2, // Increased duration
+                ease: "easeOut", // Smoother easing
+              }}
               className="max-w-2xl text-white"
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -112,10 +129,13 @@ const KurtaCategories = () => {
                 elegance.
               </p>
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.3, ease: "easeOut" },
+                }}
+                whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
                 className="bg-white text-black px-8 py-3 rounded-full text-sm font-medium inline-flex items-center 
-                         hover:bg-gray-100 transition-colors duration-200"
+                       hover:bg-gray-100 transition-colors duration-200"
               >
                 Explore Collection
               </motion.button>
@@ -127,16 +147,17 @@ const KurtaCategories = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
+          transition={{ delay: 0.8, duration: 1.5, ease: "easeOut" }}
           className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-b from-white/10 to-transparent blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 1 }}
+          transition={{ delay: 1, duration: 1.5, ease: "easeOut" }}
           className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-t from-black/20 to-transparent blur-3xl"
         />
       </section>
+
       {/* Featured Categories Grid */}
       <section className="py-5 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -156,28 +177,39 @@ const KurtaCategories = () => {
                 className="group cursor-pointer"
                 variants={item}
               >
-                <div className="relative h-[300px] rounded-2xl overflow-hidden">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                <Link to={category.url}>
+                  <div className="relative h-[300px] rounded-2xl overflow-hidden">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" // Increased duration
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform group-hover:translate-y-[-8px] transition-transform duration-300">
-                    <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
-
-                    <motion.button
-                      className="inline-flex items-center bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
-                             transform opacity-0 group-hover:opacity-100 translate-y-4 
-                             group-hover:translate-y-0 transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Explore
-                    </motion.button>
+                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform group-hover:translate-y-[-8px] transition-transform duration-500">
+                      {" "}
+                      {/* Increased duration */}
+                      <h3 className="text-2xl font-bold mb-2">
+                        {category.name}
+                      </h3>
+                      <motion.button
+                        className="inline-flex items-center bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
+                           transform opacity-0 group-hover:opacity-100 translate-y-4 
+                           group-hover:translate-y-0 transition-all duration-500" // Increased duration
+                        whileHover={{
+                          scale: 1.05,
+                          transition: { duration: 0.3, ease: "easeOut" },
+                        }}
+                        whileTap={{
+                          scale: 0.98,
+                          transition: { duration: 0.1 },
+                        }}
+                      >
+                        Explore
+                      </motion.button>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </motion.div>
