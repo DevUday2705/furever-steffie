@@ -109,7 +109,7 @@ const ProductDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <img src="/animation/paws-loading.gif" alt="loading" />
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-700"></div>
       </div>
     );
   }
@@ -173,15 +173,14 @@ const ProductDetail = () => {
           </div>
 
           {/* Carousel Dots */}
-          <div className="flex justify-center py-3">
+          <div className="flex justify-center gap-x-2 py-3">
             {scrollSnaps.map((_, index) => (
               <button
                 key={index}
-                className={`w-2 h-2 mx-1 rounded-full ${
-                  index === selectedIndex ? "bg-gray-800" : "bg-gray-300"
+                onClick={() => emblaApi?.scrollTo(index)}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  index === selectedIndex ? "bg-black w-4" : "bg-black/50"
                 }`}
-                onClick={() => scrollTo(index)}
-                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
