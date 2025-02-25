@@ -16,6 +16,8 @@ import Home from "./Components/Home";
 import PrintedKurtasListing from "./Components/PrintedKurtasListing";
 import BrocadeKurtasListing from "./Components/BrocadeKurtasListing";
 import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
+import OrderReviewPage from "./Components/OrderReviewPage";
+import CheckoutPage from "./Components/CheckoutPage";
 
 const App = () => {
   return (
@@ -32,6 +34,8 @@ const App = () => {
           <Route path="/brocade-kurtas" element={<BrocadeKurtasListing />} />
           <Route path="/full-work-kurtas" element={<FullWorkKurtasListing />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
+          <Route path="/review" element={<OrderReviewPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/gender" element={<SelectGender />} />
           <Route path="/style" element={<SelectStyle />} />
           <Route path="/traditional" element={<FabricOptions />} />

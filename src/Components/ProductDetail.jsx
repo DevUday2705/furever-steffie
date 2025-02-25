@@ -388,6 +388,24 @@ const ProductDetail = () => {
         <motion.button
           className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
           whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            // Create order details object with all selected options
+            const orderDetails = {
+              productId: product.id,
+              name: product.name,
+              subcategory: product.subcategory,
+              isBeaded: isBeaded,
+              isFullSet: isFullSet,
+              selectedSize: selectedSize,
+              price: calculatePrice(),
+              image: images[0], // Pass the first image as the primary image
+            };
+
+            // Navigate to review page with the order details
+            navigate("/review", {
+              state: { orderDetails },
+            });
+          }}
         >
           Buy Now • ₹{calculatePrice()}
         </motion.button>
