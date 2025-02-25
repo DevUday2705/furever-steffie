@@ -619,7 +619,7 @@ const CheckoutPage = () => {
                           {/* Replace with actual QR code */}
                           <div className="w-48 h-48 bg-gray-100 flex items-center justify-center border">
                             <img
-                              src="/images/sample-qr.png"
+                              src="/images/barcode.jpg"
                               alt="UPI QR Code"
                               className="max-w-full max-h-full"
                             />
