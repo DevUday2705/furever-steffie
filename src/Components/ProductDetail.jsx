@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import { productData } from "../constants/constant";
-// This would normally be fetched from an API
+import useEmblaCarousel from "embla-carousel-react";
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentImage, setCurrentImage] = useState(0);
   const navigate = useNavigate();
+
   // User selections
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
@@ -18,6 +18,33 @@ const ProductDetail = () => {
 
   // Images based on beaded/non-beaded selection
   const [images, setImages] = useState([]);
+
+  // Embla carousel setup
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState([]);
+
+  const scrollTo = useCallback(
+    (index) => emblaApi && emblaApi.scrollTo(index),
+    [emblaApi]
+  );
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    onSelect();
+    setScrollSnaps(emblaApi.scrollSnapList());
+    emblaApi.on("select", onSelect);
+
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   useEffect(() => {
     // Simulate API fetch for product details
@@ -56,7 +83,6 @@ const ProductDetail = () => {
           ? product.options.beaded.images
           : product.options.nonBeaded.images
       );
-      setCurrentImage(0); // Reset to first image on option change
     }
   }, [isBeaded, product]);
 
@@ -83,7 +109,7 @@ const ProductDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <img src="/animation/paws-loading.gif" alt="loading" />
       </div>
     );
   }
@@ -113,27 +139,8 @@ const ProductDetail = () => {
     navigate(-1); // Go back to previous page in history
   };
 
-  const isSimpleDisabled = () => {
-    // Case 1: If product is in "full work kurta" category
-    if (product.category === "full-work-kurta") {
-      return true;
-    }
-
-    // Case 2: If product is in solid kurta category and full set is selected
-    if (product.category === "solid-kurta" && isFullSet) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const isKurtaOnlyDisabled = () => {
-    // Add your business logic here if needed
-    return false;
-  };
-
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen pb-20">
       {/* Navigation */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-3 py-3">
@@ -146,43 +153,36 @@ const ProductDetail = () => {
           </button>
         </div>
       </div>
+
       {/* Product Detail */}
-      <div className="container mx-auto px-3 pt-2 pb-6">
+      <div className="container mx-auto px-3 pt-2 pb-12">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {/* Product Images */}
-          <div className="relative pb-[100%]">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={currentImage}
-                src={images[currentImage]}
-                alt={product.name}
-                className="absolute w-full h-full object-cover rounded-lg"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            </AnimatePresence>
+          {/* Embla Carousel */}
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {images.map((image, index) => (
+                <div className="min-w-full relative pb-[100%]" key={index}>
+                  <img
+                    src={image}
+                    alt={`${product.name} - View ${index + 1}`}
+                    className="absolute w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Thumbnail Navigation */}
-          <div className="flex p-2 space-x-2 overflow-x-auto">
-            {images.map((img, index) => (
+          {/* Carousel Dots */}
+          <div className="flex justify-center py-3">
+            {scrollSnaps.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentImage(index)}
-                className={`w-14 h-14 flex-shrink-0 rounded-md overflow-hidden border-2 ${
-                  currentImage === index
-                    ? "border-gray-500"
-                    : "border-transparent"
+                className={`w-2 h-2 mx-1 rounded-full ${
+                  index === selectedIndex ? "bg-gray-800" : "bg-gray-300"
                 }`}
-              >
-                <img
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
+                onClick={() => scrollTo(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
             ))}
           </div>
 
@@ -215,8 +215,8 @@ const ProductDetail = () => {
                     onClick={() => setIsBeaded(true)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       isBeaded
-                        ? "bg-gray-100 text-gray-800 border border-gray-800"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-gray-50 text-gray-800 border border-gray-800"
+                        : "bg-gray-50 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Hand Work
@@ -225,8 +225,8 @@ const ProductDetail = () => {
                     onClick={() => setIsBeaded(false)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isBeaded
-                        ? "bg-gray-100 text-gray-800 border border-gray-800"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-gray-50 text-gray-800 border border-gray-800"
+                        : "bg-gray-50 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Simple
@@ -244,8 +244,8 @@ const ProductDetail = () => {
                     onClick={() => setIsFullSet(false)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       !isFullSet
-                        ? "bg-gray-100 text-gray-800 border border-gray-800"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-gray-50 text-gray-800 border border-gray-800"
+                        : "bg-gray-50 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Kurta
@@ -254,8 +254,8 @@ const ProductDetail = () => {
                     onClick={() => setIsFullSet(true)}
                     className={`py-1.5 px-3 rounded-md text-sm ${
                       isFullSet
-                        ? "bg-gray-100 text-gray-800 border border-gray-800"
-                        : "bg-gray-100 text-gray-800 border border-gray-200"
+                        ? "bg-gray-50 text-gray-800 border border-gray-800"
+                        : "bg-gray-50 text-gray-800 border border-gray-200"
                     }`}
                   >
                     Full Set
@@ -277,7 +277,7 @@ const ProductDetail = () => {
                       className={`flex items-center justify-center py-1.5 text-xs font-medium rounded-md ${
                         selectedSize === size
                           ? "bg-gray-800 text-white"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-gray-50 text-gray-800"
                       }`}
                     >
                       {size}
@@ -301,25 +301,91 @@ const ProductDetail = () => {
                   <div className="mr-2 mt-0.5 text-gray-800">
                     <Check size={16} />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-xs font-medium text-gray-900">
                       Looking for a specific color?
                     </h3>
-                    <p className="mt-0.5 text-xs text-gray-500">
-                      Contact us to check availability of custom colors.
+                    <div className="mt-2 flex items-center">
+                      <input
+                        type="text"
+                        id="customColor"
+                        placeholder="Enter desired color"
+                        className="text-xs p-1.5 border border-gray-300 rounded-md mr-2 w-full"
+                      />
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const color =
+                            document.getElementById("customColor").value;
+                          const productName = product.name; // Replace with dynamic product name
+                          const productId = "123"; // Replace with dynamic product ID
+                          const message = `Hi! I'm interested in ${productName} (ID: ${productId}) in ${color} color. Is it available?`;
+                          const encodedMessage = encodeURIComponent(message);
+                          const whatsappNumber = "+918828145667"; // Replace with your WhatsApp number
+                          window.open(
+                            `https://wa.me/${whatsappNumber}?text=${encodedMessage}`,
+                            "_blank"
+                          );
+                        }}
+                        className="inline-flex shrink-0 items-center  text-white text-xs py-1.5 px-3 rounded-md"
+                      >
+                        <img className="h-7" src="/images/wssp.png" />
+                      </a>
+                    </div>
+                    <p className="mt-1.5 text-xs text-gray-500">
+                      We'll check availability and get back to you quickly.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Quantity */}
+              {/* Additional sections with plenty of space for new content */}
+              <div className="mt-8">
+                <h3 className="text-sm font-medium text-gray-900">
+                  Product Details
+                </h3>
+                <div className="mt-2 text-xs text-gray-600 space-y-2">
+                  <p>• Premium quality fabric for maximum comfort</p>
+                  <p>• Hand-stitched with attention to detail</p>
+                  <p>• Designed specifically for pets</p>
+                  <p>• Easy to put on and take off</p>
+                  <p>• Machine washable</p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-gray-900">
+                  Shipping Information
+                </h3>
+                <div className="mt-2 text-xs text-gray-600">
+                  <p>
+                    Free shipping on orders above ₹999. Standard delivery within
+                    3-5 business days.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-gray-900">
+                  Return Policy
+                </h3>
+                <div className="mt-2 text-xs text-gray-600">
+                  <p>
+                    Easy 7-day returns for unworn items. Please contact our
+                    customer service for more details.
+                  </p>
+                </div>
+              </div>
+
+              {/* Space for customer reviews */}
             </div>
           </div>
         </div>
       </div>
 
       {/* Fixed Add to Cart Button */}
-      <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3">
+      <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
         <motion.button
           className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
           whileTap={{ scale: 0.98 }}

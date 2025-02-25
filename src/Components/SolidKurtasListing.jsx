@@ -25,7 +25,7 @@ const SolidKurtasListing = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <img src="/animation/paws-loading.gif" alt="loading" />
       </div>
     );
   }
@@ -49,7 +49,9 @@ const SolidKurtasListing = () => {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-800">Solid Kurtas</h1>
+          <h1 className="text-2xl font-bold text-gray-800 capitalize">
+            SOLID KURTAS
+          </h1>
           <p className="text-sm text-gray-600 mt-1">
             Elegant solid color kurtas for your furry friend's special occasions
           </p>
@@ -97,15 +99,8 @@ const SolidKurtasListing = () => {
                     <div className="mt-1">
                       <div className="flex items-baseline">
                         <span className="text-base font-bold text-gray-800">
-                          ₹{defaultPrice}
+                          ₹{kurtaOnlyPrice}
                         </span>
-                        <span className="ml-1 text-xs font-medium text-gray-500">
-                          Set
-                        </span>
-                      </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        <span>₹{kurtaOnlyPrice}</span>{" "}
-                        <span className="ml-1">Kurta</span>
                       </div>
                     </div>
 
