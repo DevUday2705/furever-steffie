@@ -18,6 +18,7 @@ import BrocadeKurtasListing from "./Components/BrocadeKurtasListing";
 import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
 import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
+import UPIPayment from "./Components/UPIPayment";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
           <Route path="/order-form" element={<OrderForm />} />
           <Route path="/final-receipt" element={<FinalReceipt />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/payment" element={<UPIPayment />} />
         </Routes>
       </div>
       <Toaster />
