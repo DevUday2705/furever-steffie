@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const UPIPayment = ({
   orderTotal = 499,
   orderID = "12345",
-  upiID = "yourbusiness@upi",
+  upiID = "importantphotos1998-2@okaxis",
   businessName = "DogFashionIndia",
 }) => {
   const [showQR, setShowQR] = useState(false);
