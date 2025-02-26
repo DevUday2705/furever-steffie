@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check, AlertTriangle, Download } from "lucide-react";
 import { toPng } from "html-to-image";
+import UPIPayment from "./UPIPayment";
 
 const CheckoutPage = () => {
   const location = useLocation();
@@ -611,27 +612,10 @@ const CheckoutPage = () => {
 
                     <div className="space-y-4">
                       {/* UPI Payment */}
-                      <div className="border border-gray-200 rounded-md p-4">
-                        <h5 className="font-medium text-gray-800 mb-2">
-                          UPI Payment
-                        </h5>
-                        <div className="flex justify-center mb-3">
-                          {/* Replace with actual QR code */}
-                          <div className="w-48 h-48 bg-gray-100 flex items-center justify-center border">
-                            <img
-                              src="/images/barcode.jpg"
-                              alt="UPI QR Code"
-                              className="max-w-full max-h-full"
-                            />
-                          </div>
-                        </div>
-                        <div className="text-center text-sm text-gray-600 mb-2">
-                          Scan the QR code using any UPI app
-                        </div>
-                        <div className="text-center text-sm font-medium">
-                          UPI ID: yourshop@upi
-                        </div>
-                      </div>
+                      <UPIPayment
+                        orderTotal={calculateTotal()}
+                        orderID={orderId}
+                      />
 
                       {/* Bank Transfer */}
                       <div className="border border-gray-200 rounded-md p-4">
