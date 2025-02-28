@@ -19,6 +19,7 @@ import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
 import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
 import UPIPayment from "./Components/UPIPayment";
+import LoveMessage from "./Components/LoveMessage";
 
 const App = () => {
   return (
@@ -46,6 +47,7 @@ const App = () => {
           <Route path="/final-receipt" element={<FinalReceipt />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<UPIPayment />} />
+          <Route path="/love" element={<LoveMessage />} />
         </Routes>
       </div>
       <Toaster />
