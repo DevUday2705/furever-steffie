@@ -20,13 +20,19 @@ import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
 import UPIPayment from "./Components/UPIPayment";
 import LoveMessage from "./Components/LoveMessage";
-
+import SearchBar from "./Components/SearchBar";
+import { productData } from "../src/constants/constant";
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
         {/* <CartNav /> */}
       </nav>
+      <header className="sticky top-0 bg-white shadow-sm z-20">
+        <div className="container mx-auto py-3">
+          <SearchBar productData={productData} />
+        </div>
+      </header>
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
