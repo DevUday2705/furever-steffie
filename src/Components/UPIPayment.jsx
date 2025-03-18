@@ -5,7 +5,7 @@ const UPIPayment = ({
   orderTotal = 499,
   orderID = "12345",
   upiID = "importantphotos1998-2@okaxis",
-  businessName = "Furever Steffie",
+  businessName = "Important Photos",
 }) => {
   const [showQR, setShowQR] = useState(false);
 
