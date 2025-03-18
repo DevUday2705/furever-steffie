@@ -12,12 +12,20 @@ const UPIPayment = ({
   // Encode the parameters for the UPI deep link
   const encodedBusinessName = encodeURIComponent(businessName);
   const encodedNote = encodeURIComponent(`Order #${orderID}`);
-
+  const simpleLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=1.00`;
   // Create UPI deep links for various apps
-  const genericUpiLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal}&cu=INR&tn=${encodedNote}`;
-  const gpayLink = `gpay://upi/pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal}&cu=INR&tn=${encodedNote}`;
-  const phonepeLink = `phonepe://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal}&cu=INR&tn=${encodedNote}`;
-  const paytmLink = `paytmapp://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal}&cu=INR&tn=${encodedNote}`;
+  const genericUpiLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
+    2
+  )}&cu=INR&tn=${encodedNote}`;
+  const gpayLink = `gpay://upi/pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
+    2
+  )}&cu=INR&tn=${encodedNote}`;
+  const phonepeLink = `phonepe://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
+    2
+  )}&cu=INR&tn=${encodedNote}`;
+  const paytmLink = `paytmapp://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
+    2
+  )}&cu=INR&tn=${encodedNote}`;
 
   // Animation variants
   const containerVariants = {
@@ -94,7 +102,26 @@ const UPIPayment = ({
             </svg>
             Pay with Any UPI App
           </motion.button>
-
+          <motion.button
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center mb-3"
+            whileTap={{ scale: 0.95 }}
+            onClick={() => (window.location.href = simpleLink)}
+            variants={itemVariants}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M11 3a1 1 0 10-2 0v1.1A8.001 8.001 0 014.5 12a8 8 0 0011 7.5 1 1 0 00.5-1.9 6 6 0 100-12 1 1 0 00-.5-1.9V3z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Test Payment (₹1)
+          </motion.button>
           <div className="text-center text-sm text-gray-500 mb-3">
             - or pay using -
           </div>
