@@ -12,7 +12,7 @@ const TrendingProducts = () => {
       id: 2,
       name: "Premium Denim Jeans",
       price: 2499,
-      image: "/images/2/1.jpg",
+      image: "/images/1/2.jpg",
     },
     {
       id: 3,
