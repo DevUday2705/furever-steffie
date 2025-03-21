@@ -6,7 +6,7 @@ const TrendingProducts = () => {
       id: 1,
       name: "Classic Leather Jacket",
       price: 4999,
-      image: "/images/1/3.jpg",
+      image: "/images/1/1.jpg",
     },
     {
       id: 2,
