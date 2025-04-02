@@ -9,6 +9,17 @@ const UPIPayment = ({
 }) => {
   const [showQR, setShowQR] = useState(false);
 
+  const upiId = "importantphotos1998@okhdfcbank";
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(upiId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const upiLink = `upi://pay?pa=${upiId}&pn=YourBusinessName&cu=INR`;
+
   // Encode the parameters for the UPI deep link
   const encodedBusinessName = encodeURIComponent(businessName);
   const encodedNote = encodeURIComponent(`Order #${orderID}`);
@@ -49,12 +60,12 @@ const UPIPayment = ({
     },
   };
 
-  // Example URL format for static UPI QR code
-  const upiId = "importantphotos1998-2@okaxis";
+  // // Example URL format for static UPI QR code
+  // const upiId = "importantphotos1998-2@okaxis";
 
-  const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
-    businessName
-  )}`;
+  // const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+  //   businessName
+  // )}`;
 
   // You can use a free QR code generation API
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
@@ -104,21 +115,36 @@ const UPIPayment = ({
             </svg>
             Pay with Any UPI App
           </motion.button>
-          <motion.a
-            href={gpayLinkS}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <img
-              src="/gpay-logo.png"
-              alt="Google Pay"
-              className="h-6 w-6 mr-2"
-            />
-            Pay ₹1 with Google Pay
-          </motion.a>
+          <div className="flex flex-col items-center gap-4 p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold">Pay via UPI</h2>
+
+            {/* Copy UPI ID Button */}
+            <div className="flex items-center border p-2 rounded-lg bg-gray-100">
+              <span className="mr-2 text-sm">{upiId}</span>
+              <button
+                onClick={handleCopy}
+                className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+
+            {/* Pay Now Button (No Pre-filled Amount) */}
+            <motion.a
+              href={upiLink}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Pay via UPI
+            </motion.a>
+
+            {/* Instructions for users */}
+            <p className="text-sm text-gray-600">
+              After payment, enter ₹1 manually and send a screenshot.
+            </p>
+          </div>
+
           <div className="text-center text-sm text-gray-500 mb-3">
             - or pay using -
           </div>
