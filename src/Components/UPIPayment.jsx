@@ -12,7 +12,7 @@ const UPIPayment = ({
   // Encode the parameters for the UPI deep link
   const encodedBusinessName = encodeURIComponent(businessName);
   const encodedNote = encodeURIComponent(`Order #${orderID}`);
-  const simpleLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=1.00`;
+  const simpleLink = `https://gpay.app.goo.gl/pay?pa=importantphotos1998@okhdfcbank&pn=DogWearShop&cu=INR`;
   // Create UPI deep links for various apps
   const genericUpiLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
     2
