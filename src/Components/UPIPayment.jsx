@@ -18,7 +18,7 @@ const UPIPayment = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const upiLink = `upi://pay?pa=${upiId}&pn=YourBusinessName&cu=INR`;
+  const upiLink = `https://gpay.app.goo.gl/pay?pa=yourupi@bank&pn=YourBusinessName&am=Amount&cu=INR`;
 
   // Encode the parameters for the UPI deep link
   const encodedBusinessName = encodeURIComponent(businessName);
