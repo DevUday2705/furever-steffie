@@ -12,7 +12,9 @@ const UPIPayment = ({
   // Encode the parameters for the UPI deep link
   const encodedBusinessName = encodeURIComponent(businessName);
   const encodedNote = encodeURIComponent(`Order #${orderID}`);
-  const simpleLink = `https://gpay.app.goo.gl/pay?pa=importantphotos1998@okhdfcbank&pn=DogWearShop&cu=INR`;
+  const gpayLinkS =
+    "https://gpay.app.goo.gl/pay?pa=importantphotos1998@okhdfcbank&pn=YourBusinessName&am=1&cu=INR";
+
   // Create UPI deep links for various apps
   const genericUpiLink = `upi://pay?pa=${upiID}&pn=${encodedBusinessName}&am=${orderTotal.toFixed(
     2
@@ -102,26 +104,21 @@ const UPIPayment = ({
             </svg>
             Pay with Any UPI App
           </motion.button>
-          <motion.button
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center mb-3"
+          <motion.a
+            href={gpayLinkS}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => (window.location.href = simpleLink)}
-            variants={itemVariants}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M11 3a1 1 0 10-2 0v1.1A8.001 8.001 0 014.5 12a8 8 0 0011 7.5 1 1 0 00.5-1.9 6 6 0 100-12 1 1 0 00-.5-1.9V3z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Test Payment (₹1)
-          </motion.button>
+            <img
+              src="/gpay-logo.png"
+              alt="Google Pay"
+              className="h-6 w-6 mr-2"
+            />
+            Pay ₹1 with Google Pay
+          </motion.a>
           <div className="text-center text-sm text-gray-500 mb-3">
             - or pay using -
           </div>
