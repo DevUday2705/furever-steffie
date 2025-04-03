@@ -827,15 +827,15 @@ const CheckoutPage = () => {
                               Share Receipt on WhatsApp
                             </h4>
                             <p className="text-sm text-gray-600 mb-3">
-                              Pay
+                              Pay{" "}
                               <span
-                                className="strong font-semibold inline-block mx-1
+                                className="strong font-semibold
                               "
                               >
                                 ₹{calculateTotal()}
-                              </span>
+                              </span>{" "}
                               via UPI/bank transfer using below details and{" "}
-                              <span className="strong inline-block mx-1 font-semibold">
+                              <span className="strong font-semibold">
                                 send your payment screenshot along with this
                                 receipt
                               </span>{" "}
