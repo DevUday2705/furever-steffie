@@ -657,102 +657,6 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Receipt Section */}
-            <div id="receipt" className="p-4 bg-white">
-              <div className="text-center mb-4">
-                <h2 className="text-lg font-bold">Order Summary</h2>
-              </div>
-
-              <div className="mb-4 flex justify-between items-start">
-                <div>
-                  <div className="font-medium text-sm">Order ID: {orderId}</div>
-                  <div className="text-gray-600 text-xs">
-                    Date: {new Date().toLocaleDateString()}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-base">₹{calculateTotal()}</div>
-                  <div className="text-gray-600 text-xs">Total Amount</div>
-                </div>
-              </div>
-
-              <div className="border-t border-b border-gray-200 py-3 mb-4">
-                <div className="flex mb-3">
-                  <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                    <img
-                      src={orderDetails?.image}
-                      alt={orderDetails?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-2 flex-1">
-                    <div className="font-medium text-sm">
-                      {orderDetails?.name}
-                    </div>
-                    <div className="text-gray-600 text-xs">
-                      {orderDetails?.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                      {orderDetails?.isFullSet ? "Full Set" : "Kurta Only"} •
-                      Size {orderDetails?.selectedSize}
-                    </div>
-                    <div className="font-medium text-sm mt-1">
-                      ₹{orderDetails?.price}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1 text-gray-600 text-xs">
-                  <div className="flex justify-between">
-                    <span>
-                      Delivery (
-                      {formData.deliveryOption === "express"
-                        ? "Express"
-                        : "Standard"}
-                      ):
-                    </span>
-                    <span>
-                      ₹{formData.deliveryOption === "express" ? 399 : 49}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-medium text-black pt-2">
-                    <span>Total:</span>
-                    <span>₹{calculateTotal()}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 mb-4">
-                <div>
-                  <div className="font-medium text-sm mb-1">
-                    Shipping Information:
-                  </div>
-                  <div className="text-gray-600 text-xs space-y-0.5">
-                    <div>{formData.fullName}</div>
-                    <span>{formData.addressLine1}</span>,
-                    {formData.addressLine2 && (
-                      <span>{formData.addressLine2}</span>
-                    )}
-                    <div>
-                      {formData.city}, {formData.state}, {formData.pincode}
-                    </div>
-                    <div>Phone: {formData.mobileNumber}</div>
-                    {formData.alternateMobile && (
-                      <div>Alt Phone: {formData.alternateMobile}</div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="font-medium text-sm mb-1">Order Notes:</div>
-                  <div className="text-gray-600 text-xs">
-                    {formData.specialInstructions
-                      ? formData.specialInstructions
-                      : "No special instructions provided."}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Instructions and Action Section */}
             <div className="bg-gray-50 px-4 py-6">
               <motion.div
                 className="w-full max-w-lg mx-auto"
@@ -1186,6 +1090,103 @@ const CheckoutPage = () => {
                 </motion.div>
               </motion.div>
             </div>
+
+            {/* Receipt Section */}
+            <div id="receipt" className="p-4 bg-white">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-bold">Order Summary</h2>
+              </div>
+
+              <div className="mb-4 flex justify-between items-start">
+                <div>
+                  <div className="font-medium text-sm">Order ID: {orderId}</div>
+                  <div className="text-gray-600 text-xs">
+                    Date: {new Date().toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-base">₹{calculateTotal()}</div>
+                  <div className="text-gray-600 text-xs">Total Amount</div>
+                </div>
+              </div>
+
+              <div className="border-t border-b border-gray-200 py-3 mb-4">
+                <div className="flex mb-3">
+                  <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                    <img
+                      src={orderDetails?.image}
+                      alt={orderDetails?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="ml-2 flex-1">
+                    <div className="font-medium text-sm">
+                      {orderDetails?.name}
+                    </div>
+                    <div className="text-gray-600 text-xs">
+                      {orderDetails?.isBeaded ? "Hand Work" : "Simple"} •{" "}
+                      {orderDetails?.isFullSet ? "Full Set" : "Kurta Only"} •
+                      Size {orderDetails?.selectedSize}
+                    </div>
+                    <div className="font-medium text-sm mt-1">
+                      ₹{orderDetails?.price}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span>
+                      Delivery (
+                      {formData.deliveryOption === "express"
+                        ? "Express"
+                        : "Standard"}
+                      ):
+                    </span>
+                    <span>
+                      ₹{formData.deliveryOption === "express" ? 399 : 49}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-medium text-black pt-2">
+                    <span>Total:</span>
+                    <span>₹{calculateTotal()}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mb-4">
+                <div>
+                  <div className="font-medium text-sm mb-1">
+                    Shipping Information:
+                  </div>
+                  <div className="text-gray-600 text-xs space-y-0.5">
+                    <div>{formData.fullName}</div>
+                    <span>{formData.addressLine1}</span>,
+                    {formData.addressLine2 && (
+                      <span>{formData.addressLine2}</span>
+                    )}
+                    <div>
+                      {formData.city}, {formData.state}, {formData.pincode}
+                    </div>
+                    <div>Phone: {formData.mobileNumber}</div>
+                    {formData.alternateMobile && (
+                      <div>Alt Phone: {formData.alternateMobile}</div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="font-medium text-sm mb-1">Order Notes:</div>
+                  <div className="text-gray-600 text-xs">
+                    {formData.specialInstructions
+                      ? formData.specialInstructions
+                      : "No special instructions provided."}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Instructions and Action Section */}
           </div>
         )}
       </div>
