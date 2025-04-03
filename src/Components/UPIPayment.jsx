@@ -144,51 +144,6 @@ const UPIPayment = ({
               After payment, enter ₹1 manually and send a screenshot.
             </p>
           </div>
-
-          <div className="text-center text-sm text-gray-500 mb-3">
-            - or pay using -
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <motion.a
-              href={gpayLink}
-              className="flex flex-col items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.95 }}
-              variants={itemVariants}
-            >
-              <div className="w-10 h-10 bg-white rounded-full p-2 mb-1 flex items-center justify-center">
-                <img src="/images/gpay.png" />
-              </div>
-              <span className="text-xs">Google Pay</span>
-            </motion.a>
-
-            <motion.a
-              href={phonepeLink}
-              className="flex flex-col items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.95 }}
-              variants={itemVariants}
-            >
-              <div className="w-10 h-10 bg-white rounded-full p-2 mb-1 flex items-center justify-center">
-                <img src="/images/phonepe.png" />
-              </div>
-              <span className="text-xs">PhonePe</span>
-            </motion.a>
-
-            <motion.a
-              href={paytmLink}
-              className="flex flex-col items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.95 }}
-              variants={itemVariants}
-            >
-              <div className="w-10 h-10 bg-white rounded-full p-2 mb-1 flex items-center justify-center">
-                <img src="/images/paytm.png" />
-              </div>
-              <span className="text-xs">Paytm</span>
-            </motion.a>
-          </div>
         </motion.div>
 
         <motion.div className="text-center" variants={itemVariants}>

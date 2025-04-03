@@ -10,7 +10,7 @@ import SolidKurtasListing from "./Components/SolidKurtasListing";
 import ProductDetail from "./Components/ProductDetail";
 import Cart from "./Components/Cart";
 
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home";
 import PrintedKurtasListing from "./Components/PrintedKurtasListing";
@@ -23,16 +23,26 @@ import LoveMessage from "./Components/LoveMessage";
 import SearchBar from "./Components/SearchBar";
 import { productData } from "../src/constants/constant";
 const App = () => {
+  const location = useLocation();
+
+  // Pages where SearchBar should be hidden
+  const hideSearchBarOn = ["/checkout", "/payment", "/final-receipt"];
+
+  // Check if current path is in the hideSearchBarOn array
+  const shouldShowSearchBar = !hideSearchBarOn.includes(location.pathname);
+
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
         {/* <CartNav /> */}
       </nav>
-      <header className="sticky top-0 bg-white shadow-sm z-20">
-        <div className="container mx-auto py-3">
-          <SearchBar productData={productData} />
-        </div>
-      </header>
+      {shouldShowSearchBar && (
+        <header className="sticky top-0 bg-white shadow-sm z-20">
+          <div className="container mx-auto py-3">
+            <SearchBar productData={productData} />
+          </div>
+        </header>
+      )}
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />

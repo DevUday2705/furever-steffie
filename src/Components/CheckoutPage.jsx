@@ -1,14 +1,37 @@
 import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeft, Check, AlertTriangle, Download } from "lucide-react";
+import domtoimage from "dom-to-image";
+
+import {
+  ChevronLeft,
+  Check,
+  AlertTriangle,
+  Download,
+  Share2,
+  CheckCircle,
+  CreditCard,
+  Building,
+  Copy,
+  AlertCircle,
+  User,
+  Info,
+  Smartphone,
+} from "lucide-react";
 import { toPng } from "html-to-image";
+import { motion } from "framer-motion";
 import UPIPayment from "./UPIPayment";
+import toast from "react-hot-toast";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const receiptRef = useRef(null);
   const { orderDetails, sizeConfirmed } = location.state || {};
+  const [steps, setSteps] = useState({
+    download: false,
+    share: false,
+    payment: false,
+  });
 
   // Generate unique order ID
   const orderId = `ORD${Date.now().toString().slice(-6)}${Math.floor(
@@ -164,6 +187,151 @@ const CheckoutPage = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
+  const downloadReceipt = () => {
+    // In a real app, this would generate and download a PDF
+    // setSteps((prev) => ({ ...prev, download: true }));
+    // Simulate download delay
+    const element = document.getElementById("receipt");
+    domtoimage.toPng(element).then((dataUrl) => {
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "receipt.png";
+      link.click();
+    });
+  };
+
+  const shareOnWhatsapp = async () => {
+    try {
+      // Check if receipt element exists
+      const receiptElement = document.getElementById("receipt");
+      if (!receiptElement) {
+        console.error("Receipt element not found");
+        alert("Receipt element not found. Please try again.");
+        return;
+      }
+
+      // Import dom-to-image dynamically
+      let domtoimage;
+      try {
+        domtoimage = await import("dom-to-image");
+      } catch (importError) {
+        console.error("Failed to import dom-to-image:", importError);
+        alert(
+          "Failed to load image processing library. Please check your installation."
+        );
+        return;
+      }
+
+      // Make sure the element is visible and rendered
+      receiptElement.scrollIntoView({ behavior: "auto", block: "center" });
+
+      // Wait a short moment to ensure rendering is complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Try to convert the DOM element to a PNG blob with enhanced options
+      let blob;
+      try {
+        blob = await domtoimage.toBlob(receiptElement, {
+          quality: 0.95,
+          bgcolor: "#FFFFFF",
+          height: receiptElement.offsetHeight,
+          width: receiptElement.offsetWidth,
+          style: {
+            transform: "scale(2)",
+            "transform-origin": "top left",
+          },
+          cacheBust: true, // Add cache busting for images
+          imagePlaceholder: "data:image/png;base64,iVBORw0KGgo=", // Placeholder for failed images
+        });
+      } catch (imageError) {
+        console.error("Failed to create image:", imageError);
+
+        // Try alternative method if first method fails
+        try {
+          console.log("Trying alternative method...");
+          blob = await domtoimage.toBlob(receiptElement);
+        } catch (fallbackError) {
+          console.error("Both image creation methods failed:", fallbackError);
+          alert("Failed to create receipt image. Please try again later.");
+          return;
+        }
+      }
+
+      if (!blob) {
+        console.error("No blob was created");
+        alert("Failed to create receipt image. Please try again.");
+        return;
+      }
+
+      // Try to share the image
+      const fileToShare = new File([blob], "receipt.png", {
+        type: "image/png",
+      });
+
+      // First try the Web Share API
+      if (navigator.share && navigator.canShare({ files: [fileToShare] })) {
+        try {
+          await navigator.share({
+            files: [fileToShare],
+            title: "Order Receipt",
+            text: "Here is your order receipt",
+          });
+          setSteps((prev) => ({ ...prev, share: true }));
+          return;
+        } catch (shareError) {
+          console.error("Web Share API failed:", shareError);
+          // Continue to fallback method
+        }
+      }
+
+      // Fallback method
+      try {
+        const imageUrl = URL.createObjectURL(blob);
+
+        // Open WhatsApp with text
+        const message = "Here's my order receipt. Please process my order.";
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+
+        window.open(whatsappUrl, "_blank");
+
+        // Also trigger download
+        const downloadLink = document.createElement("a");
+        downloadLink.href = imageUrl;
+        downloadLink.download = "receipt.png";
+        document.body.appendChild(downloadLink); // Add to DOM to ensure it works in all browsers
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        setSteps((prev) => ({ ...prev, share: true }));
+      } catch (fallbackError) {
+        console.error("Fallback sharing failed:", fallbackError);
+        alert("Failed to share image. Please try again.");
+      }
+    } catch (error) {
+      console.error("Unexpected error in shareOnWhatsapp:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
   // If no order details, redirect back
   if (!orderDetails && !orderCompleted) {
     return (
@@ -187,7 +355,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-24">
+    <div className="bg-gray-50 pb-24">
       {/* Navigation */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-3 py-3">
@@ -201,11 +369,7 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      <div className="container max-w-md mx-auto px-3 pt-4 pb-16">
-        <h1 className="text-xl font-bold text-gray-800 mb-4">
-          {orderCompleted ? "Order Completed" : "Checkout"}
-        </h1>
-
+      <div className="container max-w-md mx-auto pt-4 pb-16">
         {!orderCompleted ? (
           <form onSubmit={handleSubmit}>
             {/* Order Summary */}
@@ -582,246 +746,430 @@ const CheckoutPage = () => {
         ) : (
           <div>
             {/* Order Success */}
-            {paymentDone == false ? (
-              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-green-50">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-green-100 rounded-full p-1">
-                      <Check size={18} className="text-green-600" />
-                    </div>
-                    <h3 className="ml-2 text-md font-semibold text-gray-800">
-                      Order Placed Successfully
-                    </h3>
+
+            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+              <div className="p-4 border-b border-gray-100 bg-green-50">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-green-100 rounded-full p-1">
+                    <Check size={18} className="text-green-600" />
                   </div>
-                </div>
-
-                <div className="p-4">
-                  <div className="mb-4">
-                    <div className="font-medium text-gray-700">
-                      Order ID: <span className="font-bold">{orderId}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Please complete the payment to confirm your order.
-                    </p>
-                  </div>
-
-                  <div className="border-t border-gray-100 pt-4 mb-4">
-                    <h4 className="font-medium text-gray-800 mb-3">
-                      Payment Options:
-                    </h4>
-
-                    <div className="space-y-4">
-                      {/* UPI Payment */}
-                      <UPIPayment
-                        orderTotal={calculateTotal()}
-                        orderID={orderId}
-                      />
-
-                      {/* Bank Transfer */}
-                      <div className="border border-gray-200 rounded-md p-4">
-                        <h5 className="font-medium text-gray-800 mb-2">
-                          Bank Transfer (IMPS/NEFT)
-                        </h5>
-                        <div className="space-y-1 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Account Name:</span>
-                            <span className="font-medium">Your Shop Name</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">
-                              Account Number:
-                            </span>
-                            <span className="font-medium">1234567890</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">IFSC Code:</span>
-                            <span className="font-medium">SBIN0001234</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Bank:</span>
-                            <span className="font-medium">
-                              State Bank of India
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-4">
-                    <div className="flex">
-                      <AlertTriangle
-                        size={16}
-                        className="text-yellow-600 flex-shrink-0 mt-0.5"
-                      />
-                      <div className="ml-2 text-xs text-yellow-800">
-                        <p className="font-medium">After payment:</p>
-                        <p className="mt-1">
-                          Please send a screenshot of your payment to our
-                          WhatsApp number +91 8828145667 / 9920271866 along with
-                          your Order ID for quick order processing.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setPaymentDone(true)}
-                    className="w-full flex items-center justify-center py-3 bg-gray-800 text-white font-medium rounded-md"
-                  >
-                    Payment Done? Get Receipt
-                  </button>
-                  <button
-                    onClick={() => console.log("contact us")}
-                    className="w-full flex items-center mt-2 justify-center py-3 bg-gray-50 text-gray-800 border border-gray-800 font-medium rounded-md"
-                  >
-                    Having Trouble? Contact Us{" "}
-                  </button>
+                  <h3 className="ml-2 text-md font-semibold text-gray-800">
+                    Order Placed Successfully
+                  </h3>
                 </div>
               </div>
-            ) : (
-              <div className="">
-                <div
-                  ref={receiptRef}
-                  className="bg-white p-4  rounded-md"
-                  style={{ width: "375px", fontFamily: "Arial, sans-serif" }}
-                >
-                  <div className="text-center mb-4">
-                    <h2 className="text-lg font-bold">Order Receipt</h2>
-                    <div className="text-xs">Furever Steffie</div>
-                  </div>
+              <div id="receipt" className="p-4 bg-white">
+                <div className="text-center mb-4">
+                  <h2 className="text-lg font-bold">Order Receipt</h2>
+                </div>
 
-                  <div className="mb-4 flex justify-between items-start">
-                    <div>
-                      <div className="font-medium text-sm">
-                        Order ID: {orderId}
-                      </div>
-                      <div className="text-gray-600 text-xs">
-                        Date: {new Date().toLocaleDateString()}
-                      </div>
+                <div className="mb-4 flex justify-between items-start">
+                  <div>
+                    <div className="font-medium text-sm">
+                      Order ID: {orderId}
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-base">
-                        ₹{calculateTotal()}
-                      </div>
-                      <div className="text-gray-600 text-xs">Total Amount</div>
+                    <div className="text-gray-600 text-xs">
+                      Date: {new Date().toLocaleDateString()}
                     </div>
                   </div>
-
-                  <div className="border-t border-b border-gray-200 py-3 mb-4">
-                    <div className="flex mb-3">
-                      <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                        <img
-                          src={orderDetails?.image}
-                          alt={orderDetails?.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-2 flex-1">
-                        <div className="font-medium text-sm">
-                          {orderDetails?.name}
-                        </div>
-                        <div className="text-gray-600 text-xs">
-                          {orderDetails?.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                          {orderDetails?.isFullSet ? "Full Set" : "Kurta Only"}{" "}
-                          • Size {orderDetails?.selectedSize}
-                        </div>
-                        <div className="font-medium text-sm mt-1">
-                          ₹{orderDetails?.price}
-                        </div>
-                      </div>
+                  <div className="text-right">
+                    <div className="font-bold text-base">
+                      ₹{calculateTotal()}
                     </div>
-
-                    <div className="space-y-1 text-gray-600 text-xs">
-                      <div className="flex justify-between">
-                        <span>
-                          Delivery (
-                          {formData.deliveryOption === "express"
-                            ? "Express"
-                            : "Standard"}
-                          ):
-                        </span>
-                        <span>
-                          ₹{formData.deliveryOption === "express" ? 399 : 49}
-                        </span>
-                      </div>
-                      <div className="flex justify-between font-medium text-black pt-2">
-                        <span>Total:</span>
-                        <span>₹{calculateTotal()}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 mb-4">
-                    <div>
-                      <div className="font-medium text-sm mb-1">
-                        Shipping Information:
-                      </div>
-                      <div className="text-gray-600 text-xs space-y-0.5">
-                        <div>{formData.fullName}</div>
-                        <div>{formData.addressLine1}</div>
-                        {formData.addressLine2 && (
-                          <div>{formData.addressLine2}</div>
-                        )}
-                        <div>
-                          {formData.city}, {formData.state}, {formData.pincode}
-                        </div>
-                        <div>Phone: {formData.mobileNumber}</div>
-                        {formData.alternateMobile && (
-                          <div>Alt Phone: {formData.alternateMobile}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="font-medium text-sm mb-1">
-                        Order Notes:
-                      </div>
-                      <div className="text-gray-600 text-xs">
-                        {formData.specialInstructions
-                          ? formData.specialInstructions
-                          : "No special instructions provided."}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-200 pt-3 mb-3">
-                    <div className="font-medium text-sm mb-1">
-                      Important Information:
-                    </div>
-                    <ul className="text-gray-600 text-xs list-disc pl-4 space-y-0.5">
-                      <li>
-                        No returns or exchanges available for custom-stitched
-                        orders
-                      </li>
-                      <li>
-                        Please allow 5-7 days for standard delivery (2 days
-                        stitching + 3-5 days shipping)
-                      </li>
-                      <li>
-                        For express delivery, your order will be prioritized and
-                        shipped within 2 days
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="text-center text-gray-600 text-xs mt-4">
-                    <div className="font-medium mb-1">Contact Us</div>
-                    <div>WhatsApp: 8828145667 / 9920271866</div>
-                    <div>Instagram: furever_steffie</div>
-                    <div className="mt-1">Thank you for your order!</div>
+                    <div className="text-gray-600 text-xs">Total Amount</div>
                   </div>
                 </div>
+
+                <div className="border-t border-b border-gray-200 py-3 mb-4">
+                  <div className="flex mb-3">
+                    <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                      <img
+                        src={orderDetails?.image}
+                        alt={orderDetails?.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="ml-2 flex-1">
+                      <div className="font-medium text-sm">
+                        {orderDetails?.name}
+                      </div>
+                      <div className="text-gray-600 text-xs">
+                        {orderDetails?.isBeaded ? "Hand Work" : "Simple"} •{" "}
+                        {orderDetails?.isFullSet ? "Full Set" : "Kurta Only"} •
+                        Size {orderDetails?.selectedSize}
+                      </div>
+                      <div className="font-medium text-sm mt-1">
+                        ₹{orderDetails?.price}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-gray-600 text-xs">
+                    <div className="flex justify-between">
+                      <span>
+                        Delivery (
+                        {formData.deliveryOption === "express"
+                          ? "Express"
+                          : "Standard"}
+                        ):
+                      </span>
+                      <span>
+                        ₹{formData.deliveryOption === "express" ? 399 : 49}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-medium text-black pt-2">
+                      <span>Total:</span>
+                      <span>₹{calculateTotal()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 mb-4">
+                  <div>
+                    <div className="font-medium text-sm mb-1">
+                      Shipping Information:
+                    </div>
+                    <div className="text-gray-600 text-xs space-y-0.5">
+                      <div>{formData.fullName}</div>
+                      <span>{formData.addressLine1}</span>,
+                      {formData.addressLine2 && (
+                        <span>{formData.addressLine2}</span>
+                      )}
+                      <div>
+                        {formData.city}, {formData.state}, {formData.pincode}
+                      </div>
+                      <div>Phone: {formData.mobileNumber}</div>
+                      {formData.alternateMobile && (
+                        <div>Alt Phone: {formData.alternateMobile}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="font-medium text-sm mb-1">Order Notes:</div>
+                    <div className="text-gray-600 text-xs">
+                      {formData.specialInstructions
+                        ? formData.specialInstructions
+                        : "No special instructions provided."}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className=" bg-gray-100 flex flex-col items-center px-4 py-8">
+                <motion.div
+                  className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="p-6">
+                    <motion.div
+                      className="space-y-4"
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <motion.div variants={itemVariants}>
+                        <button
+                          onClick={downloadReceipt}
+                          className={`w-full flex items-center justify-between p-4 rounded-lg border ${
+                            steps.download
+                              ? "bg-green-50 border-green-200"
+                              : "bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200"
+                          } transition-all duration-200`}
+                        >
+                          <div className="flex items-center">
+                            <div
+                              className={`rounded-full w-8 h-8 flex items-center justify-center mr-3 ${
+                                steps.download
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-blue-100 text-blue-600"
+                              }`}
+                            >
+                              {steps.download ? (
+                                <CheckCircle size={18} />
+                              ) : (
+                                <span>1</span>
+                              )}
+                            </div>
+                            <div onClick={handlePrint}>
+                              <h4 className="font-medium text-gray-800">
+                                Download Receipt
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                Save your order details
+                              </p>
+                            </div>
+                          </div>
+                          <Download size={20} className="text-gray-400" />
+                        </button>
+                      </motion.div>
+                      <motion.div variants={itemVariants}>
+                        <div
+                          className={`w-full flex items-center justify-between p-4 rounded-lg border ${
+                            steps.payment
+                              ? "bg-green-50 border-green-200"
+                              : "bg-white border-gray-200"
+                          } transition-all duration-200`}
+                        >
+                          <div className="flex items-center">
+                            <div
+                              className={`rounded-full w-8 h-8 flex items-center justify-center mr-3 ${
+                                steps.payment
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-blue-100 text-blue-600"
+                              }`}
+                            >
+                              {steps.payment ? (
+                                <CheckCircle size={18} />
+                              ) : (
+                                <span>2</span>
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-800">
+                                Make Payment
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                Pay using UPI or Bank Transfer
+                              </p>
+                            </div>
+                          </div>
+                          <CreditCard size={20} className="text-gray-400" />
+                        </div>
+                      </motion.div>
+                      <div>
+                        <button
+                          onClick={shareOnWhatsapp}
+                          className="w-full flex items-center justify-between p-4 rounded-lg border bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200 transition-all duration-200"
+                        >
+                          <div className="flex items-center">
+                            <div className="rounded-full w-8 h-8 flex items-center justify-center mr-3 bg-blue-100 text-blue-600">
+                              <span>3</span>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-800">
+                                Share on WhatsApp
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                Send receipt to process order
+                              </p>
+                            </div>
+                          </div>
+                          <span>Share</span>
+                        </button>
+                      </div>
+                      <motion.div
+                        variants={itemVariants}
+                        className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-5 border border-blue-200 mt-4 shadow-sm"
+                      >
+                        <h4 className="font-medium text-gray-800 mb-3 flex items-center">
+                          <CreditCard
+                            size={20}
+                            className="text-blue-500 mr-2"
+                          />
+                          <span>Payment Options</span>
+                        </h4>
+
+                        <p className="text-sm text-gray-700 mb-3 flex items-center">
+                          <Info size={16} className="text-blue-500 mr-2" />
+                          <span>
+                            You can pay using UPI apps like Google Pay, PhonePe,
+                            Paytm, etc.
+                          </span>
+                        </p>
+
+                        <div className="flex justify-between items-center mb-3">
+                          <div className="flex space-x-3">
+                            <img
+                              src="/images/gpay.png"
+                              alt="Google Pay"
+                              className="h-6 w-6 rounded"
+                            />
+                            <img
+                              src="/images/phonepe.png"
+                              alt="PhonePe"
+                              className="h-6 w-6 rounded"
+                            />
+                            <img
+                              src="/images/paytm.png"
+                              alt="Paytm"
+                              className="h-6 w-6 rounded"
+                            />
+                            <img
+                              src="/images/bhim.png"
+                              alt="Other UPI"
+                              className="h-6 w-6 rounded"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center">
+                              <Smartphone
+                                size={18}
+                                className="text-blue-500 mr-2"
+                              />
+                              <span className="text-gray-600">
+                                Mobile Number:
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <span className="font-medium mr-2">
+                                9876543210
+                              </span>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText("9876543210");
+                                  toast.success("Copied!");
+                                }}
+                              >
+                                <Copy size={16} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center">
+                              <CreditCard
+                                size={18}
+                                className="text-blue-500 mr-2"
+                              />
+                              <span className="text-gray-600">UPI ID:</span>
+                            </div>
+                            <div className="flex items-center">
+                              <span className="font-medium mr-2">
+                                dogstyle@upi
+                              </span>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText("dogstyle@upi");
+                                  toast.success("Copied!");
+                                }}
+                              >
+                                <Copy size={16} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center">
+                              <CreditCard
+                                size={18}
+                                className="text-blue-500 mr-2"
+                              />
+                              <span className="text-gray-600">
+                                Bank Account:
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <span className="font-medium mr-2">
+                                123456789012
+                              </span>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText("123456789012");
+                                  toast.success("Copied!");
+                                }}
+                              >
+                                <Copy size={16} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center">
+                              <User size={18} className="text-blue-500 mr-2" />
+                              <span className="text-gray-600">
+                                Account Name:
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <span className="font-medium mr-2">
+                                DogStyle Apparel
+                              </span>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(
+                                    "DogStyle Apparel"
+                                  );
+                                  toast.success("Copied!");
+                                }}
+                              >
+                                <Copy size={16} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center">
+                              <Building
+                                size={18}
+                                className="text-blue-500 mr-2"
+                              />
+                              <span className="text-gray-600">IFSC Code:</span>
+                            </div>
+                            <div className="flex items-center">
+                              <span className="font-medium mr-2">
+                                ABCD0001234
+                              </span>
+                              <button
+                                className="text-blue-500 hover:text-blue-700 transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText("ABCD0001234");
+                                  toast.success("Copied!");
+                                }}
+                              >
+                                <Copy size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-500 mt-3 flex items-center">
+                          <AlertCircle
+                            size={14}
+                            className="text-yellow-500 mr-1"
+                          />
+                          <span>
+                            Please include your Order ID in payment remarks
+                          </span>
+                        </p>
+                      </motion.div>
+
+                      <motion.div variants={itemVariants} className="mt-8">
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                          <p className="text-sm text-blue-800">
+                            <span className="font-medium">Note:</span> Your
+                            order will be confirmed and processed once we
+                            receive your payment and receipt via WhatsApp.
+                          </p>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+              {/* <div className="p-4">
                 <button
-                  onClick={handlePrint}
+                  onClick={() => setPaymentDone(true)}
                   className="w-full flex items-center justify-center py-3 bg-gray-800 text-white font-medium rounded-md"
                 >
-                  Download Receipt
+                  Payment Done? Get Receipt
                 </button>
-              </div>
-            )}
-
-            {/* Hidden Receipt for download - Made mobile-friendly */}
+                <button
+                  onClick={() => console.log("contact us")}
+                  className="w-full flex items-center mt-2 justify-center py-3 bg-gray-50 text-gray-800 border border-gray-800 font-medium rounded-md"
+                >
+                  Having Trouble? Contact Us{" "}
+                </button>
+              </div> */}
+            </div>
           </div>
         )}
       </div>
