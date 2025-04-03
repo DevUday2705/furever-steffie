@@ -828,11 +828,14 @@ const CheckoutPage = () => {
                             </h4>
                             <p className="text-sm text-gray-600 mb-3">
                               Pay
-                              <span className="strong">
+                              <span
+                                className="strong font-semibold inline-block mx-1
+                              "
+                              >
                                 ₹{calculateTotal()}
                               </span>
                               via UPI/bank transfer using below details and{" "}
-                              <span className="strong">
+                              <span className="strong inline-block mx-1 font-semibold">
                                 send your payment screenshot along with this
                                 receipt
                               </span>{" "}
