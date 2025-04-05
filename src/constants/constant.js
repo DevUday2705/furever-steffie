@@ -27,12 +27,14 @@ export const productData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://images.unsplash.com/photo-1598875184988-5e67b1a874b8?q=80&w=1000",
+                    "mainImage": "/images/pink.png",
                     "options": {
                         "beaded": {
                             "images": [
-                                "https://images.unsplash.com/photo-1598875184988-5e67b1a874b8?q=80&w=1000",
-                                "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=1000"
+                                "/images/pink.png",
+                                "/images/pink-1.png",
+                                "/images/pink-2.png",
+                                "/images/pink-3.png"
                             ]
                         },
                         "nonBeaded": {
@@ -68,12 +70,13 @@ export const productData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1000",
+                    "mainImage": "/images/red.png",
                     "options": {
                         "beaded": {
                             "images": [
-                                "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1000",
-                                "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=1000"
+                                "/images/red.png",
+                                "/images/red-1.png",
+                                "/images/red-2.png"
                             ]
                         },
                         "nonBeaded": {
@@ -86,7 +89,132 @@ export const productData = {
                     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
                     "contactForCustomColors": true,
                     "description": "An elegant maroon solid kurta for your pet, ideal for weddings and celebrations."
-                }
+                },
+                {
+                    "id": "sk003",
+                    "category": 'solid-kurtas',
+                    "name": "Maroon Elegance Solid Kurta",
+                    "pricing": {
+                        "basePrice": 999,
+                        "fullSetAdditional": 500,
+                        "beadedAdditional": 250,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 200,
+                            "L": 400,
+                            "XL": 600,
+                            "XXL": 800
+                        }
+                    },
+                    "defaultOptions": {
+                        "isBeaded": true,
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "/images/black.png",
+                    "options": {
+                        "beaded": {
+                            "images": [
+                                "/images/black.png",
+                                "/images/black-1.png",
+                                "/images/black-2.png"
+                            ]
+                        },
+                        "nonBeaded": {
+                            "images": [
+                                "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=1000",
+                                "https://images.unsplash.com/photo-1583511655826-05700442b31b?q=80&w=1000"
+                            ]
+                        }
+                    },
+                    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+                    "contactForCustomColors": true,
+                    "description": "An elegant maroon solid kurta for your pet, ideal for weddings and celebrations."
+                },
+                {
+                    "id": "sk004",
+                    "category": 'solid-kurtas',
+                    "name": "Maroon Elegance Solid Kurta",
+                    "pricing": {
+                        "basePrice": 999,
+                        "fullSetAdditional": 500,
+                        "beadedAdditional": 250,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 200,
+                            "L": 400,
+                            "XL": 600,
+                            "XXL": 800
+                        }
+                    },
+                    "defaultOptions": {
+                        "isBeaded": true,
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "/images/dark-pink.png",
+                    "options": {
+                        "beaded": {
+                            "images": [
+                                "/images/dark-pink.png",
+                                "/images/dark-pink-1.png",
+                                "/images/dark-pink-2.png",
+                            ]
+                        },
+                        "nonBeaded": {
+                            "images": [
+                                "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=1000",
+                                "https://images.unsplash.com/photo-1583511655826-05700442b31b?q=80&w=1000"
+                            ]
+                        }
+                    },
+                    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+                    "contactForCustomColors": true,
+                    "description": "An elegant maroon solid kurta for your pet, ideal for weddings and celebrations."
+                }, {
+                    "id": "sk005",
+                    "category": 'solid-kurtas',
+                    "name": "Maroon Elegance Solid Kurta",
+                    "pricing": {
+                        "basePrice": 999,
+                        "fullSetAdditional": 500,
+                        "beadedAdditional": 250,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 200,
+                            "L": 400,
+                            "XL": 600,
+                            "XXL": 800
+                        }
+                    },
+                    "defaultOptions": {
+                        "isBeaded": true,
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "/images/blue.png",
+                    "options": {
+                        "beaded": {
+                            "images": [
+                                "/images/blue.png",
+                                "/images/blue-1.png",
+                                "/images/blue-2.png",
+                            ]
+                        },
+                        "nonBeaded": {
+                            "images": [
+                                "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=1000",
+                                "https://images.unsplash.com/photo-1583511655826-05700442b31b?q=80&w=1000"
+                            ]
+                        }
+                    },
+                    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+                    "contactForCustomColors": true,
+                    "description": "An elegant maroon solid kurta for your pet, ideal for weddings and celebrations."
+                },
             ]
         },
         {
