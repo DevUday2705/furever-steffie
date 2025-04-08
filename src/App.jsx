@@ -24,6 +24,7 @@ import SearchBar from "./Components/SearchBar";
 import { productData } from "../src/constants/constant";
 import ContactUsPage from "./Components/ContactUs";
 import ShippingPolicyPage from "./Components/ShippingPolicyPage";
+import TermsAndConditionsPage from "./Components/TermsAndConditionsPage";
 const App = () => {
   const location = useLocation();
 
@@ -69,6 +70,7 @@ const App = () => {
           <Route path="/payment" element={<UPIPayment />} />
           <Route path="/contact" element={<ContactUsPage />} />
           <Route path="/policy" element={<ShippingPolicyPage />} />
+          <Route path="/terms" element={<TermsAndConditionsPage />} />
         </Routes>
       </div>
       <Toaster />

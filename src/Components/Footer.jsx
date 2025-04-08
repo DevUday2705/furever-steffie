@@ -19,6 +19,9 @@ const Footer = () => {
         <Link className="text-white" to="/policy">
           Policy
         </Link>
+        <Link className="text-white" to="/terms">
+          Terms
+        </Link>
       </div>
     </div>
   );
