@@ -186,7 +186,7 @@ const AdminPage = () => {
           </p>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs text-gray-500">Ready to Ship</p>
+          <p className="text-xs text-gray-500">Ready </p>
           <p className="text-lg font-bold text-indigo-500">
             {orderStats.readyToShip}
           </p>
