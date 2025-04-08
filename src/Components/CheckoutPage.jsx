@@ -134,10 +134,42 @@ const CheckoutPage = () => {
       name: "Furever Steffie",
       description: "Order Payment",
       order_id: data.id,
-      handler: function (response) {
-        alert("Payment successful!");
-        console.log(response);
-        // call API to verify or confirm order here
+      handler: async function (response) {
+        // 1️⃣ Verify payment
+        const verifyRes = await fetch("/api/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+
+        const verifyData = await verifyRes.json();
+
+        if (verifyData.success) {
+          // 2️⃣ Save the order
+          const saveRes = await fetch("/api/save-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              customer: {
+                name: formData?.fullName,
+                phone: formData?.mobileNumber,
+                address: formData?.address, // Add this if you have it
+              },
+              items: [orderDetails], // Replace with your actual cart/products
+              amount: 499,
+            }),
+          });
+
+          const saveData = await saveRes.json();
+          alert("✅ Payment successful and order saved!");
+          console.log(saveData);
+
+          // Navigate to thank you page or reset state
+        } else {
+          alert("❌ Payment verification failed.");
+        }
       },
       prefill: {
         name: formData?.fullName,
