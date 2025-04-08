@@ -129,17 +129,6 @@ const KurtaCategories = () => {
                 Explore our handcrafted kurtas, blending tradition with modern
                 elegance.
               </p>
-              <motion.button
-                whileHover={{
-                  scale: 1.05,
-                  transition: { duration: 0.3, ease: "easeOut" },
-                }}
-                whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
-                className="bg-white text-black px-8 py-3 rounded-full text-sm font-medium inline-flex items-center 
-                       hover:bg-gray-100 transition-colors duration-200"
-              >
-                Explore Collection
-              </motion.button>
             </motion.div>
           </div>
         </div>
