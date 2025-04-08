@@ -85,6 +85,8 @@ const CheckoutPage = () => {
 
     if (validateForm(formData, setErrors)) {
       // In a real app, this would submit the order to a backend
+      localStorage.setItem("order", orderDetails);
+      localStorage.setItem("customer", formData);
       handlePayment();
     }
   };
@@ -157,8 +159,6 @@ const CheckoutPage = () => {
               amount: 1,
             }),
           });
-          localStorage.setItem("order", orderDetails);
-          localStorage.setItem("customer", formData);
 
           navigate({
             pathname: "/thank-you",
