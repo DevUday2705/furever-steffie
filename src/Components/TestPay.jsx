@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 const PayButton = () => {
   const handlePayment = async () => {
     const options = {
-      key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay key
+      key: "rzp_test_Q2zLMwkylstbfw", // Replace with your Razorpay key
       amount: 50000, // Amount in paisa (₹500)
       currency: "INR",
       name: "Your Brand",
