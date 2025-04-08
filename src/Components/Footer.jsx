@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <div className="bg-white">
@@ -11,9 +13,9 @@ const Footer = () => {
         </div>
       </div>
       <div className="bg-gray-800 mt-5 py-4 rounded-t-3xl gap-x-8 flex justify-center items-center">
-        <img src="/images/Instagram.png" className="h-8" />
-        <img src="/images/whatsApp.png" className="h-8" />
-        <img src="/images/Facebook.png" className="h-8" />
+        <Link className="text-white" to="/contact">
+          Contact Us
+        </Link>
       </div>
     </div>
   );

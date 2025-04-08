@@ -8,14 +8,6 @@ const MobileHeroCarousel = () => {
 
   const slides = [
     {
-      id: 1,
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744096593/WhatsApp_Image_2025-04-08_at_12.32.45_bf24d479_i4xscc.jpg",
-      title: "Summer Collection",
-      subtitle: "Explore our latest arrivals",
-      cta: "Shop Now",
-    },
-    {
       id: 2,
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744099062/ChatGPT_Image_Apr_8_2025_01_19_03_PM_uiuvdz.png",
@@ -30,6 +22,14 @@ const MobileHeroCarousel = () => {
       title: "Premium Basics",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
+    },
+    {
+      id: 1,
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744096593/WhatsApp_Image_2025-04-08_at_12.32.45_bf24d479_i4xscc.jpg",
+      title: "Summer Collection",
+      subtitle: "Explore our latest arrivals",
+      cta: "Shop Now",
     },
   ];
   const scrollPrev = useCallback(() => {

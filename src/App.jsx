@@ -22,6 +22,7 @@ import UPIPayment from "./Components/UPIPayment";
 import LoveMessage from "./Components/LoveMessage";
 import SearchBar from "./Components/SearchBar";
 import { productData } from "../src/constants/constant";
+import ContactUsPage from "./Components/ContactUs";
 const App = () => {
   const location = useLocation();
 
@@ -65,7 +66,7 @@ const App = () => {
           <Route path="/final-receipt" element={<FinalReceipt />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<UPIPayment />} />
-          <Route path="/love" element={<LoveMessage />} />
+          <Route path="/contact" element={<ContactUsPage />} />
         </Routes>
       </div>
       <Toaster />
