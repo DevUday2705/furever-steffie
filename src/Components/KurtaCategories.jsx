@@ -20,7 +20,8 @@ const KurtaCategories = () => {
       id: 1,
       name: "Solid",
       description: "Timeless elegance in pure colors",
-      image: "/images/kur-1.webp",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744101810/ChatGPT_Image_Apr_8_2025_02_13_08_PM_aiocdq.png",
       url: "/solid-kurtas",
     },
     {
@@ -102,7 +103,7 @@ const KurtaCategories = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="/images/kur-1.webp"
+            src="https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744101346/ChatGPT_Image_Apr_8_2025_02_03_51_PM_qgz786.png"
             alt="Kurta Collection"
             className="w-full h-full object-cover"
           />
@@ -182,31 +183,17 @@ const KurtaCategories = () => {
                     <img
                       src={category.image}
                       alt={category.name}
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" // Increased duration
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
 
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform group-hover:translate-y-[-8px] transition-transform duration-500">
-                      {" "}
-                      {/* Increased duration */}
-                      <h3 className="text-2xl font-bold mb-2">
+                      <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
                         {category.name}
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          🔗
+                        </span>
                       </h3>
-                      <motion.button
-                        className="inline-flex items-center bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
-                           transform opacity-0 group-hover:opacity-100 translate-y-4 
-                           group-hover:translate-y-0 transition-all duration-500" // Increased duration
-                        whileHover={{
-                          scale: 1.05,
-                          transition: { duration: 0.3, ease: "easeOut" },
-                        }}
-                        whileTap={{
-                          scale: 0.98,
-                          transition: { duration: 0.1 },
-                        }}
-                      >
-                        Explore
-                      </motion.button>
                     </div>
                   </div>
                 </Link>
