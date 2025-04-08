@@ -44,7 +44,7 @@ const AdminPage = () => {
     try {
       const orderRef = doc(db, "orders", orderId);
       await updateDoc(orderRef, {
-        status: newStatus,
+        orderStatus: newStatus,
       });
 
       // Update state locally so UI reflects change immediately
@@ -169,7 +169,7 @@ const AdminPage = () => {
                       <span
                         className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
       ${
-        order.status === "pending"
+        order.orderStatus === "pending"
           ? "bg-gray-400"
           : order.status === "work-in-progress"
           ? "bg-yellow-500"
@@ -185,7 +185,7 @@ const AdminPage = () => {
                       </span>
 
                       <select
-                        value={order.status}
+                        value={order.orderStatus}
                         onChange={(e) =>
                           handleStatusChange(order.id, e.target.value)
                         }
