@@ -22,35 +22,35 @@ const Categories = () => {
       name: "Kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png",
     },
     {
       id: 1,
       name: "Tuxedo",
       description: "Classic Fits",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095275/ChatGPT_Image_Apr_8_2025_11_56_25_AM_d5f2f5.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095275/ChatGPT_Image_Apr_8_2025_11_56_25_AM_d5f2f5.png",
     },
     {
       id: 2,
       name: "Lehenga",
       description: "Traditional Elegance",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096705/ChatGPT_Image_Apr_8_2025_11_45_38_AM_xdfndo.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744096705/ChatGPT_Image_Apr_8_2025_11_45_38_AM_xdfndo.png",
     },
     {
       id: 4,
       name: "Bandana",
       description: "Trendy Accessories",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
     },
     {
       id: 5,
       name: "Bow Tie",
       description: "Suit Up!",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
     },
   ];
 
@@ -157,6 +157,7 @@ const Categories = () => {
                 >
                   <div className="relative h-[300px] rounded-2xl overflow-hidden">
                     <img
+                      loading="lazy"
                       src={category.image}
                       alt={category.name}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
