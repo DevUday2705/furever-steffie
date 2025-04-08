@@ -22,6 +22,12 @@ const Footer = () => {
         <Link className="text-white" to="/terms">
           Terms
         </Link>
+        <Link className="text-white" to="/privacy">
+          Privacy
+        </Link>
+        <Link className="text-white" to="/cancellations">
+          Cancellations
+        </Link>
       </div>
     </div>
   );
