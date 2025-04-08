@@ -154,7 +154,7 @@ const CheckoutPage = () => {
               razorpay_payment_id: response.razorpay_payment_id,
               customer: formData,
               items: [orderDetails], // Replace with your actual cart/products
-              amount: 499,
+              amount: 1,
             }),
           });
 
