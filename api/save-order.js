@@ -1,21 +1,22 @@
-import { initializeApp, applicationDefault, cert } from 'firebase-admin/app';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import path from 'path';
-import { readFileSync } from 'fs';
 
-let app;
+let db;
 
-if (!app) {
-    const serviceAccount = JSON.parse(
-        readFileSync(path.resolve('./firebase-admin-key.json'), 'utf-8')
-    );
+if (!getApps().length) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
-    app = initializeApp({
-        credential: cert(serviceAccount),
+    initializeApp({
+        credential: cert({
+            ...serviceAccount,
+            private_key: serviceAccount.private_key.replace(/\\n/g, '\n'),
+        }),
     });
-}
 
-const db = getFirestore();
+    db = getFirestore();
+} else {
+    db = getFirestore();
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
