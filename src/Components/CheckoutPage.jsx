@@ -152,11 +152,7 @@ const CheckoutPage = () => {
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              customer: {
-                name: formData?.fullName,
-                phone: formData?.mobileNumber,
-                address: formData?.address, // Add this if you have it
-              },
+              customer: formData,
               items: [orderDetails], // Replace with your actual cart/products
               amount: 499,
             }),
