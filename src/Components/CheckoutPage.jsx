@@ -29,28 +29,7 @@ import { validateForm } from "../constants/constant";
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const receiptRef = useRef(null);
   const { orderDetails, sizeConfirmed } = location.state || {};
-  const [receiptDownloaded, setReceiptDownloaded] = useState(false);
-  const upiId = "importantphotos1998-2@okaxis";
-  const upiUriScheme = `upi://pay?pa=${upiId}&pn=Payment`;
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const shareOnWhatsapp = () => {
-    const message = encodeURIComponent(
-      `Hi, I've placed Order #${orderId} for ₹${calculateTotal()} and completed the payment. Here's my order receipt.`
-    );
-    window.open(`https://wa.me/918828145667?text=${message}`, "_blank");
-  };
-
-  // Generate unique order ID
-  const orderId = `ORD${Date.now().toString().slice(-6)}${Math.floor(
-    Math.random() * 1000
-  )}`;
-
   // Form state
   const [formData, setFormData] = useState({
     fullName: "",
@@ -68,7 +47,6 @@ const CheckoutPage = () => {
   // Validation state
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [paymentDone, setPaymentDone] = useState(false);
   // Order complete state
   const [orderCompleted, setOrderCompleted] = useState(false);
 
@@ -107,7 +85,7 @@ const CheckoutPage = () => {
 
     if (validateForm(formData, setErrors)) {
       // In a real app, this would submit the order to a backend
-      setOrderCompleted(true);
+      handlePayment();
     }
   };
 
@@ -117,39 +95,6 @@ const CheckoutPage = () => {
   };
 
   // Download receipt as image
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: "beforeChildren",
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-    },
-  };
-
-  const downloadReceipt = () => {
-    // In a real app, this would generate and download a PDF
-    // setSteps((prev) => ({ ...prev, download: true }));
-    // Simulate download delay
-    const element = document.getElementById("receipt");
-    domtoimage.toPng(element).then((dataUrl) => {
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "receipt.png";
-      link.click();
-    });
-    setReceiptDownloaded(true);
-  };
 
   // If no order details, redirect back
   if (!orderDetails && !orderCompleted) {
@@ -172,6 +117,40 @@ const CheckoutPage = () => {
       </div>
     );
   }
+
+  const handlePayment = async () => {
+    const res = await fetch("/api/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 499 }), // in INR
+    });
+
+    const data = await res.json();
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from .env file
+      amount: data.amount, // in paise
+      currency: data.currency,
+      name: "Furever Steffie",
+      description: "Order Payment",
+      order_id: data.id,
+      handler: function (response) {
+        alert("Payment successful!");
+        console.log(response);
+        // call API to verify or confirm order here
+      },
+      prefill: {
+        name: formData?.fullName,
+        contact: formData?.mobileNumber,
+      },
+      theme: {
+        color: "#6366f1",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
 
   return (
     <div className="bg-gray-50 pb-24">
