@@ -29,6 +29,7 @@ import CancellationsRefundsPage from "./Components/CancellationsRefundsPage";
 import PrivacyPolicy from "./Components/PrivacyPolicy";
 import AdminPage from "./Components/AdminPage";
 import TestPay from "./Components/TestPay";
+import ScrollToTop from "./Components/ScrollToTop";
 const App = () => {
   const location = useLocation();
 
