@@ -4,6 +4,7 @@ import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
 import { doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import OrderFilters from "./OrderFilters"; // Import the new component
 
 const ADMIN_KEY = "030527";
 
@@ -13,8 +14,14 @@ const AdminPage = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
+  const [customDate, setCustomDate] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
   const handleLogin = () => {
     if (passkey === ADMIN_KEY) {
       setIsAuthorized(true);
@@ -50,14 +57,93 @@ const AdminPage = () => {
       // Update state locally so UI reflects change immediately
       setOrders((prev) =>
         prev.map((order) =>
-          order.id === orderId ? { ...order, status: newStatus } : order
+          order.id === orderId ? { ...order, orderStatus: newStatus } : order
         )
       );
       toast.success("Status updated");
+      fetchOrders();
     } catch (err) {
       console.error("Error updating status:", err);
       alert("Failed to update status. Try again.");
     }
+  };
+
+  const handleCalendarDateChange = (selectedDate) => {
+    setCustomDate(selectedDate ? new Date(selectedDate) : null);
+  };
+
+  // Filter and sort orders
+  const filteredAndSortedOrders = orders
+    .filter((order) => {
+      // Search filter
+      const nameMatch = order.customer?.fullName
+        ?.toLowerCase()
+        ?.includes(searchQuery);
+      const phoneMatch = order.customer?.mobileNumber
+        ?.toLowerCase()
+        ?.includes(searchQuery);
+      const matchesSearch = nameMatch || phoneMatch;
+
+      // Status filter
+      const matchesStatus =
+        statusFilter === "all" || order.orderStatus === statusFilter;
+
+      // Date filter
+      const orderDate = new Date(order.createdAt);
+      const now = new Date();
+      let matchesDate = true;
+
+      if (dateFilter === "today") {
+        matchesDate = orderDate.toDateString() === now.toDateString();
+      } else if (dateFilter === "last7") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        matchesDate = orderDate >= sevenDaysAgo;
+      } else if (dateFilter === "last30") {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(now.getDate() - 30);
+        matchesDate = orderDate >= thirtyDaysAgo;
+      } else if (dateFilter === "custom" && customDate) {
+        matchesDate =
+          orderDate.getFullYear() === customDate.getFullYear() &&
+          orderDate.getMonth() === customDate.getMonth() &&
+          orderDate.getDate() === customDate.getDate();
+      }
+
+      return matchesSearch && matchesStatus && matchesDate;
+    })
+    .sort((a, b) => {
+      // Sort by date or amount
+      if (sortBy === "newest") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortBy === "oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      } else if (sortBy === "amount-high") {
+        return b.amount - a.amount;
+      } else if (sortBy === "amount-low") {
+        return a.amount - b.amount;
+      }
+      return 0;
+    });
+
+  // Dashboard statistics
+  const orderStats = {
+    total: filteredAndSortedOrders.length,
+    pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
+      .length,
+    workInProgress: filteredAndSortedOrders.filter(
+      (o) => o.orderStatus === "work-in-progress"
+    ).length,
+    readyToShip: filteredAndSortedOrders.filter(
+      (o) => o.orderStatus === "ready-to-ship"
+    ).length,
+    delivered: filteredAndSortedOrders.filter(
+      (o) => o.orderStatus === "delivered"
+    ).length,
+    totalAmount: filteredAndSortedOrders.reduce(
+      (sum, order) => sum + (Number(order.amount) || 0),
+      0
+    ),
   };
 
   if (!isAuthorized) {
@@ -83,173 +169,187 @@ const AdminPage = () => {
 
   return (
     <div className="min-h-screen bg-white p-4">
-      <h1 className="text-xl font-bold mb-4">📦 Orders</h1>
+      <h1 className="text-xl font-bold mb-4">📦 Orders Management</h1>
 
+      {/* Stats Dashboard */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Pending</p>
+          <p className="text-lg font-bold text-gray-600">
+            {orderStats.pending}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">In Progress</p>
+          <p className="text-lg font-bold text-yellow-500">
+            {orderStats.workInProgress}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Ready to Ship</p>
+          <p className="text-lg font-bold text-indigo-500">
+            {orderStats.readyToShip}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Revenue</p>
+          <p className="text-lg font-bold text-green-600">
+            ₹{orderStats.totalAmount.toLocaleString()}
+          </p>
+        </div>
+      </div>
+
+      {/* Search and filters */}
+      <OrderFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        onCalendarDateChange={handleCalendarDateChange}
+      />
+      {
+        <span className="my-2 text-gray-500 inline-block italic">
+          {orders.length} orders
+        </span>
+      }
       {loading ? (
         <p className="text-center text-gray-500">Loading orders...</p>
       ) : orders.length === 0 ? (
         <p className="text-center text-gray-500">No orders found.</p>
+      ) : filteredAndSortedOrders.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No orders match your filters.
+        </p>
       ) : (
         <div className="space-y-4">
-          <div className="mb-4 space-y-3">
-            <input
-              type="text"
-              placeholder="Search by name or phone"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
-            />
-
-            <select
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+          {filteredAndSortedOrders.map((order) => (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="border rounded-lg p-4 shadow-sm"
             >
-              <option value="all">All Dates</option>
-              <option value="today">Today</option>
-              <option value="last7">Last 7 Days</option>
-            </select>
-          </div>
-
-          {orders
-            .filter((order) => {
-              const nameMatch = order.customer?.fullName
-                ?.toLowerCase()
-                .includes(searchQuery);
-              const phoneMatch = order.customer?.mobileNumber
-                ?.toLowerCase()
-                .includes(searchQuery);
-              const matchesSearch = nameMatch || phoneMatch;
-
-              const createdAt = new Date(order.createdAt);
-              const now = new Date();
-              let matchesDate = true;
-
-              if (dateFilter === "today") {
-                matchesDate = createdAt.toDateString() === now.toDateString();
-              } else if (dateFilter === "last7") {
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(now.getDate() - 7);
-                matchesDate = createdAt >= sevenDaysAgo;
-              }
-
-              return matchesSearch && matchesDate;
-            })
-            .map((order) => (
-              <motion.div
-                key={order.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="border rounded-lg p-4 shadow-sm"
-              >
-                <button
-                  onClick={() =>
-                    setExpandedOrderId(
-                      expandedOrderId === order.id ? null : order.id
-                    )
-                  }
-                  className="text-sm font-bold text-indigo-600 underline"
-                >
-                  {order.customer?.fullName}
-                </button>
-                <div className="text-xs text-gray-500 mb-2">
-                  {order.customer?.mobileNumber}
+              <div className="flex justify-between items-start">
+                <div>
+                  <button
+                    onClick={() =>
+                      setExpandedOrderId(
+                        expandedOrderId === order.id ? null : order.id
+                      )
+                    }
+                    className="text-sm font-bold text-indigo-600 underline"
+                  >
+                    {order.customer?.fullName}
+                  </button>
+                  <div className="text-xs text-gray-500 mb-2">
+                    {order.customer?.mobileNumber}
+                  </div>
                 </div>
-
-                <div className="text-xs text-gray-600">
-                  {order.items?.length} item(s) | ₹{order.amount}
+                <div className="text-right">
+                  <div className="text-sm font-bold">₹{order.amount}</div>
+                  <div className="text-xs text-gray-500">
+                    {order.items?.length} item(s)
+                  </div>
                 </div>
+              </div>
 
+              <div className="mt-3 text-xs">
+                <label className="text-gray-500 font-semibold">
+                  {" "}
+                  Payment Status:{" "}
+                </label>
+                {order.paymentStatus}
                 <div className="mt-3 text-xs">
-                  <label className="text-gray-500">Status: </label>
-                  <div className="mt-3 text-xs">
-                    <label className="text-gray-500">Status: </label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span
-                        className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
-      ${
-        order.orderStatus === "pending"
-          ? "bg-gray-400"
-          : order.status === "work-in-progress"
-          ? "bg-yellow-500"
-          : order.status === "ready-to-ship"
-          ? "bg-indigo-500"
-          : order.status === "delivered"
-          ? "bg-green-600"
-          : "bg-gray-300"
-      }
-    `}
-                      >
-                        {order.status}
-                      </span>
+                  <label className="text-gray-500"> Order Status: </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span
+                      className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
+                      ${
+                        order.orderStatus === "pending"
+                          ? "bg-gray-400"
+                          : order.orderStatus === "work-in-progress"
+                          ? "bg-yellow-500"
+                          : order.orderStatus === "ready-to-ship"
+                          ? "bg-indigo-500"
+                          : order.orderStatus === "delivered"
+                          ? "bg-green-600"
+                          : "bg-gray-300"
+                      }
+                    `}
+                    >
+                      {order.orderStatus}
+                    </span>
 
-                      <select
-                        value={order.orderStatus}
-                        onChange={(e) =>
-                          handleStatusChange(order.id, e.target.value)
-                        }
-                        className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="work-in-progress">
-                          Work in Progress
-                        </option>
-                        <option value="ready-to-ship">Ready to Ship</option>
-                        <option value="delivered">Delivered</option>
-                      </select>
-                    </div>
+                    <select
+                      value={order.orderStatus}
+                      onChange={(e) =>
+                        handleStatusChange(order.id, e.target.value)
+                      }
+                      className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="work-in-progress">Work in Progress</option>
+                      <option value="ready-to-ship">Ready to Ship</option>
+                      <option value="delivered">Delivered</option>
+                    </select>
                   </div>
                 </div>
+              </div>
 
-                <div className="mt-2 text-[10px] text-gray-400">
-                  {new Date(order.createdAt).toLocaleString()}
-                </div>
-                {expandedOrderId === order.id && (
-                  <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
-                    <div>
-                      <p className="font-semibold">Customer Details</p>
-                      <p>Name: {order.customer?.fullName}</p>
-                      <p>Phone: {order.customer?.mobileNumber}</p>
-                      <p>Alt Phone: {order.customer?.alternateMobile}</p>
-                      <p>
-                        Address: {order.customer?.addressLine1},{" "}
-                        {order.customer?.addressLine2}, {order.customer?.city},{" "}
-                        {order.customer?.state} - {order.customer?.pincode}
-                      </p>
-                      <p>Instructions: {order.customer?.specialInstructions}</p>
-                      <p>Delivery: {order.customer?.deliveryOption}</p>
-                    </div>
+              <div className="mt-2 text-[10px] text-gray-400">
+                {new Date(order.createdAt).toLocaleString()}
+              </div>
 
-                    <div>
-                      <p className="font-semibold mt-2">Items Ordered</p>
-                      <div className="space-y-1">
-                        {order.items?.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="border p-2 rounded bg-gray-50"
-                          >
-                            <p className="font-medium">{item.name}</p>
-                            <p>Size: {item.selectedSize}</p>
-                            <p>Price: ₹{item.price}</p>
-                            <p>
-                              Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
-                              {item.isFullSet ? "Yes" : "No"}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              {expandedOrderId === order.id && (
+                <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
+                  <div>
+                    <p className="font-semibold">Customer Details</p>
+                    <p>Name: {order.customer?.fullName}</p>
+                    <p>Phone: {order.customer?.mobileNumber}</p>
+                    <p>Alt Phone: {order.customer?.alternateMobile}</p>
+                    <p>
+                      Address: {order.customer?.addressLine1},{" "}
+                      {order.customer?.addressLine2}, {order.customer?.city},{" "}
+                      {order.customer?.state} - {order.customer?.pincode}
+                    </p>
+                    <p>Instructions: {order.customer?.specialInstructions}</p>
+                    <p>Delivery: {order.customer?.deliveryOption}</p>
+                  </div>
 
-                    <div className="pt-2 border-t">
-                      <p className="font-semibold">Razorpay</p>
-                      <p>Order ID: {order.razorpay_order_id}</p>
-                      <p>Payment ID: {order.razorpay_payment_id}</p>
+                  <div>
+                    <p className="font-semibold mt-2">Items Ordered</p>
+                    <div className="space-y-1">
+                      {order.items?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="border p-2 rounded bg-gray-50"
+                        >
+                          <p className="font-medium">{item.name}</p>
+                          <p>Size: {item.selectedSize}</p>
+                          <p>Price: ₹{item.price}</p>
+                          <p>
+                            Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
+                            {item.isFullSet ? "Yes" : "No"}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                )}
-              </motion.div>
-            ))}
+
+                  <div className="pt-2 border-t">
+                    <p className="font-semibold">Razorpay</p>
+                    <p>Order ID: {order.razorpay_order_id}</p>
+                    <p>Payment ID: {order.razorpay_payment_id}</p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ))}
         </div>
       )}
     </div>
