@@ -21,31 +21,36 @@ const Categories = () => {
       id: 3,
       name: "Kurta",
       description: "Contemporary Styles",
-      image: "/images/cat-1.jpg",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png",
     },
     {
       id: 1,
       name: "Tuxedo",
       description: "Classic Fits",
-      image: "/images/cat-1.webp",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095275/ChatGPT_Image_Apr_8_2025_11_56_25_AM_d5f2f5.png",
     },
     {
       id: 2,
-      name: "Sherwani",
+      name: "Lehenga",
       description: "Traditional Elegance",
-      image: "/images/cat-2.webp",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096705/ChatGPT_Image_Apr_8_2025_11_45_38_AM_xdfndo.png",
     },
     {
       id: 4,
       name: "Bandana",
       description: "Trendy Accessories",
-      image: "/images/cat-4.webp",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
     },
     {
       id: 5,
       name: "Bow Tie",
       description: "Suit Up!",
-      image: "/images/cat-5.webp",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
     },
   ];
 

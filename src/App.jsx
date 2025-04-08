@@ -34,10 +34,10 @@ const App = () => {
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
-        {/* <CartNav /> */}
+        <img src="/images/logo.png" />
       </nav>
       {shouldShowSearchBar && (
-        <header className="sticky top-0 bg-white shadow-sm z-20">
+        <header className="sticky top-0 bg-white  z-20">
           <div className="container mx-auto py-3">
             <SearchBar productData={productData} />
           </div>
