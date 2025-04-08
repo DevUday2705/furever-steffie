@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Method not allowed' });
+        return res.status(405).json({ message: 'Only POST allowed' });
     }
 
     try {
@@ -12,8 +12,8 @@ export default async function handler(req, res) {
             amount,
         } = req.body;
 
-        // For now, we'll just log — this is where you'd insert into DB
-        console.log('💾 Saving order:', {
+        // This is where you'd normally save to a database
+        console.log('📦 Saving order:', {
             razorpay_order_id,
             razorpay_payment_id,
             customer,
@@ -23,10 +23,10 @@ export default async function handler(req, res) {
             date: new Date().toISOString(),
         });
 
-        // You can replace this part with Firestore, Supabase, etc.
-        return res.status(200).json({ message: 'Order saved successfully!' });
+        // Respond success
+        return res.status(200).json({ success: true, message: 'Order saved successfully!' });
     } catch (error) {
-        console.error('Error saving order:', error);
-        return res.status(500).json({ message: 'Failed to save order' });
+        console.error('❌ Failed to save order:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 }
