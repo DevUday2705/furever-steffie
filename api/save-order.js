@@ -3,6 +3,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 let db;
 
+
+
 if (!getApps().length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
