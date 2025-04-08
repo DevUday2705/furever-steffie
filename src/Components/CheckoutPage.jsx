@@ -160,7 +160,10 @@ const CheckoutPage = () => {
           localStorage.setItem("order", orderDetails);
           localStorage.setItem("customer", formData);
 
-          navigate("/thank-you");
+          navigate({
+            pathname: "/thank-you",
+            search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
+          });
           // Navigate to thank you page or reset state
         } else {
           alert("❌ Payment verification failed.");

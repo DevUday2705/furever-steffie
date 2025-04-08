@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
+import { useSearchParams } from "react-router-dom";
 // For URL parameter extraction without useRouter
-function useQuery() {
-  return new URLSearchParams(window.location.search);
-}
 
 const ThankYouPage = () => {
-  const query = useQuery();
-  const orderId = query.get("orderId");
-  const paymentId = query.get("paymentId");
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("razorpay_order_id");
+  const paymentId = searchParams.get("razorpay_payment_id");
 
   const [orderData, setOrderData] = useState(null);
   const [customerData, setCustomerData] = useState(null);
