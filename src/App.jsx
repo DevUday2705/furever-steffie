@@ -27,6 +27,7 @@ import ShippingPolicyPage from "./Components/ShippingPolicyPage";
 import TermsAndConditionsPage from "./Components/TermsAndConditionsPage";
 import CancellationsRefundsPage from "./Components/CancellationsRefundsPage";
 import PrivacyPolicy from "./Components/PrivacyPolicy";
+import TestPay from "./Components/TestPay";
 const App = () => {
   const location = useLocation();
 
@@ -75,6 +76,7 @@ const App = () => {
           <Route path="/terms" element={<TermsAndConditionsPage />} />
           <Route path="/cancellations" element={<CancellationsRefundsPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/pay" element={<TestPay />} />
         </Routes>
       </div>
       <Toaster />
