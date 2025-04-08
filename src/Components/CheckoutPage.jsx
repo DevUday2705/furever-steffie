@@ -122,7 +122,7 @@ const CheckoutPage = () => {
     const res = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 499 }), // in INR
+      body: JSON.stringify({ amount: 1 }), // in INR
     });
 
     const data = await res.json();
