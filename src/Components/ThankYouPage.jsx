@@ -161,10 +161,10 @@ const ThankYouPage = () => {
                 <div className="p-4">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 h-16 w-16 rounded bg-gray-100 overflow-hidden">
-                      {orderData.image && (
+                      {orderData?.image && (
                         <img
-                          src={orderData.image}
-                          alt={orderData.name}
+                          src={orderData?.image}
+                          alt={orderData?.name}
                           className="h-16 w-16 object-cover"
                         />
                       )}

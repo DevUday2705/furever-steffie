@@ -85,8 +85,8 @@ const CheckoutPage = () => {
 
     if (validateForm(formData, setErrors)) {
       // In a real app, this would submit the order to a backend
-      localStorage.setItem("order", orderDetails);
-      localStorage.setItem("customer", formData);
+      localStorage.setItem("order", JSON.stringify(orderDetails));
+      localStorage.setItem("customer", JSON.stringify(formData));
       handlePayment();
     }
   };
