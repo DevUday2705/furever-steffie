@@ -9,6 +9,7 @@ const ADMIN_KEY = "030527";
 
 const AdminPage = () => {
   const [passkey, setPasskey] = useState("");
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -142,9 +143,16 @@ const AdminPage = () => {
                 transition={{ duration: 0.3 }}
                 className="border rounded-lg p-4 shadow-sm"
               >
-                <div className="text-sm font-semibold text-gray-800">
+                <button
+                  onClick={() =>
+                    setExpandedOrderId(
+                      expandedOrderId === order.id ? null : order.id
+                    )
+                  }
+                  className="text-sm font-bold text-indigo-600 underline"
+                >
                   {order.customer?.fullName}
-                </div>
+                </button>
                 <div className="text-xs text-gray-500 mb-2">
                   {order.customer?.mobileNumber}
                 </div>
@@ -197,6 +205,49 @@ const AdminPage = () => {
                 <div className="mt-2 text-[10px] text-gray-400">
                   {new Date(order.createdAt).toLocaleString()}
                 </div>
+                {expandedOrderId === order.id && (
+                  <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
+                    <div>
+                      <p className="font-semibold">Customer Details</p>
+                      <p>Name: {order.customer?.fullName}</p>
+                      <p>Phone: {order.customer?.mobileNumber}</p>
+                      <p>Alt Phone: {order.customer?.alternateMobile}</p>
+                      <p>
+                        Address: {order.customer?.addressLine1},{" "}
+                        {order.customer?.addressLine2}, {order.customer?.city},{" "}
+                        {order.customer?.state} - {order.customer?.pincode}
+                      </p>
+                      <p>Instructions: {order.customer?.specialInstructions}</p>
+                      <p>Delivery: {order.customer?.deliveryOption}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold mt-2">Items Ordered</p>
+                      <div className="space-y-1">
+                        {order.items?.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="border p-2 rounded bg-gray-50"
+                          >
+                            <p className="font-medium">{item.name}</p>
+                            <p>Size: {item.selectedSize}</p>
+                            <p>Price: ₹{item.price}</p>
+                            <p>
+                              Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
+                              {item.isFullSet ? "Yes" : "No"}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t">
+                      <p className="font-semibold">Razorpay</p>
+                      <p>Order ID: {order.razorpay_order_id}</p>
+                      <p>Payment ID: {order.razorpay_payment_id}</p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ))}
         </div>
