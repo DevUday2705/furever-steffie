@@ -23,6 +23,7 @@ import LoveMessage from "./Components/LoveMessage";
 import SearchBar from "./Components/SearchBar";
 import { productData } from "../src/constants/constant";
 import ContactUsPage from "./Components/ContactUs";
+import ShippingPolicyPage from "./Components/ShippingPolicyPage";
 const App = () => {
   const location = useLocation();
 
@@ -67,6 +68,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<UPIPayment />} />
           <Route path="/contact" element={<ContactUsPage />} />
+          <Route path="/policy" element={<ShippingPolicyPage />} />
         </Routes>
       </div>
       <Toaster />
