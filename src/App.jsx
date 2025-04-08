@@ -34,7 +34,9 @@ const App = () => {
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
-        <img src="/images/logo.png" />
+        <Link to="/" className="w-full ">
+          <img className="h-12 mx-auto" src="/images/logo.png" />
+        </Link>
       </nav>
       {shouldShowSearchBar && (
         <header className="sticky top-0 bg-white  z-20">
