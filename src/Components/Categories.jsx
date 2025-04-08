@@ -165,25 +165,20 @@ const Categories = () => {
                   </div>
 
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 p-6 text-white"
+                    className="absolute bottom-0 left-0 right-0 p-6 text-white flex items-start justify-between flex-col"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <h3 className="text-2xl font-bold mb-1">{category.name}</h3>
+                    <h3 className="text-2xl font-bold mb-1 flex items-center gap-2">
+                      {category.name}
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        🔗
+                      </span>
+                    </h3>
                     <p className="text-gray-200 mb-3 text-sm">
                       {category.description}
                     </p>
-
-                    <motion.span
-                      className="inline-block bg-white text-black px-6 py-2 rounded-full text-sm font-medium 
-                               opacity-0 group-hover:opacity-100 transform translate-y-4 
-                               group-hover:translate-y-0 transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Shop Now
-                    </motion.span>
                   </motion.div>
                 </Link>
               </div>
