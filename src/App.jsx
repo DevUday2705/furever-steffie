@@ -30,11 +30,18 @@ import PrivacyPolicy from "./Components/PrivacyPolicy";
 import AdminPage from "./Components/AdminPage";
 import TestPay from "./Components/TestPay";
 import ScrollToTop from "./Components/ScrollToTop";
+import ThankYouPage from "./Components/ThankYouPage";
 const App = () => {
   const location = useLocation();
 
   // Pages where SearchBar should be hidden
-  const hideSearchBarOn = ["/checkout", "/payment", "/final-receipt", "/admin"];
+  const hideSearchBarOn = [
+    "/checkout",
+    "/payment",
+    "/final-receipt",
+    "/admin",
+    "/thank-you",
+  ];
 
   // Check if current path is in the hideSearchBarOn array
   const shouldShowSearchBar = !hideSearchBarOn.includes(location.pathname);
@@ -72,13 +79,13 @@ const App = () => {
           <Route path="/order-form" element={<OrderForm />} />
           <Route path="/final-receipt" element={<FinalReceipt />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/payment" element={<UPIPayment />} />
           <Route path="/contact" element={<ContactUsPage />} />
           <Route path="/policy" element={<ShippingPolicyPage />} />
           <Route path="/terms" element={<TermsAndConditionsPage />} />
           <Route path="/cancellations" element={<CancellationsRefundsPage />} />
+
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/pay" element={<TestPay />} />
+          <Route path="/thank-you" element={<ThankYouPage />} />
           <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </div>

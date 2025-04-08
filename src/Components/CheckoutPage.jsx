@@ -157,11 +157,10 @@ const CheckoutPage = () => {
               amount: 1,
             }),
           });
+          localStorage.setItem("order", orderDetails);
+          localStorage.setItem("customer", formData);
 
-          const saveData = await saveRes.json();
-          alert("✅ Payment successful and order saved!");
-          console.log(saveData);
-
+          navigate("/thank-you");
           // Navigate to thank you page or reset state
         } else {
           alert("❌ Payment verification failed.");
