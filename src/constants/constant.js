@@ -532,3 +532,47 @@ export const traditionalOptions = [{
             ]
         }]
 }]
+
+
+// Validate form
+export const validateForm = (formData, setErrors) => {
+    const newErrors = {};
+
+    if (!formData.fullName.trim()) {
+        newErrors.fullName = "Full name is required";
+    }
+
+    if (!formData.addressLine1.trim()) {
+        newErrors.addressLine1 = "Address is required";
+    }
+
+    if (!formData.city.trim()) {
+        newErrors.city = "City is required";
+    }
+
+    if (!formData.state.trim()) {
+        newErrors.state = "State is required";
+    }
+
+    if (!formData.pincode.trim()) {
+        newErrors.pincode = "Pincode is required";
+    } else if (!/^\d{6}$/.test(formData.pincode)) {
+        newErrors.pincode = "Enter a valid 6-digit pincode";
+    }
+
+    if (!formData.mobileNumber.trim()) {
+        newErrors.mobileNumber = "Mobile number is required";
+    } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
+        newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+    }
+
+    if (
+        formData.alternateMobile.trim() &&
+        !/^\d{10}$/.test(formData.alternateMobile)
+    ) {
+        newErrors.alternateMobile = "Enter a valid 10-digit mobile number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+};
