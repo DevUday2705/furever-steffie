@@ -49,28 +49,28 @@ const ThankYouPage = () => {
     );
   }
 
-  if (!orderData || !customerData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-6 max-w-md mx-auto bg-white rounded-lg shadow-lg">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h1 className="text-xl md:text-2xl font-bold mb-4">
-            Order Information Not Found
-          </h1>
-          <p className="mb-6 text-gray-600 text-sm md:text-base">
-            We couldn't retrieve your order information. Please contact customer
-            support.
-          </p>
-          <button
-            onClick={handleContinueShopping}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 inline-block"
-          >
-            Return to Homepage
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (!orderData || !customerData) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  //       <div className="text-center p-6 max-w-md mx-auto bg-white rounded-lg shadow-lg">
+  //         <div className="text-red-500 text-5xl mb-4">⚠️</div>
+  //         <h1 className="text-xl md:text-2xl font-bold mb-4">
+  //           Order Information Not Found
+  //         </h1>
+  //         <p className="mb-6 text-gray-600 text-sm md:text-base">
+  //           We couldn't retrieve your order information. Please contact customer
+  //           support.
+  //         </p>
+  //         <button
+  //           onClick={handleContinueShopping}
+  //           className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 inline-block"
+  //         >
+  //           Return to Homepage
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <motion.div
