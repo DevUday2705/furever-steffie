@@ -40,7 +40,7 @@ export default async function handler(req, res) {
             customer,
             items,
             amount,
-            status: 'paid',
+            status: 'pending',
             createdAt: new Date().toISOString(),
         };
 
