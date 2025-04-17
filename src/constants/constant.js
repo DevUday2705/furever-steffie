@@ -516,7 +516,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830338/ChatGPT_Image_Apr_17_2025_12_20_28_AM_ijs5hw.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913539/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -542,7 +542,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830327/Fluffy_Shih_Tzu_in_Bow_Tie_1_le97id.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913539/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -568,7 +568,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830327/ChatGPT_Image_Apr_17_2025_12_30_37_AM_rl5k84.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913516/Adorable_Shih_Tzu_with_Bow_Tie_szepeo_xe85qr.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -594,7 +594,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830321/Fluffy_Dog_with_Elephant_Bow_Tie_rdwjpd.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913512/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw_fafcn8.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -620,7 +620,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830319/Fluffy_Shih_Tzu_in_Bow_Tie_wbwvlc.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913511/Fluffy_Pup_with_a_Stylish_Bow_Tie_u0dwbf_yegmxs.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -646,7 +646,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830318/ChatGPT_Image_Apr_17_2025_12_11_53_AM_fklx3f.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913511/Fluffy_Elegance_in_Blue_Polka_Dot_yoi6r6_bupeuu.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -672,7 +672,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913510/Fluffy_Dog_with_Elephant_Bow_Tie_rdwjpd_fczksv.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -698,7 +698,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913510/ChatGPT_Image_Apr_17_2025_12_11_53_AM_fklx3f_f8omgt.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -724,7 +724,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/Fluffy_Pup_with_a_Stylish_Bow_Tie_u0dwbf.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913508/Fluffy_Shih_Tzu_with_Bow_Tie_glcg9k_ckl4sx.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -750,7 +750,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830311/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913507/Fluffy_Shih_Tzu_in_Bow_Tie_wbwvlc_jpxp26.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -776,7 +776,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830311/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913505/Joyful_Shih_Tzu_with_Bow_Tie_hruwlp_ihizad.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -802,7 +802,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830310/Joyful_Shih_Tzu_with_Bow_Tie_hruwlp.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913504/Fluffy_Shih_Tzu_in_Bow_Tie_1_le97id_xlop2i.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -828,7 +828,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830309/Fluffy_Elegance_in_Blue_Polka_Dot_yoi6r6.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913502/ChatGPT_Image_Apr_16_2025_11_54_35_PM_vqzuo9_tyaj6j.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -854,7 +854,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830307/Adorable_Shih_Tzu_with_Bow_Tie_szepeo.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913502/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4_kkmpna.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -880,7 +880,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830307/Fluffy_Shih_Tzu_with_Bow_Tie_glcg9k.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913500/ChatGPT_Image_Apr_17_2025_12_20_28_AM_ijs5hw_ma9ugd.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -906,7 +906,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830306/ChatGPT_Image_Apr_16_2025_11_54_35_PM_vqzuo9.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913500/ChatGPT_Image_Apr_17_2025_12_30_37_AM_rl5k84_rdh4dw.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
