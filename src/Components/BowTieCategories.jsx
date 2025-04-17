@@ -20,7 +20,7 @@ const BowTieCategories = () => {
       name: "Male Bows",
       description: "Timeless elegance in pure colors",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913512/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw_fafcn8.png",
       url: "/male-bows",
     },
     {
@@ -28,7 +28,7 @@ const BowTieCategories = () => {
       name: "Female Bows",
       description: "Bold patterns & modern designs",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832613/ChatGPT_Image_Apr_17_2025_12_42_40_AM_ftwmcc.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_06_54_AM_cdpiof.png",
       url: "/female-bows",
     },
   ];
@@ -89,7 +89,7 @@ const BowTieCategories = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="https://res.cloudinary.com/di6unrpjw/image/upload/v1744105628/ChatGPT_Image_Apr_8_2025_03_12_42_PM_ssfxpx.png"
+            src="https://res.cloudinary.com/di6unrpjw/image/upload/v1744914496/ChatGPT_Image_Apr_8_2025_03_12_42_PM_1_qyymku.png"
             alt="Bows Collection"
             className="w-full h-full object-cover"
           />
