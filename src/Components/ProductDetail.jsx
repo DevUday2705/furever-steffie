@@ -181,7 +181,7 @@ const ProductDetail = () => {
                   <img
                     src={img}
                     alt={`${product.name} - View ${idx + 1}`}
-                    className="absolute w-full h-full object-cover"
+                    className="absolute w-full h-full object-cover object-[0%_25%]"
                   />
                 </div>
               ))}
