@@ -938,7 +938,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832623/ChatGPT_Image_Apr_17_2025_01_06_54_AM_lhezux.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_10_42_AM_ludkga.png",
                     "sizes": ["S", "M", "L"],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -964,7 +964,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832622/ChatGPT_Image_Apr_17_2025_12_57_09_AM_ktrmdj.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_06_54_AM_cdpiof.png",
                     "sizes": ["S", "M", "L",],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -990,7 +990,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832622/ChatGPT_Image_Apr_17_2025_01_03_20_AM_ugq7ur.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_00_56_AM_kfwhws.png",
                     "sizes": ["S", "M", "L",],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -1016,7 +1016,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832616/ChatGPT_Image_Apr_17_2025_12_59_44_AM_fjzyc9.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_02_11_AM_sp7jye.png",
                     "sizes": ["S", "M", "L",],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -1042,7 +1042,7 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832616/Apr_17_2025_12_54_14_AM_jlsavg.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_03_20_AM_iiqxyb.png",
                     "sizes": ["S", "M", "L",],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
@@ -1068,7 +1068,111 @@ export const bowData = {
                         "isFullSet": false,
                         "size": "S"
                     },
-                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832613/ChatGPT_Image_Apr_17_2025_01_00_56_AM_wpt7qe.png",
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_12_57_09_AM_qgahgw.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb007",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_12_59_44_AM_uijz1m.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb008",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913362/ChatGPT_Image_Apr_17_2025_01_05_21_AM_ikyodz.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb009",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913362/ChatGPT_Image_Apr_17_2025_12_42_40_AM_dw2xx6.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb010",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913363/Apr_17_2025_12_54_14_AM_aet4jv.png",
                     "sizes": ["S", "M", "L",],
                     "contactForCustomColors": true,
                     "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
