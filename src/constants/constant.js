@@ -1,4 +1,6 @@
-export const productData = {
+
+
+export const kurtaData = {
     "category": "Kurtas",
     "subcategories": [
         {
@@ -486,6 +488,605 @@ export const productData = {
         "calculateFinalPrice": "function(product, options) { let finalPrice = product.pricing.basePrice; if (options.isFullSet) { finalPrice += product.pricing.fullSetAdditional; } if (options.isBeaded) { finalPrice += product.pricing.beadedAdditional; } finalPrice += product.pricing.sizeIncrements[options.size]; return finalPrice; }"
     }
 }
+export const bowData = {
+    "category": "Bows",
+    "subcategories": [
+        {
+            "id": "male-bows",
+            "name": "Bows",
+            "products": [
+                {
+                    "category": 'male-bow',
+                    "id": "mb001",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830338/ChatGPT_Image_Apr_17_2025_12_20_28_AM_ijs5hw.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb002",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830327/Fluffy_Shih_Tzu_in_Bow_Tie_1_le97id.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb003",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830327/ChatGPT_Image_Apr_17_2025_12_30_37_AM_rl5k84.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb004",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830321/Fluffy_Dog_with_Elephant_Bow_Tie_rdwjpd.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb005",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830319/Fluffy_Shih_Tzu_in_Bow_Tie_wbwvlc.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb006",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830318/ChatGPT_Image_Apr_17_2025_12_11_53_AM_fklx3f.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb007",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb007",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb008",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830312/Fluffy_Pup_with_a_Stylish_Bow_Tie_u0dwbf.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb009",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830311/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb010",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830311/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb011",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830310/Joyful_Shih_Tzu_with_Bow_Tie_hruwlp.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb012",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830309/Fluffy_Elegance_in_Blue_Polka_Dot_yoi6r6.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb013",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830307/Adorable_Shih_Tzu_with_Bow_Tie_szepeo.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb014",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830307/Fluffy_Shih_Tzu_with_Bow_Tie_glcg9k.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'male-bow',
+                    "id": "mb015",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744830306/ChatGPT_Image_Apr_16_2025_11_54_35_PM_vqzuo9.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+
+            ]
+        },
+        {
+            "id": "female-bow",
+            "name": "Bows",
+            "products": [
+                {
+                    "category": 'female-bow',
+                    "id": "fb001",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832623/ChatGPT_Image_Apr_17_2025_01_06_54_AM_lhezux.png",
+                    "sizes": ["S", "M", "L"],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb002",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832622/ChatGPT_Image_Apr_17_2025_12_57_09_AM_ktrmdj.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb003",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832622/ChatGPT_Image_Apr_17_2025_01_03_20_AM_ugq7ur.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb004",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832616/ChatGPT_Image_Apr_17_2025_12_59_44_AM_fjzyc9.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb005",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832616/Apr_17_2025_12_54_14_AM_jlsavg.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+                {
+                    "category": 'female-bow',
+                    "id": "fb006",
+                    "name": "Royal Blue Solid Kurta",
+                    "pricing": {
+                        "basePrice": 199,
+                        "fullSetAdditional": 200,
+                        // "beadedAdditional": 200,
+                        "sizeIncrements": {
+                            "XS": 0,
+                            "S": 0,
+                            "M": 20,
+                            "L": 40,
+                            "XL": 60,
+                            "XXL": 80
+                        }
+                    },
+                    "defaultOptions": {
+                        "isFullSet": false,
+                        "size": "S"
+                    },
+                    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1744832613/ChatGPT_Image_Apr_17_2025_01_00_56_AM_wpt7qe.png",
+                    "sizes": ["S", "M", "L",],
+                    "contactForCustomColors": true,
+                    "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals."
+                },
+            ]
+        },
+
+    ],
+    "pricingCalculator": {
+        "calculateFinalPrice": "function(product, options) { let finalPrice = product.pricing.basePrice; if (options.isFullSet) { finalPrice += product.pricing.fullSetAdditional; } if (options.isBeaded) { finalPrice += product.pricing.beadedAdditional; } finalPrice += product.pricing.sizeIncrements[options.size]; return finalPrice; }"
+    }
+}
+
+export const productDataMap = {
+    kurta: kurtaData,
+    bows: bowData,
+    // Add more mappings as needed
+};
 
 export const containerVariants = {
     hidden: { opacity: 0 },

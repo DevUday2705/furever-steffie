@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { productData } from "../constants/constant";
+import { kurtaData } from "../constants/constant";
 import { ChevronLeft } from "lucide-react";
 
 // This would normally be fetched from an API
@@ -14,7 +14,7 @@ const SolidKurtasListing = () => {
     // Simulate API fetch
     setTimeout(() => {
       // Get only the solid kurtas subcategory
-      const solidKurtas = productData.subcategories.find(
+      const solidKurtas = kurtaData.subcategories.find(
         (subcat) => subcat.id === "solid-kurtas"
       );
       setProducts(solidKurtas.products);
@@ -79,7 +79,7 @@ const SolidKurtasListing = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -2 }}
               >
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product.id}+kurta`}>
                   <div className="relative pb-[125%]">
                     <img
                       src={product.mainImage}

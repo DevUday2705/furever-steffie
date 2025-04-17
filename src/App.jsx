@@ -9,7 +9,6 @@ import KurtaCategories from "./Components/KurtaCategories";
 import SolidKurtasListing from "./Components/SolidKurtasListing";
 import ProductDetail from "./Components/ProductDetail";
 import Cart from "./Components/Cart";
-
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home";
@@ -18,34 +17,18 @@ import BrocadeKurtasListing from "./Components/BrocadeKurtasListing";
 import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
 import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
-import UPIPayment from "./Components/UPIPayment";
-import LoveMessage from "./Components/LoveMessage";
-import SearchBar from "./Components/SearchBar";
-import { productData } from "../src/constants/constant";
 import ContactUsPage from "./Components/ContactUs";
 import ShippingPolicyPage from "./Components/ShippingPolicyPage";
 import TermsAndConditionsPage from "./Components/TermsAndConditionsPage";
 import CancellationsRefundsPage from "./Components/CancellationsRefundsPage";
 import PrivacyPolicy from "./Components/PrivacyPolicy";
 import AdminPage from "./Components/AdminPage";
-import TestPay from "./Components/TestPay";
-import ScrollToTop from "./Components/ScrollToTop";
+import FemaleBowCategories from "./Components/FemaleBowCategories";
+import MaleBowCategories from "./Components/MaleBowCategories";
+
 import ThankYouPage from "./Components/ThankYouPage";
+import BowTieCategories from "./Components/BowTieCategories";
 const App = () => {
-  const location = useLocation();
-
-  // Pages where SearchBar should be hidden
-  const hideSearchBarOn = [
-    "/checkout",
-    "/payment",
-    "/final-receipt",
-    "/admin",
-    "/thank-you",
-  ];
-
-  // Check if current path is in the hideSearchBarOn array
-  const shouldShowSearchBar = !hideSearchBarOn.includes(location.pathname);
-
   return (
     <div className=" max-w-md mx-auto">
       <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
@@ -53,13 +36,7 @@ const App = () => {
           <img className="h-12 mx-auto" src="/images/logo.png" />
         </Link>
       </nav>
-      {shouldShowSearchBar && (
-        <header className="sticky top-0 bg-white  z-20">
-          <div className="container mx-auto py-3">
-            <SearchBar productData={productData} />
-          </div>
-        </header>
-      )}
+
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -67,6 +44,9 @@ const App = () => {
           <Route path="/solid-kurtas" element={<SolidKurtasListing />} />
           <Route path="/printed-kurtas" element={<PrintedKurtasListing />} />
           <Route path="/brocade-kurtas" element={<BrocadeKurtasListing />} />
+          <Route path="/bow-tie" element={<BowTieCategories />} />
+          <Route path="/male-bows" element={<MaleBowCategories />} />
+          <Route path="/female-bows" element={<FemaleBowCategories />} />
           <Route path="/full-work-kurtas" element={<FullWorkKurtasListing />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/review" element={<OrderReviewPage />} />
@@ -83,7 +63,6 @@ const App = () => {
           <Route path="/policy" element={<ShippingPolicyPage />} />
           <Route path="/terms" element={<TermsAndConditionsPage />} />
           <Route path="/cancellations" element={<CancellationsRefundsPage />} />
-
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
           <Route path="/admin" element={<AdminPage />} />

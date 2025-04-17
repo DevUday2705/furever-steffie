@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { productData } from "../constants/constant";
+import { kurtaData } from "../constants/constant";
 import { ChevronLeft } from "lucide-react";
 
 // This would normally be fetched from an API
@@ -14,7 +14,7 @@ const FullWorkKurtasListing = () => {
     // Simulate API fetch
     setTimeout(() => {
       // Get only the fullWork kurtas subcategory
-      const fullWorkKurtas = productData.subcategories.find(
+      const fullWorkKurtas = kurtaData.subcategories.find(
         (subcat) => subcat.id === "full-work-kurtas"
       );
       setProducts(fullWorkKurtas.products);

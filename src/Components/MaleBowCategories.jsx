@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
-import { kurtaData } from "../constants/constant";
 import { ChevronLeft } from "lucide-react";
-
-// This would normally be fetched from an API
-
-const PrintedKurtasListing = () => {
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { bowData } from "../constants/constant";
+const MaleBowCategories = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simulate API fetch
     setTimeout(() => {
-      // Get only the Printed kurtas subcategory
-      const printedKurtas = kurtaData.subcategories.find(
-        (subcat) => subcat.id === "printed-kurtas"
+      // Get only the solid kurtas subcategory
+      const solidKurtas = bowData.subcategories.find(
+        (subcat) => subcat.id === "male-bows"
       );
-      setProducts(printedKurtas.products);
+      setProducts(solidKurtas.products);
       setIsLoading(false);
     }, 500);
   }, []);
@@ -50,11 +47,10 @@ const PrintedKurtasListing = () => {
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-gray-800 capitalize">
-            PRINTED KURTAS
+            MALE BOWS
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Elegant Printed color kurtas for your furry friend's special
-            occasions
+            Elegant solid color bows for your furry friend's special occasions
           </p>
         </div>
       </div>
@@ -64,12 +60,6 @@ const PrintedKurtasListing = () => {
         <div className="grid grid-cols-2 gap-4">
           {products.map((product) => {
             // Calculate the default price (full beaded set, size S)
-            const defaultPrice =
-              product.pricing.basePrice + product.pricing.beadedAdditional;
-
-            // Calculate kurta only price (beaded, size S)
-            const kurtaOnlyPrice =
-              product.pricing.basePrice + product.pricing.beadedAdditional;
 
             return (
               <motion.div
@@ -80,7 +70,7 @@ const PrintedKurtasListing = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -2 }}
               >
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product.id}+bows`}>
                   <div className="relative pb-[125%]">
                     <img
                       src={product.mainImage}
@@ -100,7 +90,7 @@ const PrintedKurtasListing = () => {
                     <div className="mt-1">
                       <div className="flex items-baseline">
                         <span className="text-base font-bold text-gray-800">
-                          ₹{kurtaOnlyPrice}
+                          ₹{product.pricing.basePrice}
                         </span>
                       </div>
                     </div>
@@ -124,4 +114,4 @@ const PrintedKurtasListing = () => {
   );
 };
 
-export default PrintedKurtasListing;
+export default MaleBowCategories;
