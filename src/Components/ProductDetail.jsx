@@ -5,7 +5,7 @@ import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { productDataMap } from "../constants/constant";
 import { useAppContext } from "../context/AppContext";
-
+import { toast } from "react-hot-toast";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -379,6 +379,7 @@ const ProductDetail = () => {
               image: images[0],
               quantity: 1,
             });
+            toast.success("Added To Cart");
             setIsOpen(true);
           }}
         >

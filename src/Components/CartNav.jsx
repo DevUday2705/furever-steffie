@@ -20,15 +20,22 @@ const CartNav = () => {
     setIsOpen(false);
     navigate("/checkout"); // or change this to your checkout route
   };
-
+  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
   return (
     <div className="relative">
-      <img
-        onClick={() => setIsOpen(!isOpen)}
-        src="/images/bag.png"
-        className="h-8 cursor-pointer"
-        alt="Cart"
-      />
+      <div className="relative">
+        <img
+          onClick={() => setIsOpen(!isOpen)}
+          src="/images/bag.png"
+          className="h-8 cursor-pointer"
+          alt="Cart"
+        />
+        {totalCartItems > 0 && (
+          <div className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md">
+            {totalCartItems}
+          </div>
+        )}
+      </div>
 
       <AnimatePresence>
         {isOpen && (
