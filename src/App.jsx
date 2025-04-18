@@ -24,6 +24,7 @@ import CancellationsRefundsPage from "./Components/CancellationsRefundsPage";
 import PrivacyPolicy from "./Components/PrivacyPolicy";
 import AdminPage from "./Components/AdminPage";
 import FemaleBowCategories from "./Components/FemaleBowCategories";
+import CartNav from "./Components/CartNav";
 import MaleBowCategories from "./Components/MaleBowCategories";
 
 import ThankYouPage from "./Components/ThankYouPage";
@@ -35,6 +36,7 @@ const App = () => {
         <Link to="/" className="w-full ">
           <img className="h-12 mx-auto" src="/images/logo.png" />
         </Link>
+        <CartNav />
       </nav>
 
       <div className="max-w-md mx-auto">

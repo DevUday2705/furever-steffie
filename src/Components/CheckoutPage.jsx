@@ -24,12 +24,16 @@ import { toPng } from "html-to-image";
 import { AnimatePresence, motion } from "framer-motion";
 import { QRCode } from "react-qrcode-logo";
 import toast from "react-hot-toast";
+import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { cart } = useAppContext();
   const { orderDetails, sizeConfirmed } = location.state || {};
+
+  const isCartCheckout = !orderDetails;
   // Form state
   const [formData, setFormData] = useState({
     fullName: "",
@@ -69,24 +73,30 @@ const CheckoutPage = () => {
 
   // Calculate total price including delivery
   const calculateTotal = () => {
-    if (!orderDetails) return 0;
-    let total = orderDetails.price;
+    let subtotal = 0;
 
-    // Add delivery charge
-    total += formData.deliveryOption === "express" ? 399 : 49;
+    if (isCartCheckout) {
+      subtotal = cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      );
+    } else {
+      subtotal = orderDetails.price;
+    }
 
-    return total;
+    const deliveryCharge = formData.deliveryOption === "express" ? 399 : 49;
+    return subtotal + deliveryCharge;
   };
-
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormSubmitted(true);
 
     if (validateForm(formData, setErrors)) {
-      // In a real app, this would submit the order to a backend
-      localStorage.setItem("order", JSON.stringify(orderDetails));
       localStorage.setItem("customer", JSON.stringify(formData));
+      if (!isCartCheckout) {
+        localStorage.setItem("order", JSON.stringify(orderDetails));
+      }
       handlePayment();
     }
   };
@@ -99,7 +109,7 @@ const CheckoutPage = () => {
   // Download receipt as image
 
   // If no order details, redirect back
-  if (!orderDetails && !orderCompleted) {
+  if (!orderDetails && cart.length === 0 && !orderCompleted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-4">
@@ -107,7 +117,7 @@ const CheckoutPage = () => {
             No Order Found
           </h2>
           <p className="text-gray-600 mb-4">
-            Please start your order from the product page.
+            Please add items to cart or buy a product first.
           </p>
           <button
             onClick={() => navigate("/")}
@@ -121,23 +131,24 @@ const CheckoutPage = () => {
   }
 
   const handlePayment = async () => {
+    const totalAmount = calculateTotal() * 100; // in paise
+
     const res = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 1 }), // in INR
+      body: JSON.stringify({ amount: totalAmount }),
     });
 
     const data = await res.json();
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from .env file
-      amount: data.amount, // in paise
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: data.amount,
       currency: data.currency,
       name: "Furever Steffie",
       description: "Order Payment",
       order_id: data.id,
       handler: async function (response) {
-        // 1️⃣ Verify payment
         const verifyRes = await fetch("/api/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -147,7 +158,6 @@ const CheckoutPage = () => {
         const verifyData = await verifyRes.json();
 
         if (verifyData.success) {
-          // 2️⃣ Save the order
           const saveRes = await fetch("/api/save-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -155,8 +165,8 @@ const CheckoutPage = () => {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               customer: formData,
-              items: [orderDetails], // Replace with your actual cart/products
-              amount: 1,
+              items: isCartCheckout ? cart : [orderDetails],
+              amount: data.amount / 100,
             }),
           });
 
@@ -164,7 +174,6 @@ const CheckoutPage = () => {
             pathname: "/thank-you",
             search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
           });
-          // Navigate to thank you page or reset state
         } else {
           alert("❌ Payment verification failed.");
         }
@@ -208,29 +217,38 @@ const CheckoutPage = () => {
                 </h3>
               </div>
 
-              <div className="p-4">
-                <div className="flex mb-4">
-                  <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
-                    <img
-                      src={orderDetails?.image}
-                      alt={orderDetails?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <div className="text-xs font-medium text-gray-600">
-                      {orderDetails?.subcategory}
+              <div className="p-4 space-y-4">
+                {(isCartCheckout ? cart : [orderDetails]).map((item, idx) => (
+                  <div key={idx} className="flex">
+                    <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+                      <img
+                        src={item.image}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <h4 className="text-md font-semibold text-gray-800">
-                      {orderDetails?.name}
-                    </h4>
-                    <div className="mt-1 text-sm text-gray-600">
-                      {orderDetails?.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                      {orderDetails?.isFullSet ? "Full Set" : "Kurta Only"} •
-                      Size {orderDetails?.selectedSize}
+                    <div className="ml-3 flex-1">
+                      <div className="text-xs text-gray-600">
+                        {item.subcategory}
+                      </div>
+                      <h4 className="text-sm font-semibold text-gray-800">
+                        {item.name}
+                      </h4>
+                      <div className="text-xs text-gray-600 mt-0.5">
+                        {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
+                        {item.isFullSet ? "Full Set" : "Kurta Only"} • Size{" "}
+                        {item.selectedSize}
+                      </div>
+                      {item.quantity && (
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          Qty: {item.quantity}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-800 ml-2">
+                      ₹{item.price * (item.quantity || 1)}
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -546,7 +564,13 @@ const CheckoutPage = () => {
               <div className="p-4 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Product Price:</span>
-                  <span className="text-gray-800">₹{orderDetails?.price}</span>
+                  <span className="text-gray-800">
+                    ₹
+                    {(isCartCheckout
+                      ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
+                      : orderDetails.price
+                    ).toFixed(2)}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
@@ -563,7 +587,6 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Place Order Button */}
             <button
               type="submit"
               className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"

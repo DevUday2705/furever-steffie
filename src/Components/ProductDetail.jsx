@@ -4,10 +4,12 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { productDataMap } from "../constants/constant";
+import { useAppContext } from "../context/AppContext";
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useAppContext();
   const [idPart, categoryPart] = productId.split("+");
 
   const [product, setProduct] = useState(null);
@@ -343,6 +345,28 @@ const ProductDetail = () => {
 
       {/* Buy Button */}
       <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+        import {useAppContext} from "../context/AppContext"; // Inside component
+        const {addToCart} = useAppContext();
+        <motion.button
+          className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
+          whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            addToCart({
+              productId: product.id,
+              name: product.name,
+              subcategory: product.subcategory,
+              isBeaded,
+              isFullSet,
+              selectedSize,
+              price: calculatePrice(),
+              image: images[0],
+              quantity: 1,
+            });
+            navigate("/cart");
+          }}
+        >
+          Add to Cart • ₹{calculatePrice()}
+        </motion.button>
         <motion.button
           className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
           whileTap={{ scale: 0.98 }}
