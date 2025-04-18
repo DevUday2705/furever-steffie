@@ -4,8 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const CartNav = () => {
-  const { cart, updateQuantity, removeFromCart } = useAppContext();
-  const [isOpen, setIsOpen] = useState(false);
+  const { cart, updateQuantity, removeFromCart, isOpen, setIsOpen } =
+    useAppContext();
+
   const navigate = useNavigate();
 
   const calculateTotal = () =>

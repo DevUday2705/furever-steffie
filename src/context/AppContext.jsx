@@ -10,6 +10,7 @@ export const useAppContext = () => useContext(AppContext);
 export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
   const [selections, setSelections] = useState({
     gender: "",
     style: "",
@@ -83,6 +84,8 @@ export const AppProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
+        isOpen,
+        setIsOpen,
       }}
     >
       {children}
