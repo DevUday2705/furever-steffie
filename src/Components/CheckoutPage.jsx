@@ -131,7 +131,7 @@ const CheckoutPage = () => {
   }
 
   const handlePayment = async () => {
-    const totalAmount = calculateTotal() * 100; // in paise
+    const totalAmount = calculateTotal(); // in paise
 
     const res = await fetch("/api/create-order", {
       method: "POST",
