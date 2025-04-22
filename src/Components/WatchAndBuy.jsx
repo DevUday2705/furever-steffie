@@ -94,7 +94,7 @@ const WatchAndBuy = () => {
     <section className="pb-8 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 pt-5">
           <h2 className="text-2xl font-bold text-gray-900">Watch & Buy</h2>
           <div className="flex gap-2">
             <button
