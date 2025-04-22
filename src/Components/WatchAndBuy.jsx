@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const WatchAndBuy = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -21,22 +22,26 @@ const WatchAndBuy = () => {
       name: "Classic Black Tuxedo",
       price: 12999,
       video: "/videos/vid-1.mp4",
+      link: "/product/sk001+kurta",
     },
     {
       id: 2,
       name: "Royal Blue Sherwani",
+      link: "/product/sk002+kurta",
       price: 15999,
       video: "/videos/vid-2.mp4",
     },
     {
       id: 3,
       name: "Designer Kurta Set",
+      link: "/product/sk003+kurta",
       price: 8999,
       video: "/videos/vid-3.mp4",
     },
     {
       id: 4,
       name: "Silk Bandana Collection",
+      link: "/product/sk004+kurta",
       price: 1499,
       video: "/videos/vid-4.mp4",
     },
@@ -143,43 +148,45 @@ const WatchAndBuy = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="relative group">
-                  {/* Video Container with 9:16 aspect ratio */}
-                  <div className="relative w-full pt-[177.78%] rounded-lg overflow-hidden bg-gray-900">
-                    <video
-                      ref={(el) => (videoRefs.current[product.id] = el)}
-                      className="absolute top-0 left-0 w-full h-full object-cover"
-                      loop
-                      muted
-                      playsInline
-                      onClick={() => handleVideoPlay(product.id)}
-                    >
-                      <source src={product.video} type="video/mp4" />
-                    </video>
+                <Link to={product.link}>
+                  <div className="relative group">
+                    {/* Video Container with 9:16 aspect ratio */}
+                    <div className="relative w-full pt-[177.78%] rounded-lg overflow-hidden bg-gray-900">
+                      <video
+                        ref={(el) => (videoRefs.current[product.id] = el)}
+                        className="absolute top-0 left-0 w-full h-full object-cover"
+                        loop
+                        muted
+                        playsInline
+                        onClick={() => handleVideoPlay(product.id)}
+                      >
+                        <source src={product.video} type="video/mp4" />
+                      </video>
 
-                    {/* Play/Pause Button Overlay */}
-                    <button
-                      onClick={() => handleVideoPlay(product.id)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {isPlaying[product.id] ? (
-                        <Pause className="w-8 h-8 text-white" />
-                      ) : (
-                        <Play className="w-8 h-8 text-white" />
-                      )}
-                    </button>
-                  </div>
+                      {/* Play/Pause Button Overlay */}
+                      <button
+                        onClick={() => handleVideoPlay(product.id)}
+                        className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        {isPlaying[product.id] ? (
+                          <Pause className="w-8 h-8 text-white" />
+                        ) : (
+                          <Play className="w-8 h-8 text-white" />
+                        )}
+                      </button>
+                    </div>
 
-                  {/* Product Info */}
-                  <div className="mt-3">
-                    <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-                      ₹{product.price.toLocaleString("en-IN")}
-                    </p>
+                    {/* Product Info */}
+                    <div className="mt-3">
+                      <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                        ₹{product.price.toLocaleString("en-IN")}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
