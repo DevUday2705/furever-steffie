@@ -53,6 +53,28 @@ const CheckoutPage = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   // Order complete state
   const [orderCompleted, setOrderCompleted] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [couponError, setCouponError] = useState("");
+
+  const availableCoupons = {
+    FUREVER10: 10, // 10% off
+    STEFFIE20: 20, // 20% off
+  };
+
+  const applyCoupon = () => {
+    const code = couponCode.trim().toUpperCase();
+    if (availableCoupons[code]) {
+      const discountPercent = availableCoupons[code];
+      setDiscount(discountPercent);
+      setCouponError("");
+      toast.success(`🎉 Coupon applied: ${discountPercent}% off`);
+    } else {
+      setDiscount(0);
+      setCouponError("Invalid coupon code");
+      toast.error("❌ Invalid coupon code");
+    }
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -85,7 +107,9 @@ const CheckoutPage = () => {
     }
 
     const deliveryCharge = formData.deliveryOption === "express" ? 399 : 49;
-    return subtotal + deliveryCharge;
+    const discountAmount = (subtotal * discount) / 100;
+
+    return Math.round(subtotal - discountAmount + deliveryCharge);
   };
   // Handle form submission
   const handleSubmit = (e) => {
@@ -136,7 +160,7 @@ const CheckoutPage = () => {
     const res = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: totalAmount }),
+      body: JSON.stringify({ amount: calculateTotal() }),
     });
 
     const data = await res.json();
@@ -167,6 +191,7 @@ const CheckoutPage = () => {
               customer: formData,
               items: isCartCheckout ? cart : [orderDetails],
               amount: data.amount / 100,
+              coupon: couponCode,
             }),
           });
 
@@ -552,7 +577,32 @@ const CheckoutPage = () => {
                 ></textarea>
               </div>
             </div>
-
+            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h3 className="text-md font-semibold text-gray-800">
+                  Have a Coupon?
+                </h3>
+              </div>
+              <div className="p-4 flex space-x-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  placeholder="Enter coupon code"
+                  className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={applyCoupon}
+                  className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md"
+                >
+                  Apply
+                </button>
+              </div>
+              {couponError && (
+                <p className="px-4 pb-3 text-xs text-red-500">{couponError}</p>
+              )}
+            </div>
             {/* Order Total */}
             <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
               <div className="p-4 border-b border-gray-100">
@@ -579,7 +629,20 @@ const CheckoutPage = () => {
                     ₹{formData.deliveryOption === "express" ? 399 : 49}
                   </span>
                 </div>
-
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Coupon Discount:</span>
+                    <span>
+                      -₹
+                      {(() => {
+                        let subtotal = isCartCheckout
+                          ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
+                          : orderDetails.price;
+                        return ((subtotal * discount) / 100).toFixed(2);
+                      })()}
+                    </span>
+                  </div>
+                )}
                 <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
                   <span className="text-gray-800">Total:</span>
                   <span className="text-gray-800">₹{calculateTotal()}</span>
