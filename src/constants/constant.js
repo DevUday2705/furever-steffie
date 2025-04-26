@@ -1,6 +1,7 @@
 
 
 export const kurtaData = {
+    "requiresMeasurements": true,
     "category": "Kurtas",
     "subcategories": [
         {
@@ -489,6 +490,7 @@ export const kurtaData = {
     }
 }
 export const bowData = {
+    "requiresMeasurements": false,
     "category": "Bows",
     "subcategories": [
         {
@@ -679,7 +681,7 @@ export const bowData = {
                 },
                 {
                     "category": 'male-bow',
-                    "id": "mb007",
+                    "id": "mb008",
                     "name": "Royal Blue Solid Kurta",
                     "pricing": {
                         "basePrice": 199,

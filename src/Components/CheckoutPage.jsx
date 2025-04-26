@@ -189,7 +189,14 @@ const CheckoutPage = () => {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               customer: formData,
-              items: isCartCheckout ? cart : [orderDetails],
+              items: isCartCheckout
+                ? cart
+                : [
+                    {
+                      ...orderDetails,
+                      measurements: orderDetails.measurements || {}, // 👈 safe default
+                    },
+                  ],
               amount: data.amount / 100,
               coupon: couponCode,
             }),

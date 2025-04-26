@@ -80,7 +80,7 @@ const BrocadeKurtasListing = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -2 }}
               >
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product.id}+kurta`}>
                   <div className="relative pb-[125%]">
                     <img
                       src={product.mainImage}
