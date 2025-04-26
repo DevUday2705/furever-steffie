@@ -1,14 +1,28 @@
-// src/components/ProductDetail/ProductMeasurements.jsx
-
 import React, { useState, useEffect } from "react";
 
 const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
-  const [neck, setNeck] = useState("");
-  const [chest, setChest] = useState("");
-  const [back, setBack] = useState("");
-
+  const [measurements, setMeasurements] = useState({
+    neck: "",
+    chest: "",
+    back: "",
+  });
+  const [touched, setTouched] = useState({
+    neck: false,
+    chest: false,
+    back: false,
+  });
   const [detectedSize, setDetectedSize] = useState(null);
   const [errors, setErrors] = useState({});
+  const [proportionError, setProportionError] = useState("");
+  const [allFieldsFilled, setAllFieldsFilled] = useState(false);
+
+  const handleChange = (name, value) => {
+    setMeasurements((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBlur = (name) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  };
 
   const validateField = (name, value) => {
     let error = "";
@@ -33,6 +47,28 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
     return error;
   };
 
+  // Check for proportional consistency in measurements
+  const validateProportions = (neck, chest, back) => {
+    const n = Number(neck);
+    const c = Number(chest);
+    const b = Number(back);
+
+    // All fields have values and are in range but don't fit into a size category
+    if (n && c && b) {
+      // Check for unrealistic proportion combinations
+      if (n > c) {
+        return "Neck measurement cannot be larger than chest measurement";
+      }
+
+      // Check if measurements don't belong to any size category
+      if (!mapMeasurementsToSize(neck, chest, back)) {
+        return "These measurements don't match any standard size. Please verify your measurements.";
+      }
+    }
+
+    return "";
+  };
+
   const mapMeasurementsToSize = (neck, chest, back) => {
     const n = Number(neck);
     const c = Number(chest);
@@ -54,6 +90,7 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
   };
 
   useEffect(() => {
+    const { neck, chest, back } = measurements;
     const newErrors = {
       neck: validateField("neck", neck),
       chest: validateField("chest", chest),
@@ -61,91 +98,188 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
     };
     setErrors(newErrors);
 
-    const hasErrors = Object.values(newErrors).some((err) => err !== "");
+    // Check if all fields have values (even if they have validation errors)
+    const allFilled = neck !== "" && chest !== "" && back !== "";
+    setAllFieldsFilled(allFilled);
 
-    if (!hasErrors) {
+    const hasFieldErrors = Object.values(newErrors).some((err) => err !== "");
+
+    // Check for proportion errors only if all fields have valid individual values
+    const propError =
+      !hasFieldErrors && allFilled
+        ? validateProportions(neck, chest, back)
+        : "";
+    setProportionError(propError);
+
+    if (!hasFieldErrors && !propError && allFilled) {
       const size = mapMeasurementsToSize(neck, chest, back);
       setDetectedSize(size);
-      setMeasurementsValid(true); // 👈 perfectly safe
-      onSizeDetected(size, { neck, chest, back }); // 👈 perfectly safe
+      setMeasurementsValid(true);
+      onSizeDetected(size, measurements);
     } else {
       setDetectedSize(null);
       setMeasurementsValid(false);
     }
-  }, [neck, chest, back]);
+  }, [measurements]);
+
+  // Get all current errors but only show for touched fields
+  const getVisibleErrors = () => {
+    const visibleErrors = {};
+    Object.keys(errors).forEach((key) => {
+      if (touched[key] && errors[key]) {
+        visibleErrors[key] = errors[key];
+      }
+    });
+    return visibleErrors;
+  };
+
+  const visibleErrors = getVisibleErrors();
+  const hasVisibleErrors = Object.keys(visibleErrors).length > 0;
+  const showProportionError =
+    proportionError &&
+    allFieldsFilled &&
+    touched.neck &&
+    touched.chest &&
+    touched.back;
+
+  // Helper to shorten labels for display
+  const shortenLabel = (field) => {
+    if (field === "neck") return "Neck";
+    if (field === "chest") return "Chest";
+    if (field === "back") return "Back Length";
+    return field;
+  };
 
   return (
-    <div className="bg-gray-50 p-4 rounded-md space-y-6">
-      {/* ✨ Motivational Section */}
-      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md text-sm text-gray-800 space-y-2 shadow-sm">
-        <div className="font-semibold text-gray-900 flex items-center gap-2">
+    <div className="bg-gray-50 p-4 rounded-md space-y-4">
+      {/* Motivational Section - More compact */}
+      <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md text-sm text-gray-800 shadow-sm">
+        <div className="font-semibold text-gray-900 mb-1">
           🧵 Why we need measurements
         </div>
-        <ul className="list-disc pl-5 space-y-1 text-[13px]">
-          <li>Every outfit is stitched custom for your pet 🐾</li>
-          <li>No ready-made sizing – only perfect fit ✂️</li>
-          <li>Better comfort, hygiene & zero return issues ✅</li>
-        </ul>
+        <div className="text-xs flex flex-wrap gap-2">
+          <span>• Custom stitched for your pet</span>
+          <span>• Perfect fit guaranteed</span>
+          <span>• Zero returns</span>
+        </div>
       </div>
 
-      {/* 📏 Input Fields */}
-      <div className="space-y-4">
+      {/* Input Fields in a Row */}
+      <div className="flex flex-wrap gap-2">
         {/* Neck */}
-        <div>
-          <label className="text-xs text-gray-700 font-medium">
-            Neck Circumference (inches)
+        <div className="flex-1 min-w-0">
+          <label className="text-xs text-gray-700 font-medium block mb-1">
+            Neck (inches)
           </label>
           <input
             type="text"
-            value={neck}
-            onChange={(e) => setNeck(e.target.value)}
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
+            value={measurements.neck}
+            onChange={(e) => handleChange("neck", e.target.value)}
+            onBlur={() => handleBlur("neck")}
+            className={`p-2 w-full border ${
+              touched.neck && errors.neck ? "border-red-300" : "border-gray-300"
+            } rounded-md text-sm`}
             placeholder="e.g., 14"
           />
-          {errors.neck && (
-            <p className="text-xs text-red-500 mt-1">{errors.neck}</p>
-          )}
         </div>
 
         {/* Chest */}
-        <div>
-          <label className="text-xs text-gray-700 font-medium">
-            Chest Circumference (inches)
+        <div className="flex-1 min-w-0">
+          <label className="text-xs text-gray-700 font-medium block mb-1">
+            Chest (inches)
           </label>
           <input
             type="text"
-            value={chest}
-            onChange={(e) => setChest(e.target.value)}
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
+            value={measurements.chest}
+            onChange={(e) => handleChange("chest", e.target.value)}
+            onBlur={() => handleBlur("chest")}
+            className={`p-2 w-full border ${
+              touched.chest && errors.chest
+                ? "border-red-300"
+                : "border-gray-300"
+            } rounded-md text-sm`}
             placeholder="e.g., 24"
           />
-          {errors.chest && (
-            <p className="text-xs text-red-500 mt-1">{errors.chest}</p>
-          )}
         </div>
 
         {/* Back */}
-        <div>
-          <label className="text-xs text-gray-700 font-medium">
+        <div className="flex-1 min-w-0">
+          <label className="text-xs text-gray-700 font-medium block mb-1">
             Back Length (inches)
           </label>
           <input
             type="text"
-            value={back}
-            onChange={(e) => setBack(e.target.value)}
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"
+            value={measurements.back}
+            onChange={(e) => handleChange("back", e.target.value)}
+            onBlur={() => handleBlur("back")}
+            className={`p-2 w-full border ${
+              touched.back && errors.back ? "border-red-300" : "border-gray-300"
+            } rounded-md text-sm`}
             placeholder="e.g., 16"
           />
-          {errors.back && (
-            <p className="text-xs text-red-500 mt-1">{errors.back}</p>
-          )}
         </div>
       </div>
 
-      {/* ✅ Detected Pet Size */}
+      {/* Field-specific Error Display */}
+      {hasVisibleErrors && (
+        <div className="text-xs text-red-500 p-2 bg-red-50 rounded-md border border-red-100">
+          <p className="font-medium mb-1">Please fix the following errors:</p>
+          <ul className="pl-5 list-disc">
+            {Object.entries(visibleErrors).map(([field, error]) => (
+              <li key={field}>
+                {shortenLabel(field)}: {error}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Proportion Error Display - only show after all fields are touched */}
+      {showProportionError && (
+        <div className="text-xs text-red-500 p-2 bg-red-50 rounded-md border border-red-100">
+          <p className="font-medium mb-1">Measurement issue:</p>
+          <p>{proportionError}</p>
+        </div>
+      )}
+
+      {/* Size Chart Helper */}
+      {!detectedSize &&
+        allFieldsFilled &&
+        !hasVisibleErrors &&
+        !proportionError && (
+          <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md border border-blue-100">
+            Finding your pet's size based on measurements...
+          </div>
+        )}
+
+      {/* Detected Pet Size */}
+
       {detectedSize && (
-        <div className="text-green-600 font-medium text-sm mt-1">
-          🎉 Measurements saved! Pet Size Detected: {detectedSize}
+        <div className="mt-3 bg-green-50 rounded-lg border-2 border-green-300 overflow-hidden shadow-sm">
+          <div className="p-4 flex items-center">
+            <div className="bg-white rounded-full p-2 mr-3 shadow-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium">
+                RECOMMENDED SIZE FOR YOUR PET
+              </p>
+              <p className="text-2xl font-bold text-gray-800">{detectedSize}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>

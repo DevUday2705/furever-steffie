@@ -143,7 +143,9 @@ const ProductDetail = () => {
       price += product.pricing.beadedAdditional;
     }
 
-    const mappedSize = sizeCodeMap[selectedSize] ?? "S"; // 👈 this is key
+    // Check if selectedSize is already a size code (S, M, L) or a full name (Small, Medium, Large)
+    // If it's a full name, map it to a code, otherwise use it directly
+    const mappedSize = sizeCodeMap[selectedSize] || selectedSize;
     price += product.pricing.sizeIncrements[mappedSize] ?? 0;
 
     return price;
