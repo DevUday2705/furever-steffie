@@ -10,7 +10,7 @@ const CustomColorEnquiry = ({ product }) => {
     e.preventDefault();
     if (!customColor.trim()) return; // Do nothing if no color entered
 
-    const message = `Hi! I'm interested in ${product.name} (ID: ${product.id}) in ${customColor} color. Is it available?`;
+    const message = `Hi, I need help with ${product.name} (ID: ${product.id}).`;
     window.open(
       `https://wa.me/+918828145667?text=${encodeURIComponent(message)}`,
       "_blank"
@@ -23,13 +23,13 @@ const CustomColorEnquiry = ({ product }) => {
         <Check className="mr-2 mt-0.5 text-gray-800" size={16} />
         <div className="flex-1">
           <h3 className="text-xs font-medium text-gray-900">
-            Looking for a specific color?
+            Looking for help? Or Specific color ? Chat Now!
           </h3>
 
           <div className="mt-2 flex items-center">
             <input
               type="text"
-              placeholder="Enter desired color"
+              placeholder="Enter your query here! We're here to help."
               value={customColor}
               onChange={(e) => setCustomColor(e.target.value)}
               className="text-xs p-1.5 border border-gray-300 rounded-md mr-2 w-full"
