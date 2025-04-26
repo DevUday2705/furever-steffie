@@ -7,13 +7,13 @@ import { productDataMap } from "../constants/constant";
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
-import ImageCarousel from "../components/ProductDetail/ImageCarousel";
-import ProductInfo from "../components/ProductDetail/ProductInfo";
-import ProductOptions from "../components/ProductDetail/ProductOptions";
-import CustomColorEnquiry from "../components/ProductDetail/CustomColorEnquiry";
-import BottomActions from "../components/ProductDetail/BottomActions";
-import ProductMeasurements from "../components/ProductDetail/ProductMeasurements";
-import ReadyMadeSizeSelector from "../components/ReadyMadeSizeSelector";
+import ImageCarousel from "../Components/ProductDetail/ImageCarousel";
+import ProductInfo from "../Components/ProductDetail/ProductInfo";
+import ProductOptions from "../Components/ProductDetail/ProductOptions";
+import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
+import BottomActions from "../Components/ProductDetail/BottomActions";
+import ProductMeasurements from "../Components/ProductDetail/ProductMeasurements";
+import ReadyMadeSizeSelector from "../Components/ReadyMadeSizeSelector";
 
 const ProductDetail = () => {
   const { productId } = useParams();
