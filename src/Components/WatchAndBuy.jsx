@@ -21,7 +21,8 @@ const WatchAndBuy = () => {
       id: 1,
       name: "Classic Black Tuxedo",
       price: 12999,
-      video: "/videos/vid-1.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692424/vid-1_cndyer.mp4",
       link: "/product/sk001+kurta",
     },
     {
@@ -29,21 +30,24 @@ const WatchAndBuy = () => {
       name: "Royal Blue Sherwani",
       link: "/product/sk002+kurta",
       price: 15999,
-      video: "/videos/vid-2.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692423/vid-2_qabxnr.mp4",
     },
     {
       id: 3,
       name: "Designer Kurta Set",
       link: "/product/sk003+kurta",
       price: 8999,
-      video: "/videos/vid-3.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692420/vid-4_dr6q2f.mp4",
     },
     {
       id: 4,
       name: "Silk Bandana Collection",
       link: "/product/sk004+kurta",
       price: 1499,
-      video: "/videos/vid-4.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692420/vid-3_fimt2h.mp4",
     },
   ];
 
