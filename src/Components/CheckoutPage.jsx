@@ -190,11 +190,14 @@ const CheckoutPage = () => {
               razorpay_payment_id: response.razorpay_payment_id,
               customer: formData,
               items: isCartCheckout
-                ? cart
+                ? cart.map((item) => ({
+                    ...item,
+                    measurements: item.measurements || {}, // Make sure measurements are included for cart items too
+                  }))
                 : [
                     {
                       ...orderDetails,
-                      measurements: orderDetails.measurements || {}, // 👈 safe default
+                      measurements: orderDetails.measurements || {}, // safe default
                     },
                   ],
               amount: data.amount / 100,
@@ -222,6 +225,8 @@ const CheckoutPage = () => {
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
+
+  console.log(cart);
 
   return (
     <div className="bg-gray-50 pb-24">

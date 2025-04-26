@@ -28,8 +28,8 @@ const BottomActions = ({
       selectedSize,
       price: calculatePrice(),
       image: images[0],
+      measurements: requiresMeasurements ? measurements : null, // Include measurements
     };
-    console.log("Hi");
     navigate("/checkout", { state: { orderDetails, sizeConfirmed: true } });
   };
 
@@ -44,6 +44,7 @@ const BottomActions = ({
       price: calculatePrice(),
       image: images[0],
       quantity: 1,
+      measurements: requiresMeasurements ? measurements : null, // Include measurements
     });
     toast.success("Added To Cart");
     setIsOpen(true);
