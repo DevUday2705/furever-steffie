@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { kurtaData } from "../constants/constant";
+import { kurtas } from "../constants/constant";
 import { ChevronLeft } from "lucide-react";
 
-// This would normally be fetched from an API
-
-const BrocadeKurtasListing = () => {
+const KurtaListing = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate API fetch
     setTimeout(() => {
-      // Get only the brocade kurtas subcategory
-      const brocadeKurtas = kurtaData.subcategories.find(
-        (subcat) => subcat.id === "brocade-kurtas"
+      const sortedKurtas = kurtas.sort(
+        (a, b) => (b.priorityScore || 0) - (a.priorityScore || 0)
       );
-      setProducts(brocadeKurtas.products);
+      setProducts(sortedKurtas);
       setIsLoading(false);
     }, 500);
   }, []);
-  const navigate = useNavigate();
+
+  const handleGoBack = () => navigate(-1);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -30,11 +29,9 @@ const BrocadeKurtasListing = () => {
     );
   }
 
-  const handleGoBack = () => {
-    navigate(-1); // Go back to previous page in history
-  };
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* Top Navigation */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-3 py-3">
           <button
@@ -46,30 +43,29 @@ const BrocadeKurtasListing = () => {
           </button>
         </div>
       </div>
+
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-gray-800 capitalize">
-            BROCADE KURTAS
+            All Kurtas
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Elegant brocade color kurtas for your furry friend's special
-            occasions
+            Explore our exclusive range of handcrafted kurtas for pets!
           </p>
         </div>
       </div>
 
-      {/* Product Grid - Always 2 columns */}
+      {/* Product Grid */}
       <div className="container mx-auto px-3 py-4">
         <div className="grid grid-cols-2 gap-4">
           {products.map((product) => {
-            // Calculate the default price (full beaded set, size S)
-            const defaultPrice =
-              product.pricing.basePrice + product.pricing.beadedAdditional;
+            const basePrice = product.pricing.basePrice || 0;
+            const beadedAdd = product.pricing.beadedAdditional || 0;
 
-            // Calculate kurta only price (beaded, size S)
-            const kurtaOnlyPrice =
-              product.pricing.basePrice + product.pricing.beadedAdditional;
+            const defaultPrice = product.isBeadedAvailable
+              ? basePrice + beadedAdd
+              : basePrice;
 
             return (
               <motion.div
@@ -80,27 +76,40 @@ const BrocadeKurtasListing = () => {
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -2 }}
               >
-                <Link to={`/product/${product.id}+kurta`}>
-                  <div className="relative pb-[125%]">
-                    <img
+                <Link to={`/product/${product.id}+${product.type}`}>
+                  <div className="relative pb-[125%] overflow-hidden">
+                    <motion.img
                       src={product.mainImage}
                       alt={product.name}
                       className="absolute w-full h-full object-cover"
+                      whileHover={{ scale: 1.05 }}
                     />
-                    <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-medium text-gray-800 shadow-sm">
-                      New
-                    </div>
+
+                    {/* 🎯 BADGES */}
+                    {product.priorityScore >= 90 && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase shadow">
+                        Best Seller
+                      </div>
+                    )}
+                    {product.availableStock <= 5 && (
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 px-2 py-1 rounded-full text-[10px] font-bold uppercase shadow">
+                        Few Left
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-3">
-                    <h3 className="text-sm font-medium text-gray-800 truncate">
+                    <h3
+                      className="text-sm font-medium text-gray-800 truncate"
+                      title={product.name}
+                    >
                       {product.name}
                     </h3>
 
                     <div className="mt-1">
                       <div className="flex items-baseline">
                         <span className="text-base font-bold text-gray-800">
-                          ₹{kurtaOnlyPrice}
+                          ₹{defaultPrice}
                         </span>
                       </div>
                     </div>
@@ -124,4 +133,4 @@ const BrocadeKurtasListing = () => {
   );
 };
 
-export default BrocadeKurtasListing;
+export default KurtaListing;

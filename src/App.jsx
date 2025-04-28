@@ -5,16 +5,11 @@ import SelectedFabric from "./Components/SelectedFabric";
 import OrderForm from "./Components/OrderForm";
 import FinalReceipt from "./Components/FinalReceipt";
 import ModernOptions from "./Components/ModernOptions";
-import KurtaCategories from "./Components/KurtaCategories";
-import SolidKurtasListing from "./Components/SolidKurtasListing";
 import ProductDetail from "./Components/ProductDetail";
 import Cart from "./Components/Cart";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home";
-import PrintedKurtasListing from "./Components/PrintedKurtasListing";
-import BrocadeKurtasListing from "./Components/BrocadeKurtasListing";
-import FullWorkKurtasListing from "./Components/FullWorkKurtasListing";
 import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
 import ContactUsPage from "./Components/ContactUs";
@@ -29,6 +24,8 @@ import MaleBowCategories from "./Components/MaleBowCategories";
 
 import ThankYouPage from "./Components/ThankYouPage";
 import BowTieCategories from "./Components/BowTieCategories";
+
+import KurtaListing from "./Components/KurtaListing";
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
@@ -42,14 +39,10 @@ const App = () => {
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/kurta" element={<KurtaCategories />} />
-          <Route path="/solid-kurtas" element={<SolidKurtasListing />} />
-          <Route path="/printed-kurtas" element={<PrintedKurtasListing />} />
-          <Route path="/brocade-kurtas" element={<BrocadeKurtasListing />} />
+          <Route path="/kurta" element={<KurtaListing />} />
           <Route path="/bow-tie" element={<BowTieCategories />} />
           <Route path="/male-bows" element={<MaleBowCategories />} />
           <Route path="/female-bows" element={<FemaleBowCategories />} />
-          <Route path="/full-work-kurtas" element={<FullWorkKurtasListing />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/review" element={<OrderReviewPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />

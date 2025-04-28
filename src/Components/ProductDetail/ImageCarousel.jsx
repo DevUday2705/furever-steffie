@@ -13,7 +13,7 @@ const ImageCarousel = ({
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {images.map((img, idx) => (
-            <div className="min-w-full relative pb-[100%]" key={idx}>
+            <div className="min-w-full relative pb-[133%]" key={idx}>
               <img
                 src={img}
                 alt={`Product Image ${idx + 1}`}

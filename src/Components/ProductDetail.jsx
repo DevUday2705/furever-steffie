@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { productDataMap } from "../constants/constant";
+import { kurtas } from "../constants/constant"; // Import all types separately
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
@@ -19,7 +19,7 @@ const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsOpen } = useAppContext();
-  const [idPart, categoryPart] = productId.split("+");
+  const [idPart, typePart] = productId.split("+");
 
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +34,7 @@ const ProductDetail = () => {
     chest: "",
     back: "",
   });
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState([]);
@@ -58,30 +59,16 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchProduct = () => {
-      const categoryData = productDataMap[categoryPart.toLowerCase()];
-      if (!categoryData) return null;
+      let productArray = [];
 
-      // Handle nested products with subcategories
-      if (Array.isArray(categoryData.subcategories)) {
-        for (const sub of categoryData.subcategories) {
-          const match = sub.products.find((p) => p.id === idPart);
-          if (match) return { ...match, subcategory: sub.name };
-        }
-      }
+      // 👇 Based on type
+      if (typePart === "kurta") productArray = kurtas;
+      else if (typePart === "bow") productArray = bows;
+      else if (typePart === "lehnga") productArray = lehngas;
+      else if (typePart === "tuxedo") productArray = tuxedos;
+      else return null; // Invalid type
 
-      // Handle flat product arrays
-      if (Array.isArray(categoryData.products)) {
-        const match = categoryData.products.find((p) => p.id === idPart);
-        if (match) return match;
-      }
-
-      // Handle direct product array (no wrapper)
-      if (Array.isArray(categoryData)) {
-        const match = categoryData.find((p) => p.id === idPart);
-        if (match) return match;
-      }
-
-      return null;
+      return productArray.find((p) => p.id === idPart) || null;
     };
 
     setTimeout(() => {
@@ -143,8 +130,6 @@ const ProductDetail = () => {
       price += product.pricing.beadedAdditional;
     }
 
-    // Check if selectedSize is already a size code (S, M, L) or a full name (Small, Medium, Large)
-    // If it's a full name, map it to a code, otherwise use it directly
     const mappedSize = sizeCodeMap[selectedSize] || selectedSize;
     price += product.pricing.sizeIncrements[mappedSize] ?? 0;
 
@@ -183,17 +168,14 @@ const ProductDetail = () => {
   }
 
   const categoriesThatRequireMeasurements = [
-    "solid-kurtas",
-    "brocade-kurtas",
-    "printed-kurtas",
-    "tuxedos",
-    "lehengas",
-    "dresses",
+    "kurta",
+    "lehnga",
+    "tuxedo",
+    "dress",
   ];
 
-  const requiresMeasurements = categoriesThatRequireMeasurements.includes(
-    product.category
-  );
+  const requiresMeasurements =
+    categoriesThatRequireMeasurements.includes(typePart);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -210,6 +192,7 @@ const ProductDetail = () => {
           />
 
           <ProductInfo product={product} calculatePrice={calculatePrice} />
+
           {requiresMeasurements ? (
             <ProductMeasurements
               onSizeDetected={(size, measurements) => {
@@ -225,6 +208,7 @@ const ProductDetail = () => {
               sizes={product.sizes || ["S", "M", "L", "XL"]}
             />
           )}
+
           <ProductOptions
             product={product}
             isBeaded={isBeaded}
