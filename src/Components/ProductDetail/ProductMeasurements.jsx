@@ -74,12 +74,15 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
     const c = Number(chest);
     const b = Number(back);
 
-    if (n >= 14 && n <= 16 && c >= 20 && c <= 24 && b >= 14 && b <= 16) {
-      return "Small";
+    // Added Extra Small size option for smaller pets
+    if (n >= 10 && n < 14 && c >= 16 && c < 20 && b >= 10 && b < 14) {
+      return "XS";
+    } else if (n >= 14 && n <= 16 && c >= 20 && c <= 24 && b >= 14 && b <= 16) {
+      return "Sm";
     } else if (n >= 17 && n <= 20 && c >= 25 && c <= 30 && b >= 17 && b <= 20) {
-      return "Medium";
+      return "Md";
     } else if (n >= 21 && n <= 24 && c >= 31 && c <= 36 && b >= 21 && b <= 24) {
-      return "Large";
+      return "Lg";
     } else if (n >= 25 && n <= 28 && c >= 37 && c <= 42 && b >= 25 && b <= 28) {
       return "XL";
     } else if (n >= 29 && n <= 32 && c >= 43 && c <= 48 && b >= 29 && b <= 32) {

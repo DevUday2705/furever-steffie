@@ -109,7 +109,7 @@ export const kurtas = [
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095416/ChatGPT_Image_Apr_7_2025_07_36_30_PM_du9r18.png"]
             }
         },
-        "sizes": ["S", "M", "L"],
+        "sizes": ["XS", "S", "M", "L"],
         "contactForCustomColors": false,
         "description": "Elegant and simple white kurta designed for grace and ease.",
         "availableStock": 20,
@@ -145,7 +145,7 @@ export const kurtas = [
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_30_44_PM-min_hkeoic.webp"],
             }
         },
-        "sizes": ["S", "M", "L"],
+        "sizes": ["XS", "S", "M", "L"],
         "contactForCustomColors": false,
         "description": "Elegant and simple white kurta designed for grace and ease.",
         "availableStock": 20,
@@ -182,7 +182,7 @@ export const kurtas = [
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp"],
             }
         },
-        "sizes": ["S", "M", "L"],
+        "sizes": ["XS", "S", "M", "L"],
         "contactForCustomColors": false,
         "description": "Elegant and simple white kurta designed for grace and ease.",
         "availableStock": 20,

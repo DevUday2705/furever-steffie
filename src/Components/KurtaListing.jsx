@@ -127,6 +127,12 @@ const KurtaListing = () => {
               ? basePrice + beadedAdd
               : basePrice;
 
+            // Calculate discount (random between 5-15%)
+            const discountPercent = Math.floor(Math.random() * 11) + 5; // 5-15%
+            const originalPrice = Math.round(
+              price * (100 / (100 - discountPercent))
+            );
+
             return (
               <motion.div
                 key={product.id}
@@ -145,7 +151,7 @@ const KurtaListing = () => {
                       whileHover={{ scale: 1.05 }}
                     />
 
-                    {/* Modern Badges */}
+                    {/* Best Seller Badge */}
                     {product.priorityScore >= 90 && (
                       <div className="absolute top-3 left-3">
                         <motion.div
@@ -156,20 +162,6 @@ const KurtaListing = () => {
                         >
                           <Flame size={14} className="text-white" />
                           <span>Best Seller</span>
-                        </motion.div>
-                      </div>
-                    )}
-
-                    {product.availableStock <= 5 && (
-                      <div className="absolute top-3 right-3">
-                        <motion.div
-                          className="flex items-center gap-1 bg-amber-400 text-gray-900 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-lg"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.2 }}
-                        >
-                          <AlertCircle size={14} />
-                          <span>Few Left</span>
                         </motion.div>
                       </div>
                     )}
@@ -199,38 +191,58 @@ const KurtaListing = () => {
                       {product.name}
                     </h3>
 
-                    <div className="mt-2 flex items-baseline">
-                      <span className="text-base font-bold text-gray-800">
-                        ₹{price}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 flex justify-end">
-                      <motion.div
-                        className="text-gray-800 font-medium text-xs flex items-center"
-                        whileHover={{ x: 4 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 15,
-                        }}
-                      >
-                        View Details
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3.5 w-3.5 ml-0.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                    <div className="flex flex-col h-16">
+                      {" "}
+                      {/* Fixed height container */}
+                      <div className="flex items-baseline flex-wrap">
+                        <span className="text-base font-bold text-gray-800 mr-2">
+                          ₹{price}
+                        </span>
+                        <span className="text-sm text-gray-500 line-through mr-2">
+                          ₹{originalPrice}
+                        </span>
+                        <span className="text-xs font-medium text-emerald-600">
+                          {discountPercent}% off
+                        </span>
+                      </div>
+                      {/* Few Left indicator as a separate element that doesn't affect layout */}
+                      {product.availableStock <= 5 && (
+                        <div className="mt-1">
+                          <span className="text-xs font-medium text-red-500">
+                            Only few left
+                          </span>
+                        </div>
+                      )}
+                      {/* Spacer to push view details to bottom */}
+                      <div className="flex-grow"></div>
+                      {/* View Details always at the bottom */}
+                      <div className="flex justify-end mt-1">
+                        <motion.div
+                          className="text-gray-800 font-medium text-xs flex items-center"
+                          whileHover={{ x: 4 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 15,
+                          }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </motion.div>
+                          View Details
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-3.5 w-3.5 ml-0.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </motion.div>
+                      </div>
                     </div>
                   </div>
                 </Link>
