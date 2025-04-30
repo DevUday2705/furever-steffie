@@ -4,12 +4,14 @@ import Categories from "./Categories";
 import WatchAndBuy from "./WatchAndBuy";
 import TrendingProducts from "./TrendingProducts";
 import Footer from "./Footer";
+import KurtaBanner from "./KurtaBanner";
 
 const Home = () => {
   return (
     <div>
       <MobileHeroCarousel />
-      <Categories />
+      {/* <Categories /> */}
+      <KurtaBanner />
       <WatchAndBuy />
       <TrendingProducts />
       <Footer />

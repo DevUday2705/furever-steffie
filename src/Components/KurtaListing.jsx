@@ -25,7 +25,7 @@ const KurtaListing = () => {
     inStockOnly: false,
     customColor: false,
     categories: [],
-    categoryOptions: ["everyday", "premium"],
+    categoryOptions: ["classic", "premium"],
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -240,9 +240,7 @@ const KurtaListing = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                       >
-                        {product.category === "premium"
-                          ? "Premium"
-                          : "Everyday"}
+                        {product.category === "premium" ? "Premium" : "Classic"}
                       </motion.div>
                     </div>
                   </div>

@@ -4,7 +4,7 @@ export const kurtas = [
     {
         "id": "sk001",
         "type": "kurta",
-        "category": "everyday",
+        "category": "classic",
         "name": "Royal Blue Solid Kurta",
         "pricing": {
             "basePrice": 899,
@@ -47,7 +47,7 @@ export const kurtas = [
     {
         "id": "sk002",
         "type": "kurta",
-        "category": "everyday",
+        "category": "classic",
         "name": "Sunshine Yellow Kurta",
         "pricing": {
             "basePrice": 799,
@@ -107,6 +107,116 @@ export const kurtas = [
         "options": {
             "nonBeaded": {
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095416/ChatGPT_Image_Apr_7_2025_07_36_30_PM_du9r18.png"]
+            }
+        },
+        "sizes": ["S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Elegant and simple white kurta designed for grace and ease.",
+        "availableStock": 20,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 75
+    },
+    {
+        "id": "sk004",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Golden Aura",
+        "pricing": {
+            "basePrice": 699,
+            "fullSetAdditional": 350,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_30_44_PM-min_hkeoic.webp",
+        "options": {
+            "nonBeaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_30_44_PM-min_hkeoic.webp"],
+            }
+        },
+        "sizes": ["S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Elegant and simple white kurta designed for grace and ease.",
+        "availableStock": 20,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 75
+    }
+    ,
+    {
+        "id": "sk005",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Red Royale",
+        "pricing": {
+            "basePrice": 699,
+            "fullSetAdditional": 350,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp",
+        "options": {
+            "nonBeaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp"],
+            }
+        },
+        "sizes": ["S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Elegant and simple white kurta designed for grace and ease.",
+        "availableStock": 20,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 75
+    }
+    ,
+    {
+        "id": "sk005",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Midnight Elegance",
+        "pricing": {
+            "basePrice": 699,
+            "fullSetAdditional": 350,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_38_45_PM-min_kiv2mb.webp",
+        "options": {
+            "nonBeaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_38_45_PM-min_kiv2mb.webp"],
             }
         },
         "sizes": ["S", "M", "L"],
