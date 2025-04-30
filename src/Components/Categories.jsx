@@ -132,7 +132,7 @@ const Categories = () => {
                   : "bg-white text-black border-gray-300 hover:border-black"
               }`}
             >
-              For {type.charAt(0).toUpperCase() + type.slice(1)} Pets
+              {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
