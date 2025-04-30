@@ -10,8 +10,8 @@ const Home = () => {
   return (
     <div>
       <MobileHeroCarousel />
-      {/* <Categories /> */}
-      <KurtaBanner />
+      <Categories />
+      {/* <KurtaBanner /> */}
       <WatchAndBuy />
       <TrendingProducts />
       <Footer />
