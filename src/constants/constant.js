@@ -87,7 +87,7 @@ export const kurtas = [
         "category": "premium",
         "name": "Elegant White Kurta",
         "pricing": {
-            "basePrice": 699,
+            "basePrice": 899,
             "fullSetAdditional": 350,
             "sizeIncrements": {
                 "XS": 0,
@@ -157,7 +157,7 @@ export const kurtas = [
     {
         "id": "sk005",
         "type": "kurta",
-        "category": "classic",
+        "category": "premium",
         "name": "Red Royale",
         "pricing": {
             "basePrice": 699,
@@ -192,7 +192,7 @@ export const kurtas = [
     }
     ,
     {
-        "id": "sk005",
+        "id": "sk006",
         "type": "kurta",
         "category": "classic",
         "name": "Midnight Elegance",

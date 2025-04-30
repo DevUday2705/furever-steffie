@@ -10,6 +10,7 @@ import {
   Flame,
 } from "lucide-react";
 import FilterDrawer from "./FilterDrawer";
+import { useProductFilter } from "../hooks/useProductFilter";
 
 const KurtaListing = () => {
   const [products, setProducts] = useState([]);
@@ -30,63 +31,8 @@ const KurtaListing = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // 1) Base list
-  const baseList = useMemo(() => kurtas, []);
-
-  // 2) Apply filters & sorting
-  const filtered = useMemo(() => {
-    let list = [...baseList];
-
-    // In stock
-    if (filters.inStockOnly) {
-      list = list.filter((p) => p.availableStock > 0);
-    }
-    // Price
-    list = list.filter(
-      (p) =>
-        p.pricing.basePrice + (p.pricing.beadedAdditional || 0) <=
-        filters.maxPrice
-    );
-    // Size
-    if (filters.sizes.length) {
-      list = list.filter((p) => p.sizes.some((s) => filters.sizes.includes(s)));
-    }
-    // Category
-    if (filters.categories.length) {
-      list = list.filter((p) => filters.categories.includes(p.category));
-    }
-    // Style
-    if (filters.styleBeaded) {
-      list = list.filter((p) => p.isBeadedAvailable);
-    }
-    if (filters.styleSimple) {
-      list = list.filter((p) => p.isNonBeadedAvailable);
-    }
-    // Custom
-    if (filters.customColor) {
-      list = list.filter((p) => p.contactForCustomColors);
-    }
-
-    // Sorting
-    if (filters.sortBy === "popularity") {
-      list.sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0));
-    } else if (filters.sortBy === "price-asc") {
-      list.sort(
-        (a, b) =>
-          a.pricing.basePrice +
-          (a.pricing.beadedAdditional || 0) -
-          (b.pricing.basePrice + (b.pricing.beadedAdditional || 0))
-      );
-    } else if (filters.sortBy === "price-desc") {
-      list.sort(
-        (a, b) =>
-          b.pricing.basePrice +
-          (b.pricing.beadedAdditional || 0) -
-          (a.pricing.basePrice + (a.pricing.beadedAdditional || 0))
-      );
-    }
-
-    return list;
-  }, [baseList, filters]);
+  const baseList = useMemo(() => [...kurtas], []);
+  const filtered = useProductFilter(baseList, filters);
 
   // Count active filters
   const activeFilterCount = useMemo(() => {
@@ -105,13 +51,7 @@ const KurtaListing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => {
-      const sortedKurtas = kurtas.sort(
-        (a, b) => (b.priorityScore || 0) - (a.priorityScore || 0)
-      );
-      setProducts(sortedKurtas);
-      setIsLoading(false);
-    }, 500);
+    setTimeout(() => setIsLoading(false), 500);
   }, []);
 
   const handleGoBack = () => navigate(-1);
@@ -123,6 +63,12 @@ const KurtaListing = () => {
       </div>
     );
   }
+
+  console.log("Selected Categories:", filters.categories);
+  console.log(
+    "Filtered Products:",
+    filtered.map((p) => `${p.name} (${p.category})`)
+  );
 
   return (
     <div className="bg-gray-50 min-h-screen">
