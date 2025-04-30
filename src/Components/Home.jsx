@@ -13,7 +13,7 @@ const Home = () => {
       <Categories />
       {/* <KurtaBanner /> */}
       <WatchAndBuy />
-      <TrendingProducts />
+      {/* <TrendingProducts /> */}
       <Footer />
     </div>
   );

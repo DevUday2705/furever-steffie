@@ -21,11 +21,14 @@ import AdminPage from "./Components/AdminPage";
 import FemaleBowCategories from "./Components/FemaleBowCategories";
 import CartNav from "./Components/CartNav";
 import MaleBowCategories from "./Components/MaleBowCategories";
-
 import ThankYouPage from "./Components/ThankYouPage";
 import BowTieCategories from "./Components/BowTieCategories";
 
 import KurtaListing from "./Components/KurtaListing";
+import TuxedoListing from "./Components/TuxedoListing";
+import BandanaListing from "./Components/BandanaListing";
+import LehengaListing from "./Components/LehengaListing";
+import FrockListing from "./Components/FrockListing";
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
@@ -40,6 +43,10 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/kurta" element={<KurtaListing />} />
+          <Route path="/tuxedo" element={<TuxedoListing />} />
+          <Route path="/bandana" element={<BandanaListing />} />
+          <Route path="/lehenga" element={<LehengaListing />} />
+          <Route path="/frock" element={<FrockListing />} />
           <Route path="/bow-tie" element={<BowTieCategories />} />
           <Route path="/male-bows" element={<MaleBowCategories />} />
           <Route path="/female-bows" element={<FemaleBowCategories />} />
