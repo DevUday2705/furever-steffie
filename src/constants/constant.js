@@ -7,9 +7,9 @@ export const kurtas = [
         "category": "classic",
         "name": "Royal Blue Solid Kurta",
         "pricing": {
-            "basePrice": 899,
+            "basePrice": 1099,
             "discountPercent": 10,
-            "fullSetAdditional": 400,
+            "fullSetAdditional": 600,
             "beadedAdditional": 200,
             "sizeIncrements": {
                 "XS": 0,
@@ -21,7 +21,7 @@ export const kurtas = [
             }
         },
         "defaultOptions": {
-            "isBeaded": true,
+            "isBeaded": false,
             "isFullSet": false,
             "size": "S"
         },
@@ -32,8 +32,8 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://images.unsplash.com/photo-1591946614720-90a587da4a36?q=80&w=1000",
-                    "https://images.unsplash.com/photo-1560743641-3914f2c45636?q=80&w=1000"
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862455/ChatGPT_Image_Apr_28_2025_09_00_37_PM-min_n3f9ox.png",
+
                 ]
             }
         },
@@ -41,7 +41,7 @@ export const kurtas = [
         "contactForCustomColors": true,
         "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals.",
         "availableStock": 15,
-        "isBeadedAvailable": true,
+        "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
         "priorityScore": 95
     },
@@ -164,9 +164,9 @@ export const kurtas = [
         "category": "premium",
         "name": "Red Royale",
         "pricing": {
-            "basePrice": 699,
+            "basePrice": 799,
             "discountPercent": 6,
-            "fullSetAdditional": 350,
+            "fullSetAdditional": 500,
             "sizeIncrements": {
                 "XS": 0,
                 "S": 0,
@@ -185,15 +185,18 @@ export const kurtas = [
         "options": {
             "nonBeaded": {
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp"],
-            }
+            },
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746092698/WhatsApp_Image_2025-05-01_at_01.13.13_48d7f5c5-optimized_jbohej.webp"]
+            },
         },
         "sizes": ["XS", "S", "M", "L"],
         "contactForCustomColors": false,
         "description": "Elegant and simple white kurta designed for grace and ease.",
-        "availableStock": 20,
-        "isBeadedAvailable": false,
+        "availableStock": 10,
+        "isBeadedAvailable": true,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
+        "priorityScore": 85
     }
     ,
     {
