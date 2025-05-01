@@ -172,9 +172,9 @@ const KurtaListing = () => {
                             className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
                             style={{
                               background:
-                                "linear-gradient(90deg, #c9a94e, #b5892e)",
+                                "linear-gradient(90deg, #ffd700, #e6b800, #c99700)", // brighter, purer gold tones
                               borderTopRightRadius: "0.5rem",
-                              boxShadow: "0 -2px 6px rgba(201, 169, 78, 0.25)",
+                              boxShadow: "0 -2px 8px rgba(255, 215, 0, 0.35)", // stronger gold shadow
                             }}
                           >
                             <CrownIcon
