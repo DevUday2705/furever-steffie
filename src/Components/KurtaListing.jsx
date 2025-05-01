@@ -8,6 +8,7 @@ import {
   Sliders,
   ArrowUpDown,
   Flame,
+  CrownIcon,
 } from "lucide-react";
 import FilterDrawer from "./FilterDrawer";
 import { useProductFilter } from "../hooks/useProductFilter";
@@ -166,40 +167,81 @@ const KurtaListing = () => {
                     <div className="absolute bottom-0 left-0">
                       {/* Premium Badge */}
                       {product.category === "premium" ? (
-                        <div className="relative overflow-hidden">
+                        <div className="relative overflow-hidden opacity-80 w-fit">
                           <div
-                            className="px-2 py-0.5 bg-gradient-to-r from-purple-900 to-indigo-800 text-white font-medium flex items-center space-x-2"
+                            className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
                             style={{
+                              background:
+                                "linear-gradient(90deg, #c9a94e, #b5892e)",
                               borderTopRightRadius: "0.5rem",
-                              borderBottomWidth: 0,
-                              borderLeftWidth: 0,
-                              boxShadow: "0 -4px 10px rgba(79, 70, 229, 0.2)",
+                              boxShadow: "0 -2px 6px rgba(201, 169, 78, 0.25)",
                             }}
                           >
-                            <span className="font-medium text-[12px]">
-                              Premium
+                            <CrownIcon
+                              size={11}
+                              className="text-white opacity-80"
+                            />
+                            <span className="font-medium text-[10px] tracking-wide uppercase text-white">
+                              Royal
                             </span>
 
-                            {/* Shine Effect */}
+                            {/* Subtle Shine Animation */}
                             <div
-                              className="absolute -inset-1 bg-white opacity-20 transform rotate-12 translate-x-full animate-pulse"
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 blur-[3px] pointer-events-none"
                               style={{
-                                animationDuration: "3s",
-                                animationIterationCount: "infinite",
+                                transform: "translateX(-100%) rotate(15deg)",
+                                animation: "shine 4s ease-in-out infinite",
                               }}
                             ></div>
                           </div>
+
+                          {/* Keyframes */}
+                          <style>
+                            {`
+                            @keyframes shine {
+                              0% {
+                                transform: translateX(-100%) rotate(15deg);
+                              }
+                              60% {
+                                transform: translateX(100%) rotate(15deg);
+                              }
+                              100% {
+                                transform: translateX(100%) rotate(15deg);
+                              }
+                            }
+                          `}
+                          </style>
                         </div>
                       ) : (
-                        <div
-                          className="px-2 py-0.5 bg-gradient-to-r from-gray-700 to-gray-600 text-white font-medium text-[12px]"
-                          style={{
-                            borderTopRightRadius: "0.5rem",
-                            borderBottomWidth: 0,
-                            borderLeftWidth: 0,
-                          }}
-                        >
-                          Classic
+                        <div className="relative overflow-hidden opacity-80 w-fit">
+                          <div
+                            className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
+                            style={{
+                              background:
+                                "linear-gradient(90deg, #4b5563, #374151)", // Gray gradient
+                              borderTopRightRadius: "0.5rem",
+                              boxShadow: "0 -1px 4px rgba(107, 114, 128, 0.2)",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-[11px] w-[11px] text-white opacity-70"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3 7h18M3 12h18M3 17h18"
+                              />
+                            </svg>
+
+                            <span className="font-medium text-[10px] tracking-wide uppercase text-white">
+                              Classic
+                            </span>
+                          </div>
                         </div>
                       )}
                     </div>
