@@ -167,7 +167,7 @@ const KurtaListing = () => {
                     <div className="absolute bottom-0 left-0">
                       {/* Premium Badge */}
                       {product.category === "premium" ? (
-                        <div className="relative overflow-hidden opacity-80 w-fit">
+                        <div className="relative overflow-hidden  w-fit">
                           <div
                             className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
                             style={{
@@ -187,10 +187,10 @@ const KurtaListing = () => {
 
                             {/* Subtle Shine Animation */}
                             <div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 blur-[3px] pointer-events-none"
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 blur-[3px] pointer-events-none"
                               style={{
                                 transform: "translateX(-100%) rotate(15deg)",
-                                animation: "shine 4s ease-in-out infinite",
+                                animation: "shine 3s ease-in-out infinite",
                               }}
                             ></div>
                           </div>
