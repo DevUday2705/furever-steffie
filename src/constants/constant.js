@@ -8,6 +8,7 @@ export const kurtas = [
         "name": "Royal Blue Solid Kurta",
         "pricing": {
             "basePrice": 899,
+            "discountPercent": 10,
             "fullSetAdditional": 400,
             "beadedAdditional": 200,
             "sizeIncrements": {
@@ -51,6 +52,7 @@ export const kurtas = [
         "name": "Sunshine Yellow Kurta",
         "pricing": {
             "basePrice": 799,
+            "discountPercent": 12,
             "fullSetAdditional": 400,
             "beadedAdditional": 200,
             "sizeIncrements": {
@@ -88,6 +90,7 @@ export const kurtas = [
         "name": "Elegant White Kurta",
         "pricing": {
             "basePrice": 899,
+            "discountPercent": 10,
             "fullSetAdditional": 350,
             "sizeIncrements": {
                 "XS": 0,
@@ -124,6 +127,7 @@ export const kurtas = [
         "name": "Golden Aura",
         "pricing": {
             "basePrice": 699,
+            "discountPercent": 8,
             "fullSetAdditional": 350,
             "sizeIncrements": {
                 "XS": 0,
@@ -161,6 +165,7 @@ export const kurtas = [
         "name": "Red Royale",
         "pricing": {
             "basePrice": 699,
+            "discountPercent": 6,
             "fullSetAdditional": 350,
             "sizeIncrements": {
                 "XS": 0,
@@ -198,6 +203,7 @@ export const kurtas = [
         "name": "Midnight Elegance",
         "pricing": {
             "basePrice": 699,
+            "discountPercent": 15,
             "fullSetAdditional": 350,
             "sizeIncrements": {
                 "XS": 0,

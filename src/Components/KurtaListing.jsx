@@ -127,11 +127,12 @@ const KurtaListing = () => {
               ? basePrice + beadedAdd
               : basePrice;
 
-            // Calculate discount (random between 5-15%)
-            const discountPercent = Math.floor(Math.random() * 11) + 5; // 5-15%
-            const originalPrice = Math.round(
-              price * (100 / (100 - discountPercent))
-            );
+            // Use the discount percentage from the product data
+            const discountPercent = product.pricing.discountPercent || 0;
+            const originalPrice =
+              discountPercent > 0
+                ? Math.round(price * (100 / (100 - discountPercent)))
+                : price;
 
             return (
               <motion.div
@@ -151,35 +152,56 @@ const KurtaListing = () => {
                       whileHover={{ scale: 1.05 }}
                     />
 
-                    {/* Best Seller Badge */}
+                    {/* Best Seller Badge - Compact Version */}
                     {product.priorityScore >= 90 && (
-                      <div className="absolute top-3 left-3">
-                        <motion.div
-                          className="flex items-center gap-1 bg-gradient-to-r from-gray-800 to-gray-700 text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-lg"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.2 }}
-                        >
-                          <Flame size={14} className="text-white" />
-                          <span>Best Seller</span>
-                        </motion.div>
+                      <div className="absolute top-0 left-0">
+                        <div className="flex items-center bg-amber-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">
+                          <Flame size={10} className="text-white mr-0.5" />
+                          <span className="font-medium text-[12px]">Hot</span>
+                        </div>
                       </div>
                     )}
 
                     {/* Category Badge */}
-                    <div className="absolute bottom-3 left-3">
-                      <motion.div
-                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold shadow-lg ${
-                          product.category === "premium"
-                            ? "bg-indigo-100 text-indigo-800"
-                            : "bg-emerald-100 text-emerald-800"
-                        }`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        {product.category === "premium" ? "Premium" : "Classic"}
-                      </motion.div>
+                    <div className="absolute bottom-0 left-0">
+                      {/* Premium Badge */}
+                      {product.category === "premium" ? (
+                        <div className="relative overflow-hidden">
+                          <div
+                            className="px-2 py-0.5 bg-gradient-to-r from-purple-900 to-indigo-800 text-white font-medium flex items-center space-x-2"
+                            style={{
+                              borderTopRightRadius: "0.5rem",
+                              borderBottomWidth: 0,
+                              borderLeftWidth: 0,
+                              boxShadow: "0 -4px 10px rgba(79, 70, 229, 0.2)",
+                            }}
+                          >
+                            <span className="font-medium text-[12px]">
+                              Premium
+                            </span>
+
+                            {/* Shine Effect */}
+                            <div
+                              className="absolute -inset-1 bg-white opacity-20 transform rotate-12 translate-x-full animate-pulse"
+                              style={{
+                                animationDuration: "3s",
+                                animationIterationCount: "infinite",
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className="px-2 py-0.5 bg-gradient-to-r from-gray-700 to-gray-600 text-white font-medium text-[12px]"
+                          style={{
+                            borderTopRightRadius: "0.5rem",
+                            borderBottomWidth: 0,
+                            borderLeftWidth: 0,
+                          }}
+                        >
+                          Classic
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -192,18 +214,21 @@ const KurtaListing = () => {
                     </h3>
 
                     <div className="flex flex-col h-16">
-                      {" "}
                       {/* Fixed height container */}
                       <div className="flex items-baseline flex-wrap">
                         <span className="text-base font-bold text-gray-800 mr-2">
                           ₹{price}
                         </span>
-                        <span className="text-sm text-gray-500 line-through mr-2">
-                          ₹{originalPrice}
-                        </span>
-                        <span className="text-xs font-medium text-emerald-600">
-                          {discountPercent}% off
-                        </span>
+                        {discountPercent > 0 && (
+                          <>
+                            <span className="text-sm text-gray-500 line-through mr-2">
+                              ₹{originalPrice}
+                            </span>
+                            <span className="text-xs font-medium text-emerald-600">
+                              {discountPercent}% off
+                            </span>
+                          </>
+                        )}
                       </div>
                       {/* Few Left indicator as a separate element that doesn't affect layout */}
                       {product.availableStock <= 5 && (
