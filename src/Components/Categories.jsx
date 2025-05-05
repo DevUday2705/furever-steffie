@@ -122,7 +122,7 @@ const Categories = () => {
   const generateSlug = (name) => name.toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
         {/* Toggle Switch */}
         <div className="flex justify-center gap-4 mb-8">

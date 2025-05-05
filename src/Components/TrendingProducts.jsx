@@ -55,7 +55,7 @@ const TrendingProducts = () => {
     show: { opacity: 1, y: 0 },
   };
   return (
-    <section className="py-12 bg-white">
+    <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
