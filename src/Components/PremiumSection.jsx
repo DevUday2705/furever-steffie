@@ -92,7 +92,7 @@ const PremiumSection = ({ products }) => {
                   transition={{ duration: 0.3 }}
                 >
                   <Link
-                    to={`/product/${generateSlug(product.id, product.name)}`}
+                    to={`/product/${product.id}+${product.type}`}
                     className="block group"
                   >
                     <div className="relative rounded-lg overflow-hidden shadow-md bg-white">
