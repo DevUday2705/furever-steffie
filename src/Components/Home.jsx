@@ -13,7 +13,7 @@ const Home = () => {
     <div>
       <MobileHeroCarousel />
       <Categories />
-      <PremiumSectionCarousel />
+
       {/* <KurtaBanner /> */}
       <WatchAndBuy />
       {/* <TrendingProducts /> */}
