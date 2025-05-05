@@ -202,7 +202,7 @@ export const kurtas = [
     {
         "id": "sk006",
         "type": "kurta",
-        "category": "classic",
+        "category": "premium",
         "name": "Midnight Elegance",
         "pricing": {
             "basePrice": 699,
