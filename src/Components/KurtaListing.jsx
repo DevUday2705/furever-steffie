@@ -105,7 +105,23 @@ const KurtaListing = () => {
           </button>
         </div>
       </div>
-
+      <div className="relative w-full h-[250px] md:h-[300px] overflow-hidden">
+        <img
+          src="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+          alt="Kurta Banner"
+          className="w-full rounded-md h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30 flex items-end justify-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-white text-xl ml-5 mb-5  md:text-4xl font-bold tracking-wide drop-shadow-md"
+          >
+            Elegant Kurtas for Every Pet Personality
+          </motion.h2>
+        </div>
+      </div>
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-5">

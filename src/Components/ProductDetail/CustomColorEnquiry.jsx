@@ -37,7 +37,7 @@ const CustomColorEnquiry = ({ product }) => {
             <a
               href="#"
               onClick={handleWhatsAppClick}
-              className="inline-flex items-center text-white text-xs py-1.5 px-3 rounded-md "
+              className="inline-flex shrink-0 items-center text-white text-xs py-1.5 px-3 rounded-md "
             >
               <img className="h-5" src="/images/wssp.png" alt="WhatsApp" />
             </a>

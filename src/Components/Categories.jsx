@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
+import { useAppContext } from "../context/AppContext";
 const Categories = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -16,7 +16,7 @@ const Categories = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
-  const [gender, setGender] = useState("male");
+  const { gender, setGender } = useAppContext();
 
   const maleCategories = [
     {
@@ -106,6 +106,11 @@ const Categories = () => {
       emblaApi.off("scroll", onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.scrollTo(0); // Reset to first slide when gender changes
+  }, [gender, emblaApi]);
 
   const scrollTo = useCallback(
     (index) => {

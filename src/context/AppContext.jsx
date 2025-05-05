@@ -11,6 +11,7 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [gender, setGender] = useState("male");
   const [selections, setSelections] = useState({
     gender: "",
     style: "",
@@ -77,6 +78,8 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        gender,
+        setGender,
         currentStep,
         selections,
         updateSelections,

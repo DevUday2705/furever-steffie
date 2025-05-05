@@ -1,14 +1,15 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useAppContext } from "../context/AppContext";
 
 const MobileHeroCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const slides = [
+  const { gender } = useAppContext();
+  const maleSlides = [
     {
-      id: 2,
+      id: 1,
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744099062/ChatGPT_Image_Apr_8_2025_01_19_03_PM_uiuvdz.png",
       title: "Autumn Essentials",
@@ -16,7 +17,7 @@ const MobileHeroCarousel = () => {
       cta: "Discover More",
     },
     {
-      id: 3,
+      id: 2,
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744099076/ChatGPT_Image_Apr_8_2025_01_13_10_PM_lz2kki.png",
       title: "Premium Basics",
@@ -24,7 +25,7 @@ const MobileHeroCarousel = () => {
       cta: "View Collection",
     },
     {
-      id: 1,
+      id: 3,
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1744101346/ChatGPT_Image_Apr_8_2025_02_03_51_PM_qgz786.png",
       title: "Summer Collection",
@@ -32,6 +33,36 @@ const MobileHeroCarousel = () => {
       cta: "Shop Now",
     },
   ];
+
+  const femaleSlides = [
+    {
+      id: 4,
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_1.png",
+      title: "Festive Vibes",
+      subtitle: "Celebrate with grace",
+      cta: "Explore Now",
+    },
+    {
+      id: 5,
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_2.png",
+      title: "Elegant Threads",
+      subtitle: "Chic. Comfortable. Classy.",
+      cta: "View Range",
+    },
+    {
+      id: 6,
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_3.png",
+      title: "Summer Breeze",
+      subtitle: "Light looks for warm days",
+      cta: "See Collection",
+    },
+  ];
+
+  const slides = gender === "female" ? femaleSlides : maleSlides;
+
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
