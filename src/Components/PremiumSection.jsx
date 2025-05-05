@@ -95,7 +95,7 @@ const PremiumSection = ({ products }) => {
                     to={`/product/${product.id}+${product.type}`}
                     className="block group"
                   >
-                    <div className="relative rounded-lg overflow-hidden shadow-md bg-white">
+                    <div className="relative rounded-lg overflow-hidden border border-gray-500/10  bg-white">
                       {/* Discount badge if applicable */}
                       {product.pricing.discountPercent > 0 && (
                         <div className="absolute top-3 left-3 z-10 animate-pulse">
