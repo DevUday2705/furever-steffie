@@ -63,7 +63,7 @@ const PremiumSection = ({ products }) => {
   return (
     <section className="py-8 bg-gray-50">
       <div className="container mx-auto px-4">
-        {/* Section Header with premium styling - simplified to match screenshot */}
+        {/* Section Header with premium styling */}
         <div className="mb-6 text-center">
           <div className="flex items-center justify-center mb-1">
             <Star className="w-4 h-4 text-black mr-1" fill="currentColor" />
@@ -96,9 +96,7 @@ const PremiumSection = ({ products }) => {
                     className="block group"
                   >
                     <div className="relative rounded-lg overflow-hidden shadow-md bg-white">
-                      {/* Premium badge removed as not shown in screenshot */}
-
-                      {/* Discount badge if applicable - styled to match screenshot */}
+                      {/* Discount badge if applicable */}
                       {product.pricing.discountPercent > 0 && (
                         <div className="absolute top-3 left-3 z-10 animate-pulse">
                           <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-md flex items-center shadow-lg">
@@ -110,12 +108,12 @@ const PremiumSection = ({ products }) => {
                         </div>
                       )}
 
-                      {/* Product image taking full height */}
-                      <div className="h-[500px] overflow-hidden">
+                      {/* Product image with responsive height and aspect ratio */}
+                      <div className="relative pb-[125%] overflow-hidden">
                         <img
                           src={product.mainImage}
                           alt={product.name}
-                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                          className="absolute top-0 left-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                           loading="lazy"
                         />
                       </div>
@@ -176,7 +174,7 @@ const PremiumSection = ({ products }) => {
             </div>
           </div>
 
-          {/* Navigation buttons - simplified to match screenshot */}
+          {/* Navigation buttons - commented out as per original */}
           {/* <div>
             <button
               onClick={scrollPrev}
@@ -210,7 +208,7 @@ const PremiumSection = ({ products }) => {
           ))}
         </div>
 
-        {/* Premium CTA button - simplified to match screenshot */}
+        {/* Premium CTA button */}
         <div className="flex justify-center mt-6">
           <Link
             to="/premium-collection"
