@@ -19,8 +19,8 @@ export const useProductFilter = (products, filters) => {
             list = list.filter((p) => p.sizes.some((s) => filters.sizes.includes(s)));
         }
 
-        if (filters.categories.length) {
-            list = list.filter((p) => filters.categories.includes(p.category));
+        if (filters.categories.includes("premium")) {
+            list = list.filter((item) => item.category === "premium");
         }
 
         if (filters.styleBeaded) {

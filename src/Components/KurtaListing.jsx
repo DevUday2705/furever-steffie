@@ -26,8 +26,8 @@ const KurtaListing = () => {
     styleSimple: false,
     inStockOnly: false,
     customColor: false,
-    categories: [],
-    categoryOptions: ["classic", "premium"],
+    categories: ["all"],
+    categoryOptions: ["all", "premium"],
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -182,7 +182,7 @@ const KurtaListing = () => {
                     {/* Category Badge */}
                     <div className="absolute bottom-0 left-0">
                       {/* Premium Badge */}
-                      {product.category === "premium" ? (
+                      {product.category === "premium" && (
                         <div className="relative overflow-hidden  w-fit">
                           <div
                             className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
@@ -227,37 +227,6 @@ const KurtaListing = () => {
                             }
                           `}
                           </style>
-                        </div>
-                      ) : (
-                        <div className="relative overflow-hidden opacity-80 w-fit">
-                          <div
-                            className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
-                            style={{
-                              background:
-                                "linear-gradient(90deg, #4b5563, #374151)", // Gray gradient
-                              borderTopRightRadius: "0.5rem",
-                              boxShadow: "0 -1px 4px rgba(107, 114, 128, 0.2)",
-                            }}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-[11px] w-[11px] text-white opacity-70"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M3 7h18M3 12h18M3 17h18"
-                              />
-                            </svg>
-
-                            <span className="font-medium text-[10px] tracking-wide uppercase text-white">
-                              Classic
-                            </span>
-                          </div>
                         </div>
                       )}
                     </div>

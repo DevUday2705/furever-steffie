@@ -139,9 +139,7 @@ export default function FilterDrawer({
                           onClick={() =>
                             setFilters((f) => ({
                               ...f,
-                              categories: f.categories.includes(cat)
-                                ? f.categories.filter((c) => c !== cat)
-                                : [...f.categories, cat],
+                              categories: [cat], // Replace array with single selected value
                             }))
                           }
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
