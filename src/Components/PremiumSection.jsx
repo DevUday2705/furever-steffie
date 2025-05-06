@@ -72,10 +72,10 @@ const PremiumSection = ({ products }) => {
             </span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-            Premium Selections
+            Royal Selections
           </h2>
           <p className="text-sm text-gray-600 max-w-xl mx-auto">
-            Discover our curated collection of premium designs crafted with
+            Discover our curated collection of royal designs crafted with
             exceptional quality and attention to detail.
           </p>
         </div>
@@ -127,7 +127,7 @@ const PremiumSection = ({ products }) => {
                           </h3>
                           <div className="ml-auto">
                             <span className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-sm font-medium">
-                              PREMIUM
+                              ROYAL
                             </span>
                           </div>
                         </div>
@@ -214,7 +214,7 @@ const PremiumSection = ({ products }) => {
             to="/premium-collection"
             className="inline-flex items-center px-6 py-2 bg-black text-white font-medium rounded-md transition-all duration-300 hover:bg-gray-800"
           >
-            View Full Premium Collection
+            View Full Royal Collection
             <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
