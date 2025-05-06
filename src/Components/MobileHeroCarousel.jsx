@@ -125,7 +125,7 @@ const MobileHeroCarousel = () => {
           ))}
         </div>
 
-        <button
+        {/* <button
           className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white z-10"
           onClick={scrollPrev}
         >
@@ -136,7 +136,7 @@ const MobileHeroCarousel = () => {
           onClick={scrollNext}
         >
           <ChevronRight className="w-5 h-5" />
-        </button>
+        </button> */}
 
         <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-2 z-10">
           {slides.map((_, index) => (
