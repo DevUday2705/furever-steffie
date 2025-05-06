@@ -182,7 +182,7 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
             className={`p-2 w-full border ${
               touched.neck && errors.neck ? "border-red-300" : "border-gray-300"
             } rounded-md text-sm`}
-            placeholder="e.g., 14"
+            placeholder="e.g. 14"
           />
         </div>
 
@@ -201,14 +201,14 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
                 ? "border-red-300"
                 : "border-gray-300"
             } rounded-md text-sm`}
-            placeholder="e.g., 24"
+            placeholder="e.g. 24"
           />
         </div>
 
         {/* Back */}
         <div className="flex-1 min-w-0">
           <label className="text-xs text-gray-700 font-medium block mb-1">
-            Back Length (inches)
+            Back (inches)
           </label>
           <input
             type="text"
@@ -218,7 +218,7 @@ const ProductMeasurements = ({ onSizeDetected, setMeasurementsValid }) => {
             className={`p-2 w-full border ${
               touched.back && errors.back ? "border-red-300" : "border-gray-300"
             } rounded-md text-sm`}
-            placeholder="e.g., 16"
+            placeholder="e.g. 16"
           />
         </div>
       </div>
