@@ -27,7 +27,7 @@ const KurtaListing = () => {
     inStockOnly: false,
     customColor: false,
     categories: ["all"],
-    categoryOptions: ["all", "premium"],
+    categoryOptions: ["all", "royal"],
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -182,7 +182,7 @@ const KurtaListing = () => {
                     {/* Category Badge */}
                     <div className="absolute bottom-0 left-0">
                       {/* Premium Badge */}
-                      {product.category === "premium" && (
+                      {product.category === "royal" && (
                         <div className="relative overflow-hidden  w-fit">
                           <div
                             className="px-2 py-0.5 text-white font-medium flex items-center space-x-1.5 relative"
