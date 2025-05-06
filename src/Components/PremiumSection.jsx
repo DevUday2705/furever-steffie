@@ -8,7 +8,7 @@ import { useAppContext } from "../context/AppContext";
 const PremiumSection = ({ products }) => {
   // Filter only premium products
   const premiumProducts = products.filter(
-    (product) => product.category === "premium"
+    (product) => product.category === "royal"
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
