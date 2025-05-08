@@ -198,16 +198,18 @@ export const kurtas = [
         "isNonBeadedAvailable": true,
         "priorityScore": 85
     }
-    ,
+]
+
+export const frocks = [
     {
-        "id": "sk006",
-        "type": "kurta",
-        "category": "royal",
-        "name": "Midnight Elegance",
+        "id": "fs-frock-001",
+        "type": "frock",
+        "category": "classic",
+        "name": "Black & White Bow Frock",
         "pricing": {
-            "basePrice": 699,
-            "discountPercent": 15,
-            "fullSetAdditional": 350,
+            "basePrice": 799,
+            "discountPercent": 6,
+            "fullSetAdditional": 500,
             "sizeIncrements": {
                 "XS": 0,
                 "S": 0,
@@ -222,19 +224,156 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_38_45_PM-min_kiv2mb.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/bow-frock-2_o8dwec.webp",
         "options": {
             "nonBeaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_38_45_PM-min_kiv2mb.webp"],
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/bow-frock-2_o8dwec.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702947/bow-frock_evjdze.webp"
+                ]
+            },
+            "beaded": {
+                "images": []
             }
         },
-        "sizes": ["S", "M", "L"],
+        "sizes": ["XS", "S", "M", "L"],
         "contactForCustomColors": false,
-        "description": "Elegant and simple white kurta designed for grace and ease.",
-        "availableStock": 20,
+        "description": "Chic black and white frock with soft layered frills and elegant black bows. Perfect for celebrations, photoshoots, and classy outings.",
+        "availableStock": 10,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
+        "priorityScore": 85
+    },
+    {
+        "id": "fs-frock-002",
+        "type": "frock",
+        "category": "classic",
+        "name": "Blue Polka Dot Frock",
+        "pricing": {
+            "basePrice": 899,
+            "discountPercent": 6,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/blue-frock_lhb0ge.webp",
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/blue-frock_lhb0ge.webp",
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Make your pet the center of attention with this adorable frock crafted in soft blue fabric adorned with timeless white polka dots. Designed with layered frills and finished with a crisp white satin bow at the back, it’s the perfect outfit for celebrations, photo sessions, or a stylish stroll. Comfort meets cuteness in this picture-perfect ensemble for your furry princess.",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
+    }
+    ,
+    {
+        "id": "fs-frock-003",
+        "type": "frock",
+        "category": "classic",
+        "name": " Pink Blossom Smocked Frock",
+        "pricing": {
+            "basePrice": 899,
+            "discountPercent": 6,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/FROCK_1_kjkkw4.webp",
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/FROCK_1_kjkkw4.webp",
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Brighten up your pet’s day with our Pink Blossom Smocked Frock, featuring a playful floral print in vibrant yellow, magenta, and white. Designed with comfy smocking at the top and soft shoulder straps, this breezy dress is perfect for sunny day outings, garden parties, and cuddly photo moments. The flared ruffle hem adds that extra bounce to every step!",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
+    }
+    ,
+    {
+        "id": "fs-frock-004",
+        "type": "frock",
+        "category": "classic",
+        "name": " Snow Belle Frock with Scarlet Bow",
+        "pricing": {
+            "basePrice": 699,
+            "discountPercent": 10,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9666_1_j33uu0.webp",
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9666_1_j33uu0.webp",
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Let your furry diva shine in our Snow Belle Frock, a dreamy white dress featuring a soft mesh overlay and a bold scarlet satin bow that makes a statement from every angle. Tied together with a matching red hair bow, this outfit is perfect for birthdays, festive occasions, or Valentine photo shoots. Elegant, adorable, and full of charm—just like your pet!",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
     }
 ]
 export const bowData = {

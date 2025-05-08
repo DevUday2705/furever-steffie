@@ -38,7 +38,7 @@ const MobileHeroCarousel = () => {
     {
       id: 4,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_1.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9666_1_j33uu0.webp",
       title: "Festive Vibes",
       subtitle: "Celebrate with grace",
       cta: "Explore Now",
@@ -46,7 +46,7 @@ const MobileHeroCarousel = () => {
     {
       id: 5,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_2.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9657_1_sz78s0.webp",
       title: "Elegant Threads",
       subtitle: "Chic. Comfortable. Classy.",
       cta: "View Range",
@@ -54,7 +54,7 @@ const MobileHeroCarousel = () => {
     {
       id: 6,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744105000/female_slide_3.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/blue-frock_lhb0ge.webp",
       title: "Summer Breeze",
       subtitle: "Light looks for warm days",
       cta: "See Collection",

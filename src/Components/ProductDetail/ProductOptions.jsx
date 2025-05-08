@@ -64,16 +64,17 @@ const ProductOptions = ({
 
   return (
     <div className="p-4 space-y-4">
-      {/* Style Selection */}
-      {(isBeadedAvailable || isNonBeadedAvailable) && (
-        <div>
-          <h3 className="text-xs font-medium text-gray-900">Style</h3>
-          {renderStyleOptions()}
-        </div>
-      )}
+      {/* STYLE OPTIONS */}
+      {["kurta", "lehnga", "tuxedo"].includes(product.type) &&
+        (isBeadedAvailable || isNonBeadedAvailable) && (
+          <div>
+            <h3 className="text-xs font-medium text-gray-900">Style</h3>
+            {renderStyleOptions()}
+          </div>
+        )}
 
-      {/* Product Type Selection */}
-      {product.options && (
+      {/* PRODUCT TYPE OPTIONS */}
+      {product.type === "kurta" && product.options && (
         <div>
           <h3 className="text-xs font-medium text-gray-900">Product Type</h3>
           <div className="mt-1 flex space-x-2">

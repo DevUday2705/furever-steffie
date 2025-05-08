@@ -23,6 +23,7 @@ export default function FilterDrawer({
     bow: ["sort", "price", "size", "availability"],
     lehnga: ["sort", "price", "size", "style", "availability"],
     tuxedo: ["sort", "price", "size", "style", "availability"],
+    frock: ["sort", "price", "size"],
   };
 
   const activeFilters = filterConfig[category] || [];

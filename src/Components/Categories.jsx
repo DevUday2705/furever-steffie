@@ -51,6 +51,13 @@ const Categories = () => {
 
   const femaleCategories = [
     {
+      id: 7,
+      name: "Frock",
+      description: "Playful Frills",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745435467/Frock_pmzqlp.jpg",
+    },
+    {
       id: 5,
       name: "Lehenga",
       description: "Traditional Elegance",
@@ -58,13 +65,6 @@ const Categories = () => {
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744096705/ChatGPT_Image_Apr_8_2025_11_45_38_AM_xdfndo.png",
     },
 
-    {
-      id: 7,
-      name: "Frock",
-      description: "Playful Frills",
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745435467/Frock_pmzqlp.jpg",
-    },
     {
       id: 8,
       name: "Bandana",

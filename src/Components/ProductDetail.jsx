@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { kurtas } from "../constants/constant"; // Import all types separately
+import { frocks, kurtas } from "../constants/constant"; // Import all types separately
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
@@ -63,11 +63,13 @@ const ProductDetail = () => {
 
       // 👇 Based on type
       if (typePart === "kurta") productArray = kurtas;
+      else if (typePart === "frock") productArray = frocks;
       else if (typePart === "bow") productArray = bows;
       else if (typePart === "lehnga") productArray = lehngas;
       else if (typePart === "tuxedo") productArray = tuxedos;
       else return null; // Invalid type
 
+      console.log(kurtas);
       return productArray.find((p) => p.id === idPart) || null;
     };
 
@@ -170,6 +172,7 @@ const ProductDetail = () => {
   const categoriesThatRequireMeasurements = [
     "kurta",
     "lehnga",
+    "frock",
     "tuxedo",
     "dress",
   ];
@@ -190,7 +193,11 @@ const ProductDetail = () => {
             scrollSnaps={scrollSnaps}
             emblaRef={emblaRef}
           />
-
+          <p className="text-xs text-gray-500 mt-2 text-center px-4">
+            Visuals are AI-enhanced for preview. Actual product is handcrafted
+            and may have slight variations. Swipe to view real fabric & color
+            references.
+          </p>
           <ProductInfo product={product} calculatePrice={calculatePrice} />
 
           {requiresMeasurements ? (
