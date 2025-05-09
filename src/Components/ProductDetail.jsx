@@ -193,11 +193,7 @@ const ProductDetail = () => {
             scrollSnaps={scrollSnaps}
             emblaRef={emblaRef}
           />
-          <p className="text-xs text-gray-500 mt-2 text-center px-4">
-            Visuals are AI-enhanced for preview. Actual product is handcrafted
-            and may have slight variations. Swipe to view real fabric & color
-            references.
-          </p>
+
           <ProductInfo product={product} calculatePrice={calculatePrice} />
 
           {requiresMeasurements ? (

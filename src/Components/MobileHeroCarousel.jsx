@@ -94,7 +94,7 @@ const MobileHeroCarousel = () => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="w-full bg-gray-900 rounded-md">
+    <section className="w-full bg-transparent rounded-md">
       <div className="relative w-full h-[60vh] overflow-hidden" ref={emblaRef}>
         <div className="flex h-full touch-pan-y">
           {slides.map((slide) => (
@@ -108,7 +108,7 @@ const MobileHeroCarousel = () => {
                   alt={slide.title}
                   className="w-full h-full object-cover rounded-md"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-md" />
+                <div className="absolute inset-0 bg-gradient-to-t  from-black/70 to-transparent rounded-md" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 rounded-md">
                   <h2 className="text-3xl font-bold mb-2 text-white">
                     {slide.title}

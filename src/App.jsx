@@ -32,7 +32,7 @@ import FrockListing from "./Components/FrockListing";
 const App = () => {
   return (
     <div className=" max-w-md mx-auto">
-      <nav className="flex items-center justify-between py-5 px-5 border-b border-b-gray-200">
+      <nav className="flex items-center justify-between py-5 px-5  ">
         <Link to="/" className="w-full ">
           <img className="h-12 mx-auto" src="/images/logo.png" />
         </Link>

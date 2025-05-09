@@ -106,13 +106,13 @@ const ProductListing = ({
       </div>
 
       {/* Banner */}
-      <div className="relative w-full h-[250px] md:h-[300px] overflow-hidden">
+      <div className="relative bg-white w-full h-[250px] md:h-[300px] overflow-hidden">
         <img
           src={bannerImage}
           alt="Kurta Banner"
           className="w-full rounded-md h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/30 flex items-end justify-center">
+        <div className="absolute inset-0 bg-black/30 rounded-md flex items-end justify-center">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
