@@ -5,7 +5,7 @@ import App from "./App.jsx";
 import { AppProvider } from "./context/AppContext.jsx";
 import { BrowserRouter } from "react-router-dom";
 import ScrollToTop from "./Components/ScrollToTop.jsx";
-
+import "@fontsource/open-sans";
 createRoot(document.getElementById("root")).render(
   <AppProvider>
     <BrowserRouter>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Star, Tag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Crown, Star, Tag } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -12,10 +12,10 @@ const PremiumSection = ({ products }) => {
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    containScroll: "trimSnaps",
-    dragFree: true,
+    align: "center",
+    loop: true,
     slidesToScroll: 1,
+    containScroll: "trimSnaps",
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -61,33 +61,32 @@ const PremiumSection = ({ products }) => {
     `${id}-${name.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
-    <section className="py-8 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section
+      style={{
+        backgroundPosition: "0px -200px ",
+      }}
+      className="py-8  bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
+    >
+      <div className="container mx-auto px-4 ">
         {/* Section Header with premium styling */}
         <div className="mb-6 text-center">
           <div className="flex items-center justify-center mb-1">
             <Star className="w-4 h-4 text-black mr-1" fill="currentColor" />
-            <span className="text-black font-medium uppercase tracking-wider text-xs">
-              Exclusive Collection
+            <span className="text-black text-4xl  uppercase tracking-wider font-black">
+              ROYAL
             </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-            Royal Selections
-          </h2>
-          <p className="text-sm text-gray-600 max-w-xl mx-auto">
-            Discover our curated collection of royal designs crafted with
-            exceptional quality and attention to detail.
-          </p>
         </div>
 
         {/* Premium Products Carousel */}
         <div className="relative mb-4">
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex pl-4">
+          {/* Main carousel container with fixed width to show only one slide */}
+          <div className="overflow-hidden max-w-[280px] mx-auto" ref={emblaRef}>
+            <div className="flex">
               {premiumProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  className="min-w-[280px] md:min-w-[320px] px-2 flex-shrink-0"
+                  className="min-w-[280px] w-full flex-shrink-0  rounded-md "
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -95,7 +94,7 @@ const PremiumSection = ({ products }) => {
                     to={`/product/${product.id}+${product.type}`}
                     className="block group"
                   >
-                    <div className="relative rounded-lg overflow-hidden border border-gray-500/10  bg-white">
+                    <div className="relative rounded-lg overflow-hidden border border-gray-500/30 bg-white">
                       {/* Discount badge if applicable */}
                       {product.pricing.discountPercent > 0 && (
                         <div className="absolute top-3 left-3 z-10 animate-pulse">
@@ -121,7 +120,7 @@ const PremiumSection = ({ products }) => {
                       {/* Enhanced product details with premium styling */}
                       <div className="p-4 bg-white">
                         <div className="flex items-center mb-1">
-                          <div className="w-1 h-4 bg-black rounded-full mr-2"></div>
+                          <Crown color="#cd9f4b" className="mr-2" size={16} />
                           <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
                             {product.name}
                           </h3>
@@ -174,12 +173,12 @@ const PremiumSection = ({ products }) => {
             </div>
           </div>
 
-          {/* Navigation buttons - commented out as per original */}
-          {/* <div>
+          {/* Navigation buttons - now visible for better navigation */}
+          <div>
             <button
               onClick={scrollPrev}
               disabled={!canScrollPrev}
-              className={`absolute top-1/2 left-2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
+              className={`absolute top-1/2 left-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
               ${!canScrollPrev ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <ChevronLeft className="w-4 h-4" />
@@ -187,12 +186,12 @@ const PremiumSection = ({ products }) => {
             <button
               onClick={scrollNext}
               disabled={!canScrollNext}
-              className={`absolute top-1/2 right-2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
+              className={`absolute top-1/2 right-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
               ${!canScrollNext ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-          </div> */}
+          </div>
         </div>
 
         {/* Pagination Dots */}
@@ -202,7 +201,7 @@ const PremiumSection = ({ products }) => {
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300
-              ${selectedIndex === index ? "bg-black w-6" : "bg-gray-300"}`}
+              ${selectedIndex === index ? "bg-[#cd9f4b] w-6" : "bg-gray-300"}`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -212,7 +211,7 @@ const PremiumSection = ({ products }) => {
         <div className="flex justify-center mt-6">
           <Link
             to="/premium-collection"
-            className="inline-flex items-center px-6 py-2 bg-black text-white font-medium rounded-md transition-all duration-300 hover:bg-gray-800"
+            className="inline-flex items-center px-6 py-2 bg-[#cd9f4b] text-white font-medium rounded-md transition-all duration-300 hover:bg-gray-800"
           >
             View Full Royal Collection
             <ChevronRight className="w-4 h-4 ml-1" />
