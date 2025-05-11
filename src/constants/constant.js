@@ -5,7 +5,7 @@ export const kurtas = [
         "id": "sk001",
         "type": "kurta",
         "category": "classic",
-        "name": "Royal Blue Solid Kurta",
+        "name": "Purple Charm",
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -25,22 +25,22 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862455/ChatGPT_Image_Apr_28_2025_09_00_37_PM-min_n3f9ox.png",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1745862455/ChatGPT_Image_Apr_28_2025_09_00_37_PM-min_n3f9ox.png", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862455/ChatGPT_Image_Apr_28_2025_09_00_37_PM-min_n3f9ox.png",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp",
 
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A beautiful royal blue solid kurta for your pet, perfect for special occasions and festivals.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
         "priorityScore": 95
@@ -49,56 +49,19 @@ export const kurtas = [
         "id": "sk002",
         "type": "kurta",
         "category": "classic",
-        "name": "Sunshine Yellow Kurta",
+        "name": "Midnight Gold",
         "pricing": {
-            "basePrice": 799,
-            "discountPercent": 12,
-            "fullSetAdditional": 400,
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
             "beadedAdditional": 200,
             "sizeIncrements": {
                 "XS": 0,
                 "S": 0,
-                "M": 150,
-                "L": 300,
-                "XL": 500,
-                "XXL": 700
-            }
-        },
-        "defaultOptions": {
-            "isBeaded": true,
-            "isFullSet": false,
-            "size": "S"
-        },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/ChatGPT_Image_Apr_28_2025_09_19_17_PM-min_jw4zey.png",
-        "options": {
-            "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/ChatGPT_Image_Apr_28_2025_09_19_17_PM-min_jw4zey.png", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096605/ChatGPT_Image_Apr_7_2025_07_09_14_PM_frwxvg.png"]
-            }
-        },
-        "sizes": ["XS", "S", "M", "L"],
-        "contactForCustomColors": false,
-        "description": "Bright and beautiful yellow kurta to brighten up your celebrations!",
-        "availableStock": 5,
-        "isBeadedAvailable": true,
-        "isNonBeadedAvailable": false,
-        "priorityScore": 80
-    },
-    {
-        "id": "sk003",
-        "type": "kurta",
-        "category": "royal",
-        "name": "Elegant White Kurta",
-        "pricing": {
-            "basePrice": 899,
-            "discountPercent": 10,
-            "fullSetAdditional": 350,
-            "sizeIncrements": {
-                "XS": 0,
-                "S": 0,
-                "M": 100,
-                "L": 300,
-                "XL": 500,
-                "XXL": 700
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
             }
         },
         "defaultOptions": {
@@ -106,36 +69,87 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp",
         "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
             "nonBeaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744095416/ChatGPT_Image_Apr_7_2025_07_36_30_PM_du9r18.png"]
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp",
+
+                ]
             }
         },
-        "sizes": ["XS", "S", "M", "L"],
-        "contactForCustomColors": false,
-        "description": "Elegant and simple white kurta designed for grace and ease.",
-        "availableStock": 20,
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "Elegant black kurta with rich gold floral embroidery — designed to make your furry one shine at every celebration.",
+        "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
+        "priorityScore": 95
+    },
+    {
+        "id": "sk003",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Sunshine Grid",
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp",
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A cheerful yellow kurta with silver checks — perfect for daytime events, haldi ceremonies, or any festive paw-ty!",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
     },
     {
         "id": "sk004",
         "type": "kurta",
         "category": "classic",
-        "name": "Golden Aura",
+        "name": "Festive Royale",
         "pricing": {
-            "basePrice": 699,
-            "discountPercent": 8,
-            "fullSetAdditional": 350,
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
             "sizeIncrements": {
                 "XS": 0,
                 "S": 0,
-                "M": 100,
-                "L": 300,
-                "XL": 500,
-                "XXL": 700
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
             }
         },
         "defaultOptions": {
@@ -143,37 +157,43 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_30_44_PM-min_hkeoic.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp",
         "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
             "nonBeaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007680/ChatGPT_Image_Apr_30_2025_02_30_44_PM-min_hkeoic.webp"],
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp"
+
+                ]
             }
         },
-        "sizes": ["XS", "S", "M", "L"],
-        "contactForCustomColors": false,
-        "description": "Elegant and simple white kurta designed for grace and ease.",
-        "availableStock": 20,
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A rich red kurta adorned with intricate multicolor motifs — perfect for weddings, pujas, and all things grand.",
+        "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
-    }
-    ,
+        "priorityScore": 95
+    },
     {
         "id": "sk005",
         "type": "kurta",
-        "category": "royal",
-        "name": "Red Royale",
+        "category": "classic",
+        "name": "Dark Floral",
         "pricing": {
-            "basePrice": 799,
-            "discountPercent": 6,
-            "fullSetAdditional": 500,
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
             "sizeIncrements": {
                 "XS": 0,
                 "S": 0,
-                "M": 100,
-                "L": 300,
-                "XL": 500,
-                "XXL": 700
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
             }
         },
         "defaultOptions": {
@@ -181,23 +201,204 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp",
         "options": {
-            "nonBeaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/ChatGPT_Image_Apr_30_2025_02_18_51_PM-min_rboxmk.webp"],
-            },
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746092698/WhatsApp_Image_2025-05-01_at_01.13.13_48d7f5c5-optimized_jbohej.webp"]
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
             },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp",
+
+                ]
+            }
         },
-        "sizes": ["XS", "S", "M", "L"],
-        "contactForCustomColors": false,
-        "description": "Elegant and simple white kurta designed for grace and ease.",
-        "availableStock": 10,
-        "isBeadedAvailable": true,
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A classy black kurta with delicate golden floral embroidery — ideal for evening gatherings, festive dinners, or making a quiet royal statement.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 85
-    }
+        "priorityScore": 95
+    },
+    {
+        "id": "sk006",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Sunset Blocks",
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg",
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A bright and cheerful coral kurta with fun geometric designs — perfect for casual outings, summer celebrations, or festive days at home.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk007",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Red Blossom",
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg",
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A charming red kurta with pretty floral embroidery and silver lace — perfect for festive days, weddings, or just making your pet look extra adorable.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk008",
+        "type": "kurta",
+        "category": "classic",
+        "name": "Floral Sunshine",
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg",
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A lively yellow kurta with colorful floral embroidery — perfect for haldi ceremonies, day functions, or spreading sunny cheer at any festive event.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk009",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Mehndi Leaf",
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp",
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A festive green kurta with gold leaf embroidery — perfect for mehndi functions, poojas, or making your pet look royally elegant.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+
+
 ]
 
 export const frocks = [
