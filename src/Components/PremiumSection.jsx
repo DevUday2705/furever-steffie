@@ -89,14 +89,14 @@ const PremiumSection = ({ products }) => {
     >
       <div className="container mx-auto px-4 ">
         {/* Section Header with premium styling */}
-        <div className="relative mb-6 text-center">
+        <div className="relative mb-2 text-center">
           <div className="flex items-center relative left-20 justify-center mb-1">
-            <span className="relative text-[#cd9f4b] text-4xl font-mont uppercase tracking-wider font-black">
+            <span className="relative text-[#cd9f4b] text-5xl font-mont uppercase tracking-wider font-black">
               <span className="shine-text block">ROYAL</span>
-              <Crown className="absolute right-[1.7rem] -top-5" size={24} />
+              <Crown className="absolute left-[0rem] -top-8" size={35} />
             </span>
           </div>
-          <h1 className="shine-text text-[#cd9f4b] font-mont font-semibold text-xl relative -top-2 -right-[5rem]">
+          <h1 className="shine-text text-[#cd9f4b] font-mont font-semibold text-xl relative -top-3 left-[4.2rem]">
             COLLECTIONS
           </h1>
         </div>
