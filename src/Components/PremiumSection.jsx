@@ -21,6 +21,7 @@ const PremiumSection = ({ products }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const [isShining, setIsShining] = useState(false);
   const { gender } = useAppContext();
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
@@ -57,26 +58,45 @@ const PremiumSection = ({ products }) => {
     }).format(price);
   };
 
-  const generateSlug = (id, name) =>
-    `${id}-${name.toLowerCase().replace(/\s+/g, "-")}`;
+  // Trigger shine effect periodically
+  useEffect(() => {
+    // Initial shine after component mounts
+    const initialTimer = setTimeout(() => {
+      triggerShine();
+    }, 1000);
 
+    // Set up interval for repeated shine effect
+    const intervalId = setInterval(() => {
+      triggerShine();
+    }, 5000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const triggerShine = () => {
+    setIsShining(true);
+    setTimeout(() => setIsShining(false), 2500);
+  };
   return (
     <section
       style={{
         backgroundPosition: "0px -160px ",
       }}
-      className="py-8 font-mont bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
+      className="py-8  bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
     >
       <div className="container mx-auto px-4 ">
         {/* Section Header with premium styling */}
         <div className="relative mb-6 text-center">
           <div className="flex items-center relative left-20 justify-center mb-1">
-            <span className="text-[#cd9f4b] text-4xl relative   uppercase tracking-wider font-black">
-              ROYAL
-              <Crown className="absolute right-[2.2rem] -top-5 " size={24} />
+            <span className="relative text-[#cd9f4b] text-4xl font-mont uppercase tracking-wider font-black">
+              <span className="shine-text block">ROYAL</span>
+              <Crown className="absolute right-[1.7rem] -top-5" size={24} />
             </span>
           </div>
-          <h1 className="text-[#cd9f4b] font-semibold text-xl relative -top-2 left-20">
+          <h1 className="shine-text text-[#cd9f4b] font-mont font-semibold text-xl relative -top-2 -right-[5rem]">
             COLLECTIONS
           </h1>
         </div>
@@ -89,7 +109,7 @@ const PremiumSection = ({ products }) => {
               {premiumProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  className="min-w-[280px]  w-full flex-shrink-0  rounded-md "
+                  className="min-w-[280px]  w-full  flex-shrink-0  rounded-md "
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -99,16 +119,6 @@ const PremiumSection = ({ products }) => {
                   >
                     <div className="relative rounded-lg overflow-hidden border border-gray-500/30 bg-white">
                       {/* Discount badge if applicable */}
-                      {product.pricing.discountPercent > 0 && (
-                        <div className="absolute top-3 left-3 z-10 animate-pulse">
-                          <div className="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-md flex items-center shadow-lg">
-                            <Tag className="w-3 h-3 mr-1" />
-                            <span className="font-bold">
-                              {product.pricing.discountPercent}% OFF
-                            </span>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Product image with responsive height and aspect ratio */}
                       <div className="relative pb-[125%] overflow-hidden">
@@ -127,11 +137,6 @@ const PremiumSection = ({ products }) => {
                           <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
                             {product.name}
                           </h3>
-                          <div className="ml-auto">
-                            <span className="bg-gray-100  text-gray-700 text-xs px-2 py-0.5 rounded-sm font-medium">
-                              ROYAL
-                            </span>
-                          </div>
                         </div>
 
                         <div className="flex items-center gap-2 mt-2">
@@ -212,13 +217,30 @@ const PremiumSection = ({ products }) => {
 
         {/* Premium CTA button */}
         <div className="flex justify-center mt-6">
-          <Link
-            to="/premium-collection"
-            className="inline-flex items-center px-6 py-2 bg-[#cd9f4b] text-white font-medium rounded-md transition-all duration-300 hover:bg-gray-800"
-          >
-            View Full Royal Collection
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Link>
+          {/* Button container with overflow hidden */}
+          <div className="relative overflow-hidden rounded-md">
+            {/* The button itself */}
+            <Link
+              to="/premium-collection"
+              className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-[#e2c275] via-[#cd9f4b] to-[#e2c275] text-white font-medium rounded-md transition-all duration-300 hover:bg-gradient-to-r hover:from-[#d4b05e] hover:via-[#bf9232] hover:to-[#d4b05e] shadow-md border border-[#e9d396] border-opacity-30"
+              onMouseEnter={() => triggerShine()}
+            >
+              View Full Royal Collection
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Link>
+
+            {/* Shine effect using Framer Motion */}
+            <motion.div
+              className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+              initial={{ x: "-100%", skewX: -30 }}
+              animate={isShining ? { x: "300%" } : { x: "-100%" }}
+              transition={
+                isShining
+                  ? { duration: 1.5, ease: "easeInOut" }
+                  : { duration: 0 }
+              }
+            />
+          </div>
         </div>
       </div>
     </section>

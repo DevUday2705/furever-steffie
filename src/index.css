@@ -2,11 +2,50 @@
 
 @import "@fontsource/hind-vadodara";
 @import "@fontsource/open-sans";
-@import "@fontsource/share-tech";
 body {
   font-family: "Hind Vadodara", sans-serif;
 }
 
+@font-face {
+  font-family: "Cinzel";
+  src: url("./assets/fonts/Cinzel.ttf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-mont {
-  font-family: "Share Tech", sans-serif;
+  font-family: "Cinzel", serif;
+}
+
+.shine-text {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.shine-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 20%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: shine 4s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
 }

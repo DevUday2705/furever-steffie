@@ -10,8 +10,8 @@ const ProductInfo = ({ product, calculatePrice }) => {
       ? Math.round(price * (100 / (100 - discountPercent)))
       : price;
 
-  const isPremium = product.category === "premium";
-
+  const isPremium = product.category === "royal";
+  console.log(product);
   return (
     <div className="p-4">
       {/* Subcategory */}
