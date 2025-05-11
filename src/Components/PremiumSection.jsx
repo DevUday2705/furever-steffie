@@ -109,7 +109,7 @@ const PremiumSection = ({ products }) => {
               {premiumProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  className="min-w-[280px]  w-full  flex-shrink-0  rounded-md "
+                  className="min-w-[280px]  w-full  flex-shrink-0  rounded-md p-2"
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -117,7 +117,7 @@ const PremiumSection = ({ products }) => {
                     to={`/product/${product.id}+${product.type}`}
                     className="block group"
                   >
-                    <div className="relative rounded-lg overflow-hidden border border-gray-500/30 bg-white">
+                    <div className="relative rounded-lg overflow-hidden border-white  border-4 bg-white shadow-md hover:shadow-lg transition-all duration-300">
                       {/* Discount badge if applicable */}
 
                       {/* Product image with responsive height and aspect ratio */}
