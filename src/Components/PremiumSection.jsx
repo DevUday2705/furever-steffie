@@ -63,7 +63,7 @@ const PremiumSection = ({ products }) => {
   return (
     <section
       style={{
-        backgroundPosition: "0px -200px ",
+        backgroundPosition: "0px -180px ",
       }}
       className="py-8 font-mont bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
     >
