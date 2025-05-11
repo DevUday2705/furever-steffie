@@ -2,7 +2,11 @@
 
 @import "@fontsource/hind-vadodara";
 @import "@fontsource/open-sans";
-
+@import "@fontsource/share-tech";
 body {
   font-family: "Hind Vadodara", sans-serif;
+}
+
+.font-mont {
+  font-family: "Share Tech", sans-serif;
 }

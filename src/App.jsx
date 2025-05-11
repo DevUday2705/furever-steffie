@@ -32,7 +32,7 @@ import FrockListing from "./Components/FrockListing";
 import FabricManagementSystem from "./Components/FabricManagementSystem";
 const App = () => {
   return (
-    <div className=" max-w-md mx-auto">
+    <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between py-5 px-5  ">
         <Link to="/" className="w-full ">
           <img className="h-12 mx-auto" src="/images/logo.png" />
@@ -41,7 +41,7 @@ const App = () => {
       </nav>
 
       <div className="max-w-md mx-auto">
-        {/* <Routes>
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/kurta" element={<KurtaListing />} />
           <Route path="/frock" element={<FrockListing />} />
@@ -71,7 +71,7 @@ const App = () => {
           <Route path="/thank-you" element={<ThankYouPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/inventory" element={<FabricManagementSystem />} />
-        </Routes> */}
+        </Routes>
       </div>
       <Toaster />
     </div>

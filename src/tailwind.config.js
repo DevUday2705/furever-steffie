@@ -1,10 +1,15 @@
-module.exports = {
+export default {
+    content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+    ],
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Open Sans', 'sans-serif'], // override default if you want
-                open: ['Open Sans', 'sans-serif'], // custom class 'font-open'
+                'montserrat': ['Montserrat', 'sans-serif'],
+                // Add more custom fonts as needed
             },
         },
     },
+    plugins: [],
 }

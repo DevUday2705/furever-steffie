@@ -65,17 +65,20 @@ const PremiumSection = ({ products }) => {
       style={{
         backgroundPosition: "0px -200px ",
       }}
-      className="py-8  bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
+      className="py-8 font-mont bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
     >
       <div className="container mx-auto px-4 ">
         {/* Section Header with premium styling */}
-        <div className="mb-6 text-center">
-          <div className="flex items-center justify-center mb-1">
-            <Star className="w-4 h-4 text-black mr-1" fill="currentColor" />
-            <span className="text-black text-4xl  uppercase tracking-wider font-black">
+        <div className="relative mb-6 text-center">
+          <div className="flex items-center relative left-20 justify-center mb-1">
+            <span className="text-[#cd9f4b] text-4xl relative   uppercase tracking-wider font-black">
               ROYAL
+              <Crown className="absolute right-[2.2rem] -top-5 " size={24} />
             </span>
           </div>
+          <h1 className="text-[#cd9f4b] font-semibold text-xl relative -top-2 left-20">
+            COLLECTIONS
+          </h1>
         </div>
 
         {/* Premium Products Carousel */}
@@ -86,7 +89,7 @@ const PremiumSection = ({ products }) => {
               {premiumProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  className="min-w-[280px] w-full flex-shrink-0  rounded-md "
+                  className="min-w-[280px]  w-full flex-shrink-0  rounded-md "
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -118,14 +121,14 @@ const PremiumSection = ({ products }) => {
                       </div>
 
                       {/* Enhanced product details with premium styling */}
-                      <div className="p-4 bg-white">
+                      <div className="p-4 bg-white ">
                         <div className="flex items-center mb-1">
                           <Crown color="#cd9f4b" className="mr-2" size={16} />
                           <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
                             {product.name}
                           </h3>
                           <div className="ml-auto">
-                            <span className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-sm font-medium">
+                            <span className="bg-gray-100  text-gray-700 text-xs px-2 py-0.5 rounded-sm font-medium">
                               ROYAL
                             </span>
                           </div>
