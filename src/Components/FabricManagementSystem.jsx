@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -41,7 +41,11 @@ export default function FabricManagementSystem() {
   const [priceRanges, setPriceRanges] = useState([]); // e.g. [ [100,150], [200,250] ]
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredLocations, setFilteredLocations] = useState([]);
   const fileInputRef = useRef(null);
+  const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -52,6 +56,11 @@ export default function FabricManagementSystem() {
     availableMeters: "",
     image: null,
   });
+
+  useEffect(() => {
+    fetchFabrics();
+  }, []);
+
   async function generateUniqueFabricId() {
     let unique = false;
     let fabricId;
@@ -96,6 +105,12 @@ export default function FabricManagementSystem() {
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handleSelect = (location) => {
+    setFormData((prev) => ({ ...prev, purchasedFrom: location }));
+    setIsOpen(false);
+    inputRef.current.focus();
   };
 
   const handleSubmit = async (e) => {
@@ -148,10 +163,6 @@ export default function FabricManagementSystem() {
     }
   };
 
-  useEffect(() => {
-    fetchFabrics();
-  }, []);
-
   const filteredFabrics = fabrics
     .filter((fabric) => {
       const nameMatch = fabric.name
@@ -177,11 +188,42 @@ export default function FabricManagementSystem() {
       return 0;
     });
 
-  const allLocations = [...new Set(fabrics.map((f) => f.purchasedFrom))];
+  const allLocations = useMemo(() => {
+    return [...new Set(fabrics.map((f) => f.purchasedFrom))];
+  }, [fabrics]);
   const locationCounts = allLocations.map((loc) => ({
     name: loc,
     count: fabrics.filter((f) => f.purchasedFrom === loc).length,
   }));
+
+  useEffect(() => {
+    // Filter locations based on input
+    if (formData.purchasedFrom) {
+      const filtered = allLocations.filter((location) =>
+        location.toLowerCase().includes(formData.purchasedFrom.toLowerCase())
+      );
+      setFilteredLocations(filtered);
+    } else {
+      setFilteredLocations(allLocations);
+    }
+  }, [formData.purchasedFrom, allLocations]);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen  p-4 font-sans text-gray-800">
@@ -524,18 +566,45 @@ export default function FabricManagementSystem() {
                     />
                   </div>
 
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Purchased From
                     </label>
                     <input
+                      ref={inputRef}
                       type="text"
                       name="purchasedFrom"
                       value={formData.purchasedFrom}
                       onChange={handleChange}
+                      onFocus={() => setIsOpen(true)}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                       placeholder="Fabric Supplier Inc."
                     />
+
+                    {isOpen && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none"
+                      >
+                        {filteredLocations.length > 0 ? (
+                          <ul className="divide-y divide-gray-100">
+                            {filteredLocations.map((location, index) => (
+                              <li
+                                key={index}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleSelect(location)}
+                              >
+                                {location}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="px-4 py-3 text-sm text-gray-700">
+                            No matches found. Your custom entry will be used.
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div>
