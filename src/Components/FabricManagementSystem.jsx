@@ -16,6 +16,7 @@ import {
   Tag,
   StickyNote,
   Filter,
+  Trash2,
 } from "lucide-react";
 import {
   collection,
@@ -24,9 +25,11 @@ import {
   doc,
   updateDoc,
   arrayUnion,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { uploadToCloudinary } from "../constants/uploadToCloudinary";
+import toast from "react-hot-toast";
 
 export default function FabricManagementSystem() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -611,7 +614,8 @@ function FabricDetailSlider({ fabric, onClose, onUpdated }) {
   const [available, setAvailable] = useState(0);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
-
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     if (fabric) {
       setAvailable(parseFloat(fabric.availableMeters) || 0);
@@ -637,8 +641,9 @@ function FabricDetailSlider({ fabric, onClose, onUpdated }) {
         availableMeters: available,
         logs: arrayUnion(newLog),
       });
-
+      toast.success("Fabric Updated Successfully!");
       onUpdated();
+
       onClose();
     } catch (err) {
       console.error("Update failed", err);
@@ -664,6 +669,22 @@ function FabricDetailSlider({ fabric, onClose, onUpdated }) {
   // Format price with 2 decimal places
   const formatPrice = (price) => {
     return parseFloat(price).toFixed(2);
+  };
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const docRef = doc(db, "fabrics", fabric.id);
+      await deleteDoc(docRef);
+      onUpdated();
+      setShowDeleteConfirm(false);
+      toast.success("Fabric Deleted Successfully!");
+      onClose();
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Failed to delete fabric. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -935,6 +956,45 @@ function FabricDetailSlider({ fabric, onClose, onUpdated }) {
               </>
             )}
           </button>
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="mt-2 w-full flex items-center mb-5 justify-center gap-2 bg-red-50 text-red-600 py-2 rounded-lg border border-red-200 hover:bg-red-100 transition-colors"
+            >
+              <Trash2 size={16} />
+              Delete Fabric
+            </button>
+          ) : (
+            <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-sm mb-2">
+                Are you sure you want to delete this fabric? This action cannot
+                be undone.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-1 rounded"
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 bg-red-600 text-white py-1 rounded flex items-center justify-center gap-1"
+                  disabled={deleting}
+                >
+                  {deleting ? (
+                    "Deleting..."
+                  ) : (
+                    <>
+                      <Trash2 size={14} />
+                      Confirm
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
