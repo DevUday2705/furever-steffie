@@ -157,14 +157,14 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp",
         "options": {
             "beaded": {
                 "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp"
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp",
 
                 ]
             }
