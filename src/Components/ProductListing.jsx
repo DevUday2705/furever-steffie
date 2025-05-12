@@ -112,7 +112,7 @@ const ProductListing = ({
           alt="Kurta Banner"
           className="w-full rounded-md h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/30 rounded-md flex items-end justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-md flex items-end justify-center">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

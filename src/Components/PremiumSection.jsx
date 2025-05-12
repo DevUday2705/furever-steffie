@@ -96,7 +96,7 @@ const PremiumSection = ({ products }) => {
               <Crown className="absolute -left-[0.1rem] -top-4" size={20} />
             </span>
           </div>
-          <h1 className="shine-text text-[#cd9f4b] font-mont font-semibold text-xs relative -top-4 left-[6rem]">
+          <h1 className="shine-text text-[#cd9f4b] font-mont font-semibold text-xs relative -top-4 left-[5.5rem]">
             COLLECTIONS
           </h1>
         </div>

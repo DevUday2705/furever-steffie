@@ -32,7 +32,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9111_gakprx.webp"
 
                 ]
             }
@@ -76,7 +76,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035106/IMG_9117_buel1o.webp"
 
                 ]
             }
@@ -164,7 +164,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035107/IMG_9109_rzqerd.webp"
 
                 ]
             }
@@ -219,7 +219,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 75
     },
     {
         "id": "sk006",
@@ -252,7 +252,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035105/IMG_9115_vm2syd.webp"
 
                 ]
             }
@@ -263,7 +263,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 70
     },
     {
         "id": "sk007",
@@ -296,7 +296,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9112_zxojtf.webp"
 
                 ]
             }
@@ -307,7 +307,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 76
     },
     {
         "id": "sk008",
@@ -340,7 +340,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9113_omiw16.webp"
 
                 ]
             }
@@ -384,7 +384,7 @@ export const kurtas = [
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035812/WhatsApp_Image_2025-05-07_at_00.34.15_d1fa9f50_hgjnwg.jpg"
 
                 ]
             }
