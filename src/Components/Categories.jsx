@@ -24,7 +24,7 @@ const Categories = () => {
       name: "Kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png",
     },
     {
       id: 2,
