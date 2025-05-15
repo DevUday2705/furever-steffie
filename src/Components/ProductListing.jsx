@@ -166,14 +166,16 @@ const ProductListing = ({
                       className="absolute w-full h-full object-cover"
                       whileHover={{ scale: 1.05 }}
                     />
-                    {product.priorityScore >= 90 && (
+                    {/* {product.priorityScore >= 90 && (
                       <div className="absolute top-0 left-0">
                         <div className="flex items-center bg-amber-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">
                           <Flame size={10} className="text-white mr-0.5" />
-                          <span className="font-medium text-[12px]">Hot</span>
+                          <span className="font-medium text-[12px]">
+                            Best Sellers
+                          </span>
                         </div>
                       </div>
-                    )}
+                    )} */}
                     {product.category === "royal" && (
                       <div className="absolute bottom-0 left-0 px-2 py-0.5 text-white text-xs bg-yellow-500 rounded-tr-lg">
                         <CrownIcon size={10} className="inline-block mr-1" />

@@ -175,7 +175,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 85
     },
     {
         "id": "sk005",
@@ -351,7 +351,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 90
     },
     {
         "id": "sk009",
@@ -395,7 +395,7 @@ export const kurtas = [
         "availableStock": 15,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 95
+        "priorityScore": 75
     },
 
 
