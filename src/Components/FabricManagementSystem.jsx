@@ -30,7 +30,7 @@ import {
 import { db } from "../firebase";
 import { uploadToCloudinary } from "../constants/uploadToCloudinary";
 import toast from "react-hot-toast";
-
+const ADMIN_KEY = "What@123";
 export default function FabricManagementSystem() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [fabrics, setFabrics] = useState([]);
@@ -43,7 +43,11 @@ export default function FabricManagementSystem() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [filteredLocations, setFilteredLocations] = useState([]);
+  const [passkey, setPasskey] = useState("");
+
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const fileInputRef = useRef(null);
+
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -224,6 +228,35 @@ export default function FabricManagementSystem() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleLogin = () => {
+    if (passkey === ADMIN_KEY) {
+      setIsAuthorized(true);
+    } else {
+      alert("Wrong admin key!");
+    }
+  };
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+        <h2 className="text-xl font-bold mb-4">Admin Access</h2>
+        <input
+          type="password"
+          placeholder="Enter admin passkey"
+          value={passkey}
+          onChange={(e) => setPasskey(e.target.value)}
+          className="border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full max-w-xs"
+        />
+        <button
+          onClick={handleLogin}
+          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 w-full max-w-xs"
+        >
+          Enter
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen  p-4 font-sans text-gray-800">

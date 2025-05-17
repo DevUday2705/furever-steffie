@@ -6,7 +6,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
 
-const ADMIN_KEY = "030527";
+const ADMIN_KEY = "What@123";
 
 const AdminPage = () => {
   const [passkey, setPasskey] = useState("");
