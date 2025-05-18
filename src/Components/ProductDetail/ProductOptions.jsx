@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const ProductOptions = ({
   product,
@@ -8,6 +9,28 @@ const ProductOptions = ({
   setIsFullSet,
 }) => {
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
+  const dhotis = product.dhotis || [
+    {
+      id: "dhoti-gold",
+      name: "Gold",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+    },
+    {
+      id: "dhoti-peacock-green",
+      name: "Peacock Green",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+    },
+    {
+      id: "dhoti-black",
+      name: "Black",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+    },
+  ];
+
+  const [selectedDhoti, setSelectedDhoti] = useState(dhotis[0]?.id);
 
   const renderStyleOptions = () => {
     if (isBeadedAvailable && isNonBeadedAvailable) {
@@ -62,6 +85,49 @@ const ProductOptions = ({
     }
   };
 
+  const renderDhotiOptions = () => {
+    if (!isFullSet || product.type !== "kurta") return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        transition={{ duration: 0.3 }}
+        className="mt-6"
+      >
+        <h3 className="text-xs font-medium text-gray-900 mb-3">Dhoti Color</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {dhotis.map((dhoti) => (
+            <motion.div
+              key={dhoti.id}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedDhoti(dhoti.id)}
+              className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
+                selectedDhoti === dhoti.id
+                  ? "border-gray-800"
+                  : "border-transparent"
+              }`}
+            >
+              <div className="relative pb-3/4 h-20">
+                <img
+                  src={dhoti.image}
+                  alt={dhoti.name}
+                  className="absolute h-full w-full object-cover"
+                />
+              </div>
+              <div className="p-1 bg-gray-50">
+                <p className="text-xs font-medium text-center text-gray-800 truncate">
+                  {dhoti.name}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="p-4 space-y-4">
       {/* STYLE OPTIONS */}
@@ -97,6 +163,7 @@ const ProductOptions = ({
           </div>
         </div>
       )}
+      {renderDhotiOptions()}
     </div>
   );
 };
