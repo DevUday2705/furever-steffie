@@ -177,9 +177,25 @@ const ProductListing = ({
                       </div>
                     )} */}
                     {product.category === "royal" && (
-                      <div className="absolute bottom-0 left-0 px-2 py-0.5 text-white text-xs bg-yellow-500 rounded-tr-lg">
+                      <div
+                        style={{
+                          background:
+                            "linear-gradient(90deg, #c9a94e, #b5892e)",
+                          boxShadow: "0 2px 6px rgba(201, 169, 78, 0.35)",
+                        }}
+                        className="absolute overflow-hidden bottom-0 left-0 px-2 py-0.5 text-white text-xs  rounded-tr-lg"
+                      >
                         <CrownIcon size={10} className="inline-block mr-1" />
                         Royal
+                        <motion.div
+                          className="absolute left-[-30%] top-0 w-[60%] h-full bg-white opacity-10 rotate-60"
+                          animate={{ left: "130%" }}
+                          transition={{
+                            duration: 3,
+                            ease: "easeInOut",
+                            repeat: Infinity,
+                          }}
+                        />
                       </div>
                     )}
                   </div>
