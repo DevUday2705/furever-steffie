@@ -336,7 +336,9 @@ const AdminPage = () => {
                             Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
                             {item.isFullSet ? "Yes" : "No"}
                           </p>
-
+                          <p>
+                            Dhoti : {item.selectedDhoti && item.selectedDhoti}
+                          </p>
                           {/* 👇 ADD this here 👇 */}
                           {item.measurements && (
                             <div className="text-[11px] text-gray-600 mt-1">
