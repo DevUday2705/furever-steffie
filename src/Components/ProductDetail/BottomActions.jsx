@@ -15,6 +15,7 @@ const BottomActions = ({
   addToCart,
   setIsOpen,
   measurements,
+  selectedDhoti,
   measurementsValid,
   requiresMeasurements,
 }) => {
@@ -25,6 +26,7 @@ const BottomActions = ({
       subcategory: product.subcategory,
       isBeaded,
       isFullSet,
+      selectedDhoti,
       selectedSize,
       price: calculatePrice(),
       image: images[0],

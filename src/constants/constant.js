@@ -6,6 +6,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "classic",
         "name": "Purple Charm",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -50,6 +70,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "royal",
         "name": "Midnight Gold",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -94,6 +134,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "classic",
         "name": "Sunshine Grid",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -138,6 +198,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "royal",
         "name": "Festive Royale",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -182,6 +262,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "royal",
         "name": "Dark Floral",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -226,6 +326,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "classic",
         "name": "Sunset Blocks",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -270,6 +390,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "classic",
         "name": "Red Blossom",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -314,6 +454,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "classic",
         "name": "Floral Sunshine",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -358,6 +518,26 @@ export const kurtas = [
         "type": "kurta",
         "category": "royal",
         "name": "Mehndi Leaf",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
         "pricing": {
             "basePrice": 1099,
             "discountPercent": 10,
@@ -400,6 +580,10 @@ export const kurtas = [
 
 
 ]
+
+
+
+
 
 export const frocks = [
     {

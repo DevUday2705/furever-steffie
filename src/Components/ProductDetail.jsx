@@ -27,6 +27,7 @@ const ProductDetail = () => {
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
   const [selectedSize, setSelectedSize] = useState("S");
+  const [selectedDhoti, setSelectedDhoti] = useState(product?.dhotis[0]?.id);
   const [images, setImages] = useState([]);
   const [measurementsValid, setMeasurementsValid] = useState(false);
   const [measurements, setMeasurements] = useState({
@@ -69,7 +70,6 @@ const ProductDetail = () => {
       else if (typePart === "tuxedo") productArray = tuxedos;
       else return null; // Invalid type
 
-      console.log(kurtas);
       return productArray.find((p) => p.id === idPart) || null;
     };
 
@@ -220,6 +220,8 @@ const ProductDetail = () => {
             setIsFullSet={setIsFullSet}
             selectedSize={selectedSize}
             setSelectedSize={setSelectedSize}
+            selectedDhoti={selectedDhoti}
+            setSelectedDhoti={setSelectedDhoti}
           />
 
           {product.contactForCustomColors && (
@@ -233,6 +235,7 @@ const ProductDetail = () => {
         images={images}
         isBeaded={isBeaded}
         isFullSet={isFullSet}
+        selectedDhoti={selectedDhoti}
         selectedSize={selectedSize}
         calculatePrice={calculatePrice}
         navigate={navigate}
