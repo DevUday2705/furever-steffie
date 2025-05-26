@@ -226,7 +226,7 @@ const CheckoutPage = () => {
     rzp.open();
   };
 
-  console.log(cart);
+  console.log(orderDetails);
 
   return (
     <div className="bg-gray-50 pb-24">

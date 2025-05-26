@@ -20,14 +20,16 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart, setIsOpen } = useAppContext();
   const [idPart, typePart] = productId.split("+");
-
+  const [selectedColor, setSelectedColor] = useState(null);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
   const [selectedSize, setSelectedSize] = useState("S");
-  const [selectedDhoti, setSelectedDhoti] = useState(product?.dhotis[0]?.id);
+  const [selectedDhoti, setSelectedDhoti] = useState(
+    product?.dhotis?.length ? product.dhotis[0].id : null
+  );
   const [images, setImages] = useState([]);
   const [measurementsValid, setMeasurementsValid] = useState(false);
   const [measurements, setMeasurements] = useState({
@@ -82,8 +84,26 @@ const ProductDetail = () => {
         setIsFullSet(foundProduct.defaultOptions?.isFullSet ?? false);
         setSelectedSize(foundProduct.defaultOptions?.size ?? "S");
 
+        // NEW: Set default color
+        const defaultColor =
+          foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
+        setSelectedColor(defaultColor);
+
+        // NEW: Updated image logic for colors
         const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
-        if (foundProduct.options) {
+        if (foundProduct.colors && foundProduct.colors.length > 0) {
+          const colorData = foundProduct.colors.find(
+            (c) => c.id === defaultColor
+          );
+          if (colorData?.options) {
+            setImages(
+              defaultIsBeaded
+                ? colorData.options.beaded?.images ?? []
+                : colorData.options.nonBeaded?.images ?? []
+            );
+          }
+        } else if (foundProduct.options) {
+          // Fallback to old structure
           setImages(
             defaultIsBeaded
               ? foundProduct.options.beaded?.images ?? []
@@ -100,6 +120,17 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!product) return;
+    if (product.colors && selectedColor) {
+      const colorData = product.colors.find((c) => c.id === selectedColor);
+      if (colorData?.options) {
+        setImages(
+          isBeaded
+            ? colorData.options.beaded?.images ?? []
+            : colorData.options.nonBeaded?.images ?? []
+        );
+        return;
+      }
+    }
     if (product.options) {
       setImages(
         isBeaded
@@ -109,7 +140,7 @@ const ProductDetail = () => {
     } else {
       setImages([product.mainImage]);
     }
-  }, [isBeaded, product]);
+  }, [isBeaded, product, selectedColor]);
 
   const sizeCodeMap = {
     Small: "S",
@@ -221,6 +252,8 @@ const ProductDetail = () => {
             selectedSize={selectedSize}
             setSelectedSize={setSelectedSize}
             selectedDhoti={selectedDhoti}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
             setSelectedDhoti={setSelectedDhoti}
           />
 
@@ -237,6 +270,7 @@ const ProductDetail = () => {
         isFullSet={isFullSet}
         selectedDhoti={selectedDhoti}
         selectedSize={selectedSize}
+        selectedColor={selectedColor} // NEW
         calculatePrice={calculatePrice}
         navigate={navigate}
         addToCart={addToCart}

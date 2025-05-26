@@ -18,6 +18,7 @@ const BottomActions = ({
   selectedDhoti,
   measurementsValid,
   requiresMeasurements,
+  selectedColor,
 }) => {
   const handleBuyNow = () => {
     const orderDetails = {
@@ -28,6 +29,7 @@ const BottomActions = ({
       isFullSet,
       selectedDhoti,
       selectedSize,
+      selectedColor,
       price: calculatePrice(),
       image: images[0],
       measurements: requiresMeasurements ? measurements : null, // Include measurements
@@ -43,6 +45,7 @@ const BottomActions = ({
       isBeaded,
       isFullSet,
       selectedSize,
+      selectedColor,
       price: calculatePrice(),
       image: images[0],
       quantity: 1,

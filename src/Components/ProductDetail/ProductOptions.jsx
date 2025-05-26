@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+
 import { motion } from "framer-motion";
+import ColorSelector from "../ColorSelector";
 
 const ProductOptions = ({
   product,
@@ -9,7 +11,12 @@ const ProductOptions = ({
   setIsFullSet,
   selectedDhoti,
   setSelectedDhoti,
+  selectedColor, // NEW
+  setSelectedColor,
 }) => {
+  const handleColorChange = (colorId) => {
+    setSelectedColor(colorId);
+  };
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
 
   const renderStyleOptions = () => {
@@ -110,6 +117,12 @@ const ProductOptions = ({
 
   return (
     <div className="p-4 space-y-4">
+      <ColorSelector
+        colors={product.colors}
+        selectedColor={selectedColor}
+        onColorSelect={handleColorChange}
+      />
+
       {/* STYLE OPTIONS */}
       {["kurta", "lehnga", "tuxedo"].includes(product.type) &&
         (isBeadedAvailable || isNonBeadedAvailable) && (
@@ -143,7 +156,7 @@ const ProductOptions = ({
           </div>
         </div>
       )}
-      {renderDhotiOptions()}
+      {product?.dhotis?.length > 0 && renderDhotiOptions()}
     </div>
   );
 };

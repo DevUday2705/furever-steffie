@@ -759,7 +759,205 @@ export const frocks = [
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
         "priorityScore": 85
-    }
+    },
+    {
+        "id": "fs-frock-005",
+        "type": "frock",
+        "category": "classic",
+        "name": " PikaPup Princess Dress",
+        "pricing": {
+            "basePrice": 699,
+            "discountPercent": 10,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/IMG_9122_snwsir.webp",
+        "colors": [
+            {
+                "id": "Yellow",
+                "name": "Yellow",
+                "colorCode": "#EFCA42", // For color swatch display
+                "options": {
+                    "nonBeaded": {
+                        "images": [
+                            "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/IMG_9122_snwsir.webp",
+                        ]
+                    },
+                    "beaded": {
+                        "images": []
+                    }
+                }
+            },
+            {
+                "id": "White",
+                "name": "White",
+                "colorCode": "#fff",
+                "options": {
+                    "nonBeaded": {
+                        "images": [
+                            "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/IMG_9120_spgjgu.webp"
+                        ]
+                    },
+                    "beaded": {
+                        "images": []
+                    }
+                }
+            },
+
+        ],
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/IMG_9122_snwsir.webp ",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/IMG_9120_spgjgu.webp"
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "It's playful, cute, and clearly inspired by Pikachu's iconic face, while also highlighting that it's a charming outfit for a little pup princess.",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
+    },
+    {
+        "id": "fs-frock-006",
+        "type": "frock",
+        "category": "classic",
+        "name": " Angel Paws Pink Frock",
+        "pricing": {
+            "basePrice": 699,
+            "discountPercent": 10,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_01_22_44_AM_wtrzdi.webp",
+        "colors": [
+            {
+                "id": "blush-pink",
+                "name": "Blush Pink",
+                "colorCode": "#F8BBD9", // For color swatch display
+                "options": {
+                    "nonBeaded": {
+                        "images": [
+                            "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_01_22_44_AM_wtrzdi.webp",
+                        ]
+                    },
+                    "beaded": {
+                        "images": []
+                    }
+                }
+            },
+            {
+                "id": "sky-blue",
+                "name": "Sky Blue",
+                "colorCode": "#87CEEB",
+                "options": {
+                    "nonBeaded": {
+                        "images": [
+                            "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_01_26_02_AM_tnyowy.webp"
+                        ]
+                    },
+                    "beaded": {
+                        "images": []
+                    }
+                }
+            },
+
+        ],
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_01_22_44_AM_wtrzdi.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_01_26_02_AM_tnyowy.webp"
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "This blush-pink dress features soft wings, a tulle skirt, and pom-pom trim—perfect for photos, playdates, or fancy strolls.",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
+    },
+    {
+        "id": "fs-frock-007",
+        "type": "frock",
+        "category": "classic",
+        "name": " Bumble Belle Dress",
+        "pricing": {
+            "basePrice": 699,
+            "discountPercent": 10,
+            "fullSetAdditional": 500,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 100,
+                "L": 300,
+                "XL": 500,
+                "XXL": 700
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_12_26_38_AM_h0xucg.webp",
+        "options": {
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244566/ChatGPT_Image_May_14_2025_12_26_38_AM_h0xucg.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1748244565/Girls_Dresses___Kids_Dresses_brxmjd.webp"
+
+                ]
+            },
+            "beaded": {
+                "images": []
+            }
+        },
+        "sizes": ["XS", "S", "M", "L"],
+        "contactForCustomColors": false,
+        "description": "Let your little fur angel flutter in style with the Angel Paws Tutu! This dreamy blush-pink dress features soft wing details on the back and a delicate tulle skirt trimmed with playful pom-poms. Perfect for photoshoots, playdates, or pampered strolls, this dress brings out the heavenly charm in every pup.",
+        "availableStock": 10,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 85
+    },
 ]
 export const bowData = {
     "requiresMeasurements": false,
