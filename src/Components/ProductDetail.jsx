@@ -226,7 +226,19 @@ const ProductDetail = () => {
           />
 
           <ProductInfo product={product} calculatePrice={calculatePrice} />
-
+          <ProductOptions
+            product={product}
+            isBeaded={isBeaded}
+            setIsBeaded={setIsBeaded}
+            isFullSet={isFullSet}
+            setIsFullSet={setIsFullSet}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+            selectedDhoti={selectedDhoti}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            setSelectedDhoti={setSelectedDhoti}
+          />
           {requiresMeasurements ? (
             <ProductMeasurements
               onSizeDetected={(size, measurements) => {
@@ -242,20 +254,6 @@ const ProductDetail = () => {
               sizes={product.sizes || ["S", "M", "L", "XL"]}
             />
           )}
-
-          <ProductOptions
-            product={product}
-            isBeaded={isBeaded}
-            setIsBeaded={setIsBeaded}
-            isFullSet={isFullSet}
-            setIsFullSet={setIsFullSet}
-            selectedSize={selectedSize}
-            setSelectedSize={setSelectedSize}
-            selectedDhoti={selectedDhoti}
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
-            setSelectedDhoti={setSelectedDhoti}
-          />
 
           {product.contactForCustomColors && (
             <CustomColorEnquiry product={product} />
