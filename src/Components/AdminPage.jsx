@@ -339,6 +339,10 @@ const AdminPage = () => {
                           <p>
                             Dhoti : {item.selectedDhoti && item.selectedDhoti}
                           </p>
+                          <p>
+                            Selected Color/Frock Color :{" "}
+                            {item.selectedColor && item.selectedColor}
+                          </p>
                           {/* 👇 ADD this here 👇 */}
                           {item.measurements && (
                             <div className="text-[11px] text-gray-600 mt-1">
