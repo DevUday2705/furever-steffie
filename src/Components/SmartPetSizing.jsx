@@ -237,6 +237,13 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
   useEffect(() => {
     calculateSize();
   }, [selectedBreed, selectedAge, selectedBodyType]);
+  useEffect(() => {
+    if (currentStep === "breed" && selectedBreed) {
+      setCurrentStep("age");
+    } else if (currentStep === "age" && selectedAge) {
+      setCurrentStep("bodyType");
+    }
+  }, [selectedBreed, selectedAge]);
 
   const nextStep = () => {
     if (currentStep === "breed" && selectedBreed) {
@@ -315,7 +322,6 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setSelectedBreed(breed.name);
-                      setTimeout(nextStep, 300);
                     }}
                     className={`p-3 rounded-xl text-sm font-medium transition-all ${
                       selectedBreed === breed.name
@@ -370,7 +376,6 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                           setSelectedBreed(breed.name);
                           setShowBreedDropdown(false);
                           setBreedSearch("");
-                          setTimeout(nextStep, 300);
                         }}
                         className="w-full p-3 text-left hover:bg-gray-50 flex items-center justify-between"
                       >
@@ -408,7 +413,6 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     setSelectedAge(age.value);
-                    setTimeout(nextStep, 300);
                   }}
                   className={`p-4 rounded-xl text-center transition-all ${
                     selectedAge === age.value
