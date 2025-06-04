@@ -13,7 +13,8 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
   const dogBreeds = [
     // Extra Small Breeds (XS)
-    { name: "Imperial Shih Tzu", avgSize: "XS", popular: true },
+    { name: "Teacup Shih Tzu", avgSize: "XS", popular: true },
+    { name: "Lhasa Apso", avgSize: "S", popular: true },
     { name: "Poodle (Toy)", avgSize: "XS", popular: true },
     { name: "Bichon Frise", avgSize: "XS", popular: true },
     { name: "Maltese", avgSize: "XS", popular: true },
@@ -24,7 +25,6 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
     // Small Breeds (S)
     { name: "Regular Shih Tzu", avgSize: "S", popular: true },
-    { name: "Lhasa Apso", avgSize: "S", popular: true },
     { name: "Havanese", avgSize: "S", popular: true },
     { name: "Dachshund", avgSize: "S", popular: true },
     { name: "Boston Terrier", avgSize: "S", popular: true },
@@ -310,23 +310,21 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
             </h4>
 
             {/* Popular Breeds */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <p className="text-xs text-gray-500 font-medium">
                 Popular Breeds
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {popularBreeds.slice(0, 6).map((breed) => (
+              <div className="grid grid-cols-4 gap-1">
+                {popularBreeds.slice(0, 8).map((breed) => (
                   <motion.button
                     key={breed.name}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setSelectedBreed(breed.name);
-                    }}
-                    className={`p-3 rounded-xl text-sm font-medium transition-all ${
+                    onClick={() => setSelectedBreed(breed.name)}
+                    className={`p-1.5 rounded-md text-[10px] font-medium transition-all leading-tight ${
                       selectedBreed === breed.name
-                        ? "bg-gray-500 text-white shadow-lg"
-                        : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
+                        ? "bg-gray-600 text-white"
+                        : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
                     }`}
                   >
                     {breed.name}
@@ -339,13 +337,13 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
             <div className="relative">
               <div
                 onClick={() => setShowBreedDropdown(!showBreedDropdown)}
-                className="w-full p-3 bg-white border border-gray-200 rounded-xl cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"
+                className="w-full p-2 bg-white border border-gray-200 rounded-lg cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"
               >
-                <span className="text-gray-500 text-sm">
+                <span className="text-gray-500 text-xs truncate">
                   {selectedBreed || "Search for other breeds..."}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform ${
+                  className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ml-1 ${
                     showBreedDropdown ? "rotate-180" : ""
                   }`}
                 />
@@ -354,37 +352,41 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
               <AnimatePresence>
                 {showBreedDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: -5, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-60 overflow-y-auto"
+                    exit={{ opacity: 0, y: -5, scale: 0.98 }}
+                    className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-0.5 max-h-48 overflow-y-auto"
                   >
-                    <div className="p-2">
+                    <div className="p-1.5">
                       <input
                         type="text"
                         placeholder="Search breeds..."
                         value={breedSearch}
                         onChange={(e) => setBreedSearch(e.target.value)}
-                        className="w-full p-2 border border-gray-200 rounded-lg text-sm"
+                        className="w-full p-1.5 border border-gray-200 rounded text-xs focus:border-gray-400 focus:outline-none"
                       />
                     </div>
-                    {filteredBreeds.map((breed) => (
-                      <motion.button
-                        key={breed.name}
-                        whileHover={{ backgroundColor: "#f3f4f6" }}
-                        onClick={() => {
-                          setSelectedBreed(breed.name);
-                          setShowBreedDropdown(false);
-                          setBreedSearch("");
-                        }}
-                        className="w-full p-3 text-left hover:bg-gray-50 flex items-center justify-between"
-                      >
-                        <span className="text-sm">{breed.name}</span>
-                        <span className="text-xs text-gray-400">
-                          {breed.avgSize}
-                        </span>
-                      </motion.button>
-                    ))}
+                    <div className="max-h-32 overflow-y-auto">
+                      {filteredBreeds.map((breed) => (
+                        <motion.button
+                          key={breed.name}
+                          whileHover={{ backgroundColor: "#f9fafb" }}
+                          onClick={() => {
+                            setSelectedBreed(breed.name);
+                            setShowBreedDropdown(false);
+                            setBreedSearch("");
+                          }}
+                          className="w-full p-2 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-b-0"
+                        >
+                          <span className="text-xs font-medium truncate">
+                            {breed.name}
+                          </span>
+                          <span className="text-[10px] text-gray-400 ml-2 flex-shrink-0">
+                            {breed.avgSize}
+                          </span>
+                        </motion.button>
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
