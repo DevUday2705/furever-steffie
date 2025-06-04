@@ -12,41 +12,65 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
   const [breedSearch, setBreedSearch] = useState("");
 
   const dogBreeds = [
-    // Small Breeds (Most Popular for Your Business)
+    // Extra Small Breeds (XS)
+    { name: "Imperial Shih Tzu", avgSize: "XS", popular: true },
+    { name: "Poodle (Toy)", avgSize: "XS", popular: true },
+    { name: "Bichon Frise", avgSize: "XS", popular: true },
+    { name: "Maltese", avgSize: "XS", popular: true },
+    { name: "Toy Poodle", avgSize: "XS", popular: true },
     { name: "Chihuahua", avgSize: "XS", popular: true },
     { name: "Yorkshire Terrier", avgSize: "XS", popular: true },
     { name: "Pomeranian", avgSize: "XS", popular: true },
-    { name: "Maltese", avgSize: "XS", popular: true },
-    { name: "Shih Tzu", avgSize: "S", popular: true },
-    { name: "Dachshund", avgSize: "S", popular: true },
+
+    // Small Breeds (S)
+    { name: "Regular Shih Tzu", avgSize: "S", popular: true },
+    { name: "Lhasa Apso", avgSize: "S", popular: true },
     { name: "Havanese", avgSize: "S", popular: true },
+    { name: "Dachshund", avgSize: "S", popular: true },
+    { name: "Boston Terrier", avgSize: "S", popular: true },
     { name: "Pug", avgSize: "S", popular: true },
 
-    // Small Mix Options
-    { name: "Small Mix (Under 10 lbs)", avgSize: "XS", popular: true },
-    { name: "Small Mix (10-20 lbs)", avgSize: "S", popular: true },
-
-    // Medium Popular
+    // Medium Breeds (M)
+    { name: "Regular Lhasa", avgSize: "M", popular: true },
+    { name: "Dachshund (Standard)", avgSize: "M", popular: true },
+    { name: "Pom", avgSize: "M", popular: false },
     { name: "Beagle", avgSize: "M", popular: true },
     { name: "Cocker Spaniel", avgSize: "M", popular: true },
-    { name: "Medium Mix (20-40 lbs)", avgSize: "M", popular: true },
+    { name: "Border Collie", avgSize: "M", popular: false },
+    { name: "Bulldog", avgSize: "M", popular: false },
 
-    // Less Common Large Breeds
+    // Large Breeds (L)
+    { name: "Poodle (Standard)", avgSize: "L", popular: false },
+    { name: "Dalmatian", avgSize: "L", popular: false },
+    { name: "Pomeranian (Large)", avgSize: "L", popular: false },
     { name: "Golden Retriever", avgSize: "L", popular: false },
     { name: "Labrador Retriever", avgSize: "L", popular: false },
-    { name: "German Shepherd", avgSize: "XL", popular: false },
-    { name: "Bulldog", avgSize: "M", popular: false },
-    { name: "Poodle (Standard)", avgSize: "L", popular: false },
-    { name: "Poodle (Toy)", avgSize: "XS", popular: false },
-    { name: "Poodle (Miniature)", avgSize: "S", popular: false },
-    { name: "Rottweiler", avgSize: "XL", popular: false },
-    { name: "Siberian Husky", avgSize: "L", popular: false },
-    { name: "Boxer", avgSize: "L", popular: false },
-    { name: "Boston Terrier", avgSize: "S", popular: false },
     { name: "Australian Shepherd", avgSize: "L", popular: false },
-    { name: "Border Collie", avgSize: "M", popular: false },
-    { name: "Large Mix (40+ lbs)", avgSize: "L", popular: false },
-    { name: "Don't Know / Other", avgSize: "S", popular: true },
+    { name: "Boxer", avgSize: "L", popular: false },
+
+    // Extra Large Breeds (XL)
+    { name: "Cocker Spaniel (Large)", avgSize: "XL", popular: false },
+    { name: "Beagle (Large)", avgSize: "XL", popular: false },
+    { name: "German Shepherd", avgSize: "XL", popular: false },
+    { name: "Rottweiler", avgSize: "XL", popular: false },
+    { name: "Siberian Husky", avgSize: "XL", popular: false },
+
+    // XX Large Breeds (XXL)
+    { name: "India", avgSize: "XXL", popular: false },
+    { name: "Great Dane", avgSize: "XXL", popular: false },
+    { name: "Saint Bernard", avgSize: "XXL", popular: false },
+
+    // XXX Large Breeds (XXXL)
+    { name: "Labrador (Golden Retriever)", avgSize: "XXXL", popular: false },
+    { name: "Husky", avgSize: "XXXL", popular: false },
+    { name: "Above (Giant Breeds)", avgSize: "XXXL", popular: false },
+
+    // Mix Options
+    { name: "Small Mix (Under 6 lbs)", avgSize: "XS", popular: true },
+    { name: "Small Mix (6-12 lbs)", avgSize: "S", popular: true },
+    { name: "Medium Mix (12-25 lbs)", avgSize: "M", popular: true },
+    { name: "Large Mix (25+ lbs)", avgSize: "L", popular: true },
+    { name: "Don't Know / Other", avgSize: "M", popular: true },
   ];
 
   const ageGroups = [
@@ -104,27 +128,64 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
     },
   ];
 
+  // Updated size chart based on Lehengas brand chart
   const sizeChart = {
     XS: {
       label: "Extra Small",
-      range: "4-8 lbs",
-      neck: '8-10"',
-      chest: '12-16"',
+      chest: '14-16"',
+      neck: '10-12"',
+      length: '13"',
+      weight: "2.5-5.5kg",
+      breeds:
+        "Imperial Shih Tzu, Poodle, Bichon Frise, Maltese, Toy Poodle, Toy Yorkie",
     },
-    S: { label: "Small", range: "8-15 lbs", neck: '10-12"', chest: '16-20"' },
-    M: { label: "Medium", range: "15-35 lbs", neck: '12-16"', chest: '20-26"' },
-    L: { label: "Large", range: "35-65 lbs", neck: '16-20"', chest: '26-32"' },
+    S: {
+      label: "Small",
+      chest: '16-18"',
+      neck: '14"',
+      length: '14"',
+      weight: "6.7-8 kg",
+      breeds: "Regular Shih Tzu, Lhasa Apso",
+    },
+    M: {
+      label: "Medium",
+      chest: '20-21"',
+      neck: '15"',
+      length: '15"',
+      weight: "8-9 kg",
+      breeds: "Regular Lhasa, Dachshund, Pom",
+    },
+    L: {
+      label: "Large",
+      chest: '22-24"',
+      neck: '18"',
+      length: '16"',
+      weight: "10-12 kg",
+      breeds: "Poodle, Toy Dalmatian, Pomeranian",
+    },
     XL: {
       label: "Extra Large",
-      range: "65-90 lbs",
-      neck: '20-24"',
-      chest: '32-38"',
+      chest: '25-27"',
+      neck: '20"',
+      length: '20"',
+      weight: "12-15 kg",
+      breeds: "Cocker Spaniel, Beagle",
     },
     XXL: {
       label: "XX Large",
-      range: "90+ lbs",
-      neck: '24-28"',
-      chest: '38-44"',
+      chest: '28-30"',
+      neck: '22-24"',
+      length: '22-25"',
+      weight: "15-20 kg",
+      breeds: "India",
+    },
+    XXXL: {
+      label: "XXX Large",
+      chest: '31-35"',
+      neck: '26-29"',
+      length: '27-30"',
+      weight: "25 kg+",
+      breeds: "Labrador, Golden Retriever, Husky, Above",
     },
   };
 
@@ -143,7 +204,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
     if (!breed || !age || !body) return;
 
-    const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+    const sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
     let baseIndex = sizes.indexOf(breed.avgSize);
 
     // Apply modifiers
@@ -160,6 +221,17 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
       age: selectedAge,
       bodyType: selectedBodyType,
     });
+  };
+
+  // Helper function to get size details
+  const getSizeDetails = (size) => {
+    return sizeChart[size] || null;
+  };
+
+  // Helper function to get breed recommendations for a size
+  const getBreedsForSize = (size) => {
+    const sizeData = sizeChart[size];
+    return sizeData ? sizeData.breeds : "";
   };
 
   useEffect(() => {
@@ -413,8 +485,8 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                   </p>
                   <p className="text-2xl font-bold">{recommendedSize}</p>
                   <p className="text-sm opacity-90">
-                    {sizeChart[recommendedSize]?.label} •{" "}
-                    {sizeChart[recommendedSize]?.range}
+                    {getSizeDetails(recommendedSize)?.label} •{" "}
+                    {getBreedsForSize(recommendedSize)}
                   </p>
                 </div>
               </div>
