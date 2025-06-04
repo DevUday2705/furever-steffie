@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Check, Heart, Shield, MessageCircle } from "lucide-react";
+import {
+  ChevronDown,
+  Check,
+  Heart,
+  Shield,
+  MessageCircle,
+  CheckCircle,
+} from "lucide-react";
 
 const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
   const [currentStep, setCurrentStep] = useState("breed");
@@ -13,15 +20,15 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
   const dogBreeds = [
     // Extra Small Breeds (XS)
-    { name: "Teacup Shih Tzu", avgSize: "XS", popular: true },
+    { name: "Teacup Shih Tzu", avgSize: "S", popular: true },
     { name: "Lhasa Apso", avgSize: "S", popular: true },
-    { name: "Poodle (Toy)", avgSize: "XS", popular: true },
-    { name: "Bichon Frise", avgSize: "XS", popular: true },
-    { name: "Maltese", avgSize: "XS", popular: true },
-    { name: "Toy Poodle", avgSize: "XS", popular: true },
-    { name: "Chihuahua", avgSize: "XS", popular: true },
-    { name: "Yorkshire Terrier", avgSize: "XS", popular: true },
-    { name: "Pomeranian", avgSize: "XS", popular: true },
+    { name: "Poodle (Toy)", avgSize: "S", popular: true },
+    { name: "Bichon Frise", avgSize: "S", popular: true },
+    { name: "Maltese", avgSize: "S", popular: true },
+    { name: "Toy Poodle", avgSize: "S", popular: true },
+    { name: "Chihuahua", avgSize: "S", popular: true },
+    { name: "Yorkshire Terrier", avgSize: "S", popular: true },
+    { name: "Pomeranian", avgSize: "S", popular: true },
 
     // Small Breeds (S)
     { name: "Regular Shih Tzu", avgSize: "S", popular: true },
@@ -204,7 +211,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
     if (!breed || !age || !body) return;
 
-    const sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+    const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
     let baseIndex = sizes.indexOf(breed.avgSize);
 
     // Apply modifiers
@@ -259,288 +266,379 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
     exit: { opacity: 0, x: -20 },
   };
 
+  const stepLabels = {
+    breed: "Breed",
+    age: "Age",
+    bodyType: "Body Type",
+  };
+  const isStepCompleted = (step) => {
+    switch (step) {
+      case "breed":
+        return selectedBreed;
+      case "age":
+        return selectedAge;
+      case "bodyType":
+        return selectedBodyType;
+      default:
+        return false;
+    }
+  };
+
+  // Helper function to check if step is accessible (current or completed previous steps)
+  const isStepAccessible = (step) => {
+    const steps = ["breed", "age", "bodyType"];
+    const stepIndex = steps.indexOf(step);
+    const currentIndex = steps.indexOf(currentStep);
+
+    // Can always go to current step or earlier
+    if (stepIndex <= currentIndex) return true;
+
+    // Can go to next step only if all previous steps are completed
+    for (let i = 0; i < stepIndex; i++) {
+      if (!isStepCompleted(steps[i])) return false;
+    }
+    return true;
+  };
+  const motionStyles = {
+    animation: "slideUp 0.6s ease-out 0.5s both",
+  };
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-pink-50 p-6 rounded-2xl space-y-6 border border-gray-100">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-2"
-      >
-        <div className="flex items-center justify-center gap-2">
-          <Heart className="w-5 h-5 text-gray-500" />
-          <h3 className="text-lg font-semibold text-gray-800">Smart Sizing</h3>
+    <>
+      <style>{`
+        @keyframes slideUp {
+          from { 
+            opacity: 0; 
+            transform: translateY(10px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+      `}</style>
+
+      <div className="bg-gradient-to-br from-gray-50 to-pink-50 p-6 rounded-2xl space-y-6 border border-gray-100">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-2"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Heart className="w-5 h-5 text-gray-500" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Smart Sizing
+            </h3>
+          </div>
+          <p className="text-sm text-gray-600">
+            Skip the measuring tape! We'll find the perfect fit.
+          </p>
+        </motion.div>
+
+        {/* Progress Bar */}
+        <div className="flex items-center gap-2">
+          {["breed", "age", "bodyType"].map((step, index) => {
+            const isCompleted = isStepCompleted(step);
+            const isCurrent = currentStep === step;
+            const isAccessible = isStepAccessible(step);
+
+            return (
+              <motion.button
+                key={step}
+                onClick={() => isAccessible && setCurrentStep(step)}
+                disabled={!isAccessible}
+                className={`flex-1 h-2 rounded-full transition-all duration-200 ${
+                  isCurrent
+                    ? "bg-gray-600 shadow-sm"
+                    : isCompleted
+                    ? "bg-gray-400 hover:bg-gray-500"
+                    : isAccessible
+                    ? "bg-gray-300 hover:bg-gray-400"
+                    : "bg-gray-200 cursor-not-allowed"
+                } ${isAccessible ? "cursor-pointer" : ""}`}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={isAccessible ? { scaleY: 1.2 } : {}}
+                whileTap={isAccessible ? { scaleY: 0.8 } : {}}
+              />
+            );
+          })}
         </div>
-        <p className="text-sm text-gray-600">
-          Skip the measuring tape! We'll find the perfect fit.
-        </p>
-      </motion.div>
 
-      {/* Progress Bar */}
-      <div className="flex items-center gap-2">
-        {["breed", "age", "bodyType"].map((step, index) => (
-          <motion.div
-            key={step}
-            className={`flex-1 h-2 rounded-full ${
-              currentStep === step
-                ? "bg-gray-500"
-                : ["breed", "age", "bodyType"].indexOf(currentStep) > index
-                ? "bg-gray-300"
-                : "bg-gray-200"
-            }`}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: index * 0.1 }}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        {currentStep === "breed" && (
-          <motion.div
-            key="breed"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-4"
-          >
-            <h4 className="font-medium text-gray-800">
-              What's your dog's breed?
-            </h4>
-
-            {/* Popular Breeds */}
-            <div className="space-y-1.5">
-              <p className="text-xs text-gray-500 font-medium">
-                Popular Breeds
-              </p>
-              <div className="grid grid-cols-4 gap-1">
-                {popularBreeds.slice(0, 8).map((breed) => (
-                  <motion.button
-                    key={breed.name}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedBreed(breed.name)}
-                    className={`p-1.5 rounded-md text-[10px] font-medium transition-all leading-tight ${
-                      selectedBreed === breed.name
-                        ? "bg-gray-600 text-white"
-                        : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
-                    }`}
-                  >
-                    {breed.name}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-
-            {/* Search Dropdown */}
-            <div className="relative">
-              <div
-                onClick={() => setShowBreedDropdown(!showBreedDropdown)}
-                className="w-full p-2 bg-white border border-gray-200 rounded-lg cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"
-              >
-                <span className="text-gray-500 text-xs truncate">
-                  {selectedBreed || "Search for other breeds..."}
-                </span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ml-1 ${
-                    showBreedDropdown ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-
-              <AnimatePresence>
-                {showBreedDropdown && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -5, scale: 0.98 }}
-                    className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-0.5 max-h-48 overflow-y-auto"
-                  >
-                    <div className="p-1.5">
-                      <input
-                        type="text"
-                        placeholder="Search breeds..."
-                        value={breedSearch}
-                        onChange={(e) => setBreedSearch(e.target.value)}
-                        className="w-full p-1.5 border border-gray-200 rounded text-xs focus:border-gray-400 focus:outline-none"
-                      />
-                    </div>
-                    <div className="max-h-32 overflow-y-auto">
-                      {filteredBreeds.map((breed) => (
-                        <motion.button
-                          key={breed.name}
-                          whileHover={{ backgroundColor: "#f9fafb" }}
-                          onClick={() => {
-                            setSelectedBreed(breed.name);
-                            setShowBreedDropdown(false);
-                            setBreedSearch("");
-                          }}
-                          className="w-full p-2 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-b-0"
-                        >
-                          <span className="text-xs font-medium truncate">
-                            {breed.name}
-                          </span>
-                          <span className="text-[10px] text-gray-400 ml-2 flex-shrink-0">
-                            {breed.avgSize}
-                          </span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-
-        {currentStep === "age" && (
-          <motion.div
-            key="age"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-4"
-          >
-            <h4 className="font-medium text-gray-800">
-              How old is your{" "}
-              {selectedBreed === "Don't Know / Other" ? "pup" : selectedBreed}?
-            </h4>
-            <div className="grid grid-cols-2 gap-3">
-              {ageGroups.map((age) => (
-                <motion.button
-                  key={age.value}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setSelectedAge(age.value);
-                  }}
-                  className={`p-4 rounded-xl text-center transition-all ${
-                    selectedAge === age.value
-                      ? "bg-gray-500 text-white shadow-lg"
-                      : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{age.emoji}</div>
-                  <div className="font-medium text-sm">{age.label}</div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {age.ageRange}
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {currentStep === "bodyType" && (
-          <motion.div
-            key="bodyType"
-            variants={stepVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="space-y-4"
-          >
-            <h4 className="font-medium text-gray-800">
-              What's your dog's body type?
-            </h4>
-            <div className="grid grid-cols-3 gap-3">
-              {bodyTypes.map((type) => (
-                <motion.button
-                  key={type.value}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedBodyType(type.value)}
-                  className={`p-4 rounded-xl text-center transition-all ${
-                    selectedBodyType === type.value
-                      ? "bg-gray-500 text-white shadow-lg"
-                      : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{type.emoji}</div>
-                  <div className="font-medium text-xs">{type.label}</div>
-                  <div className="text-xs text-white-500 mt-1 leading-tight">
-                    {type.description}
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Size Recommendation */}
-      <AnimatePresence>
-        {recommendedSize &&
-          selectedBreed &&
-          selectedAge &&
-          selectedBodyType && (
+        <AnimatePresence mode="wait">
+          {currentStep === "breed" && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="bg-gradient-to-r from-green-400 to-green-500 rounded-2xl p-6 text-white shadow-lg"
+              key="breed"
+              variants={stepVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="space-y-4"
             >
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 rounded-full p-2">
-                  <Check className="w-6 h-6" />
+              <h4 className="font-medium text-gray-800">
+                What's your dog's breed?
+              </h4>
+
+              {/* Popular Breeds */}
+              <div className="space-y-1.5">
+                <p className="text-xs text-gray-500 font-medium">
+                  Popular Breeds
+                </p>
+                <div className="grid grid-cols-4 gap-1">
+                  {popularBreeds.slice(0, 8).map((breed) => (
+                    <motion.button
+                      key={breed.name}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedBreed(breed.name)}
+                      className={`p-1.5 rounded-md text-[10px] font-medium transition-all leading-tight ${
+                        selectedBreed === breed.name
+                          ? "bg-gray-600 text-white"
+                          : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                      }`}
+                    >
+                      {breed.name}
+                    </motion.button>
+                  ))}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium opacity-90">
-                    Perfect Match Found!
-                  </p>
-                  <p className="text-2xl font-bold">{recommendedSize}</p>
-                  <p className="text-sm opacity-90">
-                    {getSizeDetails(recommendedSize)?.label} •{" "}
-                    {getBreedsForSize(recommendedSize)}
-                  </p>
+              </div>
+
+              {/* Search Dropdown */}
+              <div className="relative">
+                <div
+                  onClick={() => setShowBreedDropdown(!showBreedDropdown)}
+                  className="w-full p-2 bg-white border border-gray-200 rounded-lg cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"
+                >
+                  <span className="text-gray-500 text-xs truncate">
+                    {selectedBreed || "Search for other breeds..."}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ml-1 ${
+                      showBreedDropdown ? "rotate-180" : ""
+                    }`}
+                  />
                 </div>
+
+                <AnimatePresence>
+                  {showBreedDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -5, scale: 0.98 }}
+                      className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-0.5 max-h-48 overflow-y-auto"
+                    >
+                      <div className="p-1.5">
+                        <input
+                          type="text"
+                          placeholder="Search breeds..."
+                          value={breedSearch}
+                          onChange={(e) => setBreedSearch(e.target.value)}
+                          className="w-full p-1.5 border border-gray-200 rounded text-xs focus:border-gray-400 focus:outline-none"
+                        />
+                      </div>
+                      <div className="max-h-32 overflow-y-auto">
+                        {filteredBreeds.map((breed) => (
+                          <motion.button
+                            key={breed.name}
+                            whileHover={{ backgroundColor: "#f9fafb" }}
+                            onClick={() => {
+                              setSelectedBreed(breed.name);
+                              setShowBreedDropdown(false);
+                              setBreedSearch("");
+                            }}
+                            className="w-full p-2 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-b-0"
+                          >
+                            <span className="text-xs font-medium truncate">
+                              {breed.name}
+                            </span>
+                            <span className="text-[10px] text-gray-400 ml-2 flex-shrink-0">
+                              {breed.avgSize}
+                            </span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}
-      </AnimatePresence>
 
-      {/* Trust Badges */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100"
-      >
-        <div className="text-center">
-          <Shield className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-          <p className="text-xs text-purple-600 font-medium">Perfect Fit</p>
-          <p className="text-xs text-purple-500">Guarantee</p>
-        </div>
-        <div className="text-center">
-          <MessageCircle className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-          <p className="text-xs text-purple-600 font-medium">WhatsApp</p>
-          <p className="text-xs text-purple-500">Confirmation</p>
-        </div>
-        <div className="text-center">
-          <Check className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-          <p className="text-xs text-purple-600 font-medium">95% Accuracy</p>
-          <p className="text-xs text-purple-500">Rate</p>
-        </div>
-      </motion.div>
+          {currentStep === "age" && (
+            <motion.div
+              key="age"
+              variants={stepVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="space-y-4"
+            >
+              <h4 className="font-medium text-gray-800">
+                How old is your{" "}
+                {selectedBreed === "Don't Know / Other" ? "pup" : selectedBreed}
+                ?
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {ageGroups.map((age) => (
+                  <motion.button
+                    key={age.value}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setSelectedAge(age.value);
+                    }}
+                    className={`p-4 rounded-xl text-center transition-all ${
+                      selectedAge === age.value
+                        ? "bg-gray-500 text-white shadow-lg"
+                        : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{age.emoji}</div>
+                    <div className="font-medium text-sm">{age.label}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {age.ageRange}
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
-      {/* Reassurance Message */}
-      {recommendedSize && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center"
+          {currentStep === "bodyType" && (
+            <motion.div
+              key="bodyType"
+              variants={stepVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="space-y-4"
+            >
+              <h4 className="font-medium text-gray-800">
+                What's your dog's body type?
+              </h4>
+              <div className="grid grid-cols-3 gap-3">
+                {bodyTypes.map((type) => (
+                  <motion.button
+                    key={type.value}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedBodyType(type.value)}
+                    className={`p-4 rounded-xl text-center transition-all ${
+                      selectedBodyType === type.value
+                        ? "bg-gray-500 text-white shadow-lg"
+                        : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{type.emoji}</div>
+                    <div className="font-medium text-xs">{type.label}</div>
+                    <div className="text-xs text-white-500 mt-1 leading-tight">
+                      {type.description}
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Size Recommendation */}
+        <AnimatePresence>
+          {recommendedSize &&
+            selectedBreed &&
+            selectedAge &&
+            selectedBodyType && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border border-emerald-200 rounded-lg p-3 shadow-sm"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-emerald-100 rounded-full p-1.5">
+                    <Check className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-emerald-700 mb-0.5">
+                      Recommended Size
+                    </p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {recommendedSize}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {getSizeDetails(recommendedSize)?.label} •{" "}
+                      {getBreedsForSize(recommendedSize)}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+        </AnimatePresence>
+
+        {/* Trust Badges */}
+        <div
+          style={motionStyles}
+          className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 mt-6 border border-gray-100/50"
         >
-          <p className="text-sm text-blue-800 font-medium">
-            🎯 Our sizing experts will confirm via WhatsApp before shipping
-          </p>
-          <p className="text-xs text-blue-600 mt-1">
-            Your order will only be processed after we verify the perfect fit!
-          </p>
-        </motion.div>
-      )}
-    </div>
+          <div className="grid grid-cols-3 gap-4">
+            {/* Perfect Fit */}
+            <div className="flex flex-col items-center group cursor-default">
+              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                <Shield className="w-4 h-4 text-slate-700" />
+              </div>
+              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                PERFECT FIT
+              </p>
+              <p className="text-xs text-slate-500">Guaranteed</p>
+            </div>
+
+            {/* WhatsApp Confirmation */}
+            <div className="flex flex-col items-center group cursor-default border-x border-gray-200/50 px-2">
+              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                <MessageCircle className="w-4 h-4 text-slate-700" />
+              </div>
+              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                WHATSAPP
+              </p>
+              <p className="text-xs text-slate-500">Verified</p>
+            </div>
+
+            {/* Accuracy Rate */}
+            <div className="flex flex-col items-center group cursor-default">
+              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                <Check className="w-4 h-4 text-slate-700" />
+              </div>
+              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                98% SUCCESS
+              </p>
+              <p className="text-xs text-slate-500">Rate</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Reassurance Message */}
+        {recommendedSize && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center relative"
+          >
+            {/* Small trust indicator */}
+            <div className="absolute top-2 right-2">
+              <CheckCircle className="h-3 w-3 text-green-500" />
+            </div>
+
+            <p className="text-sm text-slate-700 font-medium flex items-center justify-center">
+              <MessageCircle className="h-4 w-4 text-slate-600 mr-2" />
+              Size confirmation via WhatsApp
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              We verify the perfect fit before shipping
+            </p>
+          </motion.div>
+        )}
+      </div>
+    </>
   );
 };
 
