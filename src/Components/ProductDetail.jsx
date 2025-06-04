@@ -14,7 +14,7 @@ import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
 import ProductMeasurements from "../Components/ProductDetail/ProductMeasurements";
 import ReadyMadeSizeSelector from "../Components/ReadyMadeSizeSelector";
-
+import SmartPetSizing from "../Components/SmartPetSizing";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -32,6 +32,7 @@ const ProductDetail = () => {
   );
   const [images, setImages] = useState([]);
   const [measurementsValid, setMeasurementsValid] = useState(false);
+  const [petInfo, setPetInfo] = useState(null); // ADD THIS LINE
   const [measurements, setMeasurements] = useState({
     neck: "",
     chest: "",
@@ -240,10 +241,10 @@ const ProductDetail = () => {
             setSelectedDhoti={setSelectedDhoti}
           />
           {requiresMeasurements ? (
-            <ProductMeasurements
-              onSizeDetected={(size, measurements) => {
+            <SmartPetSizing
+              onSizeDetected={(size, petInfo) => {
                 setSelectedSize(size);
-                setMeasurements(measurements);
+                setPetInfo(petInfo); // Store breed/age/bodyType
               }}
               setMeasurementsValid={setMeasurementsValid}
             />
