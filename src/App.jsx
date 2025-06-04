@@ -29,6 +29,7 @@ import TuxedoListing from "./Components/TuxedoListing";
 import BandanaListing from "./Components/BandanaListing";
 import LehengaListing from "./Components/LehengaListing";
 import FrockListing from "./Components/FrockListing";
+import StockManager from "./Components/StockManager";
 import FabricManagementSystem from "./Components/FabricManagementSystem";
 const App = () => {
   return (
@@ -71,6 +72,7 @@ const App = () => {
           <Route path="/thank-you" element={<ThankYouPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/inventory" element={<FabricManagementSystem />} />
+          <Route path="/stock" element={<StockManager />} />
         </Routes>
       </div>
       <Toaster />
