@@ -10,64 +10,51 @@ import {
   Filter,
   Camera,
 } from "lucide-react";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  updateDoc,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 const StockManager = () => {
   const [items, setItems] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
+  const [editingItem, setEditingItem] = useState(null); // Added missing state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSize, setSelectedSize] = useState("all");
   const [newItem, setNewItem] = useState({
     name: "",
     image: "",
-    sizes: {
-      XS: 0,
-      S: 0,
-      M: 0,
-      L: 0,
-    },
+    sizes: { XS: 0, S: 0, M: 0, L: 0 },
     fabric: "",
     createdAt: null,
   });
 
   const sizes = ["XS", "S", "M", "L"];
 
-  // Mock data for demonstration
   useEffect(() => {
-    const mockData = [
-      {
-        id: "1",
-        name: "Cozy Winter Sweater",
-        image:
-          "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop",
-        fabric: "Wool Blend",
-        sizes: { XS: 5, S: 12, M: 8, L: 3 },
-        createdAt: new Date(),
+    // Use real-time listener instead of one-time fetch
+    const unsubscribe = onSnapshot(
+      collection(db, "stock"),
+      (snapshot) => {
+        const stockList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setItems(stockList);
       },
-      {
-        id: "2",
-        name: "Summer Rain Jacket",
-        image:
-          "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop",
-        fabric: "Waterproof Nylon",
-        sizes: { XS: 2, S: 7, M: 15, L: 9 },
-        createdAt: new Date(),
-      },
-    ];
-    setItems(mockData);
-  }, []);
+      (error) => {
+        console.error("Failed to fetch stock:", error);
+      }
+    );
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "stock"), (snapshot) => {
-      const stockData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setItems(stockData);
-    });
-    return unsubscribe;
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const addItemToFirebase = async (item) => {
@@ -76,81 +63,119 @@ const StockManager = () => {
         ...item,
         createdAt: new Date(),
       });
+      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error adding item:", error);
+      throw error; // Re-throw to handle in calling function
     }
   };
 
   const updateItemInFirebase = async (id, updates) => {
     try {
-      await updateDoc(doc(db, "stock", id), updates);
+      const itemRef = doc(db, "stock", id);
+      await updateDoc(itemRef, {
+        ...updates,
+        updatedAt: new Date(),
+      });
+      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error updating item:", error);
+      throw error; // Re-throw to handle in calling function
     }
   };
 
   const deleteItemFromFirebase = async (id) => {
     try {
-      await deleteDoc(doc(db, "stock", id));
+      const itemRef = doc(db, "stock", id);
+      await deleteDoc(itemRef);
+      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error deleting item:", error);
+      throw error; // Re-throw to handle in calling function
     }
   };
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!newItem.name.trim()) return;
-
-    const item = {
-      ...newItem,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-    };
-
-    setItems((prev) => [item, ...prev]);
-    addItemToFirebase(item); // Uncomment for Firebase
-
-    setNewItem({
-      name: "",
-      image: "",
-      sizes: { XS: 0, S: 0, M: 0, L: 0 },
-      fabric: "",
-      createdAt: null,
-    });
-    setShowAddForm(false);
+    try {
+      await addItemToFirebase(newItem);
+      setNewItem({
+        name: "",
+        image: "",
+        sizes: { XS: 0, S: 0, M: 0, L: 0 },
+        fabric: "",
+        createdAt: null,
+      });
+      setShowAddForm(false);
+    } catch (error) {
+      console.error("Failed to add item:", error);
+      // You might want to show user feedback here
+    }
   };
 
-  const handleUpdateStock = (itemId, size, change) => {
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id === itemId) {
-          const newCount = Math.max(0, item.sizes[size] + change);
-          const updatedItem = {
-            ...item,
-            sizes: { ...item.sizes, [size]: newCount },
-          };
-          updateItemInFirebase(itemId, { sizes: updatedItem.sizes }); // Uncomment for Firebase
-          return updatedItem;
-        }
-        return item;
-      })
-    );
+  const handleUpdateStock = async (itemId, size, change) => {
+    try {
+      const item = items.find((itm) => itm.id === itemId);
+      if (!item) {
+        console.error("Item not found:", itemId);
+        return;
+      }
+
+      const currentStock = item.sizes[size] || 0;
+      const newStock = Math.max(0, currentStock + change);
+
+      const updatedSizes = {
+        ...item.sizes,
+        [size]: newStock,
+      };
+
+      await updateItemInFirebase(itemId, { sizes: updatedSizes });
+    } catch (error) {
+      console.error("Failed to update stock:", error);
+      // You might want to show user feedback here
+    }
   };
 
-  const handleDeleteItem = (itemId) => {
-    setItems((prev) => prev.filter((item) => item.id !== itemId));
-    deleteItemFromFirebase(itemId); // Uncomment for Firebase
+  const handleDeleteItem = async (itemId) => {
+    try {
+      // Add confirmation dialog
+      if (window.confirm("Are you sure you want to delete this item?")) {
+        await deleteItemFromFirebase(itemId);
+      }
+    } catch (error) {
+      console.error("Failed to delete item:", error);
+      // You might want to show user feedback here
+    }
+  };
+
+  const handleEditItem = async (updatedItem) => {
+    try {
+      await updateItemInFirebase(updatedItem.id, {
+        name: updatedItem.name,
+        fabric: updatedItem.fabric,
+        image: updatedItem.image,
+        sizes: updatedItem.sizes,
+      });
+      setEditingItem(null);
+    } catch (error) {
+      console.error("Failed to update item:", error);
+      // You might want to show user feedback here
+    }
   };
 
   const filteredItems = items.filter((item) => {
     const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.fabric.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSize = selectedSize === "all" || item.sizes[selectedSize] > 0;
+      item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.fabric?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSize =
+      selectedSize === "all" || (item.sizes && item.sizes[selectedSize] > 0);
     return matchesSearch && matchesSize;
   });
 
   const getTotalStock = (item) =>
-    Object.values(item.sizes).reduce((sum, count) => sum + count, 0);
+    item.sizes
+      ? Object.values(item.sizes).reduce((sum, count) => sum + count, 0)
+      : 0;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -307,7 +332,7 @@ const StockManager = () => {
                           {size}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {item.sizes[size]} units
+                          {item.sizes?.[size] || 0} units
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -316,7 +341,7 @@ const StockManager = () => {
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleUpdateStock(item.id, size, -1)}
                           className="bg-red-100 hover:bg-red-200 text-red-600 p-1.5 rounded-lg transition-colors"
-                          disabled={item.sizes[size] === 0}
+                          disabled={(item.sizes?.[size] || 0) === 0}
                         >
                           <Minus size={14} />
                         </motion.button>
@@ -419,7 +444,7 @@ const StockManager = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Image URL
+                      Image Upload
                     </label>
                     <div className="relative">
                       <Camera
@@ -427,18 +452,33 @@ const StockManager = () => {
                         size={20}
                       />
                       <input
-                        type="url"
-                        value={newItem.image}
-                        onChange={(e) =>
-                          setNewItem((prev) => ({
-                            ...prev,
-                            image: e.target.value,
-                          }))
-                        }
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="https://example.com/image.jpg"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              setNewItem((prev) => ({
+                                ...prev,
+                                image: event.target.result,
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                       />
                     </div>
+                    {newItem.image && (
+                      <div className="mt-3">
+                        <img
+                          src={newItem.image}
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -488,6 +528,118 @@ const StockManager = () => {
                     className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Add Item
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Item Modal */}
+        <AnimatePresence>
+          {editingItem && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setEditingItem(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+              >
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Edit Item
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Product Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingItem.name}
+                      onChange={(e) =>
+                        setEditingItem((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Enter product name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Fabric
+                    </label>
+                    <input
+                      type="text"
+                      value={editingItem.fabric}
+                      onChange={(e) =>
+                        setEditingItem((prev) => ({
+                          ...prev,
+                          fabric: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="e.g., Cotton, Wool, Polyester"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Stock by Size
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {sizes.map((size) => (
+                        <div key={size}>
+                          <label className="block text-xs text-gray-600 mb-1">
+                            {size}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={editingItem.sizes?.[size] || 0}
+                            onChange={(e) =>
+                              setEditingItem((prev) => ({
+                                ...prev,
+                                sizes: {
+                                  ...prev.sizes,
+                                  [size]: parseInt(e.target.value) || 0,
+                                },
+                              }))
+                            }
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setEditingItem(null)}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors"
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleEditItem(editingItem)}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Update Item
                   </motion.button>
                 </div>
               </motion.div>
