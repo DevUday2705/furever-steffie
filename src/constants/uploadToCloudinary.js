@@ -16,3 +16,5 @@ export async function uploadToCloudinary(file) {
     const data = await response.json();
     return data.secure_url;  // This is the hosted image URL
 }
+
+

@@ -17,19 +17,21 @@ import {
   doc,
   onSnapshot,
   updateDoc,
-  getDocs,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { uploadToCloudinary } from "../constants/uploadToCloudinary";
 
 const StockManager = () => {
   const [items, setItems] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingItem, setEditingItem] = useState(null); // Added missing state
+  const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSize, setSelectedSize] = useState("all");
+  const [loading, setLoading] = useState(false);
   const [newItem, setNewItem] = useState({
     name: "",
-    image: "",
+    imageFile: null,
+    imagePreview: "",
     sizes: { XS: 0, S: 0, M: 0, L: 0 },
     fabric: "",
     createdAt: null,
@@ -59,28 +61,45 @@ const StockManager = () => {
 
   const addItemToFirebase = async (item) => {
     try {
+      let imageUrl = null;
+
+      // Upload image to Cloudinary if there's a file
+      if (item.imageFile) {
+        imageUrl = await uploadToCloudinary(item.imageFile);
+      }
+
+      // Save to Firebase with Cloudinary URL
       await addDoc(collection(db, "stock"), {
-        ...item,
+        name: item.name,
+        image: imageUrl,
+        sizes: item.sizes,
+        fabric: item.fabric,
         createdAt: new Date(),
       });
-      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error adding item:", error);
-      throw error; // Re-throw to handle in calling function
+      throw error;
     }
   };
 
   const updateItemInFirebase = async (id, updates) => {
     try {
       const itemRef = doc(db, "stock", id);
+
+      // If there's a new image file, upload it to Cloudinary
+      if (updates.imageFile) {
+        const imageUrl = await uploadToCloudinary(updates.imageFile);
+        updates.image = imageUrl;
+        delete updates.imageFile; // Remove file object before saving to Firebase
+      }
+
       await updateDoc(itemRef, {
         ...updates,
         updatedAt: new Date(),
       });
-      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error updating item:", error);
-      throw error; // Re-throw to handle in calling function
+      throw error;
     }
   };
 
@@ -88,20 +107,28 @@ const StockManager = () => {
     try {
       const itemRef = doc(db, "stock", id);
       await deleteDoc(itemRef);
-      // No need to call fetchStock() with real-time listener
     } catch (error) {
       console.error("Error deleting item:", error);
-      throw error; // Re-throw to handle in calling function
+      throw error;
     }
   };
 
   const handleAddItem = async () => {
     if (!newItem.name.trim()) return;
+
+    setLoading(true);
     try {
       await addItemToFirebase(newItem);
+
+      // Clean up preview URL to avoid memory leaks
+      if (newItem.imagePreview) {
+        URL.revokeObjectURL(newItem.imagePreview);
+      }
+
       setNewItem({
         name: "",
-        image: "",
+        imageFile: null,
+        imagePreview: "",
         sizes: { XS: 0, S: 0, M: 0, L: 0 },
         fabric: "",
         createdAt: null,
@@ -109,7 +136,9 @@ const StockManager = () => {
       setShowAddForm(false);
     } catch (error) {
       console.error("Failed to add item:", error);
-      // You might want to show user feedback here
+      alert("Failed to add item. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,34 +161,66 @@ const StockManager = () => {
       await updateItemInFirebase(itemId, { sizes: updatedSizes });
     } catch (error) {
       console.error("Failed to update stock:", error);
-      // You might want to show user feedback here
+      alert("Failed to update stock. Please try again.");
     }
   };
 
   const handleDeleteItem = async (itemId) => {
     try {
-      // Add confirmation dialog
       if (window.confirm("Are you sure you want to delete this item?")) {
         await deleteItemFromFirebase(itemId);
       }
     } catch (error) {
       console.error("Failed to delete item:", error);
-      // You might want to show user feedback here
+      alert("Failed to delete item. Please try again.");
     }
   };
 
   const handleEditItem = async (updatedItem) => {
+    setLoading(true);
     try {
       await updateItemInFirebase(updatedItem.id, {
         name: updatedItem.name,
         fabric: updatedItem.fabric,
-        image: updatedItem.image,
         sizes: updatedItem.sizes,
+        ...(updatedItem.imageFile && { imageFile: updatedItem.imageFile }),
       });
+
+      // Clean up preview URL if it exists
+      if (
+        updatedItem.imagePreview &&
+        updatedItem.imagePreview.startsWith("blob:")
+      ) {
+        URL.revokeObjectURL(updatedItem.imagePreview);
+      }
+
       setEditingItem(null);
     } catch (error) {
       console.error("Failed to update item:", error);
-      // You might want to show user feedback here
+      alert("Failed to update item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageChange = (e, isEditing = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+
+      if (isEditing) {
+        setEditingItem((prev) => ({
+          ...prev,
+          imageFile: file,
+          imagePreview: previewUrl,
+        }));
+      } else {
+        setNewItem((prev) => ({
+          ...prev,
+          imageFile: file,
+          imagePreview: previewUrl,
+        }));
+      }
     }
   };
 
@@ -363,7 +424,13 @@ const StockManager = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setEditingItem(item)}
+                    onClick={() =>
+                      setEditingItem({
+                        ...item,
+                        imageFile: null,
+                        imagePreview: item.image,
+                      })
+                    }
                     className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-600 py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                   >
                     <Edit3 size={16} />
@@ -392,7 +459,7 @@ const StockManager = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowAddForm(false)}
+              onClick={() => !loading && setShowAddForm(false)}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -421,6 +488,7 @@ const StockManager = () => {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Enter product name"
+                      disabled={loading}
                     />
                   </div>
 
@@ -439,6 +507,7 @@ const StockManager = () => {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="e.g., Cotton, Wool, Polyester"
+                      disabled={loading}
                     />
                   </div>
 
@@ -454,26 +523,15 @@ const StockManager = () => {
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              setNewItem((prev) => ({
-                                ...prev,
-                                image: event.target.result,
-                              }));
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
+                        onChange={(e) => handleImageChange(e, false)}
                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                        disabled={loading}
                       />
                     </div>
-                    {newItem.image && (
+                    {newItem.imagePreview && (
                       <div className="mt-3">
                         <img
-                          src={newItem.image}
+                          src={newItem.imagePreview}
                           alt="Preview"
                           className="w-20 h-20 object-cover rounded-lg border border-gray-200"
                         />
@@ -505,6 +563,7 @@ const StockManager = () => {
                               }))
                             }
                             className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            disabled={loading}
                           />
                         </div>
                       ))}
@@ -514,20 +573,22 @@ const StockManager = () => {
 
                 <div className="flex gap-3 mt-6">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     onClick={() => setShowAddForm(false)}
                     className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors"
+                    disabled={loading}
                   >
                     Cancel
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     onClick={handleAddItem}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                    disabled={loading || !newItem.name.trim()}
                   >
-                    Add Item
+                    {loading ? "Adding..." : "Add Item"}
                   </motion.button>
                 </div>
               </motion.div>
@@ -543,7 +604,7 @@ const StockManager = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setEditingItem(null)}
+              onClick={() => !loading && setEditingItem(null)}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -572,6 +633,7 @@ const StockManager = () => {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Enter product name"
+                      disabled={loading}
                     />
                   </div>
 
@@ -590,7 +652,36 @@ const StockManager = () => {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="e.g., Cotton, Wool, Polyester"
+                      disabled={loading}
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Update Image (optional)
+                    </label>
+                    <div className="relative">
+                      <Camera
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageChange(e, true)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                        disabled={loading}
+                      />
+                    </div>
+                    {editingItem.imagePreview && (
+                      <div className="mt-3">
+                        <img
+                          src={editingItem.imagePreview}
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -617,6 +708,7 @@ const StockManager = () => {
                               }))
                             }
                             className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            disabled={loading}
                           />
                         </div>
                       ))}
@@ -626,20 +718,22 @@ const StockManager = () => {
 
                 <div className="flex gap-3 mt-6">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     onClick={() => setEditingItem(null)}
                     className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors"
+                    disabled={loading}
                   >
                     Cancel
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     onClick={() => handleEditItem(editingItem)}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                    disabled={loading}
                   >
-                    Update Item
+                    {loading ? "Updating..." : "Update Item"}
                   </motion.button>
                 </div>
               </motion.div>
