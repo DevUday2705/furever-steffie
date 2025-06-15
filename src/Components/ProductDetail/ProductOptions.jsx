@@ -30,7 +30,7 @@ const ProductOptions = ({
               isBeaded ? "border-gray-800" : "border-gray-200"
             } border bg-gray-50 text-gray-800`}
           >
-            Hand Work
+          Beaded Luxe
           </button>
           <button
             onClick={() => setIsBeaded(false)}
@@ -38,7 +38,7 @@ const ProductOptions = ({
               !isBeaded ? "border-gray-800" : "border-gray-200"
             } border bg-gray-50 text-gray-800`}
           >
-            Simple
+            Minimalist
           </button>
         </div>
       );
