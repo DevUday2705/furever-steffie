@@ -25,14 +25,6 @@ const ProductOptions = ({
       return (
         <div className="mt-1 flex space-x-2">
           <button
-            onClick={() => setIsBeaded(true)}
-            className={`py-1.5 px-3 rounded-md text-sm ${
-              isBeaded ? "border-gray-800" : "border-gray-200"
-            } border bg-gray-50 text-gray-800`}
-          >
-          Beaded Luxe
-          </button>
-          <button
             onClick={() => setIsBeaded(false)}
             className={`py-1.5 px-3 rounded-md text-sm ${
               !isBeaded ? "border-gray-800" : "border-gray-200"
@@ -40,6 +32,15 @@ const ProductOptions = ({
           >
             Minimalist
           </button>
+          <button
+            onClick={() => setIsBeaded(true)}
+            className={`py-1.5 px-3 rounded-md text-sm ${
+              isBeaded ? "border-gray-800" : "border-gray-200"
+            } border bg-gray-50 text-gray-800`}
+          >
+          Beaded Luxe
+          </button>
+          
         </div>
       );
     } else if (isBeadedAvailable) {
