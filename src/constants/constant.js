@@ -577,6 +577,70 @@ export const kurtas = [
         "isNonBeadedAvailable": true,
         "priorityScore": 75
     },
+    {
+        "id": "sk010",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Purple love",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
+        "pricing": {
+            "basePrice": 1099,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1749991625/kurta-purple-r_hj2dvu.jpg",
+        "options": {
+            "beaded": {
+                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1749991625/kurta-purple-r_hj2dvu.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1749991863/purple-fabric_brgmaj.webp"
+
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "A festive green kurta with gold leaf embroidery — perfect for mehndi functions, poojas, or making your pet look royally elegant.",
+        "availableStock": 15,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 99
+    },
 
 
 ]
