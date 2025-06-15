@@ -152,7 +152,7 @@ const ProductOptions = ({
                 isFullSet ? "border-gray-800" : "border-gray-200"
               } border bg-gray-50 text-gray-800`}
             >
-              Full Set
+              Kurta + Dhoti
             </button>
           </div>
         </div>
