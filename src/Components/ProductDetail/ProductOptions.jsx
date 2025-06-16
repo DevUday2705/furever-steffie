@@ -25,21 +25,22 @@ const ProductOptions = ({
       return (
         <div className="mt-1 flex space-x-2">
           <button
-            onClick={() => setIsBeaded(true)}
-            className={`py-1.5 px-3 rounded-md text-sm ${
-              isBeaded ? "border-gray-800" : "border-gray-200"
-            } border bg-gray-50 text-gray-800`}
-          >
-            Hand Work
-          </button>
-          <button
             onClick={() => setIsBeaded(false)}
             className={`py-1.5 px-3 rounded-md text-sm ${
               !isBeaded ? "border-gray-800" : "border-gray-200"
             } border bg-gray-50 text-gray-800`}
           >
-            Simple
+            Minimalist
           </button>
+          <button
+            onClick={() => setIsBeaded(true)}
+            className={`py-1.5 px-3 rounded-md text-sm ${
+              isBeaded ? "border-gray-800" : "border-gray-200"
+            } border bg-gray-50 text-gray-800`}
+          >
+          Beaded Luxe
+          </button>
+          
         </div>
       );
     } else if (isBeadedAvailable) {
@@ -50,7 +51,7 @@ const ProductOptions = ({
             disabled
             className="py-1.5 px-3 rounded-md text-sm border border-gray-800 bg-gray-100 text-gray-800 cursor-not-allowed"
           >
-            Hand Work Only
+          Beaded Luxe
           </button>
         </div>
       );
@@ -62,7 +63,7 @@ const ProductOptions = ({
             disabled
             className="py-1.5 px-3 rounded-md text-sm border border-gray-800 bg-gray-100 text-gray-800 cursor-not-allowed"
           >
-            Simple Only
+            Minimalist
           </button>
         </div>
       );
@@ -151,7 +152,7 @@ const ProductOptions = ({
                 isFullSet ? "border-gray-800" : "border-gray-200"
               } border bg-gray-50 text-gray-800`}
             >
-              Full Set
+              Kurta + Dhoti
             </button>
           </div>
         </div>
