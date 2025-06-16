@@ -4,8 +4,8 @@ export const kurtas = [
     {
         "id": "sk001",
         "type": "kurta",
-        "category": "classic",
-        "name": "Purple Charm",
+        "category": "royal",
+        "name": "Kamalini Tejasvini",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -27,7 +27,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -45,14 +45,14 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230459_vwjaaf.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/Cloths_mapping_xfohri.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9111_gakprx.webp"
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230459_vwjaaf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104215/ChatGPT_Image_Jun_15_2025_12_38_07_AM_njuxf1.webp"
 
                 ]
             }
@@ -69,7 +69,7 @@ export const kurtas = [
         "id": "sk002",
         "type": "kurta",
         "category": "royal",
-        "name": "Midnight Gold",
+        "name": "NeelPushpa Varnika",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -91,7 +91,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -109,22 +109,22 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230355_pucjg2.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994388/IMG_9720_h7mop7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035106/IMG_9117_buel1o.webp"
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230355_pucjg2.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104214/ChatGPT_Image_Jun_15_2025_03_38_50_PM_uxhorb.webp"
 
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "Elegant black kurta with rich gold floral embroidery — designed to make your furry one shine at every celebration.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
         "priorityScore": 95
@@ -132,8 +132,8 @@ export const kurtas = [
     {
         "id": "sk003",
         "type": "kurta",
-        "category": "classic",
-        "name": "Sunshine Grid",
+        "category": "royal",
+        "name": "Meghavarna Rajvastra",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -155,7 +155,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -173,22 +173,22 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104213/Photoroom_20250615_224952_nzxzgm.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994387/IMG_9721_gchwke.webp",
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104213/Photoroom_20250615_224952_nzxzgm.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104213/Photoroom_20250615_224928_o4rwb2.webp"
 
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A cheerful yellow kurta with silver checks — perfect for daytime events, haldi ceremonies, or any festive paw-ty!",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
         "priorityScore": 95
@@ -197,7 +197,7 @@ export const kurtas = [
         "id": "sk004",
         "type": "kurta",
         "category": "royal",
-        "name": "Festive Royale",
+        "name": "SuryaKamala Rajvastra",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -219,7 +219,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -237,31 +237,30 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Photoroom_20250616_015056_se8lve.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-traditional-red_bdszwr.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994389/IMG_9743_fu1nrn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035107/IMG_9109_rzqerd.webp"
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Photoroom_20250616_015056_se8lve.webp"
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A rich red kurta adorned with intricate multicolor motifs — perfect for weddings, pujas, and all things grand.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 85
+        "priorityScore": 95
     },
     {
         "id": "sk005",
         "type": "kurta",
         "category": "royal",
-        "name": "Dark Floral",
+        "name": "Shehzada Green",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -283,7 +282,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -301,31 +300,30 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104211/Shehzada_Green_Edition_Royal_kurta_dhoti_xalhxm.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994384/lace_and_buttons_l8stty.webp",
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104211/Shehzada_Green_Edition_Royal_kurta_dhoti_xalhxm.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Shehzada_Green_Edition_Royal_kurta__tssuoj.webp"
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A classy black kurta with delicate golden floral embroidery — ideal for evening gatherings, festive dinners, or making a quiet royal statement.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
+        "priorityScore": 95
     },
     {
         "id": "sk006",
         "type": "kurta",
-        "category": "classic",
-        "name": "Sunset Blocks",
+        "category": "royal",
+        "name": "Rajwadi Red",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -347,7 +345,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -365,31 +363,30 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_royal_Kurta_dhoti_set_for_Dogs_tnx1ie.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994386/Pattern_printed_boc5xy.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035105/IMG_9115_vm2syd.webp"
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_royal_Kurta_dhoti_set_for_Dogs_tnx1ie.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_Kurta_for_Dogs_2_dljxzj.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_royal_Kurta_for_Dogs_1_z0luws.webp"
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A bright and cheerful coral kurta with fun geometric designs — perfect for casual outings, summer celebrations, or festive days at home.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 70
+        "priorityScore": 95
     },
     {
         "id": "sk007",
         "type": "kurta",
-        "category": "classic",
-        "name": "Red Blossom",
+        "category": "royal",
+        "name": "Gulabi Shehzada",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -411,7 +408,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -429,31 +426,30 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Gulaabi_Shehzada_royal_rani_pink_kurta_dhoti__kxxzl3.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Red_Floral_pwkowh.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9112_zxojtf.webp"
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Gulaabi_Shehzada_royal_rani_pink_kurta_dhoti__kxxzl3.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104209/Gulaabi_Shehzada_royal_rani_pink_kurta_ty4jux.webp",
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A charming red kurta with pretty floral embroidery and silver lace — perfect for festive days, weddings, or just making your pet look extra adorable.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 76
+        "priorityScore": 95
     },
     {
         "id": "sk008",
         "type": "kurta",
-        "category": "classic",
-        "name": "Floral Sunshine",
+        "category": "royal",
+        "name": "Shahenshahi Rangmahal",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -475,7 +471,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -493,31 +489,30 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Photoroom_20250615_232608_plxkyf.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta_yellow_kixvre.jpg", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035104/IMG_9113_omiw16.webp"
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Photoroom_20250615_232608_plxkyf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104207/ChatGPT_Image_Jun_15_2025_12_50_08_AM_zjtjoc.webp",
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A lively yellow kurta with colorful floral embroidery — perfect for haldi ceremonies, day functions, or spreading sunny cheer at any festive event.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 90
+        "priorityScore": 95
     },
     {
         "id": "sk009",
         "type": "kurta",
         "category": "royal",
-        "name": "Mehndi Leaf",
+        "name": "Beauty Pink",
         "dhotis": [
             {
                 "id": "dhoti-gold",
@@ -539,7 +534,7 @@ export const kurtas = [
             },
         ],
         "pricing": {
-            "basePrice": 1099,
+            "basePrice": 1199,
             "discountPercent": 10,
             "fullSetAdditional": 600,
             "beadedAdditional": 200,
@@ -557,28 +552,277 @@ export const kurtas = [
             "isFullSet": false,
             "size": "S"
         },
-        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp",
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Photoroom_20250616_014910_to7uq3.webp",
         "options": {
             "beaded": {
-                "images": ["https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1744096630/ChatGPT_Image_Apr_7_2025_06_11_27_PM_rz1anz.png"]
+                "images": []
             },
             "nonBeaded": {
                 "images": [
-                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1746994385/Kurta-Green_pufyze.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1747035812/WhatsApp_Image_2025-05-07_at_00.34.15_d1fa9f50_hgjnwg.jpg"
-
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Photoroom_20250616_014910_to7uq3.webp",
                 ]
             }
         },
         "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
         "contactForCustomColors": true,
-        "description": "A festive green kurta with gold leaf embroidery — perfect for mehndi functions, poojas, or making your pet look royally elegant.",
-        "availableStock": 15,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
         "isBeadedAvailable": false,
         "isNonBeadedAvailable": true,
-        "priorityScore": 75
+        "priorityScore": 95
     },
-
-
+    {
+        "id": "sk010",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Heritage Leaf",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
+        "pricing": {
+            "basePrice": 1199,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Heritage_Leaf_xumnkl.webp",
+        "options": {
+            "beaded": {
+                "images": []
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Heritage_Leaf_xumnkl.webp",
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk011",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Floral Charm",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
+        "pricing": {
+            "basePrice": 1199,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104205/Floral_Charm_Red_Kurta_o5o4p6.webp",
+        "options": {
+            "beaded": {
+                "images": []
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104205/Floral_Charm_Red_Kurta_o5o4p6.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/IMG_9112_1_ari8xn.webp"
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk012",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Raktangi Kumudini",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
+        "pricing": {
+            "basePrice": 1199,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104205/Photoroom_20250616_014856_ztifdg.webp",
+        "options": {
+            "beaded": {
+                "images": []
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104205/Photoroom_20250616_014856_ztifdg.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750106159/IMG_9110_w18gli.webp"
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
+    {
+        "id": "sk013",
+        "type": "kurta",
+        "category": "royal",
+        "name": "Gaurangi Vasundhara",
+        "dhotis": [
+            {
+                "id": "dhoti-gold",
+                "name": "Gold",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+            },
+            {
+                "id": "dhoti-peacock-green",
+                "name": "Peacock Green",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+            },
+            {
+                "id": "dhoti-black",
+                "name": "Black",
+                "image":
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+            },
+        ],
+        "pricing": {
+            "basePrice": 1199,
+            "discountPercent": 10,
+            "fullSetAdditional": 600,
+            "beadedAdditional": 200,
+            "sizeIncrements": {
+                "XS": 0,
+                "S": 0,
+                "M": 200,
+                "L": 400,
+                "XL": 600,
+                "XXL": 800
+            }
+        },
+        "defaultOptions": {
+            "isBeaded": false,
+            "isFullSet": false,
+            "size": "S"
+        },
+        "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250615_230414_od0fdt.webp",
+        "options": {
+            "beaded": {
+                "images": []
+            },
+            "nonBeaded": {
+                "images": [
+                    "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250615_230414_od0fdt.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250616_015041_cqxpb1.webp"
+                ]
+            }
+        },
+        "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+        "contactForCustomColors": true,
+        "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+        "availableStock": 2,
+        "isBeadedAvailable": false,
+        "isNonBeadedAvailable": true,
+        "priorityScore": 95
+    },
 ]
 
 
