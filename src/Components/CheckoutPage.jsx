@@ -53,6 +53,7 @@ const CheckoutPage = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   // Order complete state
   const [orderCompleted, setOrderCompleted] = useState(false);
+  const [loadingPayment, setLoadingPayment] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState("");
@@ -164,7 +165,7 @@ const CheckoutPage = () => {
     });
 
     const data = await res.json();
-
+    setLoadingPayment(true);
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: data.amount,
@@ -210,6 +211,7 @@ const CheckoutPage = () => {
             search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
           });
         } else {
+          setLoadingPayment(false); // Hide loader if verification fails
           alert("❌ Payment verification failed.");
         }
       },
@@ -225,8 +227,16 @@ const CheckoutPage = () => {
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
-
-  console.log(orderDetails);
+  {
+    loadingPayment && (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="ml-4 text-lg font-medium text-indigo-600">
+          Processing your order...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 pb-24">
