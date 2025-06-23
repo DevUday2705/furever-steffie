@@ -49,7 +49,6 @@ const App = () => {
           <Route path="/tuxedo" element={<TuxedoListing />} />
           <Route path="/bandana" element={<BandanaListing />} />
           <Route path="/lehenga" element={<LehengaListing />} />
-          <Route path="/frock" element={<FrockListing />} />
           <Route path="/bow-tie" element={<BowTieCategories />} />
           <Route path="/male-bows" element={<MaleBowCategories />} />
           <Route path="/female-bows" element={<FemaleBowCategories />} />

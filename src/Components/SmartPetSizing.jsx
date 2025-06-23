@@ -20,7 +20,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
   const dogBreeds = [
     // Extra Small Breeds (XS)
-    { name: "Teacup Shih Tzu", avgSize: "S", popular: true },
+    { name: "Shih Tzu", avgSize: "S", popular: true },
     { name: "Lhasa Apso", avgSize: "S", popular: true },
     { name: "Poodle (Toy)", avgSize: "S", popular: true },
     { name: "Bichon Frise", avgSize: "S", popular: true },

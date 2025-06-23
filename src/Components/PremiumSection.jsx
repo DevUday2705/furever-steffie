@@ -7,9 +7,9 @@ import { useAppContext } from "../context/AppContext";
 
 const PremiumSection = ({ products }) => {
   // Filter only premium products
-  const premiumProducts = products.filter(
-    (product) => product.category === "royal"
-  );
+  const premiumProducts = products
+    .filter((product) => product.category === "royal")
+    .slice(0, 3);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
@@ -221,7 +221,7 @@ const PremiumSection = ({ products }) => {
           <div className="relative overflow-hidden rounded-md">
             {/* The button itself */}
             <Link
-              to="/premium-collection"
+              to="/kurta"
               className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-[#e2c275] via-[#cd9f4b] to-[#e2c275] text-white font-medium rounded-md transition-all duration-300 hover:bg-gradient-to-r hover:from-[#d4b05e] hover:via-[#bf9232] hover:to-[#d4b05e] shadow-md border border-[#e9d396] border-opacity-30"
               onMouseEnter={() => triggerShine()}
             >
