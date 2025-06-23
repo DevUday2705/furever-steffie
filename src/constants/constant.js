@@ -28,7 +28,9 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -59,9 +61,74 @@ export const kurtas = [
     "contactForCustomColors": true,
     "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
     "availableStock": 2,
-    "isBeadedAvailable": false,
+    "isBeadedAvailable": true,
     "isNonBeadedAvailable": true,
     "priorityScore": 95
+  },
+  {
+    "id": "sk014",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Multi Color Blue",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp"
+        ]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
   },
   {
     "id": "sk002",
@@ -92,7 +159,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -128,6 +196,70 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk015",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Multi Color Circle",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp"
+        ]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk003",
     "type": "kurta",
     "category": "royal",
@@ -156,7 +288,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -192,6 +325,70 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk016",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Green Zari",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107079/Green-zari_yckbvo.webp"
+        ]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk004",
     "type": "kurta",
     "category": "royal",
@@ -220,7 +417,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -255,6 +453,69 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk017",
+    "type": "kurta",
+    "category": "classic",
+    "name": "White Floral",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp",]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk005",
     "type": "kurta",
     "category": "royal",
@@ -283,7 +544,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -318,6 +580,69 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk018",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Multi Color Squares",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp",]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk006",
     "type": "kurta",
     "category": "royal",
@@ -346,7 +671,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -381,6 +707,69 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk019",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Yellow Love",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp",]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk007",
     "type": "kurta",
     "category": "royal",
@@ -409,7 +798,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -444,6 +834,69 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk020",
+    "type": "kurta",
+    "category": "classic",
+    "name": "White gold",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp",]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk008",
     "type": "kurta",
     "category": "royal",
@@ -472,7 +925,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -507,6 +961,69 @@ export const kurtas = [
     "priorityScore": 95
   },
   {
+    "id": "sk021",
+    "type": "kurta",
+    "category": "classic",
+    "name": "Floral Blue",
+    "dhotis": [
+      {
+        "id": "dhoti-gold",
+        "name": "Gold",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
+      },
+      {
+        "id": "dhoti-peacock-green",
+        "name": "Peacock Green",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
+      },
+      {
+        "id": "dhoti-black",
+        "name": "Black",
+        "image":
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+      },
+    ],
+    "pricing": {
+      "basePrice": 1099,
+      "discountPercent": 10,
+      "fullSetAdditional": 600,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
+      "sizeIncrements": {
+        "XS": 0,
+        "S": 0,
+        "M": 200,
+        "L": 400,
+        "XL": 600,
+        "XXL": 800
+      }
+    },
+    "defaultOptions": {
+      "isBeaded": false,
+      "isFullSet": false,
+      "size": "S"
+    },
+    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp",
+    "options": {
+      "beaded": {
+        "images": []
+      },
+      "nonBeaded": {
+        "images": [
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp",]
+      }
+    },
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "contactForCustomColors": true,
+    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
+    "availableStock": 2,
+    "isBeadedAvailable": false,
+    "isNonBeadedAvailable": true,
+    "priorityScore": 80
+  },
+  {
     "id": "sk009",
     "type": "kurta",
     "category": "royal",
@@ -535,7 +1052,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -598,7 +1116,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -661,7 +1180,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -724,7 +1244,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -787,7 +1308,8 @@ export const kurtas = [
       "basePrice": 1199,
       "discountPercent": 10,
       "fullSetAdditional": 600,
-      "beadedAdditional": 200,
+      "beadedAdditional": 100,
+      "tasselsAdditional": 100,
       "sizeIncrements": {
         "XS": 0,
         "S": 0,
@@ -821,505 +1343,14 @@ export const kurtas = [
     "isNonBeadedAvailable": true,
     "priorityScore": 95
   },
-  {
-    "id": "sk014",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Multi Color Blue",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp"
-        ]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk015",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Multi Color Circle",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp"
-        ]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk016",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Green Zari",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107079/Green-zari_yckbvo.webp"
-        ]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk017",
-    "type": "kurta",
-    "category": "classic",
-    "name": "White Floral",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp",]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk018",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Multi Color Squares",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp",]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk019",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Yellow Love",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp",]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk020",
-    "type": "kurta",
-    "category": "classic",
-    "name": "White gold",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp",]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
-  {
-    "id": "sk021",
-    "type": "kurta",
-    "category": "classic",
-    "name": "Floral Blue",
-    "dhotis": [
-      {
-        "id": "dhoti-gold",
-        "name": "Gold",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-      },
-      {
-        "id": "dhoti-peacock-green",
-        "name": "Peacock Green",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_10_32_PM_v9upwc.webp",
-      },
-      {
-        "id": "dhoti-black",
-        "name": "Black",
-        "image":
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-      },
-    ],
-    "pricing": {
-      "basePrice": 1099,
-      "discountPercent": 10,
-      "fullSetAdditional": 600,
-      "beadedAdditional": 200,
-      "sizeIncrements": {
-        "XS": 0,
-        "S": 0,
-        "M": 200,
-        "L": 400,
-        "XL": 600,
-        "XXL": 800
-      }
-    },
-    "defaultOptions": {
-      "isBeaded": false,
-      "isFullSet": false,
-      "size": "S"
-    },
-    "mainImage": "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp",
-    "options": {
-      "beaded": {
-        "images": []
-      },
-      "nonBeaded": {
-        "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp",]
-      }
-    },
-    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
-    "contactForCustomColors": true,
-    "description": "Vibrant purple kurta with traditional tile motifs — perfect for festive occasions and photo-ready moments",
-    "availableStock": 2,
-    "isBeadedAvailable": false,
-    "isNonBeadedAvailable": true,
-    "priorityScore": 80
-  },
+
+
+
+
+
+
+
+
 ]
 
 
@@ -1719,7 +1750,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1747,7 +1779,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1775,7 +1808,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1803,7 +1837,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1831,7 +1866,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1859,7 +1895,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1887,7 +1924,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1915,7 +1953,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1943,7 +1982,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1971,7 +2011,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -1999,7 +2040,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2027,7 +2069,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2055,7 +2098,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2083,7 +2127,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2111,7 +2156,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2139,7 +2185,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2200,7 +2247,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2228,7 +2276,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2256,7 +2305,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2284,7 +2334,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2312,7 +2363,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2340,7 +2392,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2368,7 +2421,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2396,7 +2450,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,
@@ -2424,7 +2479,8 @@ export const bowData = {
           pricing: {
             basePrice: 199,
             fullSetAdditional: 200,
-            // "beadedAdditional": 200,
+            //"beadedAdditional": 100,
+            "tasselsAdditional": 100,
             sizeIncrements: {
               XS: 0,
               S: 0,

@@ -315,7 +315,7 @@ export default function FilterDrawer({
               <button
                 onClick={() =>
                   setFilters({
-                    sortBy: "popularity",
+                    sortBy: "",
                     maxPrice: filters.priceLimit,
                     sizes: [],
                     categories: [],

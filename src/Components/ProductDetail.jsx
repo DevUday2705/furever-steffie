@@ -26,7 +26,9 @@ const ProductDetail = () => {
 
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState("simple");
   const [selectedSize, setSelectedSize] = useState("S");
+  const [isRoyalSet, setIsRoyalSet] = useState(false);
   const [selectedDhoti, setSelectedDhoti] = useState(
     product?.dhotis?.length ? product.dhotis[0].id : null
   );
@@ -156,20 +158,48 @@ const ProductDetail = () => {
 
     let price = product.pricing.basePrice;
 
-    if (isFullSet && product.pricing.fullSetAdditional) {
+    // Handle Royal Set pricing (takes precedence over regular full set)
+    if (isRoyalSet) {
+      // Royal set includes full set cost + additional 400 premium
+      price += (product.pricing.fullSetAdditional || 0) + 400;
+    } else if (isFullSet && product.pricing.fullSetAdditional) {
+      // Regular full set pricing
       price += product.pricing.fullSetAdditional;
     }
 
-    if (isBeaded && product.pricing.beadedAdditional) {
-      price += product.pricing.beadedAdditional;
+    // Handle style-based pricing
+    switch (selectedStyle) {
+      case "simple":
+        // No additional cost
+        break;
+      case "tassels":
+        if (product.pricing.tasselsAdditional) {
+          price += product.pricing.tasselsAdditional;
+        }
+        break;
+      case "beaded":
+        if (product.pricing.beadedAdditional) {
+          price += product.pricing.beadedAdditional;
+        }
+        break;
+      case "beaded-tassels":
+        if (product.pricing.beadedAdditional) {
+          price += product.pricing.beadedAdditional;
+        }
+        if (product.pricing.tasselsAdditional) {
+          price += product.pricing.tasselsAdditional;
+        }
+        break;
+      default:
+        break;
     }
 
+    // Size increment pricing
     const mappedSize = sizeCodeMap[selectedSize] || selectedSize;
     price += product.pricing.sizeIncrements[mappedSize] ?? 0;
 
     return price;
   };
-
   const handleGoBack = () => navigate(-1);
 
   if (isLoading) {
@@ -239,6 +269,10 @@ const ProductDetail = () => {
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
             setSelectedDhoti={setSelectedDhoti}
+            isRoyalSet={isRoyalSet}
+            setIsRoyalSet={setIsRoyalSet}
+            selectedStyle={selectedStyle}
+            setSelectedStyle={setSelectedStyle}
           />
           {requiresMeasurements ? (
             <SmartPetSizing

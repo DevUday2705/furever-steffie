@@ -4,8 +4,8 @@ import { traditionalOptions } from "../constants/constant";
 import { toPng } from "html-to-image";
 import confetti from "../../public/animation/confetti.json";
 import { Link, useParams } from "react-router-dom";
-
 import Lottie from "react-lottie";
+
 const FinalReceipt = () => {
   const { selections } = useAppContext();
   const receiptRef = useRef(null);

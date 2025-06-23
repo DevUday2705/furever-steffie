@@ -24,7 +24,7 @@ const ProductListing = ({
   const [isLoading, setIsLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [filters, setFilters] = useState({
-    sortBy: "popularity",
+    sortBy: "",
     maxPrice: 2000,
     priceLimit: 2000,
     sizes: [],
