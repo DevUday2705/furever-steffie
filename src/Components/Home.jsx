@@ -3,6 +3,7 @@ import Categories from "./Categories";
 import WatchAndBuy from "./WatchAndBuy";
 import PremiumSection from "./PremiumSection";
 import Footer from "./Footer";
+import Footer2 from "./Footer2";
 
 import { kurtas } from "../constants/constant";
 const Home = () => {
@@ -17,7 +18,7 @@ const Home = () => {
       <Categories />
       <PremiumSection products={kurtas} />
       <WatchAndBuy />
-      <Footer />
+      <Footer2 />
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
         target="_blank"

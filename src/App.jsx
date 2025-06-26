@@ -36,6 +36,7 @@ import { CurrencyContext } from "./context/currencyContext";
 import CurrencySelector from "./Components/CurrencySelector";
 import { Menu, Search } from "lucide-react";
 import HamburgerMenu from "./Components/HamburgerMenu";
+import TrackOrder from "./Components/TrackOrder";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
 
@@ -87,6 +88,7 @@ const App = () => {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/inventory" element={<FabricManagementSystem />} />
           <Route path="/stock" element={<StockManager />} />
+          <Route path="/track" element={<TrackOrder />} />
         </Routes>
       </div>
       <Toaster />
