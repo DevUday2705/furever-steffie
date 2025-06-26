@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ChevronRight } from "lucide-react";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 export default function FilterDrawer({
   open,
@@ -53,6 +55,8 @@ export default function FilterDrawer({
   const formatCategoryName = (category) => {
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
+
+  const { currency } = useContext(CurrencyContext);
 
   return (
     <AnimatePresence>
@@ -164,7 +168,7 @@ export default function FilterDrawer({
                         Price Range
                       </h3>
                       <span className="font-medium text-gray-800">
-                        ₹{filters.maxPrice}
+                        {convertCurrency(filters.maxPrice, currency)}
                       </span>
                     </div>
 
@@ -180,8 +184,10 @@ export default function FilterDrawer({
                       />
 
                       <div className="flex justify-between mt-2 text-xs text-gray-500">
-                        <span>₹0</span>
-                        <span>₹{filters.priceLimit}</span>
+                        <span>{convertCurrency(0, currency)}</span>
+                        <span>
+                          {convertCurrency(filters.priceLimit, currency)}
+                        </span>
                       </div>
                     </div>
                   </div>

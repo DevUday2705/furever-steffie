@@ -8,6 +8,8 @@ import { AppContext } from "../context/AppContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 const SelectedFabric = () => {
   const { selections, updateSelections } = useContext(AppContext);
@@ -23,7 +25,7 @@ const SelectedFabric = () => {
   // const sizes = ["xs", "sm", "md", "lg", "xl"];
 
   // const fabric = traditionalOptions.filter((item) => item.id == id)[0];
-
+  const { currency } = useContext(CurrencyContext);
   const handleOrder = () => {
     // Store all three variables in the global context
     updateSelections("variant", selectedVariant);
@@ -143,10 +145,10 @@ const SelectedFabric = () => {
         <p className="text-3xl mt-4 font-medium">{currentProduct.name}</p>
         <div className="mt-4">
           <p className="text-2xl inline-block text-green-700 font-medium mr-4">
-            ₹{getCurrentPrice()}/-
+            {convertCurrency(getCurrentPrice(), currency)}/-
           </p>
           <span className="line-through text-2xl text-red-500 font-medium">
-            ₹{parseInt(getCurrentPrice()) + 300}
+            {convertCurrency(parseInt(getCurrentPrice()) + 300, currency)}
           </span>
         </div>
         <p

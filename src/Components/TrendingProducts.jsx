@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 const TrendingProducts = () => {
   const products = [
     {
@@ -54,6 +56,7 @@ const TrendingProducts = () => {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
   };
+  const { currency } = useContext(CurrencyContext);
   return (
     <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
@@ -100,7 +103,7 @@ const TrendingProducts = () => {
                     {product.name}
                   </h3>
                   <p className="mt-1 text-base sm:text-lg font-bold text-gray-900">
-                    ₹{product.price.toLocaleString("en-IN")}
+                    {convertCurrency(product.price, currency)}
                   </p>
                 </div>
               </div>

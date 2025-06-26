@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useAppContext } from "../context/AppContext";
+import { convertCurrency } from "../constants/currency";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
+import { CurrencyContext } from "../context/currencyContext";
 const CartNav = () => {
   const { cart, updateQuantity, removeFromCart, isOpen, setIsOpen } =
     useAppContext();
@@ -21,6 +22,7 @@ const CartNav = () => {
     navigate("/checkout"); // or change this to your checkout route
   };
   const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
+  const { currency } = useContext(CurrencyContext);
   return (
     <div className="relative">
       <div className="relative">
@@ -99,7 +101,7 @@ const CartNav = () => {
                           {item.isFullSet ? "Full Set" : "Kurta"}
                         </p>
                         <p className="text-gray-700 text-sm mt-1">
-                          ₹{item.price}
+                          {convertCurrency(item.price, currency)}
                         </p>
                         <div className="flex items-center space-x-2 mt-2">
                           <button
@@ -150,7 +152,7 @@ const CartNav = () => {
                   <div className="flex justify-between mb-4">
                     <span className="font-semibold">Total</span>
                     <span className="text-xl font-bold">
-                      ₹{calculateTotal()}/-
+                      {convertCurrency(calculateTotal(), currency)}/-
                     </span>
                   </div>
                   {isFreeShipping && (

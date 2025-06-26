@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 // For URL parameter extraction without useRouter
 
 const ThankYouPage = () => {
@@ -71,6 +73,8 @@ const ThankYouPage = () => {
   //     </div>
   //   );
   // }
+
+  const { currency } = useContext(CurrencyContext);
 
   return (
     <motion.div
@@ -185,7 +189,7 @@ const ThankYouPage = () => {
                           </div>
                         </div>
                         <div className="text-sm font-semibold">
-                          ₹{orderData.price.toLocaleString()}
+                          {convertCurrency(orderData.price, currency)}
                         </div>
                       </div>
                     </div>
@@ -195,15 +199,15 @@ const ThankYouPage = () => {
                 <div className="bg-gray-50 px-4 py-3">
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Subtotal</span>
-                    <span>₹{orderData.price.toLocaleString()}</span>
+                    <span>{convertCurrency(orderData.price, currency)}</span>
                   </div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Shipping</span>
-                    <span>₹0</span>
+                    <span>{currency}0</span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold mt-2 pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span>₹{orderData.price.toLocaleString()}</span>
+                    <span>{convertCurrency(orderData.price, currency)}</span>
                   </div>
                 </div>
               </div>
@@ -257,7 +261,7 @@ const ThankYouPage = () => {
                         </div>
                       </td>
                       <td className="px-4 py-4 text-right text-sm font-medium">
-                        ₹{orderData.price.toLocaleString()}
+                        {convertCurrency(orderData.price, currency)}
                       </td>
                     </tr>
                   </tbody>
@@ -270,7 +274,7 @@ const ThankYouPage = () => {
                         Subtotal
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                        ₹{orderData.price.toLocaleString()}
+                        {convertCurrency(orderData.price, currency)}
                       </td>
                     </tr>
                     <tr>
@@ -292,7 +296,7 @@ const ThankYouPage = () => {
                         Total
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">
-                        ₹{orderData.price.toLocaleString()}
+                        {convertCurrency(orderData.price, currency)}
                       </td>
                     </tr>
                   </tfoot>

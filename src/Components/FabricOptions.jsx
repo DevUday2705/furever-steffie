@@ -6,6 +6,9 @@ import {
 } from "../constants/constant";
 import { useAppContext } from "../hooks/useAppContext";
 import { motion } from "framer-motion";
+import { convertCurrency } from "../constants/currency";
+import { useContext } from "react";
+import { CurrencyContext } from "../context/currencyContext";
 const FabricOptions = () => {
   const { updateSelections } = useAppContext();
   const navigate = useNavigate();
@@ -13,6 +16,7 @@ const FabricOptions = () => {
     updateSelections(key, value); // Update selection and move to the next step
     navigate(`/product-detail/${value}`);
   };
+  const { currency } = useContext(CurrencyContext);
   return (
     <motion.div
       className="my-10"
@@ -37,7 +41,9 @@ const FabricOptions = () => {
             </div>
             <div className="px-4 py-2">
               <p className="font-medium">{item.name}</p>
-              <p className="text-green-600 font-semibold">₹{item.price}/-</p>
+              <p className="text-green-600 font-semibold">
+                {convertCurrency(item.price, currency)}/-
+              </p>
             </div>
           </motion.div>
         ))}

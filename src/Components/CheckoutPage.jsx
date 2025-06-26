@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import domtoimage from "dom-to-image";
 
@@ -26,6 +26,8 @@ import { QRCode } from "react-qrcode-logo";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 const CheckoutPage = () => {
   const location = useLocation();
@@ -228,6 +230,8 @@ const CheckoutPage = () => {
     rzp.open();
   };
 
+  const { currency } = useContext(CurrencyContext);
+
   return loadingPayment ? (
     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
@@ -289,7 +293,7 @@ const CheckoutPage = () => {
                       )}
                     </div>
                     <div className="text-sm font-semibold text-gray-800 ml-2">
-                      ₹{item.price * (item.quantity || 1)}
+                      {item.price * (item.quantity || 1)}
                     </div>
                   </div>
                 ))}
@@ -634,37 +638,46 @@ const CheckoutPage = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Product Price:</span>
                   <span className="text-gray-800">
-                    ₹
-                    {(isCartCheckout
-                      ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                      : orderDetails.price
-                    ).toFixed(2)}
+                    {convertCurrency(
+                      (isCartCheckout
+                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
+                        : orderDetails.price
+                      ).toFixed(2),
+                      currency
+                    )}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery:</span>
                   <span className="text-gray-800">
-                    ₹{formData.deliveryOption === "express" ? 399 : 49}
+                    {convertCurrency(
+                      formData.deliveryOption === "express" ? 399 : 49,
+                      currency
+                    )}
                   </span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Coupon Discount:</span>
                     <span>
-                      -₹
                       {(() => {
                         let subtotal = isCartCheckout
                           ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
                           : orderDetails.price;
-                        return ((subtotal * discount) / 100).toFixed(2);
+                        return convertCurrency(
+                          ((subtotal * discount) / 100).toFixed(2),
+                          currency
+                        );
                       })()}
                     </span>
                   </div>
                 )}
                 <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
                   <span className="text-gray-800">Total:</span>
-                  <span className="text-gray-800">₹{calculateTotal()}</span>
+                  <span className="text-gray-800">
+                    {convertCurrency(calculateTotal(), currency)}
+                  </span>
                 </div>
               </div>
             </div>

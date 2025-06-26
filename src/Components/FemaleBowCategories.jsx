@@ -1,8 +1,10 @@
 import { ChevronLeft } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { bowData } from "../constants/constant";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 const FemaleBowCategories = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +32,7 @@ const FemaleBowCategories = () => {
   const handleGoBack = () => {
     navigate(-1); // Go back to previous page in history
   };
+  const { currency } = useContext(CurrencyContext);
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="bg-white shadow-sm sticky top-0 z-10">
@@ -90,7 +93,7 @@ const FemaleBowCategories = () => {
                     <div className="mt-1">
                       <div className="flex items-baseline">
                         <span className="text-base font-bold text-gray-800">
-                          ₹{product.pricing.basePrice}
+                          {convertCurrency(product.pricing.basePrice, currency)}
                         </span>
                       </div>
                     </div>

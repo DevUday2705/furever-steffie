@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { Truck, Clock, Calendar, AlertCircle, CheckCircle } from "lucide-react";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 export default function ShippingPolicyPage() {
   // Animation variants
@@ -23,6 +25,8 @@ export default function ShippingPolicyPage() {
       transition: { duration: 0.5 },
     },
   };
+
+  const { currency } = useContext(CurrencyContext);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -100,7 +104,7 @@ export default function ShippingPolicyPage() {
                       Standard Delivery
                     </h4>
                     <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                      ₹50
+                      {convertCurrency(50, currency)}
                     </span>
                   </div>
                   <ul className="space-y-2 text-gray-600">
@@ -125,7 +129,7 @@ export default function ShippingPolicyPage() {
                       Express Delivery
                     </h4>
                     <span className="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-                      ₹200
+                      {convertCurrency(200, currency)}
                     </span>
                   </div>
                   <ul className="space-y-2 text-gray-600">

@@ -1,8 +1,10 @@
 // src/components/ProductDetail/BottomActions.jsx
 
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { CurrencyContext } from "../../context/currencyContext";
+import { convertCurrency } from "../../constants/currency";
 
 const BottomActions = ({
   product,
@@ -55,6 +57,8 @@ const BottomActions = ({
     setIsOpen(true);
   };
 
+  const { currency, setCurrency } = useContext(CurrencyContext);
+
   return (
     <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
       <motion.button
@@ -71,7 +75,7 @@ const BottomActions = ({
         whileTap={{ scale: 0.98 }}
         onClick={handleBuyNow}
       >
-        Buy Now • ₹{calculatePrice()}
+        Buy Now • {convertCurrency(calculatePrice(), currency)}
       </motion.button>
 
       <motion.button
@@ -88,7 +92,7 @@ const BottomActions = ({
         whileTap={{ scale: 0.98 }}
         onClick={handleAddToCart}
       >
-        Add to Cart • ₹{calculatePrice()}
+        Add to Cart • {convertCurrency(calculatePrice(), currency)}
       </motion.button>
     </div>
   );

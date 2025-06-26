@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { motion } from "framer-motion";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 const UPIPayment = ({
   orderTotal = 499,
@@ -72,6 +74,8 @@ const UPIPayment = ({
     upiLink
   )}&size=200x200`;
 
+  const { currency } = useContext(CurrencyContext);
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 max-w-md mx-auto my-4">
       <motion.div
@@ -91,7 +95,8 @@ const UPIPayment = ({
           className="text-sm text-gray-600 mb-4"
           variants={itemVariants}
         >
-          Order #{orderID} • Total: ₹{orderTotal.toFixed(2)}
+          Order #{orderID} • Total:{" "}
+          {convertCurrency(orderTotal.toFixed(2), currency)}
         </motion.div>
 
         <motion.div className="mb-6" variants={itemVariants}>

@@ -1,6 +1,8 @@
 import { AlertTriangle, ChevronLeft, Edit3, X } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 const OrderReviewPage = () => {
   const { productId } = useParams();
@@ -46,7 +48,7 @@ const OrderReviewPage = () => {
     // This would typically call an API or navigate to checkout
     navigate("/checkout", { state: { orderDetails, sizeConfirmed } });
   };
-
+  const { currency } = useContext(CurrencyContext);
   return (
     <div className="bg-gray-50 min-h-screen pb-24">
       {/* Navigation */}
@@ -83,7 +85,7 @@ const OrderReviewPage = () => {
               </div>
               <h2 className="text-lg font-bold text-gray-800">{name}</h2>
               <div className="mt-1 text-gray-700 text-lg font-semibold">
-                ₹{price}
+                {convertCurrency(price, currency)}
               </div>
             </div>
           </div>
@@ -202,17 +204,23 @@ const OrderReviewPage = () => {
           <div className="p-4 space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Product Price:</span>
-              <span className="text-gray-800">₹{price}</span>
+              <span className="text-gray-800">
+                {convertCurrency(price, currency)}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
-              <span className="text-gray-800">₹49</span>
+              <span className="text-gray-800">
+                {convertCurrency(49, currency)}
+              </span>
             </div>
 
             <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
               <span className="text-gray-800">Total:</span>
-              <span className="text-gray-800">₹{price + 49}</span>
+              <span className="text-gray-800">
+                {convertCurrency(price + 49, currency)}
+              </span>
             </div>
           </div>
         </div>

@@ -1,8 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { convertCurrency } from "../constants/currency";
+import { CurrencyContext } from "../context/currencyContext";
 
 const WatchAndBuy = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -99,6 +107,8 @@ const WatchAndBuy = () => {
     }
   };
 
+  const { currency } = useContext(CurrencyContext);
+
   return (
     <section className="pb-8 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -186,7 +196,7 @@ const WatchAndBuy = () => {
                         {product.name}
                       </h3>
                       <p className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-                        ₹{product.price.toLocaleString("en-IN")}
+                        {convertCurrency(product.price, currency)}
                       </p>
                     </div>
                   </div>
