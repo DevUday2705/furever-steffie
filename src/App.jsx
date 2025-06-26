@@ -31,16 +31,21 @@ import LehengaListing from "./Components/LehengaListing";
 import FrockListing from "./Components/FrockListing";
 import StockManager from "./Components/StockManager";
 import FabricManagementSystem from "./Components/FabricManagementSystem";
+import { useContext } from "react";
+import { CurrencyContext } from "./context/currencyContext";
+import CurrencySelector from "./Components/CurrencySelector";
 const App = () => {
+  const { currency, setCurrency } = useContext(CurrencyContext);
+
   return (
     <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between py-5 px-5  ">
         <Link to="/" className="w-full ">
           <img className="h-12 mx-auto" src="/images/logo.png" />
         </Link>
+        <CurrencySelector currency={currency} setCurrency={setCurrency} />
         <CartNav />
       </nav>
-
       <div className="max-w-md mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />

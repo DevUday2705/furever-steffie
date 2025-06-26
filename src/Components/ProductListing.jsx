@@ -1,5 +1,5 @@
 // components/ProductListing.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import FilterDrawer from "./FilterDrawer";
@@ -12,6 +12,7 @@ import {
   Flame,
   CrownIcon,
 } from "lucide-react";
+import { CurrencyContext } from "../context/currencyContext";
 
 const ProductListing = ({
   title,
@@ -36,6 +37,7 @@ const ProductListing = ({
     categories: ["all"],
     categoryOptions: ["all", "royal"],
   });
+  const { currency, rate } = useContext(CurrencyContext);
 
   const baseList = useMemo(() => [...products], [products]);
   const filtered = useProductFilter(baseList, filters);
@@ -70,7 +72,16 @@ const ProductListing = ({
       </div>
     );
   }
-  console.log(category);
+
+  const currencySymbols = {
+    INR: "₹",
+    SGD: "S$",
+    MYR: "RM",
+    USD: "$",
+    GBP: "£",
+    NZD: "NZ$",
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <FilterDrawer
@@ -148,6 +159,8 @@ const ProductListing = ({
               discountPercent > 0
                 ? Math.round(price * (100 / (100 - discountPercent)))
                 : price;
+            const currentPrice = (price * rate).toFixed(2);
+            const originalPriceConverted = (originalPrice * rate).toFixed(2);
 
             return (
               <motion.div
@@ -208,17 +221,21 @@ const ProductListing = ({
                     </h3>
                     <div className="flex flex-col h-16">
                       <div className="flex items-baseline flex-wrap">
-                        <span className="text-base font-bold text-gray-800 mr-2">
-                          ₹{price}
+                        <span className="text-sm font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+                          {currencySymbols[currency] || currency} {currentPrice}
                         </span>
                         {discountPercent > 0 && (
                           <>
-                            <span className="text-sm text-gray-500 line-through mr-2">
-                              ₹{originalPrice}
+                            <span className="text-xs mx-1 text-gray-400 line-through font-medium">
+                              {currencySymbols[currency] || currency}
+                              {originalPriceConverted}
                             </span>
-                            <span className="text-xs font-medium text-emerald-600">
+                            <motion.span
+                              whileHover={{ scale: 1.05 }}
+                              className="inline-flex  items-center px-1 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border border-emerald-200/50"
+                            >
                               {discountPercent}% off
-                            </span>
+                            </motion.span>
                           </>
                         )}
                       </div>
