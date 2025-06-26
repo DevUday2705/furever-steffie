@@ -27,9 +27,10 @@ const CartNav = () => {
         <img
           onClick={() => setIsOpen(!isOpen)}
           src="/images/bag.png"
-          className="h-6 cursor-pointer"
+          className="h-8 w-14 cursor-pointer"
           alt="Cart"
         />
+
         {totalCartItems > 0 && (
           <div className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md">
             {totalCartItems}

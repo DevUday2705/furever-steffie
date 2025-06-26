@@ -12,6 +12,7 @@ const CurrencySelector = ({ currency, setCurrency }) => {
     { value: "USD", label: "🇺🇸 USD ($)", flag: "🇺🇸" },
     { value: "GBP", label: "🇬🇧 GBP (£)", flag: "🇬🇧" },
     { value: "NZD", label: "🇳🇿 NZD (NZ$)", flag: "🇳🇿" },
+    { value: "CAD", label: "🇨🇦 CAD (C$)", flag: "🇨🇦" },
   ];
 
   const selectedCurrency = currencies.find((c) => c.value === currency);
@@ -28,12 +29,12 @@ const CurrencySelector = ({ currency, setCurrency }) => {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 bg-white/70 hover:bg-white/90 border border-gray-200/50 hover:border-gray-300/50 rounded-xl px-4 py-2.5 shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-sm min-w-[140px]"
+        className="flex items-center text-sm space-x-3 mr-5 bg-white/70 hover:bg-white/90 border border-gray-200/50 hover:border-gray-300/50 rounded-xl px-2 py-1.5  transition-all duration-300 backdrop-blur-sm min-w-[50px]"
       >
         <span className="text-lg">{selectedCurrency.flag}</span>
-        <span className="font-medium text-gray-700 flex-1 text-left">
+        {/* <span className="font-medium text-gray-700 flex-1 text-left">
           {selectedCurrency.value}
-        </span>
+        </span> */}
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -50,7 +51,7 @@ const CurrencySelector = ({ currency, setCurrency }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full mt-2 left-0 right-0 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-xl z-50 overflow-hidden"
+            className="absolute min-w-[140px] top-full mt-2 left-0 right-0 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-xl z-50 overflow-hidden"
           >
             {currencies.map((curr, index) => (
               <motion.button
@@ -60,13 +61,13 @@ const CurrencySelector = ({ currency, setCurrency }) => {
                 transition={{ delay: index * 0.03 }}
                 whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
                 onClick={() => handleSelect(curr.value)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
+                className={`w-full flex items-center text-sm space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
                   currency === curr.value
                     ? "bg-blue-50 text-blue-700"
                     : "text-gray-700 hover:text-gray-900"
                 }`}
               >
-                <span className="text-lg">{curr.flag}</span>
+                {/* <span className="text-lg">{curr.flag}</span> */}
                 <span className="font-medium flex-1">{curr.label}</span>
                 {currency === curr.value && (
                   <motion.div
