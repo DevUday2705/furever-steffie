@@ -9,6 +9,7 @@ const currencyRates = {
   USD: 0.012, // US Dollar
   GBP: 0.0094, // British Pound
   NZD: 0.019, // New Zealand Dollar
+  CAD: 0.016,
 };
 
 export const CurrencyProvider = ({ children }) => {
