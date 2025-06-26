@@ -27,7 +27,7 @@ const CartNav = () => {
         <img
           onClick={() => setIsOpen(!isOpen)}
           src="/images/bag.png"
-          className="h-6 w-6 cursor-pointer"
+          className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 cursor-pointer object-contain"
           alt="Cart"
         />
 
