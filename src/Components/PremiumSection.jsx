@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 
 const PremiumSection = ({ products }) => {
-  // Filter only premium products
   const premiumProducts = products
     .filter((product) => product.category === "royal")
     .slice(0, 3);
@@ -58,14 +57,11 @@ const PremiumSection = ({ products }) => {
     }).format(price);
   };
 
-  // Trigger shine effect periodically
   useEffect(() => {
-    // Initial shine after component mounts
     const initialTimer = setTimeout(() => {
       triggerShine();
     }, 1000);
 
-    // Set up interval for repeated shine effect
     const intervalId = setInterval(() => {
       triggerShine();
     }, 5000);
@@ -80,15 +76,13 @@ const PremiumSection = ({ products }) => {
     setIsShining(true);
     setTimeout(() => setIsShining(false), 2500);
   };
+
   return (
     <section
-      style={{
-        backgroundPosition: "0px -160px ",
-      }}
-      className="py-8  bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)]"
+      style={{ backgroundPosition: "0px -160px" }}
+      className="py-8 bg-[length:100%_auto] bg-no-repeat bg-[url(/images/mandana.png)] overflow-x-hidden"
     >
-      <div className="container mx-auto px-4 ">
-        {/* Section Header with premium styling */}
+      <div className="container mx-auto px-4">
         <div className="relative mb-2 text-center">
           <div className="flex items-center relative left-20 justify-center mb-1">
             <span className="relative text-[#cd9f4b] text-3xl font-mont uppercase tracking-wider font-black">
@@ -101,15 +95,13 @@ const PremiumSection = ({ products }) => {
           </h1>
         </div>
 
-        {/* Premium Products Carousel */}
         <div className="relative mb-4">
-          {/* Main carousel container with fixed width to show only one slide */}
           <div className="overflow-hidden max-w-[280px] mx-auto" ref={emblaRef}>
             <div className="flex">
               {premiumProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  className="min-w-[280px]  w-full  flex-shrink-0  rounded-md p-2"
+                  className="min-w-[280px] w-full flex-shrink-0 rounded-md p-2"
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -117,10 +109,7 @@ const PremiumSection = ({ products }) => {
                     to={`/product/${product.id}+${product.type}`}
                     className="block group"
                   >
-                    <div className="relative rounded-lg overflow-hidden border-white  border-4 bg-white shadow-md hover:shadow-lg transition-all duration-300">
-                      {/* Discount badge if applicable */}
-
-                      {/* Product image with responsive height and aspect ratio */}
+                    <div className="relative rounded-lg overflow-hidden border-white border-4 bg-white shadow-md hover:shadow-lg transition-all duration-300">
                       <div className="relative pb-[125%] overflow-hidden">
                         <img
                           src={product.mainImage}
@@ -129,16 +118,13 @@ const PremiumSection = ({ products }) => {
                           loading="lazy"
                         />
                       </div>
-
-                      {/* Enhanced product details with premium styling */}
-                      <div className="p-4 bg-white ">
+                      <div className="p-4 bg-white">
                         <div className="flex items-center mb-1">
                           <Crown color="#cd9f4b" className="mr-2" size={16} />
                           <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
                             {product.name}
                           </h3>
                         </div>
-
                         <div className="flex items-center gap-2 mt-2">
                           {product.pricing.discountPercent > 0 ? (
                             <>
@@ -154,8 +140,6 @@ const PremiumSection = ({ products }) => {
                               {formatPrice(product.pricing.basePrice)}
                             </span>
                           )}
-
-                          {/* Small shopping bag icon */}
                           <div className="ml-auto rounded-full w-6 h-6 bg-black/10 flex items-center justify-center">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -181,45 +165,43 @@ const PremiumSection = ({ products }) => {
             </div>
           </div>
 
-          {/* Navigation buttons - now visible for better navigation */}
           <div>
             <button
               onClick={scrollPrev}
               disabled={!canScrollPrev}
-              className={`absolute top-1/2 left-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
-              ${!canScrollPrev ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`absolute top-1/2 left-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10 ${
+                !canScrollPrev ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={scrollNext}
               disabled={!canScrollNext}
-              className={`absolute top-1/2 right-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10
-              ${!canScrollNext ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`absolute top-1/2 right-0 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center transition-all duration-300 z-10 ${
+                !canScrollNext ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Pagination Dots */}
         <div className="flex justify-center gap-2">
           {premiumProducts.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300
-              ${selectedIndex === index ? "bg-[#cd9f4b] w-6" : "bg-gray-300"}`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                selectedIndex === index ? "bg-[#cd9f4b] w-6" : "bg-gray-300"
+              }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Premium CTA button */}
         <div className="flex justify-center mt-6">
-          {/* Button container with overflow hidden */}
           <div className="relative overflow-hidden rounded-md">
-            {/* The button itself */}
             <Link
               to="/kurta"
               className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-[#e2c275] via-[#cd9f4b] to-[#e2c275] text-white font-medium rounded-md transition-all duration-300 hover:bg-gradient-to-r hover:from-[#d4b05e] hover:via-[#bf9232] hover:to-[#d4b05e] shadow-md border border-[#e9d396] border-opacity-30"
@@ -229,7 +211,6 @@ const PremiumSection = ({ products }) => {
               <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
 
-            {/* Shine effect using Framer Motion */}
             <motion.div
               className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
               initial={{ x: "-100%", skewX: -30 }}

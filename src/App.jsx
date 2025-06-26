@@ -41,13 +41,19 @@ const App = () => {
 
   return (
     <div className=" max-w-md mx-auto ">
-      <nav className="flex items-center justify-between py-5 px-2  ">
-        <HamburgerMenu />
-        <Link to="/" className="w-full ">
-          <img className="h-9 mx-auto" src="/images/logo.png" />
-        </Link>
-        <CurrencySelector currency={currency} setCurrency={setCurrency} />
-        <CartNav />
+      <nav className="flex items-center justify-between py-5 px-2">
+        <div className="flex-1">
+          <HamburgerMenu />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <Link to="/">
+            <img className="h-9" src="/images/logo.png" />
+          </Link>
+        </div>
+        <div className="flex-1 flex justify-end items-center gap-2">
+          <CurrencySelector currency={currency} setCurrency={setCurrency} />
+          <CartNav />
+        </div>
       </nav>
       <div className="max-w-md mx-auto">
         <Routes>
