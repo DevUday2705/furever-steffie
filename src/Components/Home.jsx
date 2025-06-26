@@ -1,23 +1,35 @@
-import React from "react";
 import MobileHeroCarousel from "./MobileHeroCarousel";
 import Categories from "./Categories";
 import WatchAndBuy from "./WatchAndBuy";
-import TrendingProducts from "./TrendingProducts";
 import PremiumSection from "./PremiumSection";
 import Footer from "./Footer";
-import KurtaBanner from "./KurtaBanner";
-import PremiumSectionCarousel from "./PremiumSection";
+
 import { kurtas } from "../constants/constant";
 const Home = () => {
+  const phoneNumber = "918828145667"; // change to your WhatsApp business number (with country code)
+  const message = encodeURIComponent(
+    "Hi! I'm interested in your pet outfits on Furever Steffie. Can you help me place an order?"
+  );
+
   return (
     <div>
       <MobileHeroCarousel />
       <Categories />
       <PremiumSection products={kurtas} />
-      {/* <KurtaBanner /> */}
       <WatchAndBuy />
-      {/* <TrendingProducts /> */}
       <Footer />
+      <a
+        href={`https://wa.me/${phoneNumber}?text=${message}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 right-4 z-50 bg-green-500 rounded-full p-3 shadow-lg hover:scale-105 transition-transform"
+      >
+        <img
+          src="https://img.icons8.com/color/48/whatsapp--v1.png"
+          alt="Chat on WhatsApp"
+          className="w-5 h-5"
+        />
+      </a>
     </div>
   );
 };
