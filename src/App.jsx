@@ -41,13 +41,13 @@ const App = () => {
 
   return (
     <div className=" max-w-md mx-auto ">
-      <nav className="flex items-center justify-between py-5 px-2">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white flex items-center justify-between py-5 px-2">
         <div className="flex-1">
           <HamburgerMenu />
         </div>
         <div className="flex-1 flex justify-center">
           <Link to="/">
-            <img className="h-9" src="/images/logo.png" />
+            <img className="h-10 shrink-0" src="/images/logo.png" />
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-2">
