@@ -34,20 +34,21 @@ import FabricManagementSystem from "./Components/FabricManagementSystem";
 import { useContext } from "react";
 import { CurrencyContext } from "./context/currencyContext";
 import CurrencySelector from "./Components/CurrencySelector";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import HamburgerMenu from "./Components/HamburgerMenu";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
 
   return (
     <div className=" max-w-md mx-auto ">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white flex items-center justify-between py-5 px-2">
-        <div className="flex-1">
+      <nav className="flex items-center  justify-between py-5 px-2">
+        <div className="flex items-center space-x-2 flex-1">
           <HamburgerMenu />
+          <Search size={20} />
         </div>
         <div className="flex-1 flex justify-center">
           <Link to="/">
-            <img className="h-10 shrink-0" src="/images/logo.png" />
+            <img className="h-9 shrink-0 mr-2" src="/images/logo.png" />
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-2">

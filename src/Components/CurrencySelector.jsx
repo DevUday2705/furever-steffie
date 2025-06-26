@@ -23,7 +23,7 @@ const CurrencySelector = ({ currency, setCurrency }) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative ml-5">
       {/* Main Button */}
       <motion.button
         whileHover={{ scale: 1.02 }}
