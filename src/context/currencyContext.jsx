@@ -13,13 +13,30 @@ const currencyRates = {
 };
 
 export const CurrencyProvider = ({ children }) => {
-  const [currency, setCurrency] = useState("INR");
-  const [rate, setRate] = useState(currencyRates["INR"]);
+  // Initialize currency from localStorage or default to "INR"
+  const [currency, setCurrency] = useState(() => {
+    try {
+      return localStorage.getItem("selectedCurrency") || "INR";
+    } catch (error) {
+      return "INR";
+    }
+  });
 
+  const [rate, setRate] = useState(currencyRates[currency]);
+
+  // Update rate when currency changes
   useEffect(() => {
     setRate(currencyRates[currency]);
   }, [currency]);
 
+  // Save currency to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("selectedCurrency", currency);
+    } catch (error) {
+      console.error("Failed to save currency to localStorage:", error);
+    }
+  }, [currency]);
   return (
     <CurrencyContext.Provider value={{ currency, setCurrency, rate }}>
       {children}
