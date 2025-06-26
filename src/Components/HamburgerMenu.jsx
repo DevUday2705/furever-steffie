@@ -117,7 +117,7 @@ const HamburgerMenu = () => {
                   onClick={() => toggleSubmenu(index)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-all duration-300 group transform hover:scale-[1.02] ${
                     activeSubmenu === index
-                      ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-indigo-700 shadow-lg scale-[1.02]"
+                      ? "bg-gradient-to-r from-gray-50 to-gray-50 text-gray-700 shadow-lg scale-[1.02]"
                       : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
                   }`}
                 >
@@ -153,7 +153,7 @@ const HamburgerMenu = () => {
                         <button
                           key={subIndex}
                           onClick={() => handleItemClick(subItem)}
-                          className="w-full text-left p-3 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300 transform hover:translate-x-2 hover:shadow-md hover:scale-[1.02]"
+                          className="w-full text-left p-3 rounded-lg text-gray-600 hover:text-gray-600 hover:bg-gray-50 transition-all duration-300 transform hover:translate-x-2 hover:shadow-md hover:scale-[1.02]"
                           style={{
                             animation:
                               activeSubmenu === index
@@ -166,7 +166,7 @@ const HamburgerMenu = () => {
                         >
                           <span className="text-sm font-medium relative">
                             {subItem}
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gray-600 transition-all duration-300 group-hover:w-full"></span>
                           </span>
                         </button>
                       ))}
@@ -181,7 +181,7 @@ const HamburgerMenu = () => {
           <div className="p-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
             <div className="text-center">
               <p className="text-sm text-gray-500 mb-2">Need help?</p>
-              <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+              <button className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-600 text-white rounded-lg hover:from-gray-700 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                 Contact Support
               </button>
             </div>
