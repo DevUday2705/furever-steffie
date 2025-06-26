@@ -22,12 +22,12 @@ const Home = () => {
         href={`https://wa.me/${phoneNumber}?text=${message}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-4 right-4 z-50 bg-green-500 rounded-full p-3 shadow-lg hover:scale-105 transition-transform"
+        className="fixed bottom-4 left-4 z-50 hover:scale-105 transition-transform"
       >
         <img
           src="https://img.icons8.com/color/48/whatsapp--v1.png"
           alt="Chat on WhatsApp"
-          className="w-5 h-5"
+          className="w-10 h-10"
         />
       </a>
     </div>
