@@ -293,7 +293,10 @@ const CheckoutPage = () => {
                       )}
                     </div>
                     <div className="text-sm font-semibold text-gray-800 ml-2">
-                      {item.price * (item.quantity || 1)}
+                      {convertCurrency(
+                        item.price * (item.quantity || 1),
+                        currency
+                      )}
                     </div>
                   </div>
                 ))}

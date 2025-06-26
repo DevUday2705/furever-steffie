@@ -24,7 +24,7 @@ export const convertCurrency = (value, targetCurrency = "INR", round = true) => 
     const symbol = currencySymbols[targetCurrency] || "";
 
     const converted = value * rate;
-    const finalAmount = round ? Math.round(converted) : converted.toFixed(2);
+    const finalAmount = round ? Math.round(converted) : converted.toFixed(3);
 
     return `${symbol}${finalAmount}`;
 };
