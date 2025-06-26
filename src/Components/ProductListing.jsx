@@ -239,11 +239,11 @@ const ProductListing = ({
                           </>
                         )}
                       </div>
-                      {product.availableStock <= 5 && (
+                      {/* {product.availableStock <= 5 && (
                         <span className="text-xs font-medium text-red-500 mt-1">
                           Only few left
                         </span>
-                      )}
+                      )} */}
                       <div className="flex-grow" />
                       <div className="flex justify-end mt-1 text-xs font-medium text-gray-800">
                         View Details →
