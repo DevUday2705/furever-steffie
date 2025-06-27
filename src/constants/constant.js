@@ -52,7 +52,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230459_vwjaaf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104215/ChatGPT_Image_Jun_15_2025_12_38_07_AM_njuxf1.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230459_vwjaaf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104215/ChatGPT_Image_Jun_15_2025_12_38_07_AM_njuxf1.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014074/IMG_2095_w1iepq.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014074/IMG_2096_ut9k4q.webp"
 
         ]
       }
@@ -118,7 +118,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107082/multicolor-blue_n7bnt5.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014076/IMG_2060_sjgm36.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014085/IMG_2059_nesfz0.webp"
         ]
       }
     },
@@ -182,7 +182,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230355_pucjg2.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104214/ChatGPT_Image_Jun_15_2025_03_38_50_PM_uxhorb.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104216/Photoroom_20250615_230355_pucjg2.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104214/ChatGPT_Image_Jun_15_2025_03_38_50_PM_uxhorb.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014056/IMG_1983_unsinn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014057/IMG_1982_kejlqh.webp"
 
         ]
       }
@@ -247,7 +247,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107081/Multicolor-semi_pziwpn.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014056/IMG_2123_ynkmzd.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014056/IMG_2121_hvptnh.webp"
         ]
       }
     },
@@ -376,7 +376,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107079/Green-zari_yckbvo.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107079/Green-zari_yckbvo.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014093/IMG_2194_mxdyzs.webp"
         ]
       }
     },
@@ -440,7 +440,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Photoroom_20250616_015056_se8lve.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Photoroom_20250616_015056_se8lve.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014054/IMG_2152_myfhiy.webp"
         ]
       }
     },
@@ -504,7 +504,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp",]
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107078/floral-white_uvclcp.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751015304/IMG_2106_fnllgv.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751015304/IMG_2107_ugh8z5.webp"]
       }
     },
     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
@@ -567,7 +567,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104211/Shehzada_Green_Edition_Royal_kurta_dhoti_xalhxm.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Shehzada_Green_Edition_Royal_kurta__tssuoj.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104211/Shehzada_Green_Edition_Royal_kurta_dhoti_xalhxm.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104212/Shehzada_Green_Edition_Royal_kurta__tssuoj.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014055/IMG_2161_u9cdw0.webp"
         ]
       }
     },
@@ -631,7 +631,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp",]
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107089/Multi-square_k7fy8q.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014073/IMG_2103_gh16az.webp"]
       }
     },
     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
@@ -758,7 +758,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp",]
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107077/Yellow-love_sadvl8.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014054/IMG_2152_myfhiy.webp"]
       }
     },
     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
@@ -821,7 +821,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Gulaabi_Shehzada_royal_rani_pink_kurta_dhoti__kxxzl3.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104209/Gulaabi_Shehzada_royal_rani_pink_kurta_ty4jux.webp",
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Gulaabi_Shehzada_royal_rani_pink_kurta_dhoti__kxxzl3.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104209/Gulaabi_Shehzada_royal_rani_pink_kurta_ty4jux.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014056/IMG_1381_hyvkef.webp"
         ]
       }
     },
@@ -885,7 +885,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp",]
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107087/white-zari_cbr8vi.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014054/IMG_2147_zw3v65.webp"]
       }
     },
     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
@@ -948,7 +948,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Photoroom_20250615_232608_plxkyf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104207/ChatGPT_Image_Jun_15_2025_12_50_08_AM_zjtjoc.webp",
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104208/Photoroom_20250615_232608_plxkyf.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104207/ChatGPT_Image_Jun_15_2025_12_50_08_AM_zjtjoc.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014074/IMG_2086_hothly.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014074/IMG_2089_u2m7ay.webp"
         ]
       }
     },
@@ -1012,7 +1012,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp",]
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107086/floral-blue_z1dj9g.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014075/IMG_2067_anaaf8.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014075/IMG_2068_joey1u.webp"]
       }
     },
     "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
@@ -1075,7 +1075,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Photoroom_20250616_014910_to7uq3.webp",
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Photoroom_20250616_014910_to7uq3.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014072/IMG_2114_mejpfd.webp"
         ]
       }
     },
@@ -1139,7 +1139,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Heritage_Leaf_xumnkl.webp",
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104206/Heritage_Leaf_xumnkl.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014074/IMG_2080_djge6g.webp"
         ]
       }
     },
@@ -1331,7 +1331,7 @@ export const kurtas = [
       },
       "nonBeaded": {
         "images": [
-          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250615_230414_od0fdt.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250616_015041_cqxpb1.webp"
+          "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250615_230414_od0fdt.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104204/Photoroom_20250616_015041_cqxpb1.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014055/IMG_2139_mznsnh.webp", "https://res.cloudinary.com/di6unrpjw/image/upload/v1751014055/IMG_2139_mznsnh.webp"
         ]
       }
     },
