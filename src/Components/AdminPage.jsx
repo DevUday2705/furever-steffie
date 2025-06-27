@@ -137,9 +137,8 @@ const AdminPage = () => {
     readyToShip: filteredAndSortedOrders.filter(
       (o) => o.orderStatus === "ready-to-ship"
     ).length,
-    delivered: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "delivered"
-    ).length,
+    shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
+      .length,
     totalAmount: filteredAndSortedOrders.reduce(
       (sum, order) => sum + (Number(order.amount) || 0),
       0
@@ -276,7 +275,7 @@ const AdminPage = () => {
                           ? "bg-yellow-500"
                           : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
-                          : order.orderStatus === "delivered"
+                          : order.orderStatus === "shipped"
                           ? "bg-green-600"
                           : "bg-gray-300"
                       }
@@ -295,7 +294,7 @@ const AdminPage = () => {
                       <option value="pending">Pending</option>
                       <option value="work-in-progress">Work in Progress</option>
                       <option value="ready-to-ship">Ready to Ship</option>
-                      <option value="delivered">Delivered</option>
+                      <option value="shipped">shipped</option>
                     </select>
                   </div>
                 </div>

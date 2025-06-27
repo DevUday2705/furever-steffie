@@ -2607,3 +2607,13 @@ export const validateForm = (formData, setErrors) => {
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
+
+
+export function formatStatus(text) {
+  return text
+    .split('-')                     // Split by hyphens
+    .map(word =>                    // Capitalize each word
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join(' ');                     // Join back with spaces
+}
