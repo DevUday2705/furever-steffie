@@ -34,7 +34,7 @@ const OrderProgressBar = ({ status }) => {
                 <motion.div
                   className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isCompleted
-                      ? "bg-blue-600 border-blue-600 text-white"
+                      ? "bg-gray-600 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-400"
                   }`}
                   initial={{ scale: 0.8 }}
@@ -68,7 +68,7 @@ const OrderProgressBar = ({ status }) => {
 
         {/* Progress Line - animated based on status */}
         <motion.div
-          className="absolute top-6 bg-blue-600 h-0.5"
+          className="absolute top-6 bg-gray-600 h-0.5"
           style={{
             left: "24px", // Half of circle width (48px/2)
           }}
