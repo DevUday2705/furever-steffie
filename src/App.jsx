@@ -44,7 +44,7 @@ const App = () => {
     <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between px-4 py-3">
         {/* Left: Hamburger & Search */}
-        <div className="flex items-center gap-3 min-w-[100px] justify-start">
+        <div className="flex items-center gap-1 min-w-[100px] justify-start">
           <HamburgerMenu />
           <Search size={20} />
         </div>
