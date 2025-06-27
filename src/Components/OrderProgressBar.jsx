@@ -32,7 +32,7 @@ const OrderProgressBar = ({ status }) => {
               >
                 {/* Step Circle */}
                 <motion.div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                  className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isCompleted
                       ? "bg-gray-600 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-400"
@@ -59,7 +59,7 @@ const OrderProgressBar = ({ status }) => {
 
         {/* Background Line - positioned absolutely to go through circles */}
         <div
-          className="absolute top-6 bg-gray-200 h-0.5"
+          className="absolute top-4 bg-gray-200 h-0.5"
           style={{
             left: "24px", // Half of circle width (48px/2)
             right: "24px", // Half of circle width (48px/2)
@@ -68,7 +68,7 @@ const OrderProgressBar = ({ status }) => {
 
         {/* Progress Line - animated based on status */}
         <motion.div
-          className="absolute top-6 bg-gray-600 h-0.5"
+          className="absolute top-4 bg-gray-600 h-0.5"
           style={{
             left: "24px", // Half of circle width (48px/2)
           }}

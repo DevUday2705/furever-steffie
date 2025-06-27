@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { Menu, X, ChevronRight, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HamburgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const menuItems = [
+    {
+      title: "Home",
+      items: [],
+    },
     {
       title: "Male",
       items: ["Kurta", "Tuxedo", "Bandana", "Bowtie"],
@@ -41,9 +46,28 @@ const HamburgerMenu = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleItemClick = (item) => {
     console.log("Clicked:", item);
-    // Add your navigation logic here
+
+    const lower = item.toLowerCase();
+    switch (lower) {
+      case "home":
+        navigate("/");
+        break;
+      case "contact us":
+        navigate("/contact");
+        break;
+      case "kurta":
+        navigate("/kurta");
+        break;
+      default:
+        // Optionally handle other routes or log
+        break;
+    }
+
+    setIsOpen(false); // Close the menu after navigation
   };
 
   return (
@@ -114,7 +138,13 @@ const HamburgerMenu = () => {
               >
                 {/* Main Menu Item */}
                 <button
-                  onClick={() => toggleSubmenu(index)}
+                  onClick={() => {
+                    if (menuItem.items.length > 0) {
+                      toggleSubmenu(index);
+                    } else {
+                      handleItemClick(menuItem.title);
+                    }
+                  }}
                   className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-all duration-300 group transform hover:scale-[1.02] ${
                     activeSubmenu === index
                       ? "bg-gradient-to-r from-gray-50 to-gray-50 text-gray-700 shadow-lg scale-[1.02]"
