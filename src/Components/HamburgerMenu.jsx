@@ -73,7 +73,7 @@ const HamburgerMenu = () => {
   return (
     <>
       {/* Menu Button */}
-      <div className="relative z-50">
+      <div className="relative z-50 mr-3">
         <button
           onClick={toggleMenu}
           className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300"

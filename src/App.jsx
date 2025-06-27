@@ -42,17 +42,17 @@ const App = () => {
 
   return (
     <div className=" max-w-md mx-auto ">
-      <nav className="flex items-center  justify-between py-5 px-2">
-        <div className="flex items-center space-x-2 flex-1">
+      <nav className="flex py-3 items-center justify-center">
+        <div className="flex items-center">
           <HamburgerMenu />
           <Search size={20} />
         </div>
         <div className="flex-1 flex justify-center">
           <Link to="/">
-            <img className="h-9 shrink-0 mr-2" src="/images/logo.png" />
+            <img className="h-9  shrink-0 " src="/images/logo.png" />
           </Link>
         </div>
-        <div className="flex-1 flex justify-end items-center gap-2">
+        <div className="flex items-center">
           <CurrencySelector currency={currency} setCurrency={setCurrency} />
           <CartNav />
         </div>

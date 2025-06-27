@@ -23,13 +23,13 @@ const CurrencySelector = ({ currency, setCurrency }) => {
   };
 
   return (
-    <div className="relative ml-5">
+    <div className="relative mr-2">
       {/* Main Button */}
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center text-sm space-x-3 mr-5 bg-white/70 hover:bg-white/90 border border-gray-200/50 hover:border-gray-300/50 rounded-xl px-2 py-1.5  transition-all duration-300 backdrop-blur-sm min-w-[50px]"
+        className="flex items-center text-sm space-x-3  bg-white/70 hover:bg-white/90 border border-gray-200/50 hover:border-gray-300/50 rounded-xl px-2 py-1.5  transition-all duration-300 backdrop-blur-sm min-w-[50px]"
       >
         <span className="text-lg">{selectedCurrency.flag}</span>
         {/* <span className="font-medium text-gray-700 flex-1 text-left">
