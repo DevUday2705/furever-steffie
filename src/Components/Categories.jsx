@@ -55,7 +55,7 @@ const Categories = () => {
       name: "Frock",
       description: "Playful Frills",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745435467/Frock_pmzqlp.jpg",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/cherry_red_polka_dot_frock_d3cspz.webp",
     },
     {
       id: 5,

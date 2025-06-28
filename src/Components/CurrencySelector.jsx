@@ -32,7 +32,7 @@ const CurrencySelector = ({ currency, setCurrency }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 bg-white border rounded shadow w-36">
+        <div className="absolute z-50 mt-1 bg-white border rounded shadow w-36">
           {currencies.map((curr) => (
             <button
               key={curr.value}
