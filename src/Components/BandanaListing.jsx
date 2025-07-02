@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 
-import { kurtas } from "../constants/constant";
-
 import ProductListing from "./ProductListing";
+import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const BandanaListing = () => {
   const [isLoading, setIsLoading] = useState(true);
-
+  const { kurtas: data } = useFirestoreCollection("kurtas");
   // 1) Base list
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500);

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { frocks, kurtas } from "../constants/constant"; // Import all types separately
+import { frocks } from "../constants/constant"; // Import all types separately
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
@@ -23,7 +23,6 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("simple");
@@ -44,6 +43,7 @@ const ProductDetail = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState([]);
+  const { data: kurtas } = useFirestoreCollection("kurtas");
 
   const scrollTo = useCallback(
     (index) => emblaApi?.scrollTo(index),

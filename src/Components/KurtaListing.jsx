@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
-
-import { kurtas } from "../constants/constant";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase"; // adjust path
 
 import ProductListing from "./ProductListing";
 
 const KurtaListing = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState([]);
 
-  // 1) Base list
+  // Fetch products from Firestore
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 500);
+    const fetchKurtas = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "kurtas"));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching kurtas:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchKurtas();
   }, []);
 
   if (isLoading) {
@@ -26,7 +42,7 @@ const KurtaListing = () => {
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="kurta"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
-      products={kurtas}
+      products={products}
       bannerTitle="Elegant Kurtas for Every Pet Personality"
     />
   );

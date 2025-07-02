@@ -28,6 +28,8 @@ const ProductListing = ({
   products,
 }) => {
   const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search")?.toLowerCase() || "";
+
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +50,12 @@ const ProductListing = ({
   useEffect(() => {
     const query = new URLSearchParams();
 
+    // 🔁 Preserve existing ?search param
+    const currentSearch = searchParams.get("search");
+    if (currentSearch) {
+      query.set("search", currentSearch);
+    }
+
     if (filters.sortBy === "price-asc") query.set("sort", "asc");
     else if (filters.sortBy === "price-desc") query.set("sort", "desc");
     else if (filters.sortBy === "popularity") query.set("sort", "popularity");
@@ -63,13 +71,14 @@ const ProductListing = ({
     if (filters.maxPrice !== filters.priceLimit)
       query.set("price", filters.maxPrice.toString());
 
+    // ✅ Final fixed navigation
     navigate(`${location.pathname}?${query.toString()}`, { replace: true });
-  }, [filters, navigate, location.pathname]);
+  }, [filters, navigate, location.pathname, searchParams]);
 
   const { currency, rate } = useContext(CurrencyContext);
 
   const baseList = useMemo(() => [...products], [products]);
-  const filtered = useProductFilter(baseList, filters);
+  const filtered = useProductFilter(baseList, filters, searchQuery);
   const activeFilterCount = useMemo(() => {
     return Object.entries(filters).reduce((count, [key, value]) => {
       const ignoredKeys = [
