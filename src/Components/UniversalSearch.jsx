@@ -21,10 +21,7 @@ const UniversalSearchBar = () => {
   };
 
   const handleClick = (category) => {
-    // navigate(`/${category}?search=${encodeURIComponent(query)}`);
-    console.log(
-      `Hello - Navigating to /${category}?search=${encodeURIComponent(query)}`
-    );
+    navigate(`/${category}?search=${encodeURIComponent(query)}`);
   };
 
   return (

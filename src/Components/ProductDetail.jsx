@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, Check } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { frocks } from "../constants/constant"; // Import all types separately
+// import { frocks } from "../constants/constant"; // Import all types separately
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
@@ -15,6 +15,9 @@ import BottomActions from "../Components/ProductDetail/BottomActions";
 import ProductMeasurements from "../Components/ProductDetail/ProductMeasurements";
 import ReadyMadeSizeSelector from "../Components/ReadyMadeSizeSelector";
 import SmartPetSizing from "../Components/SmartPetSizing";
+import { useFirestoreCollection } from "../hooks/fetchCollection";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -64,61 +67,59 @@ const ProductDetail = () => {
   }, [emblaApi, onSelect]);
 
   useEffect(() => {
-    const fetchProduct = () => {
-      let productArray = [];
+    const fetchProduct = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, typePart + "s")); // e.g. "kurtas"
+        const allProducts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        const foundProduct = allProducts.find((p) => p.id === idPart);
 
-      // 👇 Based on type
-      if (typePart === "kurta") productArray = kurtas;
-      else if (typePart === "frock") productArray = frocks;
-      else if (typePart === "bow") productArray = bows;
-      else if (typePart === "lehnga") productArray = lehngas;
-      else if (typePart === "tuxedo") productArray = tuxedos;
-      else return null; // Invalid type
+        if (foundProduct) {
+          setProduct(foundProduct);
+          setIsBeaded(foundProduct.defaultOptions?.isBeaded ?? true);
+          setIsFullSet(foundProduct.defaultOptions?.isFullSet ?? false);
+          setSelectedSize(foundProduct.defaultOptions?.size ?? "S");
 
-      return productArray.find((p) => p.id === idPart) || null;
-    };
+          const defaultColor =
+            foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
+          setSelectedColor(defaultColor);
 
-    setTimeout(() => {
-      const foundProduct = fetchProduct();
+          const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
 
-      if (foundProduct) {
-        setProduct(foundProduct);
-        setIsBeaded(foundProduct.defaultOptions?.isBeaded ?? true);
-        setIsFullSet(foundProduct.defaultOptions?.isFullSet ?? false);
-        setSelectedSize(foundProduct.defaultOptions?.size ?? "S");
-
-        // NEW: Set default color
-        const defaultColor =
-          foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
-        setSelectedColor(defaultColor);
-
-        // NEW: Updated image logic for colors
-        const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
-        if (foundProduct.colors && foundProduct.colors.length > 0) {
-          const colorData = foundProduct.colors.find(
-            (c) => c.id === defaultColor
-          );
-          if (colorData?.options) {
+          if (foundProduct.colors && foundProduct.colors.length > 0) {
+            const colorData = foundProduct.colors.find(
+              (c) => c.id === defaultColor
+            );
+            if (colorData?.options) {
+              setImages(
+                defaultIsBeaded
+                  ? colorData.options.beaded?.images ?? []
+                  : colorData.options.nonBeaded?.images ?? []
+              );
+            }
+          } else if (foundProduct.options) {
             setImages(
               defaultIsBeaded
-                ? colorData.options.beaded?.images ?? []
-                : colorData.options.nonBeaded?.images ?? []
+                ? foundProduct.options.beaded?.images ?? []
+                : foundProduct.options.nonBeaded?.images ?? []
             );
+          } else {
+            setImages([foundProduct.mainImage]);
           }
-        } else if (foundProduct.options) {
-          // Fallback to old structure
-          setImages(
-            defaultIsBeaded
-              ? foundProduct.options.beaded?.images ?? []
-              : foundProduct.options.nonBeaded?.images ?? []
-          );
         } else {
-          setImages([foundProduct.mainImage]);
+          setProduct(null);
         }
-      }
 
-      setIsLoading(false);
-    }, 500);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading product:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
   }, [productId]);
 
   useEffect(() => {

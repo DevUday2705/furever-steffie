@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
 
-import { frocks } from "../constants/constant";
-
 import ProductListing from "./ProductListing";
+import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const FrockListing = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  // 1) Base list
-  useEffect(() => {
-    setTimeout(() => setIsLoading(false), 500);
-  }, []);
+  const { data: frocks, isLoading } = useFirestoreCollection("frocks");
 
   if (isLoading) {
     return (

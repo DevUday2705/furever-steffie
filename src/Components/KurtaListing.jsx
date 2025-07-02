@@ -3,31 +3,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // adjust path
 
 import ProductListing from "./ProductListing";
+import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const KurtaListing = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [products, setProducts] = useState([]);
-
-  // Fetch products from Firestore
-  useEffect(() => {
-    const fetchKurtas = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "kurtas"));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching kurtas:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchKurtas();
-  }, []);
-
+  const { data: kurtas, isLoading } = useFirestoreCollection("kurtas");
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -42,7 +21,7 @@ const KurtaListing = () => {
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="kurta"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
-      products={products}
+      products={kurtas}
       bannerTitle="Elegant Kurtas for Every Pet Personality"
     />
   );
