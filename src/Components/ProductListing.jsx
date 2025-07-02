@@ -1,7 +1,12 @@
 // components/ProductListing.jsx
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import FilterDrawer from "./FilterDrawer";
 import { useProductFilter } from "../hooks/useProductFilter";
 import {
@@ -22,6 +27,9 @@ const ProductListing = ({
   bannerTitle,
   products,
 }) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [filters, setFilters] = useState({
@@ -37,6 +45,27 @@ const ProductListing = ({
     categories: ["all"],
     categoryOptions: ["all", "royal"],
   });
+  useEffect(() => {
+    const query = new URLSearchParams();
+
+    if (filters.sortBy === "price-asc") query.set("sort", "asc");
+    else if (filters.sortBy === "price-desc") query.set("sort", "desc");
+    else if (filters.sortBy === "popularity") query.set("sort", "popularity");
+
+    if (filters.categories.length) query.set("type", filters.categories[0]);
+    if (filters.sizes.length) query.set("sizes", filters.sizes.join(","));
+
+    if (filters.styleBeaded) query.set("beaded", "1");
+    if (filters.styleSimple) query.set("simple", "1");
+    if (filters.inStockOnly) query.set("stock", "1");
+    if (filters.customColor) query.set("custom", "1");
+
+    if (filters.maxPrice !== filters.priceLimit)
+      query.set("price", filters.maxPrice.toString());
+
+    navigate(`${location.pathname}?${query.toString()}`, { replace: true });
+  }, [filters, navigate, location.pathname]);
+
   const { currency, rate } = useContext(CurrencyContext);
 
   const baseList = useMemo(() => [...products], [products]);
@@ -59,12 +88,40 @@ const ProductListing = ({
     }, 0);
   }, [filters]);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500);
   }, []);
+  useEffect(() => {
+    const getBoolean = (val) => val === "1";
+    const getArray = (val) => (val ? val.split(",") : []);
 
+    const updatedFilters = {
+      sortBy:
+        searchParams.get("sort") === "asc"
+          ? "price-asc"
+          : searchParams.get("sort") === "desc"
+          ? "price-desc"
+          : searchParams.get("sort") === "popularity"
+          ? "popularity"
+          : "",
+
+      categories: searchParams.get("type") ? [searchParams.get("type")] : [],
+
+      sizes: getArray(searchParams.get("sizes")),
+      styleBeaded: getBoolean(searchParams.get("beaded")),
+      styleSimple: getBoolean(searchParams.get("simple")),
+      inStockOnly: getBoolean(searchParams.get("stock")),
+      customColor: getBoolean(searchParams.get("custom")),
+      maxPrice: Number(searchParams.get("price")) || 2000,
+
+      // Keep static values intact
+      priceLimit: 2000,
+      sizeOptions: ["XS", "S", "M", "L", "XL", "XXL"],
+      categoryOptions: ["all", "royal"],
+    };
+
+    setFilters(updatedFilters);
+  }, []);
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
