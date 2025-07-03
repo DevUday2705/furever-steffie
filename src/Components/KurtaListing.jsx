@@ -14,7 +14,7 @@ const KurtaListing = () => {
       </div>
     );
   }
-
+  console.log(kurtas);
   return (
     <ProductListing
       title="All Kurtas"

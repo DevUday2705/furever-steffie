@@ -86,9 +86,15 @@ const ProductDetail = () => {
             foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
           setSelectedColor(defaultColor);
 
+          const isKurta = foundProduct.type === "kurta";
           const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
 
-          if (foundProduct.colors && foundProduct.colors.length > 0) {
+          // 👇 Combine all beaded & non-beaded images if kurta
+          if (isKurta) {
+            const beadedImgs = foundProduct.options?.beaded?.images || [];
+            const nonBeadedImgs = foundProduct.options?.nonBeaded?.images || [];
+            setImages([...beadedImgs, ...nonBeadedImgs]);
+          } else if (foundProduct.colors?.length > 0) {
             const colorData = foundProduct.colors.find(
               (c) => c.id === defaultColor
             );
@@ -123,7 +129,8 @@ const ProductDetail = () => {
   }, [productId]);
 
   useEffect(() => {
-    if (!product) return;
+    if (!product || product.type === "kurta") return; // ⛔ Skip if kurta
+
     if (product.colors && selectedColor) {
       const colorData = product.colors.find((c) => c.id === selectedColor);
       if (colorData?.options) {
@@ -135,6 +142,7 @@ const ProductDetail = () => {
         return;
       }
     }
+
     if (product.options) {
       setImages(
         isBeaded

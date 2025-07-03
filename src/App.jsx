@@ -29,6 +29,7 @@ import CartNav from "./Components/CartNav";
 import MaleBowCategories from "./Components/MaleBowCategories";
 import ThankYouPage from "./Components/ThankYouPage";
 import BowTieCategories from "./Components/BowTieCategories";
+import ComingSoonPoster from "./Components/ComingSoon";
 
 import KurtaListing from "./Components/KurtaListing";
 import TuxedoListing from "./Components/TuxedoListing";
@@ -45,9 +46,13 @@ import HamburgerMenu from "./Components/HamburgerMenu";
 import TrackOrder from "./Components/TrackOrder";
 import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
+import ProductForm from "./Components/ProductForm";
+import AdminHome from "./Components/AdminHome";
+import AdminProducts from "./Components/AdminProducts";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
+  const comingSoonFlag = true;
   return (
     <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between px-4 py-3">
@@ -79,7 +84,10 @@ const App = () => {
 
       <div className="max-w-md mx-auto">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={!comingSoonFlag ? <Home /> : <ComingSoonPoster />}
+          />
           <Route path="/kurta" element={<KurtaListing />} />
           <Route path="/frock" element={<FrockListing />} />
           <Route path="/tuxedo" element={<TuxedoListing />} />
@@ -105,12 +113,16 @@ const App = () => {
           <Route path="/cancellations" element={<CancellationsRefundsPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin" element={<AdminHome />} />
+          <Route path="/admin/orders" element={<AdminPage />} />
           <Route path="/inventory" element={<FabricManagementSystem />} />
           <Route path="/stock" element={<StockManager />} />
           <Route path="/track" element={<TrackOrder />} />
           <Route path="/upload" element={<UploadKurtasPage />} />
           <Route path="/search" element={<UniversalSearchBar />} />
+          <Route path="/admin/product" element={<AdminProducts />} />
+          <Route path="/admin/add/:category" element={<ProductForm />} />
+          <Route path="/admin/edit/:category/:id" element={<ProductForm />} />
         </Routes>
       </div>
       <Toaster />
