@@ -29,7 +29,7 @@ const UniversalSearchBar = () => {
   };
 
   return (
-    <div className="relative w-full mt-5 max-w-md mx-auto">
+    <div className="relative  w-full mt-5 mx-auto max-w-sm">
       <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-purple-500 transition">
         <Search size={18} className="text-gray-500" />
         <input

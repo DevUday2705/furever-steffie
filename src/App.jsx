@@ -7,7 +7,13 @@ import FinalReceipt from "./Components/FinalReceipt";
 import ModernOptions from "./Components/ModernOptions";
 import ProductDetail from "./Components/ProductDetail";
 import Cart from "./Components/Cart";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home";
 import OrderReviewPage from "./Components/OrderReviewPage";
@@ -41,14 +47,20 @@ import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
-
+  const navigate = useNavigate();
   return (
     <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between px-4 py-3">
         {/* Left: Hamburger & Search */}
         <div className="flex items-center gap-1 min-w-[100px] justify-start">
           <HamburgerMenu />
-          <Search size={20} />
+          <Search
+            className="cursor-pointer"
+            onClick={() => {
+              navigate("/search");
+            }}
+            size={20}
+          />
         </div>
 
         {/* Center: Logo */}
