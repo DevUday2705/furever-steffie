@@ -52,7 +52,7 @@ import AdminProducts from "./Components/AdminProducts";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const comingSoonFlag = true;
+
   return (
     <div className=" max-w-md mx-auto ">
       <nav className="flex items-center justify-between px-4 py-3">
@@ -84,10 +84,7 @@ const App = () => {
 
       <div className="max-w-md mx-auto">
         <Routes>
-          <Route
-            path="/"
-            element={!comingSoonFlag ? <Home /> : <ComingSoonPoster />}
-          />
+          <Route path="/" element={<Home />} />
           <Route path="/kurta" element={<KurtaListing />} />
           <Route path="/frock" element={<FrockListing />} />
           <Route path="/tuxedo" element={<TuxedoListing />} />
