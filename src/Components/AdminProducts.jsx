@@ -159,7 +159,7 @@ const AdminProducts = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-3">
                 {products.map((item) => (
                   <div
                     key={item.id}

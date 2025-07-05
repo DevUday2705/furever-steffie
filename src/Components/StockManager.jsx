@@ -343,7 +343,7 @@ const StockManager = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-3 gap-2"
         >
           <AnimatePresence>
             {filteredItems.map((item) => (
@@ -352,7 +352,7 @@ const StockManager = () => {
                 variants={itemVariants}
                 layout
                 exit="exit"
-                className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300"
+                className="bg-white/90 p-2 backdrop-blur-sm rounded-lg  shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300"
               >
                 <div className="relative mb-4">
                   <img
@@ -369,55 +369,18 @@ const StockManager = () => {
                 </div>
 
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">
+                  <h3 className="text-xs font-bold text-gray-800 mb-1">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 text-sm">{item.fabric}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm text-gray-500">Total Stock</span>
-                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="text-sm text-gray-500">Stock</span>
+                    <span className="px-3 py-1 rounded-full text-sm font-medium">
                       {getTotalStock(item)}
                     </span>
                   </div>
                 </div>
 
                 {/* Size Management */}
-                <div className="space-y-3">
-                  {sizes.map((size) => (
-                    <div
-                      key={size}
-                      className="flex items-center justify-between bg-gray-50 rounded-xl p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium text-gray-700 w-6">
-                          {size}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {item.sizes?.[size] || 0} units
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleUpdateStock(item.id, size, -1)}
-                          className="bg-red-100 hover:bg-red-200 text-red-600 p-1.5 rounded-lg transition-colors"
-                          disabled={(item.sizes?.[size] || 0) === 0}
-                        >
-                          <Minus size={14} />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleUpdateStock(item.id, size, 1)}
-                          className="bg-green-100 hover:bg-green-200 text-green-600 p-1.5 rounded-lg transition-colors"
-                        >
-                          <Plus size={14} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
 
                 {/* Actions */}
                 <div className="flex gap-2 mt-4">
@@ -431,19 +394,17 @@ const StockManager = () => {
                         imagePreview: item.image,
                       })
                     }
-                    className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-600 py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-600 py-1 px-2 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                   >
                     <Edit3 size={16} />
-                    Edit
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDeleteItem(item.id)}
-                    className="flex-1 bg-red-100 hover:bg-red-200 text-red-600 py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-red-100 hover:bg-red-200 text-red-600 py-1 px-2 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                   >
                     <Trash2 size={16} />
-                    Delete
                   </motion.button>
                 </div>
               </motion.div>
