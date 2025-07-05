@@ -61,14 +61,16 @@ const ProductOptions = ({
     const availableOptions = [];
 
     // Always available options
-    availableOptions.push(
-      { id: "simple", label: "Simple", description: "Classic look" },
-      {
-        id: "tassels",
-        label: "Tassels",
-        description: "With decorative tassels",
-      }
-    );
+    if (product.type == "kurta") {
+      availableOptions.push(
+        { id: "simple", label: "Simple", description: "Classic look" },
+        {
+          id: "tassels",
+          label: "Tassels",
+          description: "With decorative tassels",
+        }
+      );
+    }
 
     // Add beaded options only if beaded is available
     if (product.isBeadedAvailable) {
@@ -190,7 +192,7 @@ const ProductOptions = ({
       />
 
       {/* STYLE OPTIONS */}
-      {["kurta", "lehnga", "tuxedo"].includes(product.type) &&
+      {["kurta", "lehnga"].includes(product.type) &&
         (isBeadedAvailable || isNonBeadedAvailable) && (
           <div>
             <h3 className="text-xs font-medium text-gray-900">Style</h3>

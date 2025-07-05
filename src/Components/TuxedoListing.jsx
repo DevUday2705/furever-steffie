@@ -1,20 +1,29 @@
-import React from "react";
-import Lottie from "react-lottie";
-import comingSoon from "../../public/animation/coming-soon.json";
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData: comingSoon,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
-  },
-};
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase"; // adjust path
+
+import ProductListing from "./ProductListing";
+import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const TuxedoListing = () => {
+  const { data: tuxedos, isLoading } = useFirestoreCollection("tuxedos");
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen w-full flex items-start justify-center ">
-      <Lottie options={defaultOptions} height={200} />
-    </div>
+    <ProductListing
+      title="All Kurtas"
+      subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
+      category="kurta"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+      products={tuxedos}
+      bannerTitle="Elegant Kurtas for Every Pet Personality"
+    />
   );
 };
 

@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 
-const collections = ["kurtas", "frocks"];
+const collections = ["kurtas", "frocks", "tuxedos"];
 
 const AdminProducts = () => {
   const [selectedCollection, setSelectedCollection] = useState(null);

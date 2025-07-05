@@ -16,6 +16,10 @@ import {
   AlertCircle,
   Flame,
   CrownIcon,
+  ArrowRightCircle,
+  ArrowRightFromLine,
+  ArrowBigRightDash,
+  ArrowDownAz,
 } from "lucide-react";
 import { CurrencyContext } from "../context/currencyContext";
 
@@ -285,7 +289,7 @@ const ProductListing = ({
                     >
                       {product.name}
                     </h3>
-                    <div className="flex flex-col h-16">
+                    <div className="flex flex-col ">
                       <div className="flex items-baseline flex-wrap">
                         <span className="text-sm font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
                           {currencySymbols[currency] || currency} {currentPrice}
@@ -310,10 +314,6 @@ const ProductListing = ({
                           Only few left
                         </span>
                       )} */}
-                      <div className="flex-grow" />
-                      <div className="flex justify-end mt-1 text-xs font-medium text-gray-800">
-                        View Details →
-                      </div>
                     </div>
                   </div>
                 </Link>
