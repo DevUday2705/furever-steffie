@@ -43,6 +43,67 @@ const defaultSchema = {
     nonBeaded: { images: [] },
   },
 };
+// Schema configurations for different categories
+const schemaConfigurations = {
+  kurta: {
+    additionalFields: [],
+    excludedFields: [],
+  },
+  frock: {
+    additionalFields: ["colors"],
+    excludedFields: [],
+    fieldDefaults: {
+      colors: [],
+    },
+  },
+  // Add more categories as needed
+  tuxedo: {
+    additionalFields: ["colors"],
+    excludedFields: ["dhotis"],
+    fieldDefaults: {
+      colors: [],
+    },
+  },
+};
+
+// Default item structures for array fields
+const defaultArrayItems = {
+  colors: {
+    colorCode: "",
+    id: "",
+    name: "",
+    options: {
+      nonBeaded: {
+        images: [],
+      },
+    },
+  },
+  dhotis: {
+    name: "",
+    id: "",
+    image: "",
+  },
+};
+const generateSchemaForCategory = (category) => {
+  const config = schemaConfigurations[category];
+  if (!config) return defaultSchema;
+
+  let schema = { ...defaultSchema };
+
+  // Add additional fields with their defaults
+  config.additionalFields?.forEach((field) => {
+    if (config.fieldDefaults?.[field] !== undefined) {
+      schema[field] = config.fieldDefaults[field];
+    }
+  });
+
+  // Remove excluded fields
+  config.excludedFields?.forEach((field) => {
+    delete schema[field];
+  });
+
+  return schema;
+};
 
 const ProductForm = () => {
   const { category, id } = useParams();
@@ -50,7 +111,10 @@ const ProductForm = () => {
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
-  const [formData, setFormData] = useState(defaultSchema);
+  const [formData, setFormData] = useState(() =>
+    generateSchemaForCategory(category)
+  );
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -70,8 +134,9 @@ const ProductForm = () => {
             console.log("Fetched data:", data);
 
             // Create a deep copy of defaultSchema
-            const merged = JSON.parse(JSON.stringify(defaultSchema));
-
+            const merged = JSON.parse(
+              JSON.stringify(generateSchemaForCategory(category))
+            );
             const deepMerge = (target, source) => {
               for (const key in source) {
                 if (source[key] !== null && source[key] !== undefined) {
@@ -478,57 +543,188 @@ const ProductForm = () => {
           </div>
         ))}
 
+        {!schemaConfigurations[category]?.excludedFields?.includes(
+          "dhotis"
+        ) && (
+          <div className="border p-4 rounded">
+            <h2 className="font-semibold mb-2">Dhotis</h2>
+            {formData.dhotis.map((dhoti, idx) => (
+              <div key={idx} className="grid grid-cols-4 gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={dhoti.name || ""}
+                  onChange={(e) =>
+                    handleArrayChange("dhotis", idx, "name", e.target.value)
+                  }
+                  className="border px-2 py-1 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="ID"
+                  value={dhoti.id || ""}
+                  onChange={(e) =>
+                    handleArrayChange("dhotis", idx, "id", e.target.value)
+                  }
+                  className="border px-2 py-1 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="Image URL"
+                  value={dhoti.image || ""}
+                  onChange={(e) =>
+                    handleArrayChange("dhotis", idx, "image", e.target.value)
+                  }
+                  className="border px-2 py-1 rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeFromArray("dhotis", idx)}
+                  className="text-red-600 px-2 py-1 border border-red-300 rounded text-sm"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                addToArray("dhotis", { name: "", id: "", image: "" })
+              }
+              className="text-sm text-blue-600 border border-blue-300 px-3 py-1 rounded"
+            >
+              + Add Dhoti
+            </button>
+          </div>
+        )}
         {/* Dhotis Section */}
-        <div className="border p-4 rounded">
-          <h2 className="font-semibold mb-2">Dhotis</h2>
-          {formData.dhotis.map((dhoti, idx) => (
-            <div key={idx} className="grid grid-cols-4 gap-2 mb-2">
-              <input
-                type="text"
-                placeholder="Name"
-                value={dhoti.name || ""}
-                onChange={(e) =>
-                  handleArrayChange("dhotis", idx, "name", e.target.value)
-                }
-                className="border px-2 py-1 rounded"
-              />
-              <input
-                type="text"
-                placeholder="ID"
-                value={dhoti.id || ""}
-                onChange={(e) =>
-                  handleArrayChange("dhotis", idx, "id", e.target.value)
-                }
-                className="border px-2 py-1 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Image URL"
-                value={dhoti.image || ""}
-                onChange={(e) =>
-                  handleArrayChange("dhotis", idx, "image", e.target.value)
-                }
-                className="border px-2 py-1 rounded"
-              />
-              <button
-                type="button"
-                onClick={() => removeFromArray("dhotis", idx)}
-                className="text-red-600 px-2 py-1 border border-red-300 rounded text-sm"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() =>
-              addToArray("dhotis", { name: "", id: "", image: "" })
-            }
-            className="text-sm text-blue-600 border border-blue-300 px-3 py-1 rounded"
-          >
-            + Add Dhoti
-          </button>
-        </div>
+
+        {schemaConfigurations[category]?.additionalFields?.includes(
+          "colors"
+        ) && (
+          <div className="border p-4 rounded">
+            <h2 className="font-semibold mb-2">Colors</h2>
+            {formData.colors?.map((color, idx) => (
+              <div key={idx} className="border p-3 mb-3 rounded bg-gray-50">
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Color Name"
+                    value={color.name || ""}
+                    onChange={(e) =>
+                      handleArrayChange("colors", idx, "name", e.target.value)
+                    }
+                    className="border px-2 py-1 rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Color Code"
+                    value={color.colorCode || ""}
+                    onChange={(e) =>
+                      handleArrayChange(
+                        "colors",
+                        idx,
+                        "colorCode",
+                        e.target.value
+                      )
+                    }
+                    className="border px-2 py-1 rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="ID"
+                    value={color.id || ""}
+                    onChange={(e) =>
+                      handleArrayChange("colors", idx, "id", e.target.value)
+                    }
+                    className="border px-2 py-1 rounded"
+                  />
+                </div>
+
+                <div className="mt-2">
+                  <label className="block text-xs font-medium mb-1">
+                    Non-Beaded Images
+                  </label>
+                  {color.options?.nonBeaded?.images?.map(
+                    (imageUrl, imageIdx) => (
+                      <div key={imageIdx} className="flex gap-2 mb-1">
+                        <input
+                          type="text"
+                          value={imageUrl}
+                          placeholder="Image URL"
+                          onChange={(e) => {
+                            const newImages = [
+                              ...(color.options?.nonBeaded?.images || []),
+                            ];
+                            newImages[imageIdx] = e.target.value;
+                            handleArrayChange("colors", idx, "options", {
+                              ...color.options,
+                              nonBeaded: {
+                                ...color.options?.nonBeaded,
+                                images: newImages,
+                              },
+                            });
+                          }}
+                          className="flex-1 border px-2 py-1 rounded text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = (
+                              color.options?.nonBeaded?.images || []
+                            ).filter((_, i) => i !== imageIdx);
+                            handleArrayChange("colors", idx, "options", {
+                              ...color.options,
+                              nonBeaded: {
+                                ...color.options?.nonBeaded,
+                                images: newImages,
+                              },
+                            });
+                          }}
+                          className="text-red-600 px-2 py-1 border border-red-300 rounded text-xs"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentImages =
+                        color.options?.nonBeaded?.images || [];
+                      handleArrayChange("colors", idx, "options", {
+                        ...color.options,
+                        nonBeaded: {
+                          ...color.options?.nonBeaded,
+                          images: [...currentImages, ""],
+                        },
+                      });
+                    }}
+                    className="text-xs text-blue-600 border border-blue-300 px-2 py-1 rounded"
+                  >
+                    + Add Image
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => removeFromArray("colors", idx)}
+                  className="text-red-600 px-2 py-1 border border-red-300 rounded text-sm mt-2"
+                >
+                  Remove Color
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => addToArray("colors", defaultArrayItems.colors)}
+              className="text-sm text-blue-600 border border-blue-300 px-3 py-1 rounded"
+            >
+              + Add Color
+            </button>
+          </div>
+        )}
 
         <div className="flex gap-4 pt-4">
           <button

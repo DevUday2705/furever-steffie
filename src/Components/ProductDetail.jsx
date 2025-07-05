@@ -250,7 +250,7 @@ const ProductDetail = () => {
 
   const requiresMeasurements =
     categoriesThatRequireMeasurements.includes(typePart);
-
+  console.log(product);
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <BackButton onClick={handleGoBack} />
