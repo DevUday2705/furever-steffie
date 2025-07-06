@@ -1,28 +1,9 @@
-import React, { useState, useRef, useContext } from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import domtoimage from "dom-to-image";
 
-import {
-  ChevronLeft,
-  Check,
-  AlertTriangle,
-  Download,
-  Share2,
-  CheckCircle,
-  CreditCard,
-  Building,
-  Copy,
-  AlertCircle,
-  User,
-  Info,
-  Smartphone,
-  MessageCircle,
-  ArrowRight,
-  ChevronDown,
-} from "lucide-react";
-import { toPng } from "html-to-image";
-import { AnimatePresence, motion } from "framer-motion";
-import { QRCode } from "react-qrcode-logo";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { ChevronLeft, AlertTriangle } from "lucide-react";
+import { db } from "../firebase";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
@@ -33,7 +14,8 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart } = useAppContext();
-  const { orderDetails, sizeConfirmed } = location.state || {};
+  const { orderDetails } = location.state || {};
+  const [abandonedDocId, setAbandonedDocId] = useState(null);
 
   const isCartCheckout = !orderDetails;
   // Form state
@@ -115,15 +97,29 @@ const CheckoutPage = () => {
     return Math.round(subtotal - discountAmount + deliveryCharge);
   };
   // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormSubmitted(true);
-
+  const handleSubmit = async (e) => {
     if (validateForm(formData, setErrors)) {
       localStorage.setItem("customer", JSON.stringify(formData));
       if (!isCartCheckout) {
         localStorage.setItem("order", JSON.stringify(orderDetails));
       }
+
+      // 🔥 Save abandoned order
+      try {
+        const docRef = await addDoc(collection(db, "abandonedOrders"), {
+          customer: formData,
+          cart: orderDetails,
+          timestamp: new Date(),
+          status: "pending_payment",
+          source: "form_submitted",
+          abandoned: true,
+          paymentAttempted: false,
+        });
+        setAbandonedDocId(docRef.id);
+      } catch (err) {
+        console.error("Failed to save abandoned order:", err);
+      }
+
       handlePayment();
     }
   };
@@ -175,6 +171,9 @@ const CheckoutPage = () => {
       name: "Furever Steffie",
       description: "Order Payment",
       order_id: data.id,
+      notes: {
+        abandonedDocId: abandonedDocId || "", // Pass this to Razorpay for access in handler
+      },
       handler: async function (response) {
         const verifyRes = await fetch("/api/verify-payment", {
           method: "POST",
@@ -185,6 +184,13 @@ const CheckoutPage = () => {
         const verifyData = await verifyRes.json();
 
         if (verifyData.success) {
+          if (abandonedDocId) {
+            await updateDoc(doc(db, "abandonedOrders", abandonedDocId), {
+              status: "paid",
+              abandoned: false,
+              paymentAttempted: true,
+            });
+          }
           const saveRes = await fetch("/api/save-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
