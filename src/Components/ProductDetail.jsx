@@ -246,6 +246,7 @@ const ProductDetail = () => {
     "frock",
     "tuxedo",
     "dress",
+    "tut",
   ];
 
   const requiresMeasurements =

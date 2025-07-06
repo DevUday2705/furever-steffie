@@ -64,6 +64,13 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744096705/ChatGPT_Image_Apr_8_2025_11_45_38_AM_xdfndo.png",
     },
+    {
+      id: 6,
+      name: "Tutu Dress",
+      description: "Traditional Elegance",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/White_Whisper_with_Bow_dce8nr.webp",
+    },
 
     {
       id: 8,

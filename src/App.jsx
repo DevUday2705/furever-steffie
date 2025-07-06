@@ -49,79 +49,94 @@ import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
 import AdminProducts from "./Components/AdminProducts";
+import TutuListing from "./Components/TutuListing";
+import ComingSoonPage from "./Components/ComingSoon";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-
+  const ready = false;
   return (
     <div className=" max-w-md mx-auto ">
-      <nav className="flex items-center justify-between px-4 py-3">
-        {/* Left: Hamburger & Search */}
-        <div className="flex items-center gap-1 min-w-[100px] justify-start">
-          <HamburgerMenu />
-          <Search
-            className="cursor-pointer"
-            onClick={() => {
-              navigate("/search");
-            }}
-            size={20}
-          />
-        </div>
+      {ready ? (
+        <>
+          <nav className="flex items-center justify-between px-4 py-3">
+            {/* Left: Hamburger & Search */}
+            <div className="flex items-center gap-1 min-w-[100px] justify-start">
+              <HamburgerMenu />
+              <Search
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate("/search");
+                }}
+                size={20}
+              />
+            </div>
 
-        {/* Center: Logo */}
-        <div className="flex justify-center flex-1">
-          <Link to="/">
-            <img className="h-9" src="/images/logo.png" alt="Logo" />
-          </Link>
-        </div>
+            {/* Center: Logo */}
+            <div className="flex justify-center flex-1">
+              <Link to="/">
+                <img className="h-9" src="/images/logo.png" alt="Logo" />
+              </Link>
+            </div>
 
-        {/* Right: Currency & Cart */}
-        <div className="flex items-center gap-3 min-w-[100px] justify-end">
-          <CurrencySelector currency={currency} setCurrency={setCurrency} />
-          <CartNav />
-        </div>
-      </nav>
+            {/* Right: Currency & Cart */}
+            <div className="flex items-center gap-3 min-w-[100px] justify-end">
+              <CurrencySelector currency={currency} setCurrency={setCurrency} />
+              <CartNav />
+            </div>
+          </nav>
 
-      <div className="max-w-md mx-auto">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/kurta" element={<KurtaListing />} />
-          <Route path="/frock" element={<FrockListing />} />
-          <Route path="/tuxedo" element={<TuxedoListing />} />
-          <Route path="/bandana" element={<BandanaListing />} />
-          <Route path="/lehenga" element={<LehengaListing />} />
-          <Route path="/bow-tie" element={<BowTieCategories />} />
-          <Route path="/male-bows" element={<MaleBowCategories />} />
-          <Route path="/female-bows" element={<FemaleBowCategories />} />
-          <Route path="/product/:productId" element={<ProductDetail />} />
-          <Route path="/review" element={<OrderReviewPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/gender" element={<SelectGender />} />
-          <Route path="/style" element={<SelectStyle />} />
-          <Route path="/traditional" element={<FabricOptions />} />
-          <Route path="/modern" element={<ModernOptions />} />
-          <Route path="/product-detail/:id" element={<SelectedFabric />} />
-          <Route path="/order-form" element={<OrderForm />} />
-          <Route path="/final-receipt" element={<FinalReceipt />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/contact" element={<ContactUsPage />} />
-          <Route path="/policy" element={<ShippingPolicyPage />} />
-          <Route path="/terms" element={<TermsAndConditionsPage />} />
-          <Route path="/cancellations" element={<CancellationsRefundsPage />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/thank-you" element={<ThankYouPage />} />
-          <Route path="/admin" element={<AdminHome />} />
-          <Route path="/admin/orders" element={<AdminPage />} />
-          <Route path="/inventory" element={<FabricManagementSystem />} />
-          <Route path="/stock" element={<StockManager />} />
-          <Route path="/track" element={<TrackOrder />} />
-          <Route path="/upload" element={<UploadKurtasPage />} />
-          <Route path="/search" element={<UniversalSearchBar />} />
-          <Route path="/admin/product" element={<AdminProducts />} />
-          <Route path="/admin/add/:category" element={<ProductForm />} />
-          <Route path="/admin/edit/:category/:id" element={<ProductForm />} />
-        </Routes>
-      </div>
+          <div className="max-w-md mx-auto">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/kurta" element={<KurtaListing />} />
+              <Route path="/frock" element={<FrockListing />} />
+              <Route path="/tuxedo" element={<TuxedoListing />} />
+              <Route path="/bandana" element={<BandanaListing />} />
+              <Route path="/lehenga" element={<LehengaListing />} />
+              <Route path="/tutu-dress" element={<TutuListing />} />
+              <Route path="/bow-tie" element={<BowTieCategories />} />
+              <Route path="/male-bows" element={<MaleBowCategories />} />
+              <Route path="/female-bows" element={<FemaleBowCategories />} />
+              <Route path="/product/:productId" element={<ProductDetail />} />
+              <Route path="/review" element={<OrderReviewPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/gender" element={<SelectGender />} />
+              <Route path="/style" element={<SelectStyle />} />
+              <Route path="/traditional" element={<FabricOptions />} />
+              <Route path="/modern" element={<ModernOptions />} />
+              <Route path="/product-detail/:id" element={<SelectedFabric />} />
+              <Route path="/order-form" element={<OrderForm />} />
+              <Route path="/final-receipt" element={<FinalReceipt />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/contact" element={<ContactUsPage />} />
+              <Route path="/policy" element={<ShippingPolicyPage />} />
+              <Route path="/terms" element={<TermsAndConditionsPage />} />
+              <Route
+                path="/cancellations"
+                element={<CancellationsRefundsPage />}
+              />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/thank-you" element={<ThankYouPage />} />
+              <Route path="/admin" element={<AdminHome />} />
+              <Route path="/admin/orders" element={<AdminPage />} />
+              <Route path="/inventory" element={<FabricManagementSystem />} />
+              <Route path="/stock" element={<StockManager />} />
+              <Route path="/track" element={<TrackOrder />} />
+              <Route path="/upload" element={<UploadKurtasPage />} />
+              <Route path="/search" element={<UniversalSearchBar />} />
+              <Route path="/admin/product" element={<AdminProducts />} />
+              <Route path="/admin/add/:category" element={<ProductForm />} />
+              <Route
+                path="/admin/edit/:category/:id"
+                element={<ProductForm />}
+              />
+            </Routes>
+          </div>
+        </>
+      ) : (
+        <ComingSoonPage />
+      )}
       <Toaster />
     </div>
   );
