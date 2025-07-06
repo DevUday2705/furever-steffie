@@ -51,10 +51,12 @@ import AdminHome from "./Components/AdminHome";
 import AdminProducts from "./Components/AdminProducts";
 import TutuListing from "./Components/TutuListing";
 import ComingSoonPage from "./Components/ComingSoon";
+import FemaleBandanas from "./Components/BandanaListing";
+import MaleBandanas from "./Components/MaleBandanas";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const ready = false;
+  const ready = true;
   return (
     <div className=" max-w-md mx-auto ">
       {ready ? (
@@ -92,7 +94,8 @@ const App = () => {
               <Route path="/kurta" element={<KurtaListing />} />
               <Route path="/frock" element={<FrockListing />} />
               <Route path="/tuxedo" element={<TuxedoListing />} />
-              <Route path="/bandana" element={<BandanaListing />} />
+              <Route path="/female-bandanas" element={<FemaleBandanas />} />
+              <Route path="/male-bandanas" element={<MaleBandanas />} />
               <Route path="/lehenga" element={<LehengaListing />} />
               <Route path="/tutu-dress" element={<TutuListing />} />
               <Route path="/bow-tie" element={<BowTieCategories />} />
@@ -119,12 +122,12 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/thank-you" element={<ThankYouPage />} />
               <Route path="/admin" element={<AdminHome />} />
-              <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/inventory" element={<FabricManagementSystem />} />
               <Route path="/stock" element={<StockManager />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route path="/upload" element={<UploadKurtasPage />} />
               <Route path="/search" element={<UniversalSearchBar />} />
+              <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route

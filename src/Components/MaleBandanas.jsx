@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import ProductListing from "./ProductListing";
 import { useFirestoreCollection } from "../hooks/fetchCollection";
 
-const FemaleBandanas = () => {
+const MaleBandanas = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { data: femaleBandanas } = useFirestoreCollection("female-bandanas");
+  const { data: maleBandanas } = useFirestoreCollection("male-bandanas");
   // 1) Base list
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500);
@@ -21,14 +21,14 @@ const FemaleBandanas = () => {
 
   return (
     <ProductListing
-      title="Female Bandanas"
-      subtitle="Explore our exclusive range of handcrafted Female bandanas for pets!"
-      category="female-bandanas"
+      title="Male Bandanas"
+      subtitle="Explore our exclusive range of handcrafted Male bandanas for pets!"
+      category="male-bandanas"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
-      products={femaleBandanas}
+      products={maleBandanas}
       bannerTitle="Elegant Female Bandanas for Every Pet Personality"
     />
   );
 };
 
-export default FemaleBandanas;
+export default MaleBandanas;

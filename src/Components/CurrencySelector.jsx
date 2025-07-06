@@ -25,7 +25,7 @@ const CurrencySelector = ({ currency, setCurrency }) => {
     <div className="relative text-sm">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 px-2 py-1 border rounded bg-white shadow-sm hover:bg-gray-50"
+        className="flex items-center gap-1 px-2 py-1  rounded bg-white hover:bg-gray-50"
       >
         <span>{selected?.label.split(" ")[0]}</span> {/* just flag */}
         <ChevronDown size={14} />

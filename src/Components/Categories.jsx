@@ -35,7 +35,7 @@ const Categories = () => {
     },
     {
       id: 3,
-      name: "Bandana",
+      name: "Male Bandanas",
       description: "Trendy Accessories",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
@@ -74,7 +74,7 @@ const Categories = () => {
 
     {
       id: 8,
-      name: "Bandana",
+      name: "Female Bandanas",
       description: "Trendy Accessories",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1745436600/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png",

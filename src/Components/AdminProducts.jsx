@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 
-const collections = ["kurtas", "frocks", "tuxedos", "tutu"];
+const collections = [
+  "kurtas",
+  "frocks",
+  "tuxedos",
+  "tutu",
+  "female-bandanas",
+  "male-bandanas",
+];
 
 const AdminProducts = () => {
   const [selectedCollection, setSelectedCollection] = useState(null);
@@ -33,7 +40,22 @@ const AdminProducts = () => {
     }
   }, [selectedCollection]);
 
-  console.log(products);
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this item?"
+    );
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, selectedCollection, id));
+      await fetchProducts(selectedCollection);
+      alert("Item deleted successfully");
+      // Optionally trigger re-fetch or state update to remove deleted item from UI
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      alert("Failed to delete item");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,9 +90,6 @@ const AdminProducts = () => {
                   <h2 className="text-xl font-semibold capitalize text-gray-900 mb-1">
                     {col}
                   </h2>
-                  <p className="text-sm text-gray-500">
-                    View and manage all {col}
-                  </p>
                 </div>
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
                   <svg
@@ -159,35 +178,46 @@ const AdminProducts = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-3">
+              <div className="grid grid-cols-3 gap-4">
                 {products.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() =>
-                      navigate(
-                        `/admin/edit/${selectedCollection.slice(0, -1)}/${
-                          item.id
-                        }`
-                      )
-                    }
-                    className="group cursor-pointer bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-blue-300"
+                    className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-blue-300"
                   >
-                    <div className="relative">
-                      <img
-                        src={item.mainImage}
-                        alt={item.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                    <div
+                      onClick={() =>
+                        navigate(
+                          `/admin/edit/${selectedCollection.slice(0, -1)}/${
+                            item.id
+                          }`
+                        )
+                      }
+                      className="cursor-pointer"
+                    >
+                      <div className="relative">
+                        <img
+                          src={item.mainImage}
+                          alt={item.name}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Click to edit details
+                        </p>
+                      </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-                        {item.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Click to edit details
-                      </p>
-                    </div>
+
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+                    >
+                      Delete
+                    </button>
                   </div>
                 ))}
               </div>
