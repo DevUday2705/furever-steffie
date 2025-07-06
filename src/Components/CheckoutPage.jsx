@@ -107,8 +107,12 @@ const CheckoutPage = () => {
         localStorage.setItem("order", JSON.stringify(orderDetails));
       }
 
-      // 🔥 Save abandoned order
+      // 🔥 Save abandoned order with better error handling
       try {
+        console.log("Attempting to save abandoned order...");
+        console.log("Form data:", formData);
+        console.log("Order details:", orderDetails);
+
         const docRef = await addDoc(collection(db, "abandonedOrders"), {
           customer: formData,
           cart: orderDetails,
@@ -118,11 +122,16 @@ const CheckoutPage = () => {
           abandoned: true,
           paymentAttempted: false,
         });
+
+        console.log("Document written with ID: ", docRef.id);
         setAbandonedDocId(docRef.id);
       } catch (err) {
         console.error("Failed to save abandoned order:", err);
+        console.error("Error code:", err.code);
+        console.error("Error message:", err.message);
       }
-      handlePayment();
+
+      await handlePayment();
     }
   };
 
