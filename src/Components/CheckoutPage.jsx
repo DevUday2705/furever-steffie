@@ -98,6 +98,9 @@ const CheckoutPage = () => {
   };
   // Handle form submission
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+
     if (validateForm(formData, setErrors)) {
       localStorage.setItem("customer", JSON.stringify(formData));
       if (!isCartCheckout) {
@@ -119,7 +122,6 @@ const CheckoutPage = () => {
       } catch (err) {
         console.error("Failed to save abandoned order:", err);
       }
-
       handlePayment();
     }
   };
