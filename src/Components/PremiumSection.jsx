@@ -6,10 +6,6 @@ import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 
 const PremiumSection = ({ products }) => {
-  const premiumProducts = products
-    .filter((product) => product.category === "royal")
-    .slice(0, 3);
-
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: true,
@@ -42,7 +38,7 @@ const PremiumSection = ({ products }) => {
       emblaApi.off("select", onSelect);
       emblaApi.off("reInit", onSelect);
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, gender]);
 
   const calculateDiscountPrice = (product) => {
     const { basePrice, discountPercent } = product.pricing;
@@ -76,7 +72,7 @@ const PremiumSection = ({ products }) => {
     setIsShining(true);
     setTimeout(() => setIsShining(false), 2500);
   };
-
+  console.log(products);
   return (
     <section
       style={{ backgroundPosition: "0px -160px" }}
@@ -98,7 +94,7 @@ const PremiumSection = ({ products }) => {
         <div className="relative mb-4">
           <div className="overflow-hidden max-w-[280px] mx-auto" ref={emblaRef}>
             <div className="flex">
-              {premiumProducts.map((product) => (
+              {products.map((product) => (
                 <motion.div
                   key={product.id}
                   className="min-w-[280px] w-full flex-shrink-0 rounded-md p-2"
@@ -188,7 +184,7 @@ const PremiumSection = ({ products }) => {
         </div>
 
         <div className="flex justify-center gap-2">
-          {premiumProducts.map((_, index) => (
+          {products.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}

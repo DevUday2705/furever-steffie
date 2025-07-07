@@ -31,12 +31,14 @@ const Home = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [gender]);
+  console.log(products);
   return (
     <div>
       <MobileHeroCarousel />
       <Categories />
       <PremiumSection products={products} loading={isLoading} />
+
       <WatchAndBuy />
       <TrendingProducts />
       <Footer2 />
