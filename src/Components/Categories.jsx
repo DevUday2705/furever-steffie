@@ -197,7 +197,7 @@ const Categories = () => {
                 className="min-w-[calc(50%-8px)] w-[calc(50%-8px)] flex-shrink-0"
               >
                 <Link
-                  to={`/${generateSlug(category.name)}`}
+                  to={`/${generateSlug(category.name)}?sort=popularity`}
                   className="block relative group"
                 >
                   <div className="relative h-[300px] rounded-2xl overflow-hidden">

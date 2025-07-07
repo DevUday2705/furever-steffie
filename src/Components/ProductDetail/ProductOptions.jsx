@@ -61,7 +61,7 @@ const ProductOptions = ({
     const availableOptions = [];
 
     // Always available options
-    if (product.type == "kurta") {
+    if (product.type == "kurta" && !isRoyalSet) {
       availableOptions.push(
         { id: "simple", label: "Simple", description: "Classic look" },
         {

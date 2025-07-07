@@ -7,6 +7,9 @@ import Footer2 from "./Footer2";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import TrendingProducts from "./TrendingProducts";
+import { useAppContext } from "../context/AppContext";
+import { getTopProductsByGender } from "../constants/constant";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,35 +17,28 @@ const Home = () => {
   const message = encodeURIComponent(
     "Hi! I'm interested in your pet outfits on Furever Steffie. Can you help me place an order?"
   );
+  const { gender } = useAppContext();
   const [products, setProducts] = useState([]);
-
   // Fetch products from Firestore
   useEffect(() => {
-    const fetchKurtas = async () => {
+    const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const snapshot = await getDocs(collection(db, "kurtas"));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const data = await getTopProductsByGender(gender);
         setProducts(data);
-      } catch (error) {
-        console.error("Error fetching kurtas:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // This should happen after products are set
       }
     };
-
-    fetchKurtas();
+    fetchProducts();
   }, []);
-
   return (
     <div>
       <MobileHeroCarousel />
       <Categories />
-      <PremiumSection products={products} />
+      <PremiumSection products={products} loading={isLoading} />
       <WatchAndBuy />
+      <TrendingProducts />
       <Footer2 />
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}

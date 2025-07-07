@@ -1,7 +1,35 @@
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { db } from "../firebase";
 
 
 
 
+export const getTopProductsByGender = async (gender) => {
+  const collectionMap = {
+    male: ['kurtas', 'male-bandanas', 'tuxedos'],
+    female: ['female-bandanas', 'frocks', 'tuts'],
+  };
+
+  const categories = gender === "male" ? collectionMap.male : collectionMap.female;
+  const topProducts = [];
+
+  for (const category of categories) {
+    const q = query(
+      collection(db, category),
+      orderBy("priorityScore", "desc"),
+      limit(2)
+    );
+    const snapshot = await getDocs(q);
+    const products = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      category,
+    }));
+    topProducts.push(...products);
+  }
+
+  return topProducts;
+};
 
 
 export const bowData = {
