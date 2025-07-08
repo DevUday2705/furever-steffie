@@ -115,21 +115,21 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
     {
       label: "Lean",
       value: "slim",
-      emoji: "🏃‍♂️",
+      emoji: "/images/lean-pup.png",
       modifier: -1,
       description: "Skinny, athletic build",
     },
     {
       label: "Normal",
       value: "average",
-      emoji: "🐕",
+      emoji: "/images/mid-fur.png",
       modifier: 0,
       description: "Average, healthy weight",
     },
     {
       label: "Fluffy",
       value: "chunky",
-      emoji: "🥰",
+      emoji: "/images/full-fur.png",
       modifier: 1,
       description: "Chubby, extra fluffy",
     },
@@ -530,8 +530,12 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                         : "bg-white text-gray-700 border border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <div className="text-2xl mb-1">{type.emoji}</div>
-                    <div className="font-medium text-xs">{type.label}</div>
+                    <div className="flex justify-center mb-1">
+                      <img src={type.emoji} className="h-20" />
+                    </div>
+                    <div className="font-medium text-sm font-semibold">
+                      {type.label}
+                    </div>
                     <div className="text-xs text-white-500 mt-1 leading-tight">
                       {type.description}
                     </div>
