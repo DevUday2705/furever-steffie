@@ -117,21 +117,21 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
       value: "slim",
       emoji: "/images/lean-pup.png",
       modifier: -1,
-      description: "Skinny, athletic build",
+      description: "Skinny",
     },
     {
       label: "Normal",
       value: "average",
       emoji: "/images/mid-fur.png",
       modifier: 0,
-      description: "Average, healthy",
+      description: "Average",
     },
     {
       label: "Fluffy",
       value: "chunky",
       emoji: "/images/full-fur.png",
       modifier: 1,
-      description: "Chubby, extra fluffy",
+      description: "Chubby",
     },
   ];
 
