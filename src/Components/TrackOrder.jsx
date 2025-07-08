@@ -254,6 +254,57 @@ const TrackOrder = () => {
 
               <OrderProgressBar status={order.orderStatus} />
 
+              {/* Shipping Information - Only show if order is shipped */}
+              {order.orderStatus === "shipped" && (
+                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <svg
+                      className="w-5 h-5 text-green-600 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
+                    </svg>
+                    <h4 className="font-medium text-green-800">
+                      Shipment Information
+                    </h4>
+                  </div>
+                  <p className="text-sm text-green-700 mb-2">
+                    Your parcel has been handed over to our courier partner for
+                    delivery.
+                  </p>
+                  <div className="text-sm text-green-700">
+                    <p className="mb-1">
+                      <span className="font-medium">Courier Service:</span>{" "}
+                      Shree Maruti Courier Service
+                    </p>
+                    {order.tracking_id && (
+                      <p className="mb-2">
+                        <span className="font-medium">Tracking ID:</span>{" "}
+                        {order.tracking_id}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-medium">Track your shipment:</span>{" "}
+                      <a
+                        href="https://www.shreemaruti.com/track-your-shipment/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green-600 hover:text-green-800 underline"
+                      >
+                        Visit Shree Maruti Tracking Portal
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Customer Info */}
               {order.customer && (
                 <div className="mb-4">

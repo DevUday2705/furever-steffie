@@ -49,19 +49,44 @@ const AdminPage = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const orderRef = doc(db, "orders", orderId);
-      await updateDoc(orderRef, {
-        orderStatus: newStatus,
-      });
+      if (newStatus === "shipped") {
+        const trackingID = prompt(
+          "Enter tracking ID before marking as shipped:"
+        );
+        if (!trackingID) {
+          toast.error("Tracking ID is required to mark as shipped.");
+          return;
+        }
 
-      // Update state locally so UI reflects change immediately
-      setOrders((prev) =>
-        prev.map((order) =>
-          order.id === orderId ? { ...order, orderStatus: newStatus } : order
-        )
-      );
-      toast.success("Status updated");
-      fetchOrders();
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, {
+          orderStatus: "shipped",
+          tracking_id: trackingID,
+        });
+
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId
+              ? { ...order, orderStatus: "shipped", tracking_id: trackingID }
+              : order
+          )
+        );
+        toast.success("Tracking ID saved & status updated");
+        fetchOrders();
+      } else {
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, {
+          orderStatus: newStatus,
+        });
+
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId ? { ...order, orderStatus: newStatus } : order
+          )
+        );
+        toast.success("Status updated");
+        fetchOrders();
+      }
     } catch (err) {
       console.error("Error updating status:", err);
       alert("Failed to update status. Try again.");
@@ -362,6 +387,12 @@ const AdminPage = () => {
                     <p className="font-semibold">Razorpay</p>
                     <p>Order ID: {order.razorpay_order_id}</p>
                     <p>Payment ID: {order.razorpay_payment_id}</p>
+                    {order.tracking_id && (
+                      <p>
+                        <span className="font-semibold">Tracking ID:</span>{" "}
+                        {order.tracking_id}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
