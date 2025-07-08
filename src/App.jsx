@@ -57,7 +57,7 @@ import DailyTaskSheet from "./Components/TaskSheet";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const ready = true
+  const ready = false;
   return (
     <div className=" max-w-md mx-auto ">
       {ready ? (
