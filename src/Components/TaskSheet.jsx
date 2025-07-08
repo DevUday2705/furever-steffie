@@ -26,62 +26,20 @@ const DailyTaskSheet = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    employeeName: "",
+    employeeName: "Rinal",
     date: new Date().toISOString().split("T")[0],
     tasksCompleted: "",
     timeSpent: "",
-    challenges: "",
-    achievements: "",
-    tomorrowPlan: "",
-    overallRating: 5,
+    completedBows: "",
+    completedTassels: "",
+    completedKurtas: "",
+    inProgressKurtas: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // Mock data for demo - replace with actual Firebase data
-  const mockReports = [
-    {
-      id: "1",
-      employeeName: "John Doe",
-      date: "2025-01-15",
-      tasksCompleted:
-        "Completed user authentication module, Fixed login bugs, Updated documentation",
-      timeSpent:
-        "4 hours on auth module, 2 hours on bug fixes, 1 hour on documentation",
-      challenges: "OAuth integration was trickier than expected",
-      achievements: "Successfully implemented secure login system",
-      tomorrowPlan: "Start working on dashboard UI, Review pull requests",
-      overallRating: "8",
-      submittedAt: "2025-01-15T18:30:00Z",
-    },
-    {
-      id: "2",
-      employeeName: "Jane Smith",
-      date: "2025-01-14",
-      tasksCompleted: "Client meeting, Database optimization, Code review",
-      timeSpent:
-        "2 hours in meetings, 4 hours on database work, 1 hour on code review",
-      challenges: "Database queries were running slow, needed optimization",
-      achievements: "Improved query performance by 60%",
-      tomorrowPlan: "Implement caching layer, Write unit tests",
-      overallRating: "9",
-      submittedAt: "2025-01-14T17:45:00Z",
-    },
-    {
-      id: "3",
-      employeeName: "Mike Johnson",
-      date: "2025-01-13",
-      tasksCompleted: "API development, Error handling, Testing",
-      timeSpent:
-        "5 hours on API endpoints, 2 hours on error handling, 1 hour testing",
-      challenges: "Complex validation logic required multiple iterations",
-      achievements: "All API endpoints now have proper error handling",
-      tomorrowPlan: "Documentation update, Performance testing",
-      overallRating: "7",
-      submittedAt: "2025-01-13T19:00:00Z",
-    },
-  ];
 
   // Simulate URL routing
   useEffect(() => {
@@ -148,14 +106,14 @@ const DailyTaskSheet = () => {
       // Reset form after successful submission
       setTimeout(() => {
         setFormData({
-          employeeName: "",
+          employeeName: "Rinal",
           date: new Date().toISOString().split("T")[0],
           tasksCompleted: "",
           timeSpent: "",
-          challenges: "",
-          achievements: "",
-          tomorrowPlan: "",
-          overallRating: 5,
+          completedBows: "",
+          completedTassels: "",
+          completedKurtas: "",
+          inProgressKurtas: "",
         });
         setSubmitted(false);
       }, 3000);
@@ -182,179 +140,203 @@ const DailyTaskSheet = () => {
     return "text-red-600 bg-red-100";
   };
 
+  const calculateTotals = (reports) => {
+    return reports.reduce(
+      (totals, report) => {
+        const completedKurtas = parseInt(report.completedKurtas) || 0;
+        const inprogressKurtas = parseInt(report.inprogressKurtas) || 0;
+        const totalKurtas = completedKurtas + inprogressKurtas * 0.5;
+
+        return {
+          totalKurtas: totals.totalKurtas + totalKurtas,
+          totalTassels:
+            totals.totalTassels + (parseInt(report.completedTassels) || 0),
+          totalBows: totals.totalBows + (parseInt(report.completedBows) || 0),
+        };
+      },
+      { totalKurtas: 0, totalTassels: 0, totalBows: 0 }
+    );
+  };
+
+  const getKurtaTotal = (report) => {
+    const completed = parseInt(report.completedKurtas) || 0;
+    const inProgress = parseInt(report.inprogressKurtas) || 0;
+    return completed + inProgress * 0.5;
+  };
+
   // Reports View Component
-  const ReportsView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-8 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-6xl mx-auto"
-      >
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
-          <div className="bg-gradient-to-r from-slate-600 to-gray-700 px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-white mb-2">
-                  Daily Task Reports
-                </h1>
-                <p className="text-slate-200">Employee productivity overview</p>
+  const ReportsView = () => {
+    const totals = calculateTotals(reports);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-8 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-6xl mx-auto"
+        >
+          {/* Header */}
+          <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-600 to-gray-700 px-8 py-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    Daily Task Reports
+                  </h1>
+                  <p className="text-slate-200">Production tracking overview</p>
+                </div>
+                <button
+                  onClick={navigateToForm}
+                  className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to Form</span>
+                </button>
               </div>
-              <button
-                onClick={navigateToForm}
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to Form</span>
-              </button>
+            </div>
+
+            {/* Production Stats */}
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-slate-50">
+              <div className="grid grid-cols-3 gap-3 md:grid-cols-3">
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {totals.totalKurtas}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Kurtas</div>
+                </div>
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-green-600">
+                    {totals.totalTassels}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Tassels</div>
+                </div>
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {totals.totalBows}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Bows</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-slate-50">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-800">
-                  {reports.length}
-                </div>
-                <div className="text-sm text-gray-600">Total Reports</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-800">
-                  {reports.length > 0
-                    ? Math.round(
-                        reports.reduce(
-                          (acc, r) => acc + parseInt(r.overallRating),
-                          0
-                        ) / reports.length
-                      )
-                    : 0}
-                </div>
-                <div className="text-sm text-gray-600">Avg. Rating</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-800">
-                  {reports.length > 0
-                    ? new Set(reports.map((r) => r.employeeName)).size
-                    : 0}
-                </div>
-                <div className="text-sm text-gray-600">Active Employees</div>
-              </div>
+          {/* Reports List */}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading reports...</p>
             </div>
-          </div>
-        </div>
-
-        {/* Reports List */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading reports...</p>
-          </div>
-        ) : reports.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No reports submitted yet.</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {reports.map((report, index) => (
-              <motion.div
-                key={report.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                {/* Report Header */}
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">
-                          {report.employeeName}
-                        </h3>
-                        <div className="flex items-center space-x-2 text-blue-100">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-sm">
-                            {formatDate(report.date)}
-                          </span>
+          ) : reports.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">No reports submitted yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {reports.map((report, index) => (
+                <motion.div
+                  key={report.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                >
+                  {/* Report Header */}
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">
+                            {report.employeeName}
+                          </h3>
+                          <div className="flex items-center space-x-2 text-blue-100">
+                            <Calendar className="w-4 h-4" />
+                            <span className="text-sm">
+                              {formatDate(report.date)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${getRatingColor(
-                        report.overallRating
-                      )}`}
-                    >
-                      {report.overallRating}/10
-                    </div>
-                  </div>
-                </div>
-
-                {/* Report Content */}
-                <div className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Tasks Completed
-                      </h4>
-                      <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
-                        {report.tasksCompleted}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Time Breakdown
-                      </h4>
-                      <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
-                        {report.timeSpent}
-                      </p>
-                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Challenges
-                      </h4>
-                      <p className="text-gray-600 text-sm bg-red-50 p-3 rounded-lg">
-                        {report.challenges || "None reported"}
-                      </p>
+                  {/* Report Content */}
+                  <div className="p-6 space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-2">
+                          Tasks Completed
+                        </h4>
+                        <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
+                          {report.tasksCompleted}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-2">
+                          Time Breakdown
+                        </h4>
+                        <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
+                          {report.timeSpent}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Achievements
+
+                    {/* Production Numbers */}
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-3">
+                        Production Summary
                       </h4>
-                      <p className="text-gray-600 text-sm bg-green-50 p-3 rounded-lg">
-                        {report.achievements || "None reported"}
-                      </p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-xl font-bold text-blue-600">
+                            {getKurtaTotal(report)}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            Total Kurtas
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            ({report.completedKurtas} +{" "}
+                            {report.inprogressKurtas}×0.5)
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xl font-bold text-green-600">
+                            {report.completedTassels}
+                          </div>
+                          <div className="text-xs text-gray-600">Tassels</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xl font-bold text-purple-600">
+                            {report.completedBows}
+                          </div>
+                          <div className="text-xs text-gray-600">Bows</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xl font-bold text-orange-600">
+                            {report.inprogressKurtas}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            In Progress
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 text-xs text-gray-500 border-t">
+                      Submitted: {new Date(report.submittedAt).toLocaleString()}
                     </div>
                   </div>
-
-                  <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                      Tomorrow's Plan
-                    </h4>
-                    <p className="text-gray-600 text-sm bg-blue-50 p-3 rounded-lg">
-                      {report.tomorrowPlan || "No plan specified"}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 text-xs text-gray-500 border-t">
-                    Submitted: {new Date(report.submittedAt).toLocaleString()}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </motion.div>
-    </div>
-  );
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </div>
+    );
+  };
 
   // Show reports view if on reports route
   if (currentView === "reports") {
@@ -434,6 +416,7 @@ const DailyTaskSheet = () => {
                 </label>
                 <input
                   type="text"
+                  disabled
                   name="employeeName"
                   value={formData.employeeName}
                   onChange={handleInputChange}
@@ -510,15 +493,15 @@ const DailyTaskSheet = () => {
                 transition={{ delay: 0.5 }}
               >
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Challenges Faced
+                  Completed Bows
                 </label>
-                <textarea
-                  name="challenges"
+                <input
+                  type="number"
+                  name="completedBows"
                   value={formData.challenges}
                   onChange={handleInputChange}
-                  rows="3"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                  placeholder="Any obstacles or difficulties..."
+                  placeholder="Completed Bows"
                 />
               </motion.div>
 
@@ -528,15 +511,32 @@ const DailyTaskSheet = () => {
                 transition={{ delay: 0.6 }}
               >
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Key Achievements
+                  Completed Tassels
                 </label>
-                <textarea
-                  name="achievements"
+                <input
+                  name="completedTassels"
                   value={formData.achievements}
                   onChange={handleInputChange}
-                  rows="3"
+                  type="number"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                  placeholder="What went well today..."
+                  placeholder="Completed Tassels"
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Completed Kurtas
+                </label>
+                <input
+                  name="completedKurtas"
+                  value={formData.achievements}
+                  type="number"
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                  placeholder="Completed Kurtas"
                 />
               </motion.div>
             </div>
@@ -548,45 +548,16 @@ const DailyTaskSheet = () => {
               transition={{ delay: 0.7 }}
             >
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Tomorrow's Priority Tasks
+                In Progress Kurtas
               </label>
-              <textarea
-                name="tomorrowPlan"
+              <input
+                name="inprogressKurtas"
                 value={formData.tomorrowPlan}
+                type="number"
                 onChange={handleInputChange}
-                rows="3"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                placeholder="What do you plan to focus on tomorrow..."
+                placeholder="Number of In Progress Kurtas"
               />
-            </motion.div>
-
-            {/* Overall Rating */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Overall Productivity Rating
-              </label>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">1 (Low)</span>
-                <input
-                  type="range"
-                  name="overallRating"
-                  min="1"
-                  max="10"
-                  value={formData.overallRating}
-                  onChange={handleInputChange}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <span className="text-sm text-gray-600">10 (High)</span>
-                <div className="ml-4 px-3 py-1 bg-blue-100 rounded-full">
-                  <span className="text-blue-700 font-semibold">
-                    {formData.overallRating}
-                  </span>
-                </div>
-              </div>
             </motion.div>
 
             {/* Submit Button */}
