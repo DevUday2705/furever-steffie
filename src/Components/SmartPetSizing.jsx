@@ -531,11 +531,12 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                     }`}
                   >
                     <div className="flex justify-center mb-1">
-                      <img src={type.emoji} className="h-20" />
+                      <img
+                        src={type.emoji}
+                        className="h-20 shrink-0 object-cover"
+                      />
                     </div>
-                    <div className="font-medium text-sm font-semibold">
-                      {type.label}
-                    </div>
+                    <div className="text-sm font-semibold">{type.label}</div>
                     <div className="text-xs text-white-500 mt-1 leading-tight">
                       {type.description}
                     </div>
