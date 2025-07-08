@@ -53,6 +53,7 @@ import TutuListing from "./Components/TutuListing";
 import ComingSoonPage from "./Components/ComingSoon";
 import FemaleBandanas from "./Components/BandanaListing";
 import MaleBandanas from "./Components/MaleBandanas";
+import DailyTaskSheet from "./Components/TaskSheet";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
@@ -130,6 +131,7 @@ const App = () => {
               <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
+              <Route path="/daily-task" element={<DailyTaskSheet />} />
               <Route
                 path="/admin/edit/:category/:id"
                 element={<ProductForm />}
