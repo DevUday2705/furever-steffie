@@ -124,7 +124,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
       value: "average",
       emoji: "/images/mid-fur.png",
       modifier: 0,
-      description: "Average, healthy weight",
+      description: "Average, healthy",
     },
     {
       label: "Fluffy",
