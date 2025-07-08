@@ -56,6 +56,13 @@ const schemaConfigurations = {
       colors: [],
     },
   },
+  tut: {
+    additionalFields: ["colors"],
+    excludedFields: [],
+    fieldDefaults: {
+      colors: [],
+    },
+  },
   // Add more categories as needed
   tuxedo: {
     additionalFields: ["colors"],
@@ -89,7 +96,7 @@ const generateSchemaForCategory = (category) => {
   if (!config) return defaultSchema;
 
   let schema = { ...defaultSchema };
-
+  console.log(schema);
   // Add additional fields with their defaults
   config.additionalFields?.forEach((field) => {
     if (config.fieldDefaults?.[field] !== undefined) {
@@ -117,7 +124,7 @@ const ProductForm = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  console.log(formData);
   useEffect(() => {
     const fetchData = async () => {
       if (isEditMode) {
