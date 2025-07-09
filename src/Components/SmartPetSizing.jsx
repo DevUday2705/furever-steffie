@@ -580,45 +580,47 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
         </AnimatePresence>
 
         {/* Trust Badges */}
-        <div
-          style={motionStyles}
-          className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 mt-6 border border-gray-100/50"
-        >
-          <div className="grid grid-cols-3 gap-4">
-            {/* Perfect Fit */}
-            <div className="flex flex-col items-center group cursor-default">
-              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
-                <Shield className="w-4 h-4 text-slate-700" />
+        {selectedBodyType && (
+          <div
+            style={motionStyles}
+            className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 mt-6 border border-gray-100/50"
+          >
+            <div className="grid grid-cols-3 gap-4">
+              {/* Perfect Fit */}
+              <div className="flex flex-col items-center group cursor-default">
+                <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                  <Shield className="w-4 h-4 text-slate-700" />
+                </div>
+                <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                  PERFECT FIT
+                </p>
+                <p className="text-xs text-slate-500">Guaranteed</p>
               </div>
-              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
-                PERFECT FIT
-              </p>
-              <p className="text-xs text-slate-500">Guaranteed</p>
-            </div>
 
-            {/* WhatsApp Confirmation */}
-            <div className="flex flex-col items-center group cursor-default border-x border-gray-200/50 px-2">
-              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
-                <MessageCircle className="w-4 h-4 text-slate-700" />
+              {/* WhatsApp Confirmation */}
+              <div className="flex flex-col items-center group cursor-default border-x border-gray-200/50 px-2">
+                <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                  <MessageCircle className="w-4 h-4 text-slate-700" />
+                </div>
+                <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                  WHATSAPP
+                </p>
+                <p className="text-xs text-slate-500">Verified</p>
               </div>
-              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
-                WHATSAPP
-              </p>
-              <p className="text-xs text-slate-500">Verified</p>
-            </div>
 
-            {/* Accuracy Rate */}
-            <div className="flex flex-col items-center group cursor-default">
-              <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
-                <Check className="w-4 h-4 text-slate-700" />
+              {/* Accuracy Rate */}
+              <div className="flex flex-col items-center group cursor-default">
+                <div className="w-8 h-8 mb-2 bg-white rounded-lg shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-shadow duration-200">
+                  <Check className="w-4 h-4 text-slate-700" />
+                </div>
+                <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
+                  98% SUCCESS
+                </p>
+                <p className="text-xs text-slate-500">Rate</p>
               </div>
-              <p className="text-xs font-semibold text-slate-800 mb-0.5 tracking-wide">
-                98% SUCCESS
-              </p>
-              <p className="text-xs text-slate-500">Rate</p>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Reassurance Message */}
         {recommendedSize && (

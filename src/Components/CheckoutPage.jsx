@@ -91,10 +91,16 @@ const CheckoutPage = () => {
       subtotal = orderDetails.price;
     }
 
-    const deliveryCharge = formData.deliveryOption === "express" ? 399 : 49;
     const discountAmount = (subtotal * discount) / 100;
+    const totalAfterDiscount = subtotal - discountAmount;
 
-    return Math.round(subtotal - discountAmount + deliveryCharge);
+    let deliveryCharge = 0;
+
+    if (totalAfterDiscount <= 1500) {
+      deliveryCharge = formData.deliveryOption === "express" ? 199 : 49;
+    }
+
+    return Math.round(totalAfterDiscount + deliveryCharge);
   };
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -671,10 +677,23 @@ const CheckoutPage = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery:</span>
                   <span className="text-gray-800">
-                    {convertCurrency(
-                      formData.deliveryOption === "express" ? 399 : 49,
-                      currency
-                    )}
+                    {(() => {
+                      const productPrice = isCartCheckout
+                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
+                        : orderDetails.price;
+
+                      const discountAmount = (productPrice * discount) / 100;
+                      const totalAfterDiscount = productPrice - discountAmount;
+
+                      if (totalAfterDiscount > 1500) {
+                        return "Free";
+                      }
+
+                      const deliveryCharge =
+                        formData.deliveryOption === "express" ? 199 : 49;
+
+                      return convertCurrency(deliveryCharge, currency);
+                    })()}
                   </span>
                 </div>
                 {discount > 0 && (
