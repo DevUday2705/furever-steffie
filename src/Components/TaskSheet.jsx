@@ -28,8 +28,7 @@ const DailyTaskSheet = () => {
   const [formData, setFormData] = useState({
     employeeName: "Rinal",
     date: new Date().toISOString().split("T")[0],
-    tasksCompleted: "",
-    timeSpent: "",
+
     completedBows: "",
     completedTassels: "",
     completedKurtas: "",
@@ -108,8 +107,6 @@ const DailyTaskSheet = () => {
         setFormData({
           employeeName: "Rinal",
           date: new Date().toISOString().split("T")[0],
-          tasksCompleted: "",
-          timeSpent: "",
           completedBows: "",
           completedTassels: "",
           completedKurtas: "",
@@ -265,25 +262,6 @@ const DailyTaskSheet = () => {
 
                   {/* Report Content */}
                   <div className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">
-                          Tasks Completed
-                        </h4>
-                        <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
-                          {report.tasksCompleted}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">
-                          Time Breakdown
-                        </h4>
-                        <p className="text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
-                          {report.timeSpent}
-                        </p>
-                      </div>
-                    </div>
-
                     {/* Production Numbers */}
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <h4 className="font-semibold text-gray-800 mb-3">
@@ -446,44 +424,8 @@ const DailyTaskSheet = () => {
             </div>
 
             {/* Tasks Completed */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Tasks Completed Today
-              </label>
-              <textarea
-                name="tasksCompleted"
-                value={formData.tasksCompleted}
-                onChange={handleInputChange}
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                placeholder="List the main tasks you completed today..."
-                required
-              />
-            </motion.div>
 
             {/* Time Spent */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Time Breakdown
-              </label>
-              <textarea
-                name="timeSpent"
-                value={formData.timeSpent}
-                onChange={handleInputChange}
-                rows="3"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                placeholder="How did you spend your time? (e.g., 3 hours on project A, 2 hours on meetings...)"
-                required
-              />
-            </motion.div>
 
             {/* Challenges & Achievements */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
