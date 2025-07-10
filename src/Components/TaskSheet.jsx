@@ -10,6 +10,8 @@ import {
   User,
   TrendingUp,
   ArrowLeft,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 
 import { db } from "../firebase";
@@ -19,6 +21,8 @@ import {
   getDocs,
   orderBy,
   query,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 
 const DailyTaskSheet = () => {
@@ -32,7 +36,7 @@ const DailyTaskSheet = () => {
     completedBows: "",
     completedTassels: "",
     completedKurtas: "",
-    inProgressKurtas: "",
+    notes: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,7 +114,7 @@ const DailyTaskSheet = () => {
           completedBows: "",
           completedTassels: "",
           completedKurtas: "",
-          inProgressKurtas: "",
+          notes: "",
         });
         setSubmitted(false);
       }, 3000);
@@ -141,9 +145,7 @@ const DailyTaskSheet = () => {
     return reports.reduce(
       (totals, report) => {
         const completedKurtas = parseInt(report.completedKurtas) || 0;
-        const inprogressKurtas = parseInt(report.inprogressKurtas) || 0;
-        const totalKurtas = completedKurtas + inprogressKurtas * 0.5;
-
+        const totalKurtas = completedKurtas;
         return {
           totalKurtas: totals.totalKurtas + totalKurtas,
           totalTassels:
@@ -157,13 +159,43 @@ const DailyTaskSheet = () => {
 
   const getKurtaTotal = (report) => {
     const completed = parseInt(report.completedKurtas) || 0;
-    const inProgress = parseInt(report.inprogressKurtas) || 0;
-    return completed + inProgress * 0.5;
+
+    return completed;
   };
 
   // Reports View Component
   const ReportsView = () => {
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
     const totals = calculateTotals(reports);
+
+    const handleDeleteReport = async (reportId) => {
+      try {
+        // Delete from Firebase dailyReports collection
+        await deleteDoc(doc(db, "dailyReports", reportId));
+
+        // Update local state to remove the deleted report
+        setReports(reports.filter((r) => r.id !== reportId));
+
+        // Close confirmation modal
+        setDeleteConfirm(null);
+
+        // Optional: Show success notification
+        console.log("Report deleted successfully");
+      } catch (error) {
+        console.error("Error deleting report:", error);
+        // Handle error (show notification, etc.)
+        alert("Error deleting report. Please try again.");
+      }
+    };
+
+    const confirmDelete = (report) => {
+      setDeleteConfirm(report);
+    };
+
+    const cancelDelete = () => {
+      setDeleteConfirm(null);
+    };
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 py-8 px-4">
         <motion.div
@@ -257,6 +289,15 @@ const DailyTaskSheet = () => {
                           </div>
                         </div>
                       </div>
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => confirmDelete(report)}
+                        className="bg-red-500/20 hover:bg-red-500/30 text-red-100 hover:text-white px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                        title="Delete Report"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
                     </div>
                   </div>
 
@@ -276,8 +317,7 @@ const DailyTaskSheet = () => {
                             Total Kurtas
                           </div>
                           <div className="text-xs text-gray-500">
-                            ({report.completedKurtas} +{" "}
-                            {report.inprogressKurtas}×0.5)
+                            {report.completedKurtas}
                           </div>
                         </div>
                         <div className="text-center">
@@ -292,15 +332,11 @@ const DailyTaskSheet = () => {
                           </div>
                           <div className="text-xs text-gray-600">Bows</div>
                         </div>
-                        <div className="text-center">
-                          <div className="text-xl font-bold text-orange-600">
-                            {report.inprogressKurtas}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            In Progress
-                          </div>
-                        </div>
                       </div>
+                      <h4 className="font-semibold text-gray-800 mb-3">
+                        Notes
+                      </h4>
+                      <p>{report.notes}</p>
                     </div>
 
                     <div className="pt-2 text-xs text-gray-500 border-t">
@@ -312,6 +348,57 @@ const DailyTaskSheet = () => {
             </div>
           )}
         </motion.div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+            >
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Delete Report
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    This action cannot be undone
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700">
+                  Are you sure you want to delete the report for{" "}
+                  <span className="font-semibold">
+                    {deleteConfirm.employeeName}
+                  </span>{" "}
+                  from {formatDate(deleteConfirm.date)}?
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteReport(deleteConfirm.id)}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     );
   };
@@ -490,15 +577,16 @@ const DailyTaskSheet = () => {
               transition={{ delay: 0.7 }}
             >
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                In Progress Kurtas
+                Notes
               </label>
-              <input
-                name="inprogressKurtas"
-                value={formData.tomorrowPlan}
+              <textarea
+                name="notes"
+                rows={3}
+                value={formData.notes}
                 type="number"
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
-                placeholder="Number of In Progress Kurtas"
+                placeholder="Notes"
               />
             </motion.div>
 
