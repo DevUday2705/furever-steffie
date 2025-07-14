@@ -2,6 +2,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
+import { Link } from "react-router-dom";
 
 const MobileHeroCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -11,26 +12,29 @@ const MobileHeroCarousel = () => {
     {
       id: 1,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744099062/ChatGPT_Image_Apr_8_2025_01_19_03_PM_uiuvdz.png",
-      title: "Autumn Essentials",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
+      title: "Timeless Attire",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
+      link: "tuxedo?sort=popularity",
     },
     {
       id: 2,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_800/v1744099076/ChatGPT_Image_Apr_8_2025_01_13_10_PM_lz2kki.png",
-      title: "Premium Basics",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_Kurta_for_Dogs_2_dljxzj.webp",
+      title: "Tradition Tailored",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
+      link: "kurta?sort=popularity",
     },
     {
       id: 3,
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744101346/ChatGPT_Image_Apr_8_2025_02_03_51_PM_qgz786.png",
-      title: "Summer Collection",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104207/ChatGPT_Image_Jun_15_2025_12_50_08_AM_zjtjoc.webp",
+      title: "Modern Heritage",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
+      link: "kurta?sort=popularity",
     },
   ];
 
@@ -42,6 +46,7 @@ const MobileHeroCarousel = () => {
       title: "Festive Vibes",
       subtitle: "Celebrate with grace",
       cta: "Explore Now",
+      link: "",
     },
     {
       id: 5,
@@ -50,6 +55,7 @@ const MobileHeroCarousel = () => {
       title: "Elegant Threads",
       subtitle: "Chic. Comfortable. Classy.",
       cta: "View Range",
+      link: "",
     },
     {
       id: 6,
@@ -58,6 +64,7 @@ const MobileHeroCarousel = () => {
       title: "Summer Breeze",
       subtitle: "Light looks for warm days",
       cta: "See Collection",
+      link: "",
     },
   ];
 
@@ -108,7 +115,7 @@ const MobileHeroCarousel = () => {
                   alt={slide.title}
                   className="w-full h-full object-cover rounded-md"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t  from-black/70 to-transparent rounded-md" />
+                <div className="absolute inset-0 bg-gradient-to-t  from-black/40 to-transparent rounded-md" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 rounded-md">
                   <h2 className="text-3xl font-bold mb-2 text-white">
                     {slide.title}
@@ -116,9 +123,11 @@ const MobileHeroCarousel = () => {
                   <p className="text-base mb-4 text-gray-200">
                     {slide.subtitle}
                   </p>
-                  <button className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
-                    {slide.cta}
-                  </button>
+                  <Link to={`/${slide.link}`}>
+                    <button className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+                      {slide.cta}
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

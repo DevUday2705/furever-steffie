@@ -1,16 +1,21 @@
-// Updated Categories Component with Gender Toggle
+// Updated Categories Component with 3 Categories View
 import React, { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+
 const Categories = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     containScroll: "trimSnaps",
     dragFree: true,
-    slidesToScroll: 2,
+    slidesToScroll: 1,
+    breakpoints: {
+      "(min-width: 768px)": { slidesToScroll: 2 },
+      "(min-width: 1024px)": { slidesToScroll: 3 },
+    },
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -71,7 +76,6 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/White_Whisper_with_Bow_dce8nr.webp",
     },
-
     {
       id: 8,
       name: "Female Bandanas",
@@ -95,22 +99,19 @@ const Categories = () => {
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    const progress = emblaApi.scrollProgress();
-    setSelectedIndex(Math.round(progress * Math.ceil(categories.length / 2)));
+    setSelectedIndex(emblaApi.selectedScrollSnap());
     setCanScrollPrev(emblaApi.canScrollPrev());
     setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi, categories.length]);
+  }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
     onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
-    emblaApi.on("scroll", onSelect);
     return () => {
       emblaApi.off("select", onSelect);
       emblaApi.off("reInit", onSelect);
-      emblaApi.off("scroll", onSelect);
     };
   }, [emblaApi, onSelect]);
 
@@ -121,7 +122,7 @@ const Categories = () => {
 
   const scrollTo = useCallback(
     (index) => {
-      emblaApi?.scrollTo(index * 2);
+      emblaApi?.scrollTo(index);
     },
     [emblaApi]
   );
@@ -137,11 +138,11 @@ const Categories = () => {
             <button
               key={type}
               onClick={() => setGender(type)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border
+              className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 border
               ${
                 gender === type
-                  ? "bg-black text-white border-black scale-105"
-                  : "bg-white text-black border-gray-300 hover:border-black"
+                  ? "bg-black text-white border-black scale-105 shadow-lg"
+                  : "bg-white text-black border-gray-300 hover:border-black hover:shadow-md"
               }`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -150,21 +151,21 @@ const Categories = () => {
         </div>
 
         {/* Section Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
-          <div className="flex gap-2">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900">Shop by Category</h2>
+          <div className="flex gap-3">
             <button
               onClick={scrollPrev}
               disabled={!canScrollPrev}
-              className={`w-10 h-10 rounded-full border flex items-center justify-center
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300
               ${
                 !canScrollPrev
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50"
+                  ? "opacity-40 cursor-not-allowed bg-gray-50 border-gray-200"
+                  : "hover:bg-gray-50 border-gray-300 hover:border-gray-400 hover:shadow-md"
               }`}
             >
               <ChevronLeft
-                className={`w-5 h-5 ${
+                className={`w-6 h-6 ${
                   !canScrollPrev ? "text-gray-400" : "text-gray-600"
                 }`}
               />
@@ -172,15 +173,15 @@ const Categories = () => {
             <button
               onClick={scrollNext}
               disabled={!canScrollNext}
-              className={`w-10 h-10 rounded-full border flex items-center justify-center
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300
               ${
                 !canScrollNext
-                  ? "opacity-50 cursor-not-allowed bg-gray-50"
-                  : "hover:bg-gray-50"
+                  ? "opacity-40 cursor-not-allowed bg-gray-50 border-gray-200"
+                  : "hover:bg-gray-50 border-gray-300 hover:border-gray-400 hover:shadow-md"
               }`}
             >
               <ChevronRight
-                className={`w-5 h-5 ${
+                className={`w-6 h-6 ${
                   !canScrollNext ? "text-gray-400" : "text-gray-600"
                 }`}
               />
@@ -190,38 +191,39 @@ const Categories = () => {
 
         {/* Carousel */}
         <div className="relative overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-4">
-            {categories.map((category) => (
+          <div className="flex gap-3">
+            {categories.map((category, index) => (
               <div
                 key={category.id}
-                className="min-w-[calc(50%-8px)] w-[calc(50%-8px)] flex-shrink-0"
+                className="min-w-[calc(33.333%-8px)] w-[calc(33.333%-8px)] flex-shrink-0"
               >
                 <Link
                   to={`/${generateSlug(category.name)}?sort=popularity`}
                   className="block relative group"
                 >
-                  <div className="relative h-[300px] rounded-2xl overflow-hidden">
+                  <div className="relative h-[220px] rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img
                       loading="lazy"
                       src={category.image}
                       alt={category.name}
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   </div>
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 p-6 text-white flex flex-col"
+                    className="absolute bottom-0 left-0 right-0 p-3 text-white flex flex-col transform group-hover:translate-y-[-2px] transition-transform duration-300"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: index * 0.1 }}
                   >
-                    <h3 className="text-2xl font-bold mb-1">
-                      {category.name}{" "}
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        🔗
+                    <h3 className="text-sm font-bold mb-1 flex items-center gap-1">
+                      {category.name}
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs">
+                        →
                       </span>
                     </h3>
-                    <p className="text-gray-200 text-sm">
+                    <p className="text-gray-200 text-xs font-medium">
                       {category.description}
                     </p>
                   </motion.div>
@@ -232,13 +234,13 @@ const Categories = () => {
         </div>
 
         {/* Pagination Dots */}
-        <div className="flex justify-center gap-2 mt-6">
-          {[...Array(Math.ceil(categories.length / 2))].map((_, index) => (
+        <div className="flex justify-center gap-2 mt-8">
+          {[...Array(Math.max(1, categories.length - 2))].map((_, index) => (
             <button
               key={index}
               onClick={() => scrollTo(index)}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300
-              ${selectedIndex === index ? "bg-black w-4" : "bg-gray-300"}`}
+              className={`h-2 rounded-full transition-all duration-300 hover:bg-gray-600
+              ${selectedIndex === index ? "bg-black w-8" : "bg-gray-300 w-2"}`}
             />
           ))}
         </div>

@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
-import { Crown } from "lucide-react";
+import React, { useContext, useState } from "react";
+import { Crown, ChevronDown, ChevronUp } from "lucide-react";
 import PremiumBadge from "../PremiumBadge";
 import { convertCurrency } from "../../constants/currency";
 import { CurrencyContext } from "../../context/currencyContext";
 
 const ProductInfo = ({ product, calculatePrice }) => {
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const price = calculatePrice();
   const discountPercent = product.pricing.discountPercent || 0;
   const originalPrice =
@@ -14,8 +15,38 @@ const ProductInfo = ({ product, calculatePrice }) => {
 
   const isPremium = product.category === "royal";
   const { currency, rate } = useContext(CurrencyContext);
+
+  // Parse description into bullet points
+  const parseDescription = (description) => {
+    if (!description) return [];
+
+    // Check if description contains bullet points
+    if (description.includes("* ")) {
+      return description
+        .split("* ")
+        .filter((point) => point.trim())
+        .map((point) => point.trim());
+    }
+
+    // Return as single paragraph if no bullet points
+    return [description];
+  };
+
+  const bulletPoints = parseDescription(product.description);
+  const isBulletFormat =
+    product.description && product.description.includes("* ");
+  const visiblePoints = showFullDescription
+    ? bulletPoints
+    : bulletPoints.slice(0, 2);
+  const hasMorePoints = bulletPoints.length > 2;
+
+  // Process text to handle markdown-style formatting
+  const processText = (text) => {
+    return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  };
+
   return (
-    <div className="p-4">
+    <div className="px-4 pb-4">
       {/* Subcategory */}
       {product.subcategory && (
         <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">
@@ -47,9 +78,46 @@ const ProductInfo = ({ product, calculatePrice }) => {
       </div>
 
       {/* Description */}
-      <p className="mt-4 text-sm leading-relaxed text-gray-700">
-        {product.description}
-      </p>
+      <div className="mt-4">
+        {isBulletFormat ? (
+          <div className="space-y-3">
+            {visiblePoints.map((point, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors duration-200"
+              >
+                <p
+                  className="text-sm leading-relaxed text-gray-700 flex-1"
+                  dangerouslySetInnerHTML={{ __html: processText(point) }}
+                />
+              </div>
+            ))}
+
+            {hasMorePoints && (
+              <button
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200 mt-3 group"
+              >
+                {showFullDescription ? (
+                  <>
+                    <span>Show less</span>
+                    <ChevronUp className="w-4 h-4 group-hover:translate-y-[-1px] transition-transform duration-200" />
+                  </>
+                ) : (
+                  <>
+                    <span>See {bulletPoints.length - 2} more features</span>
+                    <ChevronDown className="w-4 h-4 group-hover:translate-y-[1px] transition-transform duration-200" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm leading-relaxed text-gray-700">
+            {product.description}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

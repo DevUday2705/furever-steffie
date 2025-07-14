@@ -1,8 +1,7 @@
-// src/components/ProductDetail/BottomActions.jsx
-
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { MessageCircle } from "lucide-react";
 import { CurrencyContext } from "../../context/currencyContext";
 import { convertCurrency } from "../../constants/currency";
 
@@ -11,7 +10,7 @@ const BottomActions = ({
   images,
   isBeaded,
   isFullSet,
-  selectedSize,
+  selectedSize = "XL",
   calculatePrice,
   navigate,
   addToCart,
@@ -22,6 +21,15 @@ const BottomActions = ({
   requiresMeasurements,
   selectedColor,
 }) => {
+  const { currency, setCurrency } = useContext(CurrencyContext);
+
+  // Check if selected size requires custom tailoring
+  const isCustomSize =
+    selectedSize &&
+    ["XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"].includes(
+      selectedSize.toUpperCase()
+    );
+
   const handleBuyNow = () => {
     const orderDetails = {
       productId: product.id,
@@ -34,7 +42,7 @@ const BottomActions = ({
       selectedColor,
       price: calculatePrice(),
       image: images[0],
-      measurements: requiresMeasurements ? measurements : null, // Include measurements
+      measurements: requiresMeasurements ? measurements : null,
     };
     navigate("/checkout", { state: { orderDetails, sizeConfirmed: true } });
   };
@@ -51,14 +59,61 @@ const BottomActions = ({
       price: calculatePrice(),
       image: images[0],
       quantity: 1,
-      measurements: requiresMeasurements ? measurements : null, // Include measurements
+      measurements: requiresMeasurements ? measurements : null,
     });
     toast.success("Added To Cart");
     setIsOpen(true);
   };
 
-  const { currency, setCurrency } = useContext(CurrencyContext);
+  const handleWhatsAppChat = () => {
+    const businessWhatsAppNumber = "+918828145667"; // Replace with your actual business WhatsApp number
 
+    const message = `Hi, I need help with my dog's dress - 
+Name: ${product.name}
+Product ID: ${product.id}
+Selected Size: ${selectedSize}
+Can we talk?
+Thanks`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${businessWhatsAppNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
+
+  // If custom size is selected, show WhatsApp button
+  if (isCustomSize) {
+    return (
+      <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+          <p className="text-sm text-amber-800 font-medium">
+            🐕 Custom Tailoring Required
+          </p>
+          <p className="text-xs text-amber-700 mt-1">
+            For {selectedSize} size, we provide custom fitting to ensure perfect
+            comfort for your dog
+          </p>
+        </div>
+
+        <motion.button
+          className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors duration-200"
+          whileTap={{ scale: 0.98 }}
+          onClick={handleWhatsAppChat}
+        >
+          <MessageCircle className="w-5 h-5" />
+          Chat with Us for Custom Fitting
+        </motion.button>
+
+        <div className="text-center mt-2">
+          <p className="text-xs text-gray-600">
+            Get personalized assistance for the perfect fit
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular flow for standard sizes
   return (
     <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
       <motion.button
