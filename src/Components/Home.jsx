@@ -10,6 +10,7 @@ import { db } from "../firebase";
 import TrendingProducts from "./TrendingProducts";
 import { useAppContext } from "../context/AppContext";
 import { getTopProductsByGender } from "../constants/constant";
+import ModernReviewsSection from "./ModernReviewsSection";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +42,7 @@ const Home = () => {
 
       <WatchAndBuy />
       <TrendingProducts />
+      <ModernReviewsSection />
       <Footer2 />
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
