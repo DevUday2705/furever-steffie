@@ -102,7 +102,7 @@ const MobileHeroCarousel = () => {
 
   return (
     <section className="w-full bg-transparent rounded-md">
-      <div className="relative w-full h-[70vh] overflow-hidden" ref={emblaRef}>
+      <div className="relative w-full h-[65vh] overflow-hidden" ref={emblaRef}>
         <div className="flex h-full touch-pan-y">
           {slides.map((slide) => (
             <div
