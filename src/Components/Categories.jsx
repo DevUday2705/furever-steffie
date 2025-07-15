@@ -13,14 +13,14 @@ const Categories = () => {
       name: "Kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745862448/with_lace-min_ze5iom.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_royal_Kurta_for_Dogs_1_z0luws.webp",
     },
     {
       id: 2,
       name: "Tuxedo",
       description: "Classic Fits",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095275/ChatGPT_Image_Apr_8_2025_11_56_25_AM_d5f2f5.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
     },
     {
       id: 3,
