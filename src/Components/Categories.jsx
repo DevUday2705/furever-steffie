@@ -10,28 +10,28 @@ const Categories = () => {
   const maleCategories = [
     {
       id: 1,
-      name: "Kurta",
+      name: "KURTA",
       description: "Contemporary Styles",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp",
     },
     {
       id: 2,
-      name: "Tuxedo",
+      name: "TUXEDO",
       description: "Classic Fits",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
     },
     {
       id: 3,
-      name: "Male Bandanas",
+      name: "MALE BANDANAS",
       description: "Trendy Accessories",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
     },
     {
       id: 4,
-      name: "Bow Tie",
+      name: "BOW TIE",
       description: "Suit Up!",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
@@ -77,13 +77,13 @@ const Categories = () => {
     <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
         {/* Toggle Switch */}
-        <h1 className="text-2xl font-semibold text-center mb-5">I have a</h1>
-        <div className="flex justify-center gap-4 mb-8">
+
+        <div className="flex mx-10 justify-center gap-4 mb-8">
           {["male", "female"].map((type) => (
             <button
               key={type}
               onClick={() => setGender(type)}
-              className={`flex-1 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 border relative overflow-hidden
+              className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 border relative overflow-hidden
       ${
         gender === type
           ? "bg-black text-white border-black scale-105 shadow-lg"
@@ -137,15 +137,15 @@ const Categories = () => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <h3 className="text-sm font-bold mb-1 flex items-center gap-1">
+                  <h3 className="text-xl capitalize  mb-1 flex items-center gap-1">
                     {category.name}
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs">
                       →
                     </span>
                   </h3>
-                  <p className="text-gray-200 text-xs font-medium">
+                  {/* <p className="text-gray-200 text-xs font-medium">
                     {category.description}
-                  </p>
+                  </p> */}
                 </motion.div>
               </Link>
             </motion.div>
