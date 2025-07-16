@@ -42,7 +42,7 @@ const Home = () => {
 
       <WatchAndBuy />
       <TrendingProducts />
-     // <ModernReviewsSection />
+     <ModernReviewsSection />
       <Footer2 />
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
