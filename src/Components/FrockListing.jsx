@@ -19,7 +19,7 @@ const FrockListing = () => {
       title="All Frocks"
       subtitle="Explore our exclusive range of handcrafted frocks for pets!"
       category="frock"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746704011/banner_yge1ej.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1753033327/Frock-poster_mx9qyr.webp"
       products={frocks}
       bannerTitle="Elegant Frocks for Every Pet Personality"
     />

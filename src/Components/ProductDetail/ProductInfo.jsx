@@ -80,17 +80,17 @@ const ProductInfo = ({ product, calculatePrice }) => {
       {/* Description */}
       <div className="mt-4">
         {isBulletFormat ? (
-          <div className="space-y-3">
+          <ul className="space-y-3">
             {visiblePoints.map((point, index) => (
-              <div
+              <li
                 key={index}
-                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors duration-200"
+                className="flex items-start gap-3 p-1 hover:border-gray-200 transition-colors duration-200"
               >
                 <p
                   className="text-sm leading-relaxed text-gray-700 flex-1"
                   dangerouslySetInnerHTML={{ __html: processText(point) }}
                 />
-              </div>
+              </li>
             ))}
 
             {hasMorePoints && (
@@ -111,7 +111,7 @@ const ProductInfo = ({ product, calculatePrice }) => {
                 )}
               </button>
             )}
-          </div>
+          </ul>
         ) : (
           <p className="text-sm leading-relaxed text-gray-700">
             {product.description}
