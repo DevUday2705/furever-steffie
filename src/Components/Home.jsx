@@ -40,9 +40,9 @@ const Home = () => {
       <Categories />
       <PremiumSection products={products} loading={isLoading} />
 
-      <WatchAndBuy />
+      {/* <WatchAndBuy /> */}
       <TrendingProducts />
-     <ModernReviewsSection />
+      <ModernReviewsSection />
       <Footer2 />
       <a
         href={`https://wa.me/${phoneNumber}?text=${message}`}
