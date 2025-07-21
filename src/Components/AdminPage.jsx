@@ -356,6 +356,7 @@ const AdminPage = () => {
                           <p className="font-medium">{item.name}</p>
                           <p>Size: {item.selectedSize}</p>
                           <p>Price: ₹{item.price}</p>
+                          <p>Is Royal: {item.isRoyalSet ? "Yes" : "No"}</p>
                           <p>
                             Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
                             {item.isFullSet ? "Yes" : "No"}
