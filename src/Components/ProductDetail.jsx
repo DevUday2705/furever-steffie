@@ -311,6 +311,7 @@ const ProductDetail = () => {
         images={images}
         isBeaded={isBeaded}
         isFullSet={isFullSet}
+        isRoyalSet={isRoyalSet}
         selectedDhoti={selectedDhoti}
         selectedSize={selectedSize}
         selectedColor={selectedColor} // NEW
