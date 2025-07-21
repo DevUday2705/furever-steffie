@@ -13,7 +13,7 @@ const ProductInfo = ({ product, calculatePrice }) => {
       ? Math.round(price * (100 / (100 - discountPercent)))
       : price;
 
-  const isPremium = product.category === "royal";
+  const isPremium = product.isRoyal;
   const { currency, rate } = useContext(CurrencyContext);
 
   // Parse description into bullet points
