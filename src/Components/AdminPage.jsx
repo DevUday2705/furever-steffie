@@ -383,9 +383,11 @@ const AdminPage = () => {
                     </div>
                   </div>
 
+                  {console.log(order)}
                   <div className="pt-2 border-t">
                     <p className="font-semibold">Razorpay</p>
                     <p>Order ID: {order.razorpay_order_id}</p>
+
                     <p>Payment ID: {order.razorpay_payment_id}</p>
                     {order.tracking_id && (
                       <p>
