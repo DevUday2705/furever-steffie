@@ -232,7 +232,7 @@ const ProductOptions = ({
             {/* Royal Set Option - Only for Royal category */}
             <div className="relative">
               {/* Your existing Royal Set button */}
-              {product.category === "royal" && (
+              {product.isRoyal && (
                 <button
                   onClick={handleRoyalSetClick}
                   className={`py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 relative overflow-hidden ${

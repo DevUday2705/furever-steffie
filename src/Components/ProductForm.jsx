@@ -16,6 +16,8 @@ const defaultSchema = {
   type: "kurta",
   isBeadedAvailable: false,
   isNonBeadedAvailable: true,
+  isRoyal: false, // Add this line
+
   sizes: ["XS", "S", "M", "L", "XL", "XXL"],
   dhotis: [],
   pricing: {
@@ -236,8 +238,6 @@ const ProductForm = () => {
         category: category,
       };
 
-      console.log("Saving data:", dataToSave);
-
       if (isEditMode) {
         await setDoc(doc(db, `${category}s`, id), dataToSave);
         console.log("Product updated successfully");
@@ -245,7 +245,7 @@ const ProductForm = () => {
         const docRef = await addDoc(collection(db, `${category}s`), dataToSave);
         console.log("Product added successfully with ID:", docRef.id);
       }
-      navigate("/admin");
+      navigate("/admin/product");
     } catch (err) {
       console.error("Error saving product:", err);
       setError("Failed to save product");
@@ -374,7 +374,16 @@ const ProductForm = () => {
             <span>Non-Beaded Option Available</span>
           </label>
         </div>
-
+        {category === "kurta" && (
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.isRoyal}
+              onChange={(e) => handleChange("isRoyal", e.target.checked)}
+            />
+            <span>Is Royal</span>
+          </label>
+        )}
         <div>
           <label className="block text-sm font-medium mb-1">Category</label>
           <input
