@@ -13,7 +13,7 @@ const Categories = () => {
       name: "KURTA",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750107084/green-zari-2_nlnnc7.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_royal_Kurta_dhoti_set_for_Dogs_tnx1ie.webp",
     },
     {
       id: 2,

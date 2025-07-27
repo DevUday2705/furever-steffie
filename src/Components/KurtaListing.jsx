@@ -20,7 +20,7 @@ const KurtaListing = () => {
       title="All Kurtas"
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="kurta"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1753619355/554E70EA-8215-4CEF-804D-766586922143_Copy_rdst4h.webp"
       products={kurtas}
       bannerTitle="Elegant Kurtas for Every Pet Personality"
     />

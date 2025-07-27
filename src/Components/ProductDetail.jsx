@@ -170,7 +170,7 @@ const ProductDetail = () => {
     // Handle Royal Set pricing (takes precedence over regular full set)
     if (isRoyalSet) {
       // Royal set includes full set cost + additional 400 premium
-      price += (product.pricing.fullSetAdditional || 0) + 400;
+      price += (product.pricing.fullSetAdditional || 0) + 300;
     } else if (isFullSet && product.pricing.fullSetAdditional) {
       // Regular full set pricing
       price += product.pricing.fullSetAdditional;

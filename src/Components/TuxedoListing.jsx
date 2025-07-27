@@ -17,12 +17,12 @@ const TuxedoListing = () => {
 
   return (
     <ProductListing
-      title="All Kurtas"
+      title="All Tuxedos"
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
-      category="kurta"
+      category="tuxedo"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
       products={tuxedos}
-      bannerTitle="Elegant Kurtas for Every Pet Personality"
+      bannerTitle="Elegant Tuxedos for Every Pet Personality"
     />
   );
 };
