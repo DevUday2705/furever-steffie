@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
-const ADMIN_KEY = "What@123";
+const ADMIN_KEY = "What@270598";
 const collections = [
   "kurtas",
   "frocks",
