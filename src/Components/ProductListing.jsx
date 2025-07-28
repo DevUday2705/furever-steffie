@@ -48,7 +48,7 @@ const ProductListing = ({
     styleSimple: false,
     inStockOnly: false,
     customColor: false,
-    categories: ["all"],
+    categories: ["all", "royal"],
     categoryOptions: ["all", "royal"],
   });
   useEffect(() => {

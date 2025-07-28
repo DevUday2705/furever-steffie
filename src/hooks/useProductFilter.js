@@ -31,7 +31,7 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
 
         // ✅ 5. Category
         if (filters.categories.includes("royal")) {
-            list = list.filter((item) => item.category === "royal");
+            list = list.filter((item) => item.isRoyal === true);
         }
 
         // ✅ 6. Style
