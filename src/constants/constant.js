@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 
 
@@ -14,23 +14,47 @@ export const getTopProductsByGender = async (gender) => {
   const topProducts = [];
 
   for (const category of categories) {
-    const q = query(
-      collection(db, category),
-      orderBy("priorityScore", "desc"),
-      limit(4)
-    );
-    const snapshot = await getDocs(q);
-    const products = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      category,
-    }));
-    topProducts.push(...products);
+    let q;
+
+    if (gender === "male") {
+      // Fetch more documents and filter client-side
+      q = query(
+        collection(db, category),
+        orderBy("priorityScore", "desc"),
+        limit(20) // Fetch more to account for filtering
+      );
+
+      const snapshot = await getDocs(q);
+      const products = snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          category,
+        }))
+        .filter(product => product.isRoyal === true) // Filter for royal products
+        .slice(0, 4); // Take only top 4
+
+      topProducts.push(...products);
+    } else {
+      // For female products, keep original query
+      q = query(
+        collection(db, category),
+        orderBy("priorityScore", "desc"),
+        limit(4)
+      );
+
+      const snapshot = await getDocs(q);
+      const products = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        category,
+      }));
+      topProducts.push(...products);
+    }
   }
 
   return topProducts;
 };
-
 
 export const bowData = {
   requiresMeasurements: false,

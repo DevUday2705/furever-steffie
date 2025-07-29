@@ -11,6 +11,7 @@ import TrendingProducts from "./TrendingProducts";
 import { useAppContext } from "../context/AppContext";
 import { getTopProductsByGender } from "../constants/constant";
 import ModernReviewsSection from "./ModernReviewsSection";
+import ComingSoonSection from "./ComingSoonSection";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +43,7 @@ const Home = () => {
 
       {/* <WatchAndBuy /> */}
       <TrendingProducts />
+      <ComingSoonSection />
       {/* <ModernReviewsSection /> */}
       <Footer2 />
       <a
