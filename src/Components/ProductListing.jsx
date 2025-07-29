@@ -20,6 +20,9 @@ import {
   ArrowRightFromLine,
   ArrowBigRightDash,
   ArrowDownAz,
+  ShirtIcon,
+  Star,
+  StarsIcon,
 } from "lucide-react";
 import { CurrencyContext } from "../context/currencyContext";
 
@@ -231,7 +234,7 @@ const ProductListing = ({
                 : price;
             const currentPrice = (price * rate).toFixed(2);
             const originalPriceConverted = (originalPrice * rate).toFixed(2);
-
+            const isRoyal = product.isRoyal;
             return (
               <motion.div
                 key={product.id}
@@ -259,7 +262,7 @@ const ProductListing = ({
                         </div>
                       </div>
                     )} */}
-                    {product.category === "royal" && (
+                    {product.isRoyal === "royal" && (
                       <div
                         style={{
                           background:
@@ -284,9 +287,15 @@ const ProductListing = ({
                   </div>
                   <div className="p-4">
                     <h3
-                      className="text-sm font-medium text-gray-800 truncate"
+                      className="text-sm  font-medium text-gray-800 truncate"
                       title={product.name}
                     >
+                      {product.isRoyal ? (
+                        <CrownIcon className="text-yellow-600" size={15} />
+                      ) : (
+                        <StarsIcon className="text-gray-400" size={15} />
+                      )}
+
                       {product.name}
                     </h3>
                     <div className="flex flex-col ">
