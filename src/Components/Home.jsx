@@ -33,7 +33,7 @@ const Home = () => {
     };
     fetchProducts();
   }, [gender]);
-  console.log(products);
+
   return (
     <div>
       <MobileHeroCarousel />

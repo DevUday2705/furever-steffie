@@ -6,7 +6,7 @@ import { db } from "../firebase";
 
 export const getTopProductsByGender = async (gender) => {
   const collectionMap = {
-    male: ['kurtas', 'male-bandanas', 'tuxedos'],
+    male: ['kurtas'],
     female: ['female-bandanas', 'frocks', 'tuts'],
   };
 
@@ -17,7 +17,7 @@ export const getTopProductsByGender = async (gender) => {
     const q = query(
       collection(db, category),
       orderBy("priorityScore", "desc"),
-      limit(2)
+      limit(4)
     );
     const snapshot = await getDocs(q);
     const products = snapshot.docs.map(doc => ({
