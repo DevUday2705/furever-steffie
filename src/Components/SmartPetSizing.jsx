@@ -27,7 +27,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
     { name: "Maltese", avgSize: "S", popular: true },
     { name: "Toy Poodle", avgSize: "S", popular: true },
     { name: "Chihuahua", avgSize: "S", popular: true },
-    { name: "Yorkshire Terrier", avgSize: "S", popular: true },
+    { name: "Yorkie", avgSize: "S", popular: true },
     { name: "Pomeranian", avgSize: "S", popular: true },
 
     // Small Breeds (S)
