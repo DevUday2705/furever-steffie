@@ -156,7 +156,7 @@ const CheckoutPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // body: JSON.stringify({ amount: calculateTotal() }),
-        body: JSON.stringify({ amount: 100 }),
+        body: JSON.stringify({ amount: 1 }),
       });
 
       if (!res.ok) {
