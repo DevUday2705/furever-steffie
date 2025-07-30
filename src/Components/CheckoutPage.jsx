@@ -9,7 +9,7 @@ import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
-import mixpanel from "mixpanel-browser";
+import mixpanel from "../hooks/mixpanel";
 
 const CheckoutPage = () => {
   const location = useLocation();
