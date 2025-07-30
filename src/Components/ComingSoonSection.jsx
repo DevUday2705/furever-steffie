@@ -101,17 +101,14 @@ const ComingSoonSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-4">
-            <span className="text-pink-600 font-semibold text-sm tracking-wide uppercase">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-100 to-purple-100 rounded-full mb-4">
+            <span className="text-gray-700 font-semibold text-sm tracking-wide uppercase">
               Coming Soon
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Exciting New
-            <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              {" "}
-              Collections
-            </span>
+            <span className=""> Collections</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Get ready for our most adorable and stylish pet outfits yet.
@@ -141,7 +138,7 @@ const ComingSoonSection = () => {
                     </div>
 
                     {/* Content overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div className="absolute bottom-0 left-0 right-0 p-2 text-white">
                       {/* Interest Button */}
                       <button
                         onClick={() => handleInterestClick(item.id)}

@@ -234,7 +234,7 @@ const ProductListing = ({
                 : price;
             const currentPrice = (price * rate).toFixed(2);
             const originalPriceConverted = (originalPrice * rate).toFixed(2);
-            const isRoyal = product.isRoyal;
+
             return (
               <motion.div
                 key={product.id}
@@ -262,7 +262,7 @@ const ProductListing = ({
                         </div>
                       </div>
                     )} */}
-                    {product.isRoyal === "royal" && (
+                    {product.isRoyal && (
                       <div
                         style={{
                           background:
@@ -290,12 +290,6 @@ const ProductListing = ({
                       className="text-sm  font-medium text-gray-800 truncate"
                       title={product.name}
                     >
-                      {product.isRoyal ? (
-                        <CrownIcon className="text-yellow-600" size={15} />
-                      ) : (
-                        <StarsIcon className="text-gray-400" size={15} />
-                      )}
-
                       {product.name}
                     </h3>
                     <div className="flex flex-col ">

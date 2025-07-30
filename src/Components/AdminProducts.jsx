@@ -67,26 +67,26 @@ const AdminProducts = () => {
     }
   };
 
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-        <h2 className="text-xl font-bold mb-4">Admin Access</h2>
-        <input
-          type="password"
-          placeholder="Enter admin passkey"
-          value={passkey}
-          onChange={(e) => setPasskey(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full max-w-xs"
-        />
-        <button
-          onClick={handleLogin}
-          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 w-full max-w-xs"
-        >
-          Enter
-        </button>
-      </div>
-    );
-  }
+  // if (!isAuthorized) {
+  //   return (
+  //     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+  //       <h2 className="text-xl font-bold mb-4">Admin Access</h2>
+  //       <input
+  //         type="password"
+  //         placeholder="Enter admin passkey"
+  //         value={passkey}
+  //         onChange={(e) => setPasskey(e.target.value)}
+  //         className="border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full max-w-xs"
+  //       />
+  //       <button
+  //         onClick={handleLogin}
+  //         className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 w-full max-w-xs"
+  //       >
+  //         Enter
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -235,7 +235,7 @@ const AdminProducts = () => {
                       </div>
                       <div className="p-4">
                         <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-                          {item.name}
+                          {item.name} {item.isRoyal && "R"}
                         </h3>
                         <p className="text-sm text-gray-500">
                           Click to edit details

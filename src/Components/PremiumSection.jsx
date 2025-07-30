@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Crown, Star, Tag } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import { CurrencyContext } from "../context/currencyContext";
 
 const PremiumSection = ({ products }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -40,17 +41,13 @@ const PremiumSection = ({ products }) => {
     };
   }, [emblaApi, onSelect, gender]);
 
-  const calculateDiscountPrice = (product) => {
-    const { basePrice, discountPercent } = product.pricing;
-    return basePrice - basePrice * (discountPercent / 100);
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(price);
+  const currencySymbols = {
+    INR: "₹",
+    SGD: "S$",
+    MYR: "RM",
+    USD: "$",
+    GBP: "£",
+    NZD: "NZ$",
   };
 
   useEffect(() => {
@@ -72,7 +69,8 @@ const PremiumSection = ({ products }) => {
     setIsShining(true);
     setTimeout(() => setIsShining(false), 2500);
   };
-  console.log(products);
+
+  const { currency, rate } = useContext(CurrencyContext);
   return (
     <section
       style={{ backgroundPosition: "0px -160px" }}
@@ -94,70 +92,92 @@ const PremiumSection = ({ products }) => {
         <div className="relative mb-4">
           <div className="overflow-hidden max-w-[280px] mx-auto" ref={emblaRef}>
             <div className="flex">
-              {products.map((product) => (
-                <motion.div
-                  key={product.id}
-                  className="min-w-[280px] w-full flex-shrink-0 rounded-md p-2"
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Link
-                    to={`/product/${product.id}+${product.type}`}
-                    className="block group"
+              {products.map((product) => {
+                const basePrice = product.pricing.basePrice || 0;
+                const beadedAdd = product.pricing.beadedAdditional || 0;
+                const price = product.isBeadedAvailable
+                  ? basePrice + beadedAdd
+                  : basePrice;
+                const discountPercent = product.pricing.discountPercent || 0;
+                const originalPrice =
+                  discountPercent > 0
+                    ? Math.round(price * (100 / (100 - discountPercent)))
+                    : price;
+                const currentPrice = (price * rate).toFixed(2);
+                const originalPriceConverted = (originalPrice * rate).toFixed(
+                  2
+                );
+                return (
+                  <motion.div
+                    key={product.id}
+                    className="min-w-[280px] w-full flex-shrink-0 rounded-md p-2"
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <div className="relative rounded-lg overflow-hidden border-white border-4 bg-white shadow-md hover:shadow-lg transition-all duration-300">
-                      <div className="relative pb-[125%] overflow-hidden">
-                        <img
-                          src={product.mainImage}
-                          alt={product.name}
-                          className="absolute top-0 left-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="p-4 bg-white">
-                        <div className="flex items-center mb-1">
-                          <Crown color="#cd9f4b" className="mr-2" size={16} />
-                          <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
-                            {product.name}
-                          </h3>
+                    <Link
+                      to={`/product/${product.id}+${product.type}`}
+                      className="block group"
+                    >
+                      <div className="relative rounded-lg overflow-hidden border-white border-4 bg-white shadow-md hover:shadow-lg transition-all duration-300">
+                        <div className="relative pb-[125%] overflow-hidden">
+                          <img
+                            src={product.mainImage}
+                            alt={product.name}
+                            className="absolute top-0 left-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                            loading="lazy"
+                          />
                         </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          {product.pricing.discountPercent > 0 ? (
-                            <>
-                              <span className="text-base font-bold text-gray-900">
-                                {formatPrice(calculateDiscountPrice(product))}
+                        <div className="p-4 bg-white">
+                          <div className="flex items-center mb-1">
+                            <Crown color="#cd9f4b" className="mr-2" size={16} />
+                            <h3 className="text-base font-medium text-gray-900 group-hover:text-gray-800 transition-colors">
+                              {product.name}
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-baseline flex-wrap">
+                              <span className="text-sm font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+                                {currencySymbols[currency] || currency}{" "}
+                                {currentPrice}
                               </span>
-                              <span className="text-sm text-gray-500 line-through">
-                                {formatPrice(product.pricing.basePrice)}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-base font-bold text-gray-900">
-                              {formatPrice(product.pricing.basePrice)}
-                            </span>
-                          )}
-                          <div className="ml-auto rounded-full w-6 h-6 bg-black/10 flex items-center justify-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-3 w-3 text-black"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                              />
-                            </svg>
+                              {discountPercent > 0 && (
+                                <>
+                                  <span className="text-xs mx-1 text-gray-400 line-through font-medium">
+                                    {currencySymbols[currency] || currency}
+                                    {originalPriceConverted}
+                                  </span>
+                                  <motion.span
+                                    whileHover={{ scale: 1.05 }}
+                                    className="inline-flex  items-center px-1 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border border-emerald-200/50"
+                                  >
+                                    {discountPercent}% off
+                                  </motion.span>
+                                </>
+                              )}
+                            </div>
+                            <div className="ml-auto rounded-full w-6 h-6 bg-black/10 flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3 w-3 text-black"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                />
+                              </svg>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
