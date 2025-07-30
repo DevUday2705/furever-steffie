@@ -168,7 +168,8 @@ const CheckoutPage = () => {
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: data.amount,
+        // amount: data.amount,
+        amount: 100,
         currency: data.currency,
         name: "Furever Steffie",
         description: "Order Payment",
