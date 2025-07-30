@@ -54,10 +54,11 @@ import ComingSoonPage from "./Components/ComingSoon";
 import FemaleBandanas from "./Components/BandanaListing";
 import MaleBandanas from "./Components/MaleBandanas";
 import DailyTaskSheet from "./Components/TaskSheet";
+import PaymentFailed from "./Components/PaymentFailed";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const ready = true
+  const ready = true;
   return (
     <div className=" max-w-md mx-auto ">
       {ready ? (
@@ -136,6 +137,7 @@ const App = () => {
                 path="/admin/edit/:category/:id"
                 element={<ProductForm />}
               />
+              <Route path="/payment-failed" element={<PaymentFailed />} />
             </Routes>
           </div>
         </>

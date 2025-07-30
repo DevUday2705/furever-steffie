@@ -9,6 +9,7 @@ import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
+import mixpanel from "mixpanel-browser";
 
 const CheckoutPage = () => {
   const location = useLocation();
@@ -108,33 +109,10 @@ const CheckoutPage = () => {
     setFormSubmitted(true);
 
     if (validateForm(formData, setErrors)) {
+      mixpanel.track("Address Submitted");
       localStorage.setItem("customer", JSON.stringify(formData));
       if (!isCartCheckout) {
         localStorage.setItem("order", JSON.stringify(orderDetails));
-      }
-
-      // 🔥 Save abandoned order with better error handling
-      try {
-        console.log("Attempting to save abandoned order...");
-        console.log("Form data:", formData);
-        console.log("Order details:", orderDetails);
-
-        const docRef = await addDoc(collection(db, "abandonedOrders"), {
-          customer: formData,
-          cart: orderDetails,
-          timestamp: new Date(),
-          status: "pending_payment",
-          source: "form_submitted",
-          abandoned: true,
-          paymentAttempted: false,
-        });
-
-        console.log("Document written with ID: ", docRef.id);
-        setAbandonedDocId(docRef.id);
-      } catch (err) {
-        console.error("Failed to save abandoned order:", err);
-        console.error("Error code:", err.code);
-        console.error("Error message:", err.message);
       }
 
       await handlePayment();
@@ -173,84 +151,183 @@ const CheckoutPage = () => {
   const handlePayment = async () => {
     const totalAmount = calculateTotal(); // in paise
 
-    const res = await fetch("/api/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: calculateTotal() }),
-    });
+    try {
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: calculateTotal() }),
+      });
 
-    const data = await res.json();
-    setLoadingPayment(true);
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: data.amount,
-      currency: data.currency,
-      name: "Furever Steffie",
-      description: "Order Payment",
-      order_id: data.id,
-      notes: {
-        abandonedDocId: abandonedDocId || "", // Pass this to Razorpay for access in handler
-      },
-      handler: async function (response) {
-        const verifyRes = await fetch("/api/verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(response),
-        });
+      if (!res.ok) {
+        throw new Error(`Failed to create order: ${res.status}`);
+      }
 
-        const verifyData = await verifyRes.json();
+      const data = await res.json();
+      mixpanel.track("Payment Started");
+      setLoadingPayment(true);
 
-        if (verifyData.success) {
-          if (abandonedDocId) {
-            await updateDoc(doc(db, "abandonedOrders", abandonedDocId), {
-              status: "paid",
-              abandoned: false,
-              paymentAttempted: true,
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Furever Steffie",
+        description: "Order Payment",
+        order_id: data.id,
+        notes: {
+          abandonedDocId: abandonedDocId || "",
+        },
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            });
+
+            if (!verifyRes.ok) {
+              throw new Error(
+                `Payment verification failed: ${verifyRes.status}`
+              );
+            }
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              mixpanel.track("Payment Success");
+
+              const saveRes = await fetch("/api/save-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  customer: formData,
+                  items: isCartCheckout
+                    ? cart.map((item) => ({
+                        ...item,
+                        measurements: item.measurements || {},
+                      }))
+                    : [
+                        {
+                          ...orderDetails,
+                          measurements: orderDetails.measurements || {},
+                        },
+                      ],
+                  amount: data.amount / 100,
+                  coupon: couponCode,
+                }),
+              });
+
+              if (!saveRes.ok) {
+                console.error(
+                  "Failed to save order, but payment was successful"
+                );
+                // Still redirect to success page since payment went through
+              }
+
+              navigate({
+                pathname: "/thank-you",
+                search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
+              });
+            } else {
+              // Payment verification failed
+              mixpanel.track("Payment Verification Failed", {
+                order_id: data.id,
+                error: verifyData.error || "Verification failed",
+              });
+
+              setLoadingPayment(false);
+
+              navigate({
+                pathname: "/payment-failed",
+                search: `?error_code=VERIFICATION_FAILED&error_description=${encodeURIComponent(
+                  verifyData.error || "Payment verification failed"
+                )}&order_id=${data.id}`,
+              });
+            }
+          } catch (error) {
+            console.error("Error in payment handler:", error);
+            mixpanel.track("Payment Handler Error", {
+              order_id: data.id,
+              error: error.message,
+            });
+
+            setLoadingPayment(false);
+
+            navigate({
+              pathname: "/payment-failed",
+              search: `?error_code=SERVER_ERROR&error_description=${encodeURIComponent(
+                error.message
+              )}&order_id=${data.id}`,
             });
           }
-          const saveRes = await fetch("/api/save-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              customer: formData,
-              items: isCartCheckout
-                ? cart.map((item) => ({
-                    ...item,
-                    measurements: item.measurements || {}, // Make sure measurements are included for cart items too
-                  }))
-                : [
-                    {
-                      ...orderDetails,
-                      measurements: orderDetails.measurements || {}, // safe default
-                    },
-                  ],
-              amount: data.amount / 100,
-              coupon: couponCode,
-            }),
-          });
+        },
+        modal: {
+          ondismiss: function () {
+            // User closed the payment modal
+            mixpanel.track("Payment Modal Dismissed", {
+              order_id: data.id,
+            });
+            setLoadingPayment(false);
 
-          navigate({
-            pathname: "/thank-you",
-            search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
-          });
-        } else {
-          setLoadingPayment(false); // Hide loader if verification fails
-          alert("❌ Payment verification failed.");
-        }
-      },
-      prefill: {
-        name: formData?.fullName,
-        contact: formData?.mobileNumber,
-      },
-      theme: {
-        color: "#6366f1",
-      },
-    };
+            navigate({
+              pathname: "/payment-failed",
+              search: `?error_code=USER_CANCELLED&error_description=${encodeURIComponent(
+                "Payment was cancelled by user"
+              )}&order_id=${data.id}`,
+            });
+          },
+        },
+        prefill: {
+          name: formData?.fullName,
+          contact: formData?.mobileNumber,
+        },
+        theme: {
+          color: "#6366f1",
+        },
+      };
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      const rzp = new window.Razorpay(options);
+
+      // Handle Razorpay errors
+      rzp.on("payment.failed", function (response) {
+        mixpanel.track("Payment Failed", {
+          order_id: data.id,
+          error_code: response.error.code,
+          error_description: response.error.description,
+          error_source: response.error.source,
+          error_step: response.error.step,
+        });
+
+        setLoadingPayment(false);
+
+        navigate({
+          pathname: "/payment-failed",
+          search: `?error_code=${
+            response.error.code
+          }&error_description=${encodeURIComponent(
+            response.error.description
+          )}&order_id=${data.id}`,
+        });
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      mixpanel.track("Payment Initiation Error", {
+        error: error.message,
+      });
+
+      setLoadingPayment(false);
+
+      // Handle network errors or server errors during order creation
+      navigate({
+        pathname: "/payment-failed",
+        search: `?error_code=NETWORK_ERROR&error_description=${encodeURIComponent(
+          error.message
+        )}`,
+      });
+    }
   };
 
   const { currency } = useContext(CurrencyContext);
