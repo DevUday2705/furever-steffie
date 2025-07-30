@@ -155,7 +155,8 @@ const CheckoutPage = () => {
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: calculateTotal() }),
+        // body: JSON.stringify({ amount: calculateTotal() }),
+        body: JSON.stringify({ amount: 100 }),
       });
 
       if (!res.ok) {
