@@ -353,6 +353,18 @@ const AdminPage = () => {
                           key={idx}
                           className="border p-2 rounded bg-gray-50"
                         >
+                          {item.image && (
+                            <div className="mb-2">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-16 h-16 object-cover rounded border"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            </div>
+                          )}
                           <p className="font-medium">{item.name}</p>
                           <p>Size: {item.selectedSize}</p>
                           <p>Price: ₹{item.price}</p>
