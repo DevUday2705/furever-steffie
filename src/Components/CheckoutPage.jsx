@@ -98,7 +98,7 @@ const CheckoutPage = () => {
     let deliveryCharge = 0;
 
     if (totalAfterDiscount <= 1500) {
-      deliveryCharge = formData.deliveryOption === "express" ? 199 : 49;
+      deliveryCharge = formData.deliveryOption === "express" ? 199 : 99;
     }
 
     return Math.round(totalAfterDiscount + deliveryCharge);
@@ -657,7 +657,7 @@ const CheckoutPage = () => {
                         Standard Delivery
                       </span>
                       <span className="block text-xs text-gray-500">
-                        5-7 days • ₹49
+                        5-7 days • ₹99
                       </span>
                     </div>
                   </label>
