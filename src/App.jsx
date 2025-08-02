@@ -6,7 +6,7 @@ import OrderForm from "./Components/OrderForm";
 import FinalReceipt from "./Components/FinalReceipt";
 import ModernOptions from "./Components/ModernOptions";
 import ProductDetail from "./Components/ProductDetail";
-import Cart from "./Components/Cart";
+
 import {
   Routes,
   Route,
@@ -48,6 +48,8 @@ import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
+import WhyUs from "./Components/WhyUs";
+import AboutUs from "./Components/AboutUs";
 import AdminProducts from "./Components/AdminProducts";
 import TutuListing from "./Components/TutuListing";
 import ComingSoonPage from "./Components/ComingSoon";
@@ -63,7 +65,7 @@ const App = () => {
     <div className=" max-w-md mx-auto ">
       {ready ? (
         <>
-          <nav className="flex items-center justify-between px-4 py-3">
+          <nav className="flex items-center justify-between px-4 py-3 sticky top-0 z-[70] bg-white">
             {/* Left: Hamburger & Search */}
             <div className="flex items-center gap-1 min-w-[100px] justify-start">
               <HamburgerMenu />
@@ -113,8 +115,10 @@ const App = () => {
               <Route path="/product-detail/:id" element={<SelectedFabric />} />
               <Route path="/order-form" element={<OrderForm />} />
               <Route path="/final-receipt" element={<FinalReceipt />} />
-              <Route path="/cart" element={<Cart />} />
+
               <Route path="/contact" element={<ContactUsPage />} />
+              <Route path="/why-us" element={<WhyUs />} />
+              <Route path="/about-us" element={<AboutUs />} />
               <Route path="/policy" element={<ShippingPolicyPage />} />
               <Route path="/terms" element={<TermsAndConditionsPage />} />
               <Route

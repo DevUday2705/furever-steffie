@@ -13,11 +13,11 @@ const HamburgerMenu = () => {
     },
     {
       title: "Male",
-      items: ["Kurta", "Tuxedo", "Bandana", "Bowtie"],
+      items: ["Kurta", "Tuxedo", "Bandana", "Bow tie"],
     },
     {
       title: "Female",
-      items: ["Frock", "Lehenga", "Tutu Dress", "Bowtie"],
+      items: ["Frock", "Tutu Dress", "Female Bandanas", "Bow tie"],
     },
     {
       title: "Contact Us",
@@ -51,25 +51,57 @@ const HamburgerMenu = () => {
   const handleItemClick = (item) => {
     console.log("Clicked:", item);
 
-    const lower = item.toLowerCase();
-    switch (lower) {
+    // Convert to lowercase and replace spaces with hyphens for URL routing
+    const routePath = item.toLowerCase().replace(/\s+/g, "-");
+    console.log("female-bandana", routePath);
+    switch (routePath) {
       case "home":
         navigate("/");
         break;
-      case "contact us":
+      case "contact-us":
         navigate("/contact");
         break;
+      case "about-us":
+        navigate("/about-us");
+        break;
+      case "why-us?":
+        navigate("/why-us");
+        break;
+      // Male items
       case "kurta":
         navigate("/kurta");
         break;
+      case "tuxedo":
+        navigate("/tuxedo");
+        break;
+      case "bandana":
+        navigate("/bandana");
+        break;
+      case "bow-tie":
+        navigate("/bow-tie");
+        break;
+      // Female items
+      case "frock":
+        navigate("/frock");
+        break;
+      case "tutu-dress":
+        navigate("/tutu-dress");
+        break;
+      case "female-bandanas":
+        navigate("/female-bandanas");
+        break;
+      case "bow-set":
+        navigate("/bow-set");
+        break;
+
       default:
         // Optionally handle other routes or log
+        console.log("No route defined for:", item);
         break;
     }
 
     setIsOpen(false); // Close the menu after navigation
   };
-
   return (
     <>
       {/* Menu Button */}
