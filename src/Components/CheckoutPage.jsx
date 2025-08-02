@@ -595,7 +595,7 @@ const CheckoutPage = () => {
                     htmlFor="alternateMobile"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Alternate Mobile Number
+                    Whats App Mobile Number
                   </label>
                   <input
                     type="tel"

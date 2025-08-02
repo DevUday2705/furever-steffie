@@ -66,6 +66,21 @@ const ProductDetail = () => {
     return () => emblaApi.off("select", onSelect);
   }, [emblaApi, onSelect]);
 
+  const [hasSavedSize, setHasSavedSize] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("savedPetSize");
+    setHasSavedSize(!!saved);
+    if (saved) {
+      const { size } = JSON.parse(saved);
+      setSelectedSize(size);
+    }
+  }, [productId]);
+
+  const handleClearSavedSize = () => {
+    setHasSavedSize(false);
+    setSelectedSize("");
+  };
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -285,13 +300,23 @@ const ProductDetail = () => {
             setSelectedStyle={setSelectedStyle}
           />
           {requiresMeasurements ? (
-            <SmartPetSizing
-              onSizeDetected={(size, petInfo) => {
-                setSelectedSize(size);
-                setPetInfo(petInfo); // Store breed/age/bodyType
-              }}
-              setMeasurementsValid={setMeasurementsValid}
-            />
+            hasSavedSize ? (
+              <ReadyMadeSizeSelector
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+                sizes={product.sizes || ["S", "M", "L", "XL"]}
+                onClearSavedSize={handleClearSavedSize}
+              />
+            ) : (
+              <SmartPetSizing
+                onSizeDetected={(size, petInfo) => {
+                  setSelectedSize(size);
+                  setPetInfo(petInfo);
+                  setHasSavedSize(!!localStorage.getItem("savedPetSize"));
+                }}
+                setMeasurementsValid={setMeasurementsValid}
+              />
+            )
           ) : (
             <ReadyMadeSizeSelector
               selectedSize={selectedSize}
@@ -299,7 +324,6 @@ const ProductDetail = () => {
               sizes={product.sizes || ["S", "M", "L", "XL"]}
             />
           )}
-
           {product.contactForCustomColors && (
             <CustomColorEnquiry product={product} />
           )}

@@ -17,6 +17,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
   const [recommendedSize, setRecommendedSize] = useState("");
   const [showBreedDropdown, setShowBreedDropdown] = useState(false);
   const [breedSearch, setBreedSearch] = useState("");
+  const [sizeSaved, setSizeSaved] = useState(false);
 
   const dogBreeds = [
     // Extra Small Breeds (XS)
@@ -284,6 +285,19 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
     }
   };
 
+  const handleSaveSize = () => {
+    localStorage.setItem(
+      "savedPetSize",
+      JSON.stringify({
+        size: recommendedSize,
+        breed: selectedBreed,
+        age: selectedAge,
+        bodyType: selectedBodyType,
+      })
+    );
+    setSizeSaved(true);
+  };
+
   // Helper function to check if step is accessible (current or completed previous steps)
   const isStepAccessible = (step) => {
     const steps = ["breed", "age", "bodyType"];
@@ -548,6 +562,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
         </AnimatePresence>
 
         {/* Size Recommendation */}
+
         <AnimatePresence>
           {recommendedSize &&
             selectedBreed &&
@@ -575,10 +590,23 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                     </p>
                   </div>
                 </div>
+                {/* Save Size Button */}
+                {!sizeSaved ? (
+                  <button
+                    onClick={handleSaveSize}
+                    className="mt-3 px-4 py-1.5 bg-emerald-600 text-white rounded-md text-xs font-semibold hover:bg-emerald-700 transition"
+                  >
+                    Save this size for more clothes I purchase
+                  </button>
+                ) : (
+                  <div className="mt-3 text-emerald-700 text-xs font-semibold flex items-center gap-1">
+                    <Check className="w-4 h-4" /> Size saved for future
+                    purchases!
+                  </div>
+                )}
               </motion.div>
             )}
         </AnimatePresence>
-
         {/* Trust Badges */}
         {selectedBodyType && (
           <div
