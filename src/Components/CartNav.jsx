@@ -218,9 +218,7 @@ const CartNav = () => {
                           {recommendedProducts.map((product) => (
                             <Link
                               key={product.id}
-                              to={`/product/${product.id}+${
-                                product.category || product.type
-                              }`}
+                              to={`/product/${product.id}+${product.type}`}
                               onClick={() => setIsOpen(false)}
                             >
                               <motion.div
