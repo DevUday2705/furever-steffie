@@ -285,14 +285,14 @@ const ProductOptions = ({
 
           {/* Royal Set Description */}
           {showRoyalDescription && isRoyalSet && (
-            <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg animate-fadeIn">
+            <div className="mt-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg animate-fadeIn">
               <div className="flex items-start gap-2">
-                <span className="text-lg">✨</span>
+                <span className="text-lg text-gray-400">✨</span>
                 <div>
-                  <h4 className="font-semibold text-purple-800 text-sm">
+                  <h4 className="font-semibold text-gray-800 text-sm">
                     Royal Experience for Your Pet
                   </h4>
-                  <p className="text-xs text-purple-700 mt-1">
+                  <p className="text-xs text-gray-600 mt-1">
                     Comes with Premium packaging, Kurta, Dhoti, Tassels, Dupatta
                     and a Free gift.
                   </p>

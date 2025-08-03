@@ -1,6 +1,5 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-
 let db;
 
 // Initialize Firestore only once
