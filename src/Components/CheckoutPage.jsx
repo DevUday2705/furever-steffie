@@ -109,7 +109,14 @@ const CheckoutPage = () => {
     setFormSubmitted(true);
 
     if (validateForm(formData, setErrors)) {
-      mixpanel.track("Address Submitted");
+      // Send Mixpanel event with all customer data
+      mixpanel.track("Address Submitted", {
+        ...formData,
+        cart: isCartCheckout ? cart : [orderDetails],
+        isCartCheckout,
+        timestamp: new Date().toISOString(),
+      });
+
       localStorage.setItem("customer", JSON.stringify(formData));
       if (!isCartCheckout) {
         localStorage.setItem("order", JSON.stringify(orderDetails));
