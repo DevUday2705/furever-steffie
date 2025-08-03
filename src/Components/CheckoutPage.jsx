@@ -155,7 +155,7 @@ const CheckoutPage = () => {
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 1 }),
+        body: JSON.stringify({ amount: calculateTotal() }),
       });
 
       if (!res.ok) {
@@ -169,8 +169,7 @@ const CheckoutPage = () => {
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         // amount: data.amount,
-        // amount: calculateTotal() * 100, // Convert to paise
-        amount: 100, // Convert to paise
+        amount: calculateTotal() * 100, // Convert to paise
         currency: data.currency,
         name: "Furever Steffie",
         description: "Order Payment",
