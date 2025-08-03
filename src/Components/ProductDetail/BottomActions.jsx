@@ -31,6 +31,22 @@ const BottomActions = ({
       selectedSize.toUpperCase()
     );
 
+  // Check if user has saved size (from localStorage)
+  const hasSavedSize = !!localStorage.getItem("savedPetSize");
+
+  // Determine if actions should be enabled
+  const shouldEnableActions = () => {
+    if (!selectedSize) return false;
+
+    if (requiresMeasurements) {
+      // If measurements are required, check if user has saved size OR valid measurements
+      return hasSavedSize || measurementsValid;
+    }
+
+    // For products that don't require measurements, just check if size is selected
+    return true;
+  };
+
   const handleBuyNow = () => {
     const orderDetails = {
       productId: product.id,
@@ -69,7 +85,7 @@ const BottomActions = ({
   };
 
   const handleWhatsAppChat = () => {
-    const businessWhatsAppNumber = "+918828145667"; // Replace with your actual business WhatsApp number
+    const businessWhatsAppNumber = "+918828145667";
 
     const message = `Hi, I need help with my dog's dress - 
 Name: ${product.name}
@@ -83,6 +99,8 @@ Thanks`;
 
     window.open(whatsappUrl, "_blank");
   };
+
+  const isActionsEnabled = shouldEnableActions();
 
   // If custom size is selected, show WhatsApp button
   if (isCustomSize) {
@@ -120,13 +138,9 @@ Thanks`;
   return (
     <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
       <motion.button
-        disabled={requiresMeasurements ? !measurementsValid : !selectedSize}
+        disabled={!isActionsEnabled}
         className={`w-full py-3 ${
-          requiresMeasurements
-            ? !measurementsValid
-              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-              : "bg-gray-800 text-white"
-            : !selectedSize
+          !isActionsEnabled
             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
             : "bg-gray-800 text-white"
         } font-medium rounded-md`}
@@ -137,13 +151,9 @@ Thanks`;
       </motion.button>
 
       <motion.button
-        disabled={requiresMeasurements ? !measurementsValid : !selectedSize}
+        disabled={!isActionsEnabled}
         className={`w-full py-3 mt-2 font-medium rounded-md border ${
-          requiresMeasurements
-            ? !measurementsValid
-              ? "text-gray-400 border-gray-300 cursor-not-allowed"
-              : "text-gray-800 border-gray-800"
-            : !selectedSize
+          !isActionsEnabled
             ? "text-gray-400 border-gray-300 cursor-not-allowed"
             : "text-gray-800 border-gray-800"
         }`}
