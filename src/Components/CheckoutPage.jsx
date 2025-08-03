@@ -169,7 +169,8 @@ const CheckoutPage = () => {
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         // amount: data.amount,
-        amount: calculateTotal() * 100, // Convert to paise
+        // amount: calculateTotal() * 100, // Convert to paise
+        amount: 100, // Convert to paise
         currency: data.currency,
         name: "Furever Steffie",
         description: "Order Payment",
