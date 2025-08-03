@@ -237,28 +237,31 @@ const ProductOptions = ({
                   onClick={handleRoyalSetClick}
                   className={`py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 relative overflow-hidden ${
                     isRoyalSet
-                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-2 border-emerald-400 shadow-xl ring-4 ring-emerald-200 ring-opacity-50"
-                      : "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-2 border-purple-300 hover:from-purple-600 hover:to-pink-600 hover:shadow-xl"
+                      ? "bg-gradient-to-r from-gray-700 to-gray-500 text-white border-2 border-gray-400 shadow-xl ring-4 ring-gray-200 ring-opacity-50"
+                      : "bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 border-2 border-gray-300 hover:from-gray-300 hover:to-gray-200 hover:shadow-xl"
                   }`}
                 >
                   <span className="relative z-10 flex items-center gap-1">
                     {isRoyalSet ? (
                       <>
-                        <CheckCircle size={20} className="animate-pulse" />
+                        <CheckCircle
+                          size={20}
+                          className="animate-pulse text-white"
+                        />
                         <span className="font-bold">Royal Set Selected ✓</span>
                       </>
                     ) : (
                       <>
-                        <Gift size={20} />
+                        <Gift size={20} className="text-gray-700" />
                         <span>Full Royal Set</span>
                       </>
                     )}
                   </span>
 
                   {isRoyalSet ? (
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 animate-pulse"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-400/20 to-gray-300/20 animate-pulse"></div>
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                   )}
                 </button>
               )}
@@ -276,6 +279,7 @@ const ProductOptions = ({
                       left: 0,
                       right: 0,
                       bottom: 0,
+                      filter: "grayscale(0.7) brightness(0.95)", // subtle gray overlay
                     }}
                   />
                 </div>

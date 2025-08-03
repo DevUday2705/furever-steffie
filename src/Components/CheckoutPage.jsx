@@ -97,8 +97,10 @@ const CheckoutPage = () => {
 
     let deliveryCharge = 0;
 
-    if (totalAfterDiscount <= 1500) {
-      deliveryCharge = formData.deliveryOption === "express" ? 199 : 99;
+    if (formData.deliveryOption === "express") {
+      deliveryCharge = 399;
+    } else {
+      deliveryCharge = totalAfterDiscount > 1499 ? 0 : 99;
     }
 
     return Math.round(totalAfterDiscount + deliveryCharge);
@@ -770,14 +772,13 @@ const CheckoutPage = () => {
                       const discountAmount = (productPrice * discount) / 100;
                       const totalAfterDiscount = productPrice - discountAmount;
 
-                      if (totalAfterDiscount > 1500) {
+                      if (formData.deliveryOption === "express") {
+                        return convertCurrency(399, currency);
+                      }
+                      if (totalAfterDiscount > 1499) {
                         return "Free";
                       }
-
-                      const deliveryCharge =
-                        formData.deliveryOption === "express" ? 199 : 49;
-
-                      return convertCurrency(deliveryCharge, currency);
+                      return convertCurrency(99, currency);
                     })()}
                   </span>
                 </div>
