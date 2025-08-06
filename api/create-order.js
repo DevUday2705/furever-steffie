@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     // Setup order options
     const options = {
-        amount: Math.round(1 * 100), // Convert to paise
+        amount: Math.round(amount * 100), // Convert to paise
         currency: "INR",
         receipt: `receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
         notes: {
