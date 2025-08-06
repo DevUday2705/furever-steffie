@@ -44,7 +44,7 @@ export default async function handler(req, res) {
             razorpay_payment_id,
             customer,
             items, // Should contain: productId, name, selectedSize, price, quantity, etc.
-            amount: 1,
+            amount,
             orderSource: items.length > 1 ? "cart" : "buy-now",
             paymentStatus: "paid",
             orderStatus: "pending",
