@@ -63,7 +63,8 @@ const BottomActions = ({
     const orderDetails = {
       productId: product.id,
       name: product.name,
-      subcategory: product.subcategory,
+      category: product.category || product.type, // Use category from your JSON structure
+      subcategory: product.subcategory, // Keep for backward compatibility
       isBeaded,
       isRoyalSet,
       isFullSet,
@@ -82,7 +83,8 @@ const BottomActions = ({
     addToCart({
       productId: product.id,
       name: product.name,
-      subcategory: product.subcategory,
+      category: product.category || product.type, // Use category from your JSON structure
+      subcategory: product.subcategory, // Keep for backward compatibility
       isBeaded,
       isFullSet,
       isDupattaSet, // NEW
