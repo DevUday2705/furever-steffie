@@ -14,6 +14,7 @@ const AdminPage = () => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,6 +22,27 @@ const AdminPage = () => {
   const [customDate, setCustomDate] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+
+  // Helper function to get dhoti details from product data
+  const getDhotiDetails = (item) => {
+    if (item.selectedDhotiDetails) {
+      return item.selectedDhotiDetails;
+    }
+
+    if (item.selectedDhoti && item.category) {
+      const productKey = `${item.category}s`; // e.g., "kurtas"
+      const product = productData[productKey]?.find(
+        (p) => p.id === item.productId
+      );
+      if (product?.dhotis) {
+        return product.dhotis.find(
+          (dhoti) => dhoti.name === item.selectedDhoti
+        );
+      }
+    }
+
+    return null;
+  };
 
   const handleLogin = () => {
     if (passkey === ADMIN_KEY) {
@@ -33,6 +55,7 @@ const AdminPage = () => {
   useEffect(() => {
     if (isAuthorized) {
       fetchOrders();
+      fetchProductData(); // Fetch product data for dhoti lookup
     }
   }, [isAuthorized]);
 
@@ -45,6 +68,24 @@ const AdminPage = () => {
     }));
     setOrders(allOrders);
     setLoading(false);
+  };
+
+  const fetchProductData = async () => {
+    try {
+      // Fetch kurtas data for dhoti lookup
+      const kurtasSnapshot = await getDocs(collection(db, "kurtas"));
+      const kurtasData = kurtasSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProductData((prev) => ({
+        ...prev,
+        kurtas: kurtasData,
+      }));
+    } catch (error) {
+      console.error("Error fetching product data:", error);
+    }
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -259,24 +300,36 @@ const AdminPage = () => {
               className="border rounded-lg p-4 shadow-sm"
             >
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex-1">
                   <button
                     onClick={() =>
                       setExpandedOrderId(
                         expandedOrderId === order.id ? null : order.id
                       )
                     }
-                    className="text-sm font-bold text-indigo-600 underline"
+                    className="text-lg font-bold text-indigo-600 underline mb-1"
                   >
                     {order.customer?.fullName}
                   </button>
-                  <div className="text-xs text-gray-500 mb-2">
-                    {order.customer?.mobileNumber}
+                  <div className="text-sm font-medium text-gray-800 mb-1">
+                    📞 {order.customer?.mobileNumber}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    📅{" "}
+                    {new Date(order.createdAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-bold">₹{order.amount}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-lg font-bold text-green-600">
+                    ₹{order.amount}
+                  </div>
+                  <div className="text-sm text-gray-500">
                     {order.items?.length} item(s)
                   </div>
                 </div>
@@ -325,10 +378,6 @@ const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="mt-2 text-[10px] text-gray-400">
-                {new Date(order.createdAt).toLocaleString()}
-              </div>
-
               {expandedOrderId === order.id && (
                 <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
                   <div>
@@ -348,51 +397,135 @@ const AdminPage = () => {
                   <div>
                     <p className="font-semibold mt-2">Items Ordered</p>
                     <div className="space-y-1">
-                      {order.items?.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="border p-2 rounded bg-gray-50"
-                        >
-                          {item.image && (
-                            <div className="mb-2">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-16 h-16 object-cover rounded border"
-                                onError={(e) => {
-                                  e.target.style.display = "none";
-                                }}
-                              />
+                      {order.items?.map((item, idx) => {
+                        // Debug: Log item data to see what's being stored
+                        console.log("Order item data:", {
+                          name: item.name,
+                          selectedDhoti: item.selectedDhoti,
+                          selectedDhotiDetails: item.selectedDhotiDetails,
+                          hasImage: !!item.selectedDhotiDetails?.image,
+                        });
+
+                        // Get dhoti details using helper function
+                        const dhotiBrother = getDhotiDetails(item);
+
+                        return (
+                          <div
+                            key={idx}
+                            className="border p-3 rounded bg-gray-50"
+                          >
+                            <div className="flex gap-3">
+                              {/* Main Product Image */}
+                              {item.image && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-20 h-20 object-cover rounded border"
+                                    onError={(e) => {
+                                      e.target.style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Dhoti Image if selected */}
+                              {dhotiBrother && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={dhotiBrother.image}
+                                    alt={`${dhotiBrother.name} dhoti`}
+                                    className="w-20 h-20 object-cover rounded border border-blue-200"
+                                    onError={(e) => {
+                                      e.target.style.display = "none";
+                                    }}
+                                  />
+                                  <p className="text-xs text-center text-blue-600 mt-1">
+                                    {dhotiBrother.name} Dhoti
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Product Details */}
+                              <div className="flex-1">
+                                <p className="font-medium text-base">
+                                  {item.name}
+                                </p>
+                                <p className="text-sm">
+                                  Size:{" "}
+                                  <span className="font-medium">
+                                    {item.selectedSize}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Price:{" "}
+                                  <span className="font-medium text-green-600">
+                                    ₹{item.price}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Is Royal:{" "}
+                                  <span className="font-medium">
+                                    {item.isRoyalSet ? "Yes" : "No"}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Beaded:{" "}
+                                  <span className="font-medium">
+                                    {item.isBeaded ? "Yes" : "No"}
+                                  </span>
+                                  , Full Set:{" "}
+                                  <span className="font-medium">
+                                    {item.isFullSet ? "Yes" : "No"}
+                                  </span>
+                                  {item.isDupattaSet && (
+                                    <>
+                                      , Dupatta Set:{" "}
+                                      <span className="font-medium text-purple-600">
+                                        Yes
+                                      </span>
+                                    </>
+                                  )}
+                                </p>
+                                {(item.selectedDhoti || dhotiBrother) && (
+                                  <p className="text-sm">
+                                    Dhoti:{" "}
+                                    <span className="font-medium text-blue-600">
+                                      {dhotiBrother?.name || item.selectedDhoti}
+                                    </span>
+                                    {item.selectedDhoti && !dhotiBrother && (
+                                      <span className="text-xs text-gray-500 ml-2">
+                                        (lookup failed - product data not
+                                        loaded)
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
+                                {item.selectedColor && (
+                                  <p className="text-sm">
+                                    Color:{" "}
+                                    <span className="font-medium">
+                                      {item.selectedColor}
+                                    </span>
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          )}
-                          <p className="font-medium">{item.name}</p>
-                          <p>Size: {item.selectedSize}</p>
-                          <p>Price: ₹{item.price}</p>
-                          <p>Is Royal: {item.isRoyalSet ? "Yes" : "No"}</p>
-                          <p>
-                            Beaded: {item.isBeaded ? "Yes" : "No"}, Full Set:{" "}
-                            {item.isFullSet ? "Yes" : "No"}
-                          </p>
-                          <p>
-                            Dhoti : {item.selectedDhoti && item.selectedDhoti}
-                          </p>
-                          <p>
-                            Selected Color/Frock Color :{" "}
-                            {item.selectedColor && item.selectedColor}
-                          </p>
-                          {/* 👇 ADD this here 👇 */}
-                          {item.measurements && (
-                            <div className="text-[11px] text-gray-600 mt-1">
-                              <p>Measurements:</p>
-                              <p>
-                                Neck: {item.measurements.neck}" • Chest:{" "}
-                                {item.measurements.chest}" • Back:{" "}
-                                {item.measurements.back}"
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+
+                            {/* Measurements */}
+                            {item.measurements && (
+                              <div className="text-xs text-gray-600 mt-2 p-2 bg-blue-50 rounded">
+                                <p className="font-medium">📏 Measurements:</p>
+                                <p>
+                                  Neck: {item.measurements.neck}&quot; • Chest:{" "}
+                                  {item.measurements.chest}&quot; • Back:{" "}
+                                  {item.measurements.back}&quot;
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 

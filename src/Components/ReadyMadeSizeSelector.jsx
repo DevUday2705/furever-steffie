@@ -12,7 +12,7 @@ const ReadyMadeSizeSelector = ({
   // Helper function to check if size is in stock
   const isSizeInStock = (size) => {
     // For sizes XS, S, M - check stock from product.sizeStock
-    if (['XS', 'S', 'M'].includes(size)) {
+    if (["XS", "S", "M"].includes(size)) {
       return product?.sizeStock?.[size] > 0;
     }
     // For L, XL, XXL+ - always available (manual management)
@@ -21,7 +21,7 @@ const ReadyMadeSizeSelector = ({
 
   // Helper function to get stock count
   const getStockCount = (size) => {
-    if (['XS', 'S', 'M'].includes(size)) {
+    if (["XS", "S", "M"].includes(size)) {
       return product?.sizeStock?.[size] || 0;
     }
     return null; // No stock display for manual sizes
@@ -72,7 +72,7 @@ const ReadyMadeSizeSelector = ({
           const stockCount = getStockCount(size);
           const isSelected = selectedSize === size;
           const isDisabled = !inStock || (!!savedSize && savedSize !== size);
-          
+
           return (
             <div key={size} className="relative">
               <button

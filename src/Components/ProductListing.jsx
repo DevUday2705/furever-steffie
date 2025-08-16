@@ -58,22 +58,25 @@ const ProductListing = ({
   // Helper function to check product stock status
   const getProductStockStatus = (product) => {
     // Check XS, S, M stock
-    const managedSizes = ['XS', 'S', 'M'];
-    const stockInfo = managedSizes.map(size => ({
+    const managedSizes = ["XS", "S", "M"];
+    const stockInfo = managedSizes.map((size) => ({
       size,
       stock: product?.sizeStock?.[size] || 0,
-      inStock: (product?.sizeStock?.[size] || 0) > 0
+      inStock: (product?.sizeStock?.[size] || 0) > 0,
     }));
-    
-    const totalManagedStock = stockInfo.reduce((sum, item) => sum + item.stock, 0);
-    const inStockSizes = stockInfo.filter(item => item.inStock);
-    
+
+    const totalManagedStock = stockInfo.reduce(
+      (sum, item) => sum + item.stock,
+      0
+    );
+    const inStockSizes = stockInfo.filter((item) => item.inStock);
+
     return {
       stockInfo,
       totalManagedStock,
       hasAnyStock: inStockSizes.length > 0 || true, // L, XL, XXL always available
       lowStock: totalManagedStock > 0 && totalManagedStock <= 5,
-      soldOut: totalManagedStock === 0
+      soldOut: totalManagedStock === 0,
     };
   };
   useEffect(() => {
@@ -256,7 +259,7 @@ const ProductListing = ({
                 : price;
             const currentPrice = (price * rate).toFixed(2);
             const originalPriceConverted = (originalPrice * rate).toFixed(2);
-            
+
             // Get stock status
             const stockStatus = getProductStockStatus(product);
 
@@ -264,7 +267,7 @@ const ProductListing = ({
               <motion.div
                 key={product.id}
                 className={`bg-white rounded-xl shadow-md overflow-hidden ${
-                  stockStatus.soldOut ? 'opacity-60' : ''
+                  stockStatus.soldOut ? "opacity-60" : ""
                 }`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -279,20 +282,26 @@ const ProductListing = ({
                       className="absolute w-full h-full object-cover"
                       whileHover={{ scale: 1.05 }}
                     />
-                    
+
                     {/* Stock Status Indicators */}
                     {stockStatus.soldOut && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <div className="bg-red-600 text-white px-3 py-1 rounded-md font-semibold text-sm">
-                          SOLD OUT
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/40 flex items-center justify-center backdrop-blur-sm">
+                        <div className="bg-white/95 text-gray-800 px-4 py-2 rounded-lg font-semibold text-sm shadow-lg border border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            OUT OF STOCK
+                          </div>
                         </div>
                       </div>
                     )}
-                    
+
                     {!stockStatus.soldOut && stockStatus.lowStock && (
                       <div className="absolute top-2 right-2">
-                        <div className="bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                          Low Stock
+                        <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                            Low Stock
+                          </div>
                         </div>
                       </div>
                     )}
@@ -356,15 +365,17 @@ const ProductListing = ({
                           </>
                         )}
                       </div>
-                      
+
                       {/* Stock Status Information */}
                       {stockStatus.soldOut ? (
-                        <span className="text-xs font-medium text-red-600 mt-1">
-                          Sold out in XS, S, M
+                        <span className="text-xs font-medium text-gray-600 mt-1 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                          Currently unavailable in XS, S, M
                         </span>
                       ) : stockStatus.lowStock ? (
-                        <span className="text-xs font-medium text-orange-600 mt-1">
-                          Low stock ({stockStatus.totalManagedStock} left)
+                        <span className="text-xs font-medium text-amber-600 mt-1 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
+                          Only {stockStatus.totalManagedStock} left in stock
                         </span>
                       ) : null}
                     </div>

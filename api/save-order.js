@@ -44,44 +44,44 @@ export default async function handler(req, res) {
 
         for (const item of items) {
             console.log(`🔍 Checking item: ${item.name}, Size: ${item.selectedSize}, Category: ${item.category || item.subcategory || item.type}`);
-            
+
             if (['XS', 'S', 'M'].includes(item.selectedSize)) {
                 // Try different collection name patterns
                 let collectionName = item.category || item.subcategory || item.type;
-                
+
                 // Handle known collection mappings
                 const collectionMap = {
                     'kurta': 'kurtas',
-                    'lehenga': 'lehengas', 
+                    'lehenga': 'lehengas',
                     'frock': 'frocks',
                     'bandana': 'bandanas',
                     'bowtie': 'bowties'
                 };
-                
+
                 // Use mapped name or add 's' if needed
                 if (collectionMap[collectionName]) {
                     collectionName = collectionMap[collectionName];
                 } else if (collectionName && !collectionName.endsWith('s')) {
                     collectionName += 's';
                 }
-                
+
                 console.log(`📁 Using collection: ${collectionName}, Product ID: ${item.productId}`);
-                
+
                 const productRef = db.collection(collectionName).doc(item.productId);
                 const productDoc = await productRef.get();
 
                 if (!productDoc.exists) {
                     console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
-                    
+
                     // Try alternative collection names
                     const alternativeCollections = ['kurtas', 'lehengas', 'frocks', 'bandanas', 'bowties'];
                     let found = false;
-                    
+
                     for (const altCollection of alternativeCollections) {
                         try {
                             const altRef = db.collection(altCollection).doc(item.productId);
                             const altDoc = await altRef.get();
-                            
+
                             if (altDoc.exists) {
                                 console.log(`✅ Found product in alternative collection: ${altCollection}`);
                                 const product = altDoc.data();
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
                                     productId: item.productId,
                                     collectionName: altCollection
                                 });
-                                
+
                                 found = true;
                                 break;
                             }
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
                             console.log(`Failed to check collection ${altCollection}:`, err.message);
                         }
                     }
-                    
+
                     if (!found) {
                         return res.status(400).json({
                             message: `Product ${item.productId} not found in any collection`
@@ -120,7 +120,7 @@ export default async function handler(req, res) {
                 } else {
                     const product = productDoc.data();
                     console.log(`📊 Product data:`, JSON.stringify(product.sizeStock, null, 2));
-                    
+
                     const currentStock = product.sizeStock?.[item.selectedSize] || 0;
                     const requestedQty = item.quantity || 1;
 
@@ -177,7 +177,7 @@ export default async function handler(req, res) {
         }
 
         console.log(`🚀 Committing batch with ${stockUpdates.length} stock updates...`);
-        
+
         try {
             // Commit all changes atomically
             await batch.commit();
@@ -196,12 +196,12 @@ export default async function handler(req, res) {
             });
         } catch (batchError) {
             console.error("❌ Batch commit failed:", batchError);
-            
+
             // Try to save order without stock update as fallback
             try {
                 console.log("🔄 Attempting to save order without stock update...");
                 const fallbackOrderRef = await db.collection("orders").add(orderData);
-                
+
                 return res.status(200).json({
                     success: true,
                     orderId: fallbackOrderRef.id,

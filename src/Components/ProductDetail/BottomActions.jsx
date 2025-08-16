@@ -37,7 +37,7 @@ const BottomActions = ({
 
   // Check if selected size is in stock
   const isSizeInStock = () => {
-    if (['XS', 'S', 'M'].includes(selectedSize)) {
+    if (["XS", "S", "M"].includes(selectedSize)) {
       return product?.sizeStock?.[selectedSize] > 0;
     }
     return true; // L, XL, XXL+ are always available
@@ -46,7 +46,7 @@ const BottomActions = ({
   // Determine if actions should be enabled
   const shouldEnableActions = () => {
     if (!selectedSize) return false;
-    
+
     // Check stock for XS, S, M sizes
     if (!isSizeInStock()) return false;
 
@@ -60,6 +60,12 @@ const BottomActions = ({
   };
 
   const handleBuyNow = () => {
+    // Find selected dhoti details if dhoti is selected
+    const selectedDhotiDetails =
+      selectedDhoti && product.dhotis
+        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
+        : null;
+
     const orderDetails = {
       productId: product.id,
       name: product.name,
@@ -70,6 +76,7 @@ const BottomActions = ({
       isFullSet,
       isDupattaSet, // NEW
       selectedDhoti,
+      selectedDhotiDetails, // Store full dhoti object with name and image
       selectedSize,
       selectedColor,
       price: calculatePrice(),
@@ -80,6 +87,12 @@ const BottomActions = ({
   };
 
   const handleAddToCart = () => {
+    // Find selected dhoti details if dhoti is selected
+    const selectedDhotiDetails =
+      selectedDhoti && product.dhotis
+        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
+        : null;
+
     addToCart({
       productId: product.id,
       name: product.name,
@@ -89,6 +102,8 @@ const BottomActions = ({
       isFullSet,
       isDupattaSet, // NEW
       isRoyalSet,
+      selectedDhoti,
+      selectedDhotiDetails, // Store full dhoti object with name and image
       selectedSize,
       selectedColor,
       price: calculatePrice(),
