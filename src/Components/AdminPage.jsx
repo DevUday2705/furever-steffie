@@ -392,20 +392,6 @@ const AdminPage = () => {
               {expandedOrderId === order.id && (
                 <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
                   <div>
-                    <p className="font-semibold">Customer Details</p>
-                    <p>Name: {order.customer?.fullName}</p>
-                    <p>Phone: {order.customer?.mobileNumber}</p>
-                    <p>Alt Phone: {order.customer?.alternateMobile}</p>
-                    <p>
-                      Address: {order.customer?.addressLine1},{" "}
-                      {order.customer?.addressLine2}, {order.customer?.city},{" "}
-                      {order.customer?.state} - {order.customer?.pincode}
-                    </p>
-                    <p>Instructions: {order.customer?.specialInstructions}</p>
-                    <p>Delivery: {order.customer?.deliveryOption}</p>
-                  </div>
-
-                  <div>
                     <p className="font-semibold mt-2">Items Ordered</p>
                     <div className="space-y-1">
                       {order.items?.map((item, idx) => {
@@ -550,7 +536,36 @@ const AdminPage = () => {
                     </div>
                   </div>
 
-                  {console.log(order)}
+                  <div>
+                    <p className="font-semibold">Customer Details</p>
+                    <p>
+                      {" "}
+                      <span className="font-bold">Name:</span>{" "}
+                      {order.customer?.fullName}
+                    </p>
+                    <p>
+                      <span className="font-bold">Phone:</span>{" "}
+                      {order.customer?.mobileNumber}
+                    </p>
+                    <p>
+                      <span className="font-bold">WhatsApp Number :</span>{" "}
+                      {order.customer?.alternateMobile || "N/A"}
+                    </p>
+                    <p>
+                      <span className="font-bold">Address:</span>{" "}
+                      {order.customer?.addressLine1},{" "}
+                      {order.customer?.addressLine2}, {order.customer?.city},{" "}
+                      {order.customer?.state} - {order.customer?.pincode}
+                    </p>
+                    <p>
+                      <span className="font-bold">Instructions:</span>{" "}
+                      {order.customer?.specialInstructions}
+                    </p>
+                    <p>
+                      <span className="font-bold">Delivery:</span>{" "}
+                      {order.customer?.deliveryOption}
+                    </p>
+                  </div>
                   <div className="pt-2 border-t">
                     <p className="font-semibold">Razorpay</p>
                     <p>Order ID: {order.razorpay_order_id}</p>
