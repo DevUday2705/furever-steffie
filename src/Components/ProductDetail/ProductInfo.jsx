@@ -46,7 +46,7 @@ const ProductInfo = ({ product, calculatePrice }) => {
   };
 
   return (
-    <div className="px-4 pb-4">
+    <div className="px-4 pb-1">
       {/* Subcategory */}
       {product.subcategory && (
         <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">

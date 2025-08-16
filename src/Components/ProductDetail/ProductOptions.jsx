@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { CheckCircle, Gift } from "lucide-react";
+import { CheckCircle, ChevronRight, Gift } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
+import { Link } from "react-router-dom";
 
 const confettiOptions = {
   loop: false,
@@ -22,6 +23,8 @@ const ProductOptions = ({
   setIsBeaded,
   isFullSet,
   setIsFullSet,
+  isDupattaSet, // NEW
+  setIsDupattaSet, // NEW
   selectedDhoti,
   setSelectedDhoti,
   selectedColor, // NEW
@@ -33,6 +36,7 @@ const ProductOptions = ({
 }) => {
   const [showRoyalDescription, setShowRoyalDescription] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isShining, setIsShining] = useState(false);
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
   };
@@ -41,6 +45,7 @@ const ProductOptions = ({
   const handleRoyalSetClick = () => {
     setIsRoyalSet(true);
     setIsFullSet(true); // Royal set includes dhoti
+    setIsDupattaSet(false); // Reset dupatta when royal is selected
     setShowRoyalDescription(true);
     // Trigger confetti animation
     setShowConfetti(true);
@@ -52,9 +57,33 @@ const ProductOptions = ({
     // Hide description after 5 seconds
   };
 
-  const handleRegularOptionClick = (isFullSetOption) => {
+  useEffect(() => {
+    const initialTimer = setTimeout(() => {
+      triggerShine();
+    }, 1000);
+
+    const intervalId = setInterval(() => {
+      triggerShine();
+    }, 5000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const triggerShine = () => {
+    setIsShining(true);
+    setTimeout(() => setIsShining(false), 2500);
+  };
+
+  const handleRegularOptionClick = (
+    isFullSetOption,
+    isDupattaOption = false
+  ) => {
     setIsRoyalSet(false);
     setIsFullSet(isFullSetOption);
+    setIsDupattaSet(isDupattaOption);
     setShowRoyalDescription(false);
   };
   const renderStyleOptions = () => {
@@ -204,87 +233,95 @@ const ProductOptions = ({
       {product.type === "kurta" && product.options && (
         <div>
           <h3 className="text-xs font-medium text-gray-900">Product Type</h3>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {/* Regular Kurta Option */}
-            <button
-              onClick={() => handleRegularOptionClick(false)}
-              className={`py-1.5 px-3 rounded-md text-sm transition-all duration-200 ${
-                !isFullSet && !isRoyalSet
-                  ? "border-gray-800 bg-gray-100"
-                  : "border-gray-200 bg-gray-50 hover:border-gray-300"
-              } border text-gray-800`}
-            >
-              Kurta
-            </button>
+          <div className="mt-1 space-y-2">
+            {/* Regular options in a row */}
+            <div className="flex flex-wrap gap-2">
+              {/* Regular Kurta Option */}
+              <button
+                onClick={() => handleRegularOptionClick(false, false)}
+                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
+                  !isFullSet && !isRoyalSet && !isDupattaSet
+                    ? "border-gray-800 bg-gray-100"
+                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                } border text-gray-800`}
+              >
+                Kurta
+              </button>
 
-            {/* Regular Kurta + Dhoti Option */}
-            <button
-              onClick={() => handleRegularOptionClick(true)}
-              className={`py-1.5 px-3 rounded-md text-sm transition-all duration-200 ${
-                isFullSet && !isRoyalSet
-                  ? "border-gray-800 bg-gray-100"
-                  : "border-gray-200 bg-gray-50 hover:border-gray-300"
-              } border text-gray-800`}
-            >
-              Kurta + Dhoti
-            </button>
+              {/* Regular Kurta + Dhoti Option */}
+              <button
+                onClick={() => handleRegularOptionClick(true, false)}
+                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
+                  isFullSet && !isRoyalSet && !isDupattaSet
+                    ? "border-gray-800 bg-gray-100"
+                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                } border text-gray-800`}
+              >
+                Kurta + Dhoti
+              </button>
 
-            {/* Royal Set Option - Only for Royal category */}
-            <div className="relative">
-              {/* Your existing Royal Set button */}
-              {product.isRoyal && (
+              {/* NEW: Kurta + Dupatta Option */}
+              <button
+                onClick={() => handleRegularOptionClick(false, true)}
+                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
+                  isDupattaSet && !isRoyalSet
+                    ? "border-gray-800 bg-gray-100"
+                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                } border text-gray-800`}
+              >
+                Kurta + Dupatta
+              </button>
+            </div>
+
+            {/* Royal Set Option - Full width */}
+            {product.isRoyal && (
+              <div className="relative w-full overflow-hidden rounded-md">
                 <button
                   onClick={handleRoyalSetClick}
-                  className={`py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 relative overflow-hidden ${
-                    isRoyalSet
-                      ? "bg-gradient-to-r from-gray-700 to-gray-500 text-white border-2 border-gray-400 shadow-xl ring-4 ring-gray-200 ring-opacity-50"
-                      : "bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 border-2 border-gray-300 hover:from-gray-300 hover:to-gray-200 hover:shadow-xl"
-                  }`}
+                  onMouseEnter={triggerShine}
+                  className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-[#e9d396] border-opacity-30
+                    ${
+                      isRoyalSet
+                        ? "bg-gradient-to-r from-gray-700 to-gray-500 text-white border-2 border-gray-400 shadow-xl ring-4 ring-gray-200 ring-opacity-50"
+                        : "bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 border-2 border-gray-300 hover:from-gray-300 hover:to-gray-200 hover:shadow-xl"
+                    }
+                  `}
                 >
-                  <span className="relative z-10 flex items-center gap-1">
-                    {isRoyalSet ? (
-                      <>
-                        <CheckCircle
-                          size={20}
-                          className="animate-pulse text-white"
-                        />
-                        <span className="font-bold">Royal Set Selected ✓</span>
-                      </>
-                    ) : (
-                      <>
-                        <Gift size={20} className="text-gray-700" />
-                        <span>Full Royal Set</span>
-                      </>
-                    )}
-                  </span>
-
-                  {isRoyalSet ? (
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-400/20 to-gray-300/20 animate-pulse"></div>
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/40 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                  )}
+                  <Gift className="w-5 h-5 mr-2" />
+                  {isRoyalSet ? "Royal Set Selected ✓" : "Full Royal Set"}
                 </button>
-              )}
 
-              {/* Confetti Animation Overlay */}
-              {showConfetti && (
-                <div className="fixed inset-0 pointer-events-none z-50">
-                  <Lottie
-                    options={confettiOptions}
-                    height="100vh"
-                    width="100vw"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      filter: "grayscale(0.7) brightness(0.95)", // subtle gray overlay
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+                <motion.div
+                  className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-transparent via-gray-200/40 to-transparent opacity-30"
+                  initial={{ x: "-100%", skewX: -30 }}
+                  animate={isShining ? { x: "300%" } : { x: "-100%" }}
+                  transition={
+                    isShining
+                      ? { duration: 1.5, ease: "easeInOut" }
+                      : { duration: 0 }
+                  }
+                />
+              </div>
+            )}
+
+            {/* Confetti Animation Overlay */}
+            {showConfetti && (
+              <div className="fixed inset-0 pointer-events-none z-50">
+                <Lottie
+                  options={confettiOptions}
+                  height="100vh"
+                  width="100vw"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    filter: "grayscale(0.7) brightness(0.95)",
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Royal Set Description */}

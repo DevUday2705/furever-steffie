@@ -393,8 +393,12 @@ const CheckoutPage = () => {
                       </h4>
                       <div className="text-xs text-gray-600 mt-0.5">
                         {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                        {item.isFullSet ? "Full Set" : "Kurta Only"} • Size{" "}
-                        {item.selectedSize}
+                        {item.isFullSet
+                          ? "Full Set"
+                          : item.isDupattaSet
+                          ? "Kurta + Dupatta"
+                          : "Kurta Only"}{" "}
+                        • Size {item.selectedSize}
                       </div>
                       {item.quantity && (
                         <div className="text-xs text-gray-500 mt-0.5">

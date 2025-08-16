@@ -10,6 +10,7 @@ const BottomActions = ({
   images,
   isBeaded,
   isFullSet,
+  isDupattaSet, // NEW
   selectedSize = "XL",
   calculatePrice,
   navigate,
@@ -34,9 +35,20 @@ const BottomActions = ({
   // Check if user has saved size (from localStorage)
   const hasSavedSize = !!localStorage.getItem("savedPetSize");
 
+  // Check if selected size is in stock
+  const isSizeInStock = () => {
+    if (['XS', 'S', 'M'].includes(selectedSize)) {
+      return product?.sizeStock?.[selectedSize] > 0;
+    }
+    return true; // L, XL, XXL+ are always available
+  };
+
   // Determine if actions should be enabled
   const shouldEnableActions = () => {
     if (!selectedSize) return false;
+    
+    // Check stock for XS, S, M sizes
+    if (!isSizeInStock()) return false;
 
     if (requiresMeasurements) {
       // If measurements are required, check if user has saved size OR valid measurements
@@ -55,6 +67,7 @@ const BottomActions = ({
       isBeaded,
       isRoyalSet,
       isFullSet,
+      isDupattaSet, // NEW
       selectedDhoti,
       selectedSize,
       selectedColor,
@@ -72,6 +85,7 @@ const BottomActions = ({
       subcategory: product.subcategory,
       isBeaded,
       isFullSet,
+      isDupattaSet, // NEW
       isRoyalSet,
       selectedSize,
       selectedColor,

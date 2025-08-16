@@ -28,6 +28,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isBeaded, setIsBeaded] = useState(true);
   const [isFullSet, setIsFullSet] = useState(false);
+  const [isDupattaSet, setIsDupattaSet] = useState(false); // NEW
   const [selectedStyle, setSelectedStyle] = useState("simple");
   const [selectedSize, setSelectedSize] = useState("S");
   const [isRoyalSet, setIsRoyalSet] = useState(false);
@@ -189,6 +190,9 @@ const ProductDetail = () => {
     } else if (isFullSet && product.pricing.fullSetAdditional) {
       // Regular full set pricing
       price += product.pricing.fullSetAdditional;
+    } else if (isDupattaSet) {
+      // Dupatta set pricing - base price + 200 INR
+      price += 200;
     }
 
     // Handle style-based pricing
@@ -288,6 +292,8 @@ const ProductDetail = () => {
             setIsBeaded={setIsBeaded}
             isFullSet={isFullSet}
             setIsFullSet={setIsFullSet}
+            isDupattaSet={isDupattaSet}
+            setIsDupattaSet={setIsDupattaSet}
             selectedSize={selectedSize}
             setSelectedSize={setSelectedSize}
             selectedDhoti={selectedDhoti}
@@ -306,6 +312,7 @@ const ProductDetail = () => {
                 setSelectedSize={setSelectedSize}
                 sizes={product.sizes || ["S", "M", "L", "XL"]}
                 onClearSavedSize={handleClearSavedSize}
+                product={product} // NEW: Pass product for stock checking
               />
             ) : (
               <SmartPetSizing
@@ -322,6 +329,7 @@ const ProductDetail = () => {
               selectedSize={selectedSize}
               setSelectedSize={setSelectedSize}
               sizes={product.sizes || ["S", "M", "L", "XL"]}
+              product={product} // NEW: Pass product for stock checking
             />
           )}
           {product.contactForCustomColors && (
@@ -335,6 +343,7 @@ const ProductDetail = () => {
         images={images}
         isBeaded={isBeaded}
         isFullSet={isFullSet}
+        isDupattaSet={isDupattaSet} // NEW
         isRoyalSet={isRoyalSet}
         selectedDhoti={selectedDhoti}
         selectedSize={selectedSize}

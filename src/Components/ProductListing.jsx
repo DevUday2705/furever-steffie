@@ -54,6 +54,28 @@ const ProductListing = ({
     categories: ["all", "royal"],
     categoryOptions: ["all", "royal"],
   });
+
+  // Helper function to check product stock status
+  const getProductStockStatus = (product) => {
+    // Check XS, S, M stock
+    const managedSizes = ['XS', 'S', 'M'];
+    const stockInfo = managedSizes.map(size => ({
+      size,
+      stock: product?.sizeStock?.[size] || 0,
+      inStock: (product?.sizeStock?.[size] || 0) > 0
+    }));
+    
+    const totalManagedStock = stockInfo.reduce((sum, item) => sum + item.stock, 0);
+    const inStockSizes = stockInfo.filter(item => item.inStock);
+    
+    return {
+      stockInfo,
+      totalManagedStock,
+      hasAnyStock: inStockSizes.length > 0 || true, // L, XL, XXL always available
+      lowStock: totalManagedStock > 0 && totalManagedStock <= 5,
+      soldOut: totalManagedStock === 0
+    };
+  };
   useEffect(() => {
     const query = new URLSearchParams();
 
@@ -234,11 +256,16 @@ const ProductListing = ({
                 : price;
             const currentPrice = (price * rate).toFixed(2);
             const originalPriceConverted = (originalPrice * rate).toFixed(2);
+            
+            // Get stock status
+            const stockStatus = getProductStockStatus(product);
 
             return (
               <motion.div
                 key={product.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
+                className={`bg-white rounded-xl shadow-md overflow-hidden ${
+                  stockStatus.soldOut ? 'opacity-60' : ''
+                }`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -252,6 +279,23 @@ const ProductListing = ({
                       className="absolute w-full h-full object-cover"
                       whileHover={{ scale: 1.05 }}
                     />
+                    
+                    {/* Stock Status Indicators */}
+                    {stockStatus.soldOut && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <div className="bg-red-600 text-white px-3 py-1 rounded-md font-semibold text-sm">
+                          SOLD OUT
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!stockStatus.soldOut && stockStatus.lowStock && (
+                      <div className="absolute top-2 right-2">
+                        <div className="bg-orange-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                          Low Stock
+                        </div>
+                      </div>
+                    )}
                     {/* {product.priorityScore >= 90 && (
                       <div className="absolute top-0 left-0">
                         <div className="flex items-center bg-amber-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">
@@ -312,11 +356,17 @@ const ProductListing = ({
                           </>
                         )}
                       </div>
-                      {/* {product.availableStock <= 5 && (
-                        <span className="text-xs font-medium text-red-500 mt-1">
-                          Only few left
+                      
+                      {/* Stock Status Information */}
+                      {stockStatus.soldOut ? (
+                        <span className="text-xs font-medium text-red-600 mt-1">
+                          Sold out in XS, S, M
                         </span>
-                      )} */}
+                      ) : stockStatus.lowStock ? (
+                        <span className="text-xs font-medium text-orange-600 mt-1">
+                          Low stock ({stockStatus.totalManagedStock} left)
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 </Link>
