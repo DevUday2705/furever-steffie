@@ -200,11 +200,7 @@ const ProductDetail = () => {
       case "simple":
         // No additional cost
         break;
-      case "tassels":
-        if (product.pricing.tasselsAdditional) {
-          price += product.pricing.tasselsAdditional;
-        }
-        break;
+
       case "beaded":
         if (product.pricing.beadedAdditional) {
           price += product.pricing.beadedAdditional;
@@ -214,9 +210,9 @@ const ProductDetail = () => {
         if (product.pricing.beadedAdditional) {
           price += product.pricing.beadedAdditional;
         }
-        if (product.pricing.tasselsAdditional) {
-          price += product.pricing.tasselsAdditional;
-        }
+        // if (product.pricing.tasselsAdditional) {
+        //   price += product.pricing.tasselsAdditional;
+        // }
         break;
       default:
         break;
