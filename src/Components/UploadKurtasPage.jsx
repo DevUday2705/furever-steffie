@@ -17,11 +17,11 @@ const UploadKurtasPage = () => {
     setStatus("");
 
     try {
-      // Update kurtas
-      const kurtasSnapshot = await getDocs(collection(db, "kurtas"));
+      // Update frocks
+      const frocksSnapshot = await getDocs(collection(db, "frocks"));
 
-      for (const docSnapshot of kurtasSnapshot.docs) {
-        const productRef = doc(db, "kurtas", docSnapshot.id);
+      for (const docSnapshot of frocksSnapshot.docs) {
+        const productRef = doc(db, "frocks", docSnapshot.id);
 
         // Add default stock for XS, S, M
         await updateDoc(productRef, {
