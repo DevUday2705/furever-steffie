@@ -475,7 +475,7 @@ const AdminPage = () => {
                                   </span>
                                 </p>
                                 <p className="text-sm">
-                                  Is Royal:{" "}
+                                  Full Royal Set:{" "}
                                   <span className="font-medium">
                                     {item.isRoyalSet ? "Yes" : "No"}
                                   </span>

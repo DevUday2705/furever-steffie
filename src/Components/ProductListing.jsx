@@ -286,11 +286,8 @@ const ProductListing = ({
                     {/* Stock Status Indicators */}
                     {stockStatus.soldOut && (
                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/40 flex items-center justify-center ">
-                        <div className="bg-white/95 text-gray-800 px-4 py-2 rounded-lg font-semibold text-sm shadow-lg border border-gray-200">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                            OUT OF STOCK
-                          </div>
+                        <div className=" text-white px-4 py-2 rounded-lg font-semibold text-4xl text-center shadow-lg">
+                          SOLD <br /> OUT
                         </div>
                       </div>
                     )}
