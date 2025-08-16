@@ -19,6 +19,7 @@ const BottomActions = ({
   setIsOpen,
   measurements,
   selectedDhoti,
+  selectedStyle, // NEW: for tassels tracking
   measurementsValid,
   requiresMeasurements,
   selectedColor,
@@ -77,6 +78,7 @@ const BottomActions = ({
       isDupattaSet, // NEW
       selectedDhoti,
       selectedDhotiDetails, // Store full dhoti object with name and image
+      selectedStyle, // NEW: Track tassels selection
       selectedSize,
       selectedColor,
       price: calculatePrice(),
@@ -104,6 +106,7 @@ const BottomActions = ({
       isRoyalSet,
       selectedDhoti,
       selectedDhotiDetails, // Store full dhoti object with name and image
+      selectedStyle, // NEW: Track tassels selection
       selectedSize,
       selectedColor,
       price: calculatePrice(),

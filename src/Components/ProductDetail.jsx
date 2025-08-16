@@ -342,6 +342,7 @@ const ProductDetail = () => {
         isDupattaSet={isDupattaSet} // NEW
         isRoyalSet={isRoyalSet}
         selectedDhoti={selectedDhoti}
+        selectedStyle={selectedStyle} // NEW: Pass selected style for tassels
         selectedSize={selectedSize}
         selectedColor={selectedColor} // NEW
         calculatePrice={calculatePrice}

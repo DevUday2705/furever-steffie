@@ -44,6 +44,17 @@ const AdminPage = () => {
     return null;
   };
 
+  // Helper function to get readable style name
+  const getStyleDisplayName = (selectedStyle) => {
+    const styleMap = {
+      simple: "Simple",
+      tassels: "With Tassels",
+      beaded: "Beaded Luxe",
+      "beaded-tassels": "Beaded + Tassels",
+    };
+    return styleMap[selectedStyle] || selectedStyle;
+  };
+
   const handleLogin = () => {
     if (passkey === ADMIN_KEY) {
       setIsAuthorized(true);
@@ -483,6 +494,16 @@ const AdminPage = () => {
                                       , Dupatta Set:{" "}
                                       <span className="font-medium text-purple-600">
                                         Yes
+                                      </span>
+                                    </>
+                                  )}
+                                  {item.selectedStyle && (
+                                    <>
+                                      , Style:{" "}
+                                      <span className="font-medium text-orange-600">
+                                        {getStyleDisplayName(
+                                          item.selectedStyle
+                                        )}
                                       </span>
                                     </>
                                   )}

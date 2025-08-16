@@ -285,7 +285,7 @@ const ProductListing = ({
 
                     {/* Stock Status Indicators */}
                     {stockStatus.soldOut && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/40 flex items-center justify-center backdrop-blur-sm">
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/40 flex items-center justify-center ">
                         <div className="bg-white/95 text-gray-800 px-4 py-2 rounded-lg font-semibold text-sm shadow-lg border border-gray-200">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
@@ -367,17 +367,6 @@ const ProductListing = ({
                       </div>
 
                       {/* Stock Status Information */}
-                      {stockStatus.soldOut ? (
-                        <span className="text-xs font-medium text-gray-600 mt-1 flex items-center gap-1">
-                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-                          Currently unavailable in XS, S, M
-                        </span>
-                      ) : stockStatus.lowStock ? (
-                        <span className="text-xs font-medium text-amber-600 mt-1 flex items-center gap-1">
-                          <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
-                          Only {stockStatus.totalManagedStock} left in stock
-                        </span>
-                      ) : null}
                     </div>
                   </div>
                 </Link>
