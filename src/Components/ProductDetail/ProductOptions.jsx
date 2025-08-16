@@ -171,7 +171,7 @@ const ProductOptions = ({
 
   const renderDhotiOptions = () => {
     if (!isFullSet || product.type !== "kurta") return null;
-
+    console.log(product.dhotis);
     return (
       <motion.div
         initial={{ opacity: 0, height: 0 }}
@@ -186,9 +186,9 @@ const ProductOptions = ({
               key={dhoti.id}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedDhoti(dhoti.id)}
+              onClick={() => setSelectedDhoti(dhoti.name)}
               className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
-                selectedDhoti === dhoti.id
+                selectedDhoti === dhoti.name
                   ? "border-gray-800"
                   : "border-transparent"
               }`}

@@ -33,7 +33,7 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState("S");
   const [isRoyalSet, setIsRoyalSet] = useState(false);
   const [selectedDhoti, setSelectedDhoti] = useState(
-    product?.dhotis?.length ? product.dhotis[0].id : null
+    product?.dhotis?.length ? product.dhotis[0].name : null
   );
   const [images, setImages] = useState([]);
   const [measurementsValid, setMeasurementsValid] = useState(false);
