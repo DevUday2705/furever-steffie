@@ -381,7 +381,7 @@ const ThankYouPage = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={handleContinueShopping}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm md:text-base shadow-sm"
+                className="bg-gray-600 text-white px-6 py-3 rounded-md  transition-colors duration-200 text-sm md:text-base shadow-sm"
               >
                 Continue Shopping
               </button>
@@ -413,7 +413,9 @@ const ThankYouPage = () => {
           {/* Support */}
           <div className="mt-8 text-center text-gray-500 text-xs md:text-sm">
             <p>Have questions about your order? Contact our support team:</p>
-            <p className="font-medium">support@example.com | +91 98765 43210</p>
+            <p className="font-medium">
+              fureversteffie@gmail.com | +91 88281 45667
+            </p>
           </div>
         </div>
       </div>
