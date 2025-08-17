@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { CheckCircle, ChevronRight, Gift } from "lucide-react";
+import { CheckCircle, ChevronRight, Crown, Gift } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
@@ -282,24 +282,25 @@ const ProductOptions = ({
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-[#e9d396] border-opacity-30
                     ${
                       isRoyalSet
-                        ? "bg-gradient-to-r from-gray-700 to-gray-500 text-white border-2 border-gray-400 shadow-xl ring-4 ring-gray-200 ring-opacity-50"
-                        : "bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 border-2 border-gray-300 hover:from-gray-300 hover:to-gray-200 hover:shadow-xl"
+                        ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
+                        : "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
                     }
                   `}
                 >
-                  <Gift className="w-5 h-5 mr-2" />
-                  {isRoyalSet ? "Royal Set Selected ✓" : "Full Royal Set"}
+                  <Crown className="w-5 h-5 mr-2" />
+                  {isRoyalSet
+                    ? "Royal Set Selected ✓"
+                    : "Select Full Royal Set"}
                 </button>
 
                 <motion.div
-                  className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-transparent via-gray-200/40 to-transparent opacity-30"
+                  className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-gray-200/80 to-transparent opacity-50"
                   initial={{ x: "-100%", skewX: -30 }}
                   animate={isShining ? { x: "300%" } : { x: "-100%" }}
-                  transition={
-                    isShining
-                      ? { duration: 1.5, ease: "easeInOut" }
-                      : { duration: 0 }
-                  }
+                  transition={{
+                    duration: 3,
+                    ease: "easeInOut",
+                  }}
                 />
               </div>
             )}

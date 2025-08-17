@@ -17,7 +17,11 @@ const defaultSchema = {
   isBeadedAvailable: false,
   isNonBeadedAvailable: true,
   isRoyal: false, // Add this line
-
+  sizeStock: {
+    XS: 5,
+    S: 5,
+    M: 5,
+  },
   sizes: ["XS", "S", "M", "L", "XL", "XXL"],
   dhotis: [],
   pricing: {
@@ -98,7 +102,7 @@ const generateSchemaForCategory = (category) => {
   if (!config) return defaultSchema;
 
   let schema = { ...defaultSchema };
-  console.log(schema);
+
   // Add additional fields with their defaults
   config.additionalFields?.forEach((field) => {
     if (config.fieldDefaults?.[field] !== undefined) {
@@ -126,17 +130,13 @@ const ProductForm = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log(formData);
+
   useEffect(() => {
     const fetchData = async () => {
       if (isEditMode) {
         try {
-          console.log(
-            `Fetching product with ID: ${id} from collection: ${category}s`
-          );
           const docRef = doc(db, `${category}s`, id);
           const snap = await getDoc(docRef);
-          console.log(snap);
 
           if (snap.exists()) {
             const data = snap.data();
