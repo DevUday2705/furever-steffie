@@ -3,6 +3,10 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
+import { CheckCircle, Clock, Heart, MessageCircle, Ruler } from "lucide-react";
+import Lottie from "react-lottie";
+
+import success from "../../public/animation/success.json";
 // For URL parameter extraction without useRouter
 
 const ThankYouPage = () => {
@@ -13,6 +17,36 @@ const ThankYouPage = () => {
   const [orderData, setOrderData] = useState(null);
   const [customerData, setCustomerData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData: success,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  const handleWhatsAppClick = () => {
+    const message = `Hi Furever Team! 🐾
+
+I've just placed an order (Order ID: ${
+      orderId || "Just placed"
+    }) and I'm ready to share my pup's measurements for the perfect fit!
+
+📦 Order Details:
+• Product: ${orderData?.name || "Custom outfit"}
+• Size: ${orderData?.selectedSize || "As selected"}
+• Customer: ${customerData?.fullName || ""}
+
+Please guide me through the measuring process so you can custom stitch the outfit according to my pup's measurements for perfect fitting and comfort.
+
+Looking forward to hearing from you! 🎉`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/918828145667?text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   useEffect(() => {
     // Fetch data from localStorage
@@ -88,32 +122,106 @@ const ThankYouPage = () => {
         <motion.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}
-          className="bg-gradient-to-r from-indigo-600 to-indigo-700 py-6 px-4 md:px-8 text-white text-center"
+          className="bg-gradient-to-r from-gray-600 to-gray-700 py-6 px-4 md:px-8 text-white text-center"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-3"
-          >
-            <svg
-              className="w-8 h-8 text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-          </motion.div>
+          <div className="w-full justify-center">
+            <Lottie options={defaultOptions} height={100} width={100} />
+          </div>
+
           <h1 className="text-xl md:text-2xl font-bold">
             Thank You For Your Order!
           </h1>
-          <p className="text-indigo-100 text-sm md:text-base mt-1">
+          <p className="text-gray-100 text-sm md:text-base mt-1">
             Your payment was successful
           </p>
+        </motion.div>
+
+        {/* WhatsApp Notification Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mx-4 md:mx-8 mt-8"
+        >
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <CheckCircle className="w-6 h-6 text-gray-700" />
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Order Confirmed!
+                </h2>
+              </div>
+              <p className="text-gray-600 text-lg mb-2">
+                Congratulations! We're excited to create the perfect outfit for
+                your pup.
+              </p>
+              <p className="text-gray-500 text-sm">
+                One final step to ensure the perfect fit and maximum comfort.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-4 mb-6">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+                  <Ruler className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Final Step: Share Your Pup's Measurements
+                </h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  <p className="text-gray-600 text-sm">
+                    Quick & simple - takes less than 2 minutes
+                  </p>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  We'll guide you through the entire process to ensure perfect
+                  fit and comfort for your furry friend.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-5 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Heart className="w-4 h-4 text-gray-600" />
+                <h4 className="font-medium text-gray-900 text-sm">
+                  Essential measurements for perfect fit:
+                </h4>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {[
+                  "Neck circumference",
+                  "Chest circumference",
+                  "Back length",
+                ].map((measurement, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                    <span className="text-sm text-gray-700">{measurement}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-3 italic">
+                Precise measurements ensure maximum comfort and the perfect fit
+                your pup deserves.
+              </p>
+            </div>
+
+            <button
+              onClick={handleWhatsAppClick}
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group shadow-sm hover:shadow-md"
+            >
+              <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>Finalize Fit on WhatsApp</span>
+            </button>
+
+            {/* Footer */}
+            <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
+              <Heart className="w-3 h-3" />
+              <span>Opens WhatsApp to +91 88281 45667</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Order Receipt */}
@@ -135,7 +243,7 @@ const ThankYouPage = () => {
                 </p>
               </div>
               <div className="mt-4 md:mt-0">
-                <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium inline-flex items-center">
+                <div className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-medium inline-flex items-center">
                   <svg
                     className="w-3 h-3 mr-1"
                     fill="currentColor"
@@ -373,7 +481,7 @@ const ThankYouPage = () => {
             className="border-t border-gray-200 pt-6 text-center"
           >
             <p className="text-gray-600 mb-6 text-sm md:text-base">
-              We've sent a confirmation email with your order details.
+              Thank you for shopping with us! Your order has been placed
               <br />
               Your order will be shipped soon.
             </p>
@@ -381,7 +489,7 @@ const ThankYouPage = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={handleContinueShopping}
-                className="bg-gray-600 text-white px-6 py-3 rounded-md  transition-colors duration-200 text-sm md:text-base shadow-sm"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-md transition-colors duration-200 text-sm md:text-base shadow-sm"
               >
                 Continue Shopping
               </button>
