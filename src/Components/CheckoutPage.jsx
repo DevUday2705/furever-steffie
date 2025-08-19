@@ -234,7 +234,7 @@ const CheckoutPage = () => {
                 );
                 // Still redirect to success page since payment went through
               }
-
+              setLoadingPayment(false);
               navigate({
                 pathname: "/thank-you",
                 search: `?razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}`,
