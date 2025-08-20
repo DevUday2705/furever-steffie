@@ -62,7 +62,7 @@ const Categories = () => {
     },
     {
       id: 9,
-      name: "Bow Set",
+      name: "Bow Tie",
       description: "Cute Touch",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_02_11_AM_sp7jye.png",

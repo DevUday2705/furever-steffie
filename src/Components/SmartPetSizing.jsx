@@ -419,7 +419,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
               </div>
 
               {/* Search Dropdown */}
-              <div className="relative">
+              <div className="relative z-50">
                 <div
                   onClick={() => setShowBreedDropdown(!showBreedDropdown)}
                   className="w-full p-2 bg-white border border-gray-200 rounded-lg cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"
@@ -436,12 +436,18 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
 
                 <AnimatePresence>
                   {showBreedDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -5, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -5, scale: 0.98 }}
-                      className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg mt-0.5 max-h-48 overflow-y-auto"
-                    >
+                    <>
+                      {/* Overlay to close dropdown */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowBreedDropdown(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -5, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -5, scale: 0.98 }}
+                        className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-lg shadow-xl mt-0.5 max-h-48 overflow-y-auto"
+                      >
                       <div className="p-1.5">
                         <input
                           type="text"
@@ -473,6 +479,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                         ))}
                       </div>
                     </motion.div>
+                    </>
                   )}
                 </AnimatePresence>
               </div>

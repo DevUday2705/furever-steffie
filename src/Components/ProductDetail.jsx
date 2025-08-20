@@ -268,11 +268,11 @@ const ProductDetail = () => {
     categoriesThatRequireMeasurements.includes(typePart);
   console.log(product);
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
+    <div className="bg-gray-50 min-h-screen pb-48">
       <BackButton onClick={handleGoBack} />
 
-      <div className="container mx-auto px-3 pt-2 pb-12">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="container mx-auto px-3 pt-2 pb-24">
+        <div className="bg-white rounded-lg shadow-md overflow-visible">
           <ImageCarousel
             images={images}
             selectedIndex={selectedIndex}
@@ -281,56 +281,58 @@ const ProductDetail = () => {
             emblaRef={emblaRef}
           />
 
-          <ProductInfo product={product} calculatePrice={calculatePrice} />
-          <ProductOptions
-            product={product}
-            isBeaded={isBeaded}
-            setIsBeaded={setIsBeaded}
-            isFullSet={isFullSet}
-            setIsFullSet={setIsFullSet}
-            isDupattaSet={isDupattaSet}
-            setIsDupattaSet={setIsDupattaSet}
-            selectedSize={selectedSize}
-            setSelectedSize={setSelectedSize}
-            selectedDhoti={selectedDhoti}
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
-            setSelectedDhoti={setSelectedDhoti}
-            isRoyalSet={isRoyalSet}
-            setIsRoyalSet={setIsRoyalSet}
-            selectedStyle={selectedStyle}
-            setSelectedStyle={setSelectedStyle}
-          />
-          {requiresMeasurements ? (
-            hasSavedSize ? (
+          <div className="pb-8">
+            <ProductInfo product={product} calculatePrice={calculatePrice} />
+            <ProductOptions
+              product={product}
+              isBeaded={isBeaded}
+              setIsBeaded={setIsBeaded}
+              isFullSet={isFullSet}
+              setIsFullSet={setIsFullSet}
+              isDupattaSet={isDupattaSet}
+              setIsDupattaSet={setIsDupattaSet}
+              selectedSize={selectedSize}
+              setSelectedSize={setSelectedSize}
+              selectedDhoti={selectedDhoti}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+              setSelectedDhoti={setSelectedDhoti}
+              isRoyalSet={isRoyalSet}
+              setIsRoyalSet={setIsRoyalSet}
+              selectedStyle={selectedStyle}
+              setSelectedStyle={setSelectedStyle}
+            />
+            {requiresMeasurements ? (
+              hasSavedSize ? (
+                <ReadyMadeSizeSelector
+                  selectedSize={selectedSize}
+                  setSelectedSize={setSelectedSize}
+                  sizes={product.sizes || ["S", "M", "L", "XL"]}
+                  onClearSavedSize={handleClearSavedSize}
+                  product={product} // NEW: Pass product for stock checking
+                />
+              ) : (
+                <SmartPetSizing
+                  onSizeDetected={(size, petInfo) => {
+                    setSelectedSize(size);
+                    setPetInfo(petInfo);
+                    setHasSavedSize(!!localStorage.getItem("savedPetSize"));
+                  }}
+                  setMeasurementsValid={setMeasurementsValid}
+                />
+              )
+            ) : (
               <ReadyMadeSizeSelector
                 selectedSize={selectedSize}
                 setSelectedSize={setSelectedSize}
                 sizes={product.sizes || ["S", "M", "L", "XL"]}
-                onClearSavedSize={handleClearSavedSize}
                 product={product} // NEW: Pass product for stock checking
               />
-            ) : (
-              <SmartPetSizing
-                onSizeDetected={(size, petInfo) => {
-                  setSelectedSize(size);
-                  setPetInfo(petInfo);
-                  setHasSavedSize(!!localStorage.getItem("savedPetSize"));
-                }}
-                setMeasurementsValid={setMeasurementsValid}
-              />
-            )
-          ) : (
-            <ReadyMadeSizeSelector
-              selectedSize={selectedSize}
-              setSelectedSize={setSelectedSize}
-              sizes={product.sizes || ["S", "M", "L", "XL"]}
-              product={product} // NEW: Pass product for stock checking
-            />
-          )}
-          {product.contactForCustomColors && (
-            <CustomColorEnquiry product={product} />
-          )}
+            )}
+            {product.contactForCustomColors && (
+              <CustomColorEnquiry product={product} />
+            )}
+          </div>
         </div>
       </div>
 

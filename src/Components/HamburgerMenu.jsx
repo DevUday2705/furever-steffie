@@ -91,7 +91,7 @@ const HamburgerMenu = () => {
         navigate("/female-bandanas");
         break;
       case "bow-set":
-        navigate("/bow-set");
+        navigate("/bow-tie");
         break;
 
       default:

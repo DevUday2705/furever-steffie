@@ -48,8 +48,6 @@ import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
-import WhatsAppTester from "./Components/WhatsAppTester";
-import WhatsAppIntegrationInfo from "./Components/WhatsAppIntegrationInfo";
 import WhyUs from "./Components/WhyUs";
 import AboutUs from "./Components/AboutUs";
 import AdminProducts from "./Components/AdminProducts";
@@ -139,8 +137,7 @@ const App = () => {
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />
-              <Route path="/whatsapp-test" element={<WhatsAppTester />} />
-              <Route path="/whatsapp-info" element={<WhatsAppIntegrationInfo />} />
+
               <Route
                 path="/admin/edit/:category/:id"
                 element={<ProductForm />}
