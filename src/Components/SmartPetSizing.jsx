@@ -438,8 +438,8 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                   {showBreedDropdown && (
                     <>
                       {/* Overlay to close dropdown */}
-                      <div 
-                        className="fixed inset-0 z-40" 
+                      <div
+                        className="fixed inset-0 z-40"
                         onClick={() => setShowBreedDropdown(false)}
                       />
                       <motion.div
@@ -448,37 +448,37 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
                         exit={{ opacity: 0, y: -5, scale: 0.98 }}
                         className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-lg shadow-xl mt-0.5 max-h-48 overflow-y-auto"
                       >
-                      <div className="p-1.5">
-                        <input
-                          type="text"
-                          placeholder="Search breeds..."
-                          value={breedSearch}
-                          onChange={(e) => setBreedSearch(e.target.value)}
-                          className="w-full p-1.5 border border-gray-200 rounded text-xs focus:border-gray-400 focus:outline-none"
-                        />
-                      </div>
-                      <div className="max-h-32 overflow-y-auto">
-                        {filteredBreeds.map((breed) => (
-                          <motion.button
-                            key={breed.name}
-                            whileHover={{ backgroundColor: "#f9fafb" }}
-                            onClick={() => {
-                              setSelectedBreed(breed.name);
-                              setShowBreedDropdown(false);
-                              setBreedSearch("");
-                            }}
-                            className="w-full p-2 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-b-0"
-                          >
-                            <span className="text-xs font-medium truncate">
-                              {breed.name}
-                            </span>
-                            <span className="text-[10px] text-gray-400 ml-2 flex-shrink-0">
-                              {breed.avgSize}
-                            </span>
-                          </motion.button>
-                        ))}
-                      </div>
-                    </motion.div>
+                        <div className="p-1.5">
+                          <input
+                            type="text"
+                            placeholder="Search breeds..."
+                            value={breedSearch}
+                            onChange={(e) => setBreedSearch(e.target.value)}
+                            className="w-full p-1.5 border border-gray-200 rounded text-xs focus:border-gray-400 focus:outline-none"
+                          />
+                        </div>
+                        <div className="max-h-32 overflow-y-auto">
+                          {filteredBreeds.map((breed) => (
+                            <motion.button
+                              key={breed.name}
+                              whileHover={{ backgroundColor: "#f9fafb" }}
+                              onClick={() => {
+                                setSelectedBreed(breed.name);
+                                setShowBreedDropdown(false);
+                                setBreedSearch("");
+                              }}
+                              className="w-full p-2 text-left hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-b-0"
+                            >
+                              <span className="text-xs font-medium truncate">
+                                {breed.name}
+                              </span>
+                              <span className="text-[10px] text-gray-400 ml-2 flex-shrink-0">
+                                {breed.avgSize}
+                              </span>
+                            </motion.button>
+                          ))}
+                        </div>
+                      </motion.div>
                     </>
                   )}
                 </AnimatePresence>

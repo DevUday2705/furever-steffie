@@ -139,7 +139,7 @@ Thanks`;
   // If custom size is selected, show WhatsApp button
   if (isCustomSize) {
     return (
-      <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+      <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
           <p className="text-sm text-amber-800 font-medium">
             🐕 Custom Tailoring Required
@@ -170,7 +170,7 @@ Thanks`;
 
   // Regular flow for standard sizes
   return (
-    <div className="fixed bottom-0 max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+    <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
       <motion.button
         disabled={!isActionsEnabled}
         className={`w-full py-3 ${

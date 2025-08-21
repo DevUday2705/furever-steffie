@@ -268,10 +268,10 @@ const ProductDetail = () => {
     categoriesThatRequireMeasurements.includes(typePart);
   console.log(product);
   return (
-    <div className="bg-gray-50 min-h-screen pb-48">
+    <div className="bg-gray-50 min-h-screen pb-4">
       <BackButton onClick={handleGoBack} />
 
-      <div className="container mx-auto px-3 pt-2 pb-24">
+      <div className="container mx-auto px-3 pt-2 pb-4">
         <div className="bg-white rounded-lg shadow-md overflow-visible">
           <ImageCarousel
             images={images}
@@ -281,7 +281,7 @@ const ProductDetail = () => {
             emblaRef={emblaRef}
           />
 
-          <div className="pb-8">
+          <div className="">
             <ProductInfo product={product} calculatePrice={calculatePrice} />
             <ProductOptions
               product={product}
