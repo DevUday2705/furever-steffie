@@ -250,6 +250,7 @@ const ProductOptions = ({
 
               {/* Regular Kurta + Dhoti Option */}
               <button
+                disabled
                 onClick={() => handleRegularOptionClick(true, false)}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
                   isFullSet && !isRoyalSet && !isDupattaSet
@@ -277,6 +278,7 @@ const ProductOptions = ({
             {product.isRoyal && (
               <div className="relative w-full overflow-hidden rounded-md">
                 <button
+                  disabled
                   onClick={handleRoyalSetClick}
                   onMouseEnter={triggerShine}
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-[#e9d396] border-opacity-30

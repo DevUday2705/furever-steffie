@@ -21,12 +21,12 @@ const MaleBandanas = () => {
 
   return (
     <ProductListing
-      title="Male Bandanas"
-      subtitle="Explore our exclusive range of handcrafted Male bandanas for pets!"
+      title="Bandanas"
+      subtitle="Explore our exclusive range of handcrafted  bandanas for pets!"
       category="male-bandanas"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1755713281/Photoroom_20250817_100242_abrmwu.webp"
       products={maleBandanas}
-      bannerTitle="Elegant Female Bandanas for Every Pet Personality"
+      bannerTitle="Elegant  Bandanas for Every Pet Personality"
     />
   );
 };

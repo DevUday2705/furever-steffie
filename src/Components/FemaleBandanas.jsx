@@ -26,7 +26,7 @@ const FemaleBandanas = () => {
       category="female-bandanas"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
       products={femaleBandanas}
-      bannerTitle="Elegant Female Bandanas for Every Pet Personality"
+      bannerTitle="Elegant  Bandanas for Every Pet Personality"
     />
   );
 };

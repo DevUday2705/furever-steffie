@@ -20,7 +20,7 @@ const TuxedoListing = () => {
       title="All Tuxedos"
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="tuxedo"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1753618664/Luxury_navy_blue_Sets_for_Pets_bnp2ck.webp"
       products={tuxedos}
       bannerTitle="Elegant Tuxedos for Every Pet Personality"
     />
