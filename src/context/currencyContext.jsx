@@ -9,7 +9,8 @@ const currencyRates = {
   USD: 0.012, // US Dollar
   GBP: 0.0094, // British Pound
   NZD: 0.019, // New Zealand Dollar
-  CAD: 0.016,
+  CAD: 0.016, // Canadian Dollar
+  AED: 0.044, // UAE Dirham
 };
 
 export const CurrencyProvider = ({ children }) => {

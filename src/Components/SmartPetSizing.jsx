@@ -419,7 +419,7 @@ const SmartPetSizing = ({ onSizeDetected, setMeasurementsValid }) => {
               </div>
 
               {/* Search Dropdown */}
-              <div className="relative z-50">
+              <div className="relative">
                 <div
                   onClick={() => setShowBreedDropdown(!showBreedDropdown)}
                   className="w-full p-2 bg-white border border-gray-200 rounded-lg cursor-pointer flex items-center justify-between hover:border-gray-300 transition-colors"

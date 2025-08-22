@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { CheckCircle, ChevronRight, Crown, Gift } from "lucide-react";
+import { CheckCircle, ChevronRight, Crown, Gift, X, Clock } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
@@ -37,8 +37,15 @@ const ProductOptions = ({
   const [showRoyalDescription, setShowRoyalDescription] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isShining, setIsShining] = useState(false);
+  const [showDhotiUnavailableModal, setShowDhotiUnavailableModal] =
+    useState(false);
+
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
+  };
+
+  const handleDhotiUnavailableClick = () => {
+    setShowDhotiUnavailableModal(true);
   };
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
 
@@ -250,15 +257,15 @@ const ProductOptions = ({
 
               {/* Regular Kurta + Dhoti Option */}
               <button
-                disabled
-                onClick={() => handleRegularOptionClick(true, false)}
-                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
+                onClick={handleDhotiUnavailableClick}
+                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
                   isFullSet && !isRoyalSet && !isDupattaSet
                     ? "border-gray-800 bg-gray-100"
                     : "border-gray-200 bg-gray-50 hover:border-gray-300"
-                } border text-gray-800`}
+                } border text-gray-600`}
               >
-                Kurta + Dhoti
+                <span className="opacity-60">Kurta + Dhoti</span>
+                <Clock className="w-3 h-3 absolute top-1 right-1 text-gray-400" />
               </button>
 
               {/* NEW: Kurta + Dupatta Option */}
@@ -278,10 +285,9 @@ const ProductOptions = ({
             {product.isRoyal && (
               <div className="relative w-full overflow-hidden rounded-md">
                 <button
-                  disabled
-                  onClick={handleRoyalSetClick}
+                  onClick={handleDhotiUnavailableClick}
                   onMouseEnter={triggerShine}
-                  className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-[#e9d396] border-opacity-30
+                  className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
                     ${
                       isRoyalSet
                         ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
@@ -289,8 +295,11 @@ const ProductOptions = ({
                     }
                   `}
                 >
-                  <Crown className="w-5 h-5 mr-2" />
-                  {isRoyalSet ? "Royal Set Selected ✓" : "Get Full Royal Set"}
+                  <Crown className="w-5 h-5 mr-2 opacity-60" />
+                  <span className="opacity-60">
+                    {isRoyalSet ? "Royal Set Selected ✓" : "Get Full Royal Set"}
+                  </span>
+                  <Clock className="w-4 h-4 ml-2 text-gray-200" />
                 </button>
 
                 <motion.div
@@ -345,6 +354,65 @@ const ProductOptions = ({
         </div>
       )}
       {product?.dhotis?.length > 0 && renderDhotiOptions()}
+
+      {/* Dhoti Unavailable Modal */}
+      <AnimatePresence>
+        {showDhotiUnavailableModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowDhotiUnavailableModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowDhotiUnavailableModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Content */}
+              <div className="text-center">
+                <div className="mb-4">
+                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <Clock className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    Coming Soon!
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Dhoti and Royal Set options are currently being crafted with
+                    love. They'll be available soon for your furry friend!
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-center text-gray-700 text-sm">
+                    <Gift className="w-4 h-4 mr-2 text-gray-500" />
+                    Stay tuned for exclusive launch offers
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowDhotiUnavailableModal(false)}
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors font-medium"
+                >
+                  Got it, Thanks!
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

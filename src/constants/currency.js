@@ -7,6 +7,7 @@ const currencyRates = {
     GBP: 0.0094,
     NZD: 0.019,
     CAD: 0.016,
+    AED: 0.044, // Added Dubai Dirham
 };
 
 const currencySymbols = {
@@ -17,6 +18,7 @@ const currencySymbols = {
     GBP: "£",
     NZD: "NZ$",
     CAD: "C$",
+    AED: "د.إ", // Added Dubai Dirham symbol
 };
 
 export const convertCurrency = (value, targetCurrency = "INR", round = true) => {

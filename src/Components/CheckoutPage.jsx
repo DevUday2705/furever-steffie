@@ -15,6 +15,7 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart } = useAppContext();
+  const { currency, setCurrency } = useContext(CurrencyContext);
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
 
@@ -31,6 +32,7 @@ const CheckoutPage = () => {
     alternateMobile: "",
     specialInstructions: "",
     deliveryOption: "standard",
+    country: "india", // NEW: Add country selection
   });
 
   // Validation state
@@ -46,6 +48,41 @@ const CheckoutPage = () => {
   const availableCoupons = {
     FUREVER10: 10, // 10% off
     STEFFIE20: 20, // 20% off
+  };
+
+  // International delivery charges
+  const internationalDelivery = {
+    singapore: { charge: 21, currency: "SGD", symbol: "$" },
+    malaysia: { charge: 39, currency: "MYR", symbol: "RM" },
+    usa: { charge: 31, currency: "USD", symbol: "$" },
+    uk: { charge: 13, currency: "GBP", symbol: "£" },
+    newzealand: { charge: 40, currency: "NZD", symbol: "$" },
+    canada: { charge: 49, currency: "CAD", symbol: "$" },
+    dubai: { charge: 32, currency: "AED", symbol: "AED" },
+  };
+
+  // Currency rates for conversion calculations
+  const currencyRates = {
+    INR: 1,
+    SGD: 0.016,
+    MYR: 0.056,
+    USD: 0.012,
+    GBP: 0.0094,
+    NZD: 0.019,
+    CAD: 0.016,
+    AED: 0.044,
+  };
+
+  // Country to currency mapping
+  const countryToCurrency = {
+    india: "INR",
+    singapore: "SGD",
+    malaysia: "MYR",
+    usa: "USD",
+    uk: "GBP",
+    newzealand: "NZD",
+    canada: "CAD",
+    dubai: "AED",
   };
 
   const applyCoupon = () => {
@@ -65,10 +102,29 @@ const CheckoutPage = () => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
+
+    let updatedFormData = {
       ...formData,
       [name]: value,
-    });
+    };
+
+    // Auto-set delivery option when country changes
+    if (name === "country") {
+      if (value === "india") {
+        updatedFormData.deliveryOption = "standard";
+      } else {
+        updatedFormData.deliveryOption = "international";
+      }
+      // Clear state and pincode when changing countries
+      updatedFormData.state = "";
+      updatedFormData.pincode = "";
+
+      // Update currency based on selected country
+      const newCurrency = countryToCurrency[value] || "INR";
+      setCurrency(newCurrency);
+    }
+
+    setFormData(updatedFormData);
 
     // Clear error when field is edited
     if (errors[name]) {
@@ -97,10 +153,22 @@ const CheckoutPage = () => {
 
     let deliveryCharge = 0;
 
-    if (formData.deliveryOption === "express") {
-      deliveryCharge = 299;
+    // Handle international delivery
+    if (formData.country !== "india") {
+      const deliveryInfo = internationalDelivery[formData.country];
+      if (deliveryInfo) {
+        // Convert delivery charge from original currency to INR for consistent calculation
+        const chargeInINR =
+          deliveryInfo.charge / currencyRates[deliveryInfo.currency];
+        deliveryCharge = Math.round(chargeInINR);
+      }
     } else {
-      deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0; //
+      // Domestic delivery charges
+      if (formData.deliveryOption === "express") {
+        deliveryCharge = 299;
+      } else {
+        deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0;
+      }
     }
 
     return Math.round(totalAfterDiscount + deliveryCharge);
@@ -158,7 +226,21 @@ const CheckoutPage = () => {
   }
 
   const handlePayment = async () => {
-    const totalAmount = calculateTotal(); // in paise
+    const totalAmount = calculateTotal(); // Always in INR for Razorpay
+
+    // For international customers, show a note about INR conversion
+    if (formData.country !== "india") {
+      const currentCurrency = countryToCurrency[formData.country];
+      const displayAmount = convertCurrency(totalAmount, currentCurrency);
+
+      const confirmPayment = window.confirm(
+        `Payment will be processed in Indian Rupees (₹${totalAmount}) which is approximately ${displayAmount} in your local currency. The exact amount charged may vary slightly due to exchange rate fluctuations. Do you want to proceed?`
+      );
+
+      if (!confirmPayment) {
+        return;
+      }
+    }
 
     try {
       const res = await fetch("/api/create-order", {
@@ -172,7 +254,11 @@ const CheckoutPage = () => {
       }
 
       const data = await res.json();
-      mixpanel.track("Payment Started");
+      mixpanel.track("Payment Started", {
+        country: formData.country,
+        currency: currency,
+        amount: totalAmount,
+      });
       setLoadingPayment(true);
 
       const options = {
@@ -340,8 +426,6 @@ const CheckoutPage = () => {
     }
   };
 
-  const { currency } = useContext(CurrencyContext);
-
   return loadingPayment ? (
     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
@@ -494,6 +578,38 @@ const CheckoutPage = () => {
                   />
                 </div>
 
+                <div>
+                  <label
+                    htmlFor="country"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Country*
+                  </label>
+                  <select
+                    id="country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    className={`w-full p-2 border ${
+                      errors.country ? "border-red-500" : "border-gray-300"
+                    } rounded-md text-sm`}
+                  >
+                    <option value="india">🇮🇳 India</option>
+                    <option value="singapore">🇸🇬 Singapore</option>
+                    <option value="malaysia">🇲🇾 Malaysia</option>
+                    <option value="usa">🇺🇸 United States</option>
+                    <option value="uk">🇬🇧 United Kingdom</option>
+                    <option value="newzealand">🇳🇿 New Zealand</option>
+                    <option value="canada">🇨🇦 Canada</option>
+                    <option value="dubai">🇦🇪 UAE (Dubai)</option>
+                  </select>
+                  {errors.country && formSubmitted && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.country}
+                    </p>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
@@ -523,70 +639,89 @@ const CheckoutPage = () => {
                       htmlFor="state"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      State*
+                      {formData.country === "india"
+                        ? "State*"
+                        : "State/Province"}
                     </label>
-                    <select
-                      id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      className={`w-full p-2 border ${
-                        errors.state ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                    >
-                      <option value="">Select State</option>
-
-                      {/* States */}
-                      <option value="Andaman and Nicobar Islands">
-                        Andaman and Nicobar Islands
-                      </option>
-                      <option value="Andhra Pradesh">Andhra Pradesh</option>
-                      <option value="Arunachal Pradesh">
-                        Arunachal Pradesh
-                      </option>
-                      <option value="Assam">Assam</option>
-                      <option value="Bihar">Bihar</option>
-                      <option value="Chandigarh">Chandigarh</option>
-                      <option value="Chhattisgarh">Chhattisgarh</option>
-                      <option value="Dadra and Nagar Haveli and Daman and Diu">
-                        Dadra and Nagar Haveli and Daman and Diu
-                      </option>
-                      <option value="Delhi">Delhi</option>
-                      <option value="Goa">Goa</option>
-                      <option value="Gujarat">Gujarat</option>
-                      <option value="Haryana">Haryana</option>
-                      <option value="Himachal Pradesh">Himachal Pradesh</option>
-                      <option value="Jammu and Kashmir">
-                        Jammu and Kashmir
-                      </option>
-                      <option value="Jharkhand">Jharkhand</option>
-                      <option value="Karnataka">Karnataka</option>
-                      <option value="Kerala">Kerala</option>
-                      <option value="Ladakh">Ladakh</option>
-                      <option value="Lakshadweep">Lakshadweep</option>
-                      <option value="Madhya Pradesh">Madhya Pradesh</option>
-                      <option value="Maharashtra">Maharashtra</option>
-                      <option value="Manipur">Manipur</option>
-                      <option value="Meghalaya">Meghalaya</option>
-                      <option value="Mizoram">Mizoram</option>
-                      <option value="Nagaland">Nagaland</option>
-                      <option value="Odisha">Odisha</option>
-                      <option value="Puducherry">Puducherry</option>
-                      <option value="Punjab">Punjab</option>
-                      <option value="Rajasthan">Rajasthan</option>
-                      <option value="Sikkim">Sikkim</option>
-                      <option value="Tamil Nadu">Tamil Nadu</option>
-                      <option value="Telangana">Telangana</option>
-                      <option value="Tripura">Tripura</option>
-                      <option value="Uttar Pradesh">Uttar Pradesh</option>
-                      <option value="Uttarakhand">Uttarakhand</option>
-                      <option value="West Bengal">West Bengal</option>
-                    </select>
-                    {errors.state && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.state}
-                      </p>
+                    {formData.country === "india" ? (
+                      <select
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className={`w-full p-2 border ${
+                          errors.state ? "border-red-500" : "border-gray-300"
+                        } rounded-md text-sm`}
+                      >
+                        <option value="">Select State</option>
+                        {/* Indian States */}
+                        <option value="Andaman and Nicobar Islands">
+                          Andaman and Nicobar Islands
+                        </option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Arunachal Pradesh">
+                          Arunachal Pradesh
+                        </option>
+                        <option value="Assam">Assam</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Chandigarh">Chandigarh</option>
+                        <option value="Chhattisgarh">Chhattisgarh</option>
+                        <option value="Dadra and Nagar Haveli and Daman and Diu">
+                          Dadra and Nagar Haveli and Daman and Diu
+                        </option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Goa">Goa</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Himachal Pradesh">
+                          Himachal Pradesh
+                        </option>
+                        <option value="Jammu and Kashmir">
+                          Jammu and Kashmir
+                        </option>
+                        <option value="Jharkhand">Jharkhand</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Ladakh">Ladakh</option>
+                        <option value="Lakshadweep">Lakshadweep</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Manipur">Manipur</option>
+                        <option value="Meghalaya">Meghalaya</option>
+                        <option value="Mizoram">Mizoram</option>
+                        <option value="Nagaland">Nagaland</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Puducherry">Puducherry</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Sikkim">Sikkim</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Uttarakhand">Uttarakhand</option>
+                        <option value="West Bengal">West Bengal</option>
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className={`w-full p-2 border ${
+                          errors.state ? "border-red-500" : "border-gray-300"
+                        } rounded-md text-sm`}
+                        placeholder="Enter state/province"
+                      />
                     )}
+                    {formData.country === "india" &&
+                      errors.state &&
+                      formSubmitted && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.state}
+                        </p>
+                      )}
                   </div>
                 </div>
 
@@ -595,7 +730,7 @@ const CheckoutPage = () => {
                     htmlFor="pincode"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    PIN Code*
+                    {formData.country === "india" ? "PIN Code*" : "Postal Code"}
                   </label>
                   <input
                     type="text"
@@ -603,17 +738,23 @@ const CheckoutPage = () => {
                     name="pincode"
                     value={formData.pincode}
                     onChange={handleChange}
-                    maxLength={6}
+                    maxLength={formData.country === "india" ? 6 : 20}
                     className={`w-full p-2 border ${
                       errors.pincode ? "border-red-500" : "border-gray-300"
                     } rounded-md text-sm`}
-                    placeholder="6-digit PIN code"
+                    placeholder={
+                      formData.country === "india"
+                        ? "6-digit PIN code"
+                        : "Enter postal code"
+                    }
                   />
-                  {errors.pincode && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.pincode}
-                    </p>
-                  )}
+                  {formData.country === "india" &&
+                    errors.pincode &&
+                    formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.pincode}
+                      </p>
+                    )}
                 </div>
 
                 <div>
@@ -687,51 +828,78 @@ const CheckoutPage = () => {
                       <AlertTriangle size={16} className="text-yellow-600" />
                     </div>
                     <div className="flex-1 text-xs text-gray-600">
-                      Our products are custom-stitched after your order.
-                      Standard delivery takes 5-7 days (2 days for stitching +
-                      3-5 days for shipping).
+                      {formData.country === "india"
+                        ? "Our products are custom-stitched after your order. Standard delivery takes 5-7 days (2 days for stitching + 3-5 days for shipping)."
+                        : "Our products are custom-stitched after your order. International delivery takes 10-15 business days (2 days for stitching + 8-13 days for international shipping)."}
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
-                    <input
-                      type="radio"
-                      name="deliveryOption"
-                      value="standard"
-                      checked={formData.deliveryOption === "standard"}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
-                    />
-                    <div className="ml-3">
-                      <span className="block text-sm font-medium text-gray-800">
-                        Standard Delivery
-                      </span>
-                      <span className="block text-xs text-green-500">
-                        5-7 days • ₹Free
-                      </span>
-                    </div>
-                  </label>
+                  {formData.country === "india" ? (
+                    <>
+                      <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          value="standard"
+                          checked={formData.deliveryOption === "standard"}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                        />
+                        <div className="ml-3">
+                          <span className="block text-sm font-medium text-gray-800">
+                            Standard Delivery
+                          </span>
+                          <span className="block text-xs text-green-500">
+                            5-7 days • ₹Free
+                          </span>
+                        </div>
+                      </label>
 
-                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
-                    <input
-                      type="radio"
-                      name="deliveryOption"
-                      value="express"
-                      checked={formData.deliveryOption === "express"}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
-                    />
-                    <div className="ml-3">
-                      <span className="block text-sm font-medium text-gray-800">
-                        Express Delivery
-                      </span>
-                      <span className="block text-xs text-gray-500">
-                        Within 2 days • ₹299
-                      </span>
-                    </div>
-                  </label>
+                      <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          value="express"
+                          checked={formData.deliveryOption === "express"}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                        />
+                        <div className="ml-3">
+                          <span className="block text-sm font-medium text-gray-800">
+                            Express Delivery
+                          </span>
+                          <span className="block text-xs text-gray-500">
+                            Within 2 days • ₹299
+                          </span>
+                        </div>
+                      </label>
+                    </>
+                  ) : (
+                    <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                      <input
+                        type="radio"
+                        name="deliveryOption"
+                        value="international"
+                        checked={formData.deliveryOption === "international"}
+                        onChange={handleChange}
+                        className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                      />
+                      <div className="ml-3">
+                        <span className="block text-sm font-medium text-gray-800">
+                          International Delivery
+                        </span>
+                        <span className="block text-xs text-gray-500">
+                          10-15 business days •{" "}
+                          {internationalDelivery[formData.country]?.currency ||
+                            "TBD"}{" "}
+                          {internationalDelivery[formData.country]?.charge ||
+                            "0"}
+                        </span>
+                      </div>
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
@@ -808,6 +976,20 @@ const CheckoutPage = () => {
                   <span className="text-gray-600">Delivery:</span>
                   <span className="text-gray-800">
                     {(() => {
+                      if (formData.country !== "india") {
+                        // International delivery - convert to current currency
+                        const country = internationalDelivery[formData.country];
+                        if (country) {
+                          // Convert the charge from INR to display currency
+                          const chargeInINR =
+                            country.charge /
+                            (currencyRates[country.currency] || 1);
+                          return convertCurrency(chargeInINR, currency);
+                        }
+                        return "International";
+                      }
+
+                      // Domestic delivery
                       const productPrice = isCartCheckout
                         ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
                         : orderDetails.price;
@@ -816,7 +998,7 @@ const CheckoutPage = () => {
                       const totalAfterDiscount = productPrice - discountAmount;
 
                       if (formData.deliveryOption === "express") {
-                        return convertCurrency(399, currency);
+                        return convertCurrency(299, currency);
                       }
                       if (totalAfterDiscount > 1499) {
                         return "Free";
@@ -849,6 +1031,23 @@ const CheckoutPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* International Payment Note */}
+            {formData.country !== "india" && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
+                <div className="flex items-start">
+                  <div className="mr-2 mt-0.5">
+                    <AlertTriangle size={16} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1 text-sm text-blue-700">
+                    <strong>International Payment:</strong> Payment will be
+                    processed in Indian Rupees (INR) through our secure payment
+                    gateway. The exact amount charged may vary slightly due to
+                    exchange rate fluctuations and bank conversion fees.
+                  </div>
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
