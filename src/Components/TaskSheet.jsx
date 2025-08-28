@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircle,
@@ -28,7 +28,15 @@ import {
 const DailyTaskSheet = () => {
   const [currentView, setCurrentView] = useState("form"); // 'form' or 'reports'
   const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]); // NEW: For filtered reports
   const [loading, setLoading] = useState(false);
+
+  // NEW: Date range filter state
+  const [dateFilter, setDateFilter] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
   const [formData, setFormData] = useState({
     employeeName: "Rinal",
     date: new Date().toISOString().split("T")[0],
@@ -42,43 +50,113 @@ const DailyTaskSheet = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Mock data for demo - replace with actual Firebase data
-
   // Simulate URL routing
   useEffect(() => {
     const path = window.location.pathname || "/";
     if (path === "/daily-task/report") {
       setCurrentView("reports");
-      loadReports();
+      // Load reports directly here to avoid dependency issues
+      const loadData = async () => {
+        setLoading(true);
+        try {
+          const q = query(
+            collection(db, "dailyReports"),
+            orderBy("submittedAt", "desc")
+          );
+          const querySnapshot = await getDocs(q);
+          const reportsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setReports(reportsData);
+          setFilteredReports(reportsData); // Initialize filtered reports
+        } catch (error) {
+          console.error("Error loading reports:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadData();
     } else {
       setCurrentView("form");
     }
-  }, []);
+  }, []); // No dependencies to prevent loops
 
-  const loadReports = async () => {
-    setLoading(true);
-    try {
-      const q = query(
-        collection(db, "dailyReports"),
-        orderBy("submittedAt", "desc")
-      );
-      const querySnapshot = await getDocs(q);
-      const reportsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setReports(reportsData);
-    } catch (error) {
-      console.error("Error loading reports:", error);
-    } finally {
-      setLoading(false);
+  // Memoize date filter values to prevent unnecessary re-renders
+  const memoizedDateFilter = useMemo(() => ({
+    fromDate: dateFilter.fromDate,
+    toDate: dateFilter.toDate
+  }), [dateFilter.fromDate, dateFilter.toDate]);
+
+  // Apply date filter whenever dateFilter changes (optimize to prevent unnecessary re-renders)
+  useEffect(() => {
+    if (reports.length === 0) return; // Don't filter if no reports
+
+    let filtered = [...reports]; // Create a copy to avoid mutation
+
+    if (memoizedDateFilter.fromDate || memoizedDateFilter.toDate) {
+      filtered = reports.filter((report) => {
+        if (!report.date) return false; // Skip reports without date
+        
+        const reportDate = new Date(report.date);
+        
+        // Validate date
+        if (isNaN(reportDate.getTime())) return false;
+        
+        const fromDate = memoizedDateFilter.fromDate
+          ? new Date(memoizedDateFilter.fromDate)
+          : null;
+        const toDate = memoizedDateFilter.toDate ? new Date(memoizedDateFilter.toDate) : null;
+
+        // Set time to start/end of day for accurate comparison
+        if (fromDate) {
+          fromDate.setHours(0, 0, 0, 0);
+          if (isNaN(fromDate.getTime())) return false;
+        }
+        if (toDate) {
+          toDate.setHours(23, 59, 59, 999);
+          if (isNaN(toDate.getTime())) return false;
+        }
+        
+        reportDate.setHours(0, 0, 0, 0);
+
+        const afterFromDate = !fromDate || reportDate >= fromDate;
+        const beforeToDate = !toDate || reportDate <= toDate;
+
+        return afterFromDate && beforeToDate;
+      });
     }
+
+    // Only update if the filtered results actually changed
+    setFilteredReports(prevFiltered => {
+      const isSame = prevFiltered.length === filtered.length && 
+        prevFiltered.every((report, index) => report.id === filtered[index]?.id);
+      return isSame ? prevFiltered : filtered;
+    });
+  }, [memoizedDateFilter, reports]);
+
+  // NEW: Function to apply date range filter
+
+  // NEW: Handle date filter changes
+  const handleDateFilterChange = (e) => {
+    const { name, value } = e.target;
+    setDateFilter({
+      ...dateFilter,
+      [name]: value,
+    });
+    // Filter will be applied automatically via useEffect
+  };
+
+  // NEW: Reset date filter
+  const resetDateFilter = () => {
+    setDateFilter({ fromDate: "", toDate: "" });
+    // Filter will be reset automatically via useEffect
   };
 
   const navigateToReports = () => {
     window.history.pushState({}, "", "/daily-task/report");
     setCurrentView("reports");
-    loadReports();
+    // Reports are already loaded, no need to reload
   };
 
   const navigateToForm = () => {
@@ -166,7 +244,13 @@ const DailyTaskSheet = () => {
   // Reports View Component
   const ReportsView = () => {
     const [deleteConfirm, setDeleteConfirm] = useState(null);
-    const totals = calculateTotals(reports);
+
+    // Use filtered reports for calculations and display
+    const displayReports =
+      filteredReports.length > 0 || dateFilter.fromDate || dateFilter.toDate
+        ? filteredReports
+        : reports;
+    const totals = calculateTotals(displayReports);
 
     const handleDeleteReport = async (reportId) => {
       try {
@@ -174,7 +258,14 @@ const DailyTaskSheet = () => {
         await deleteDoc(doc(db, "dailyReports", reportId));
 
         // Update local state to remove the deleted report
-        setReports(reports.filter((r) => r.id !== reportId));
+        const updatedReports = reports.filter((r) => r.id !== reportId);
+        setReports(updatedReports);
+
+        // Update filtered reports as well
+        const updatedFilteredReports = filteredReports.filter(
+          (r) => r.id !== reportId
+        );
+        setFilteredReports(updatedFilteredReports);
 
         // Close confirmation modal
         setDeleteConfirm(null);
@@ -249,20 +340,88 @@ const DailyTaskSheet = () => {
             </div>
           </div>
 
+          {/* Date Range Filter */}
+          <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+              <h3 className="text-lg font-semibold text-white flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Date Range Filter
+              </h3>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    From Date
+                  </label>
+                  <input
+                    type="date"
+                    name="fromDate"
+                    value={dateFilter.fromDate}
+                    onChange={handleDateFilterChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    To Date
+                  </label>
+                  <input
+                    type="date"
+                    name="toDate"
+                    value={dateFilter.toDate}
+                    onChange={handleDateFilterChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={resetDateFilter}
+                    className="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Clear Filter
+                  </button>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">
+                    {displayReports.length} of {reports.length} reports
+                    {(dateFilter.fromDate || dateFilter.toDate) && (
+                      <span className="block text-indigo-600 font-medium">
+                        (Filtered)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Reports List */}
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading reports...</p>
             </div>
-          ) : reports.length === 0 ? (
+          ) : displayReports.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No reports submitted yet.</p>
+              <p className="text-gray-600">
+                {reports.length === 0
+                  ? "No reports submitted yet."
+                  : "No reports found for the selected date range."}
+              </p>
+              {reports.length > 0 && displayReports.length === 0 && (
+                <button
+                  onClick={resetDateFilter}
+                  className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Clear Date Filter
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
-              {reports.map((report, index) => (
+              {displayReports.map((report, index) => (
                 <motion.div
                   key={report.id}
                   initial={{ opacity: 0, y: 20 }}
