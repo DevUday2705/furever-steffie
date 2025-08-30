@@ -55,32 +55,33 @@ const DailyTaskSheet = () => {
     const path = window.location.pathname || "/";
     if (path === "/daily-task/report") {
       setCurrentView("reports");
-      // Load reports directly here to avoid dependency issues
-      const loadData = async () => {
-        setLoading(true);
-        try {
-          const q = query(
-            collection(db, "dailyReports"),
-            orderBy("submittedAt", "desc")
-          );
-          const querySnapshot = await getDocs(q);
-          const reportsData = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setReports(reportsData);
-          setFilteredReports(reportsData); // Initialize filtered reports
-        } catch (error) {
-          console.error("Error loading reports:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadData();
+      loadReports();
     } else {
       setCurrentView("form");
     }
-  }, []); // No dependencies to prevent loops
+  }, []);
+
+  // Load reports function
+  const loadReports = async () => {
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, "dailyReports"),
+        orderBy("submittedAt", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+      const reportsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReports(reportsData);
+      setFilteredReports(reportsData); // Initialize filtered reports
+    } catch (error) {
+      console.error("Error loading reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  }; // No dependencies to prevent loops
 
   // Memoize date filter values to prevent unnecessary re-renders
   const memoizedDateFilter = useMemo(() => ({
@@ -156,7 +157,7 @@ const DailyTaskSheet = () => {
   const navigateToReports = () => {
     window.history.pushState({}, "", "/daily-task/report");
     setCurrentView("reports");
-    // Reports are already loaded, no need to reload
+    loadReports(); // Load reports when navigating to reports view
   };
 
   const navigateToForm = () => {
