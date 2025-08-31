@@ -183,6 +183,48 @@ export default async function handler(req, res) {
             await batch.commit();
             console.log(`✅ Batch committed successfully!`);
 
+            // Send order confirmation email
+            try {
+                const emailPayload = {
+                    orderId: orderRef.id,
+                    orderNumber,
+                    razorpay_order_id,
+                    razorpay_payment_id,
+                    customer,
+                    items,
+                    amount,
+                };
+
+                console.log("📧 Sending order confirmation email...");
+                
+                // Import and call the email handler directly
+                const { default: sendOrderConfirmation } = await import('./send-order-confirmation.js');
+                
+                // Create a mock request object for the email handler
+                const mockReq = {
+                    method: 'POST',
+                    body: emailPayload
+                };
+                
+                const mockRes = {
+                    status: (code) => ({
+                        json: (data) => {
+                            if (code === 200) {
+                                console.log("✅ Order confirmation email sent successfully");
+                            } else {
+                                console.warn("⚠️ Failed to send order confirmation email, but order was saved");
+                            }
+                            return data;
+                        }
+                    })
+                };
+
+                await sendOrderConfirmation(mockReq, mockRes);
+            } catch (emailError) {
+                console.error("❌ Email service error:", emailError);
+                // Don't fail the order if email fails
+            }
+
             return res.status(200).json({
                 success: true,
                 orderId: orderRef.id,
@@ -201,6 +243,48 @@ export default async function handler(req, res) {
             try {
                 console.log("🔄 Attempting to save order without stock update...");
                 const fallbackOrderRef = await db.collection("orders").add(orderData);
+
+                // Send order confirmation email for fallback order too
+                try {
+                    const emailPayload = {
+                        orderId: fallbackOrderRef.id,
+                        orderNumber,
+                        razorpay_order_id,
+                        razorpay_payment_id,
+                        customer,
+                        items,
+                        amount,
+                    };
+
+                    console.log("📧 Sending order confirmation email for fallback order...");
+                    
+                    // Import and call the email handler directly
+                    const { default: sendOrderConfirmation } = await import('./send-order-confirmation.js');
+                    
+                    // Create a mock request object for the email handler
+                    const mockReq = {
+                        method: 'POST',
+                        body: emailPayload
+                    };
+                    
+                    const mockRes = {
+                        status: (code) => ({
+                            json: (data) => {
+                                if (code === 200) {
+                                    console.log("✅ Order confirmation email sent successfully");
+                                } else {
+                                    console.warn("⚠️ Failed to send order confirmation email, but order was saved");
+                                }
+                                return data;
+                            }
+                        })
+                    };
+
+                    await sendOrderConfirmation(mockReq, mockRes);
+                } catch (emailError) {
+                    console.error("❌ Email service error:", emailError);
+                    // Don't fail the order if email fails
+                }
 
                 return res.status(200).json({
                     success: true,

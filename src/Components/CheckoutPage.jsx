@@ -23,6 +23,7 @@ const CheckoutPage = () => {
   // Form state
   const [formData, setFormData] = useState({
     fullName: "",
+    email: "", // NEW: Add email field
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -531,6 +532,31 @@ const CheckoutPage = () => {
                   {errors.fullName && formSubmitted && (
                     <p className="mt-1 text-xs text-red-500">
                       {errors.fullName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email Address*
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full p-2 border ${
+                      errors.email ? "border-red-500" : "border-gray-300"
+                    } rounded-md text-sm`}
+                    placeholder="Enter your email address"
+                  />
+                  {errors.email && formSubmitted && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.email}
                     </p>
                   )}
                 </div>
