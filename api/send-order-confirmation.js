@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'fureversteffie@gmail.com',
