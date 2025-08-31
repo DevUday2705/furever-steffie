@@ -920,13 +920,6 @@ export const validateForm = (formData, setErrors) => {
     newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
   }
 
-  if (
-    formData.alternateMobile.trim() &&
-    !/^\d{10}$/.test(formData.alternateMobile)
-  ) {
-    newErrors.alternateMobile = "Enter a valid 10-digit mobile number";
-  }
-
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };

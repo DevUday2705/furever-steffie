@@ -2,27 +2,27 @@ import nodemailer from 'nodemailer';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'fureversteffie@gmail.com',
-      pass: 'htyq oijh ugoi echv', // App password
-    },
-  });
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'fureversteffie@gmail.com',
+            pass: 'htyq oijh ugoi echv', // App password
+        },
+    });
 };
 
 // Generate WhatsApp link
 const generateWhatsAppLink = (orderDetails) => {
-  const phoneNumber = '919876543210'; // Replace with your actual WhatsApp business number
-  const message = `Hi! I just placed an order (ID: ${orderDetails.orderId}) on Furever Steffie. I need to share my pup's exact measurements. Can you help me with the next steps?`;
-  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const phoneNumber = '918828145667'; // Replace with your actual WhatsApp business number
+    const message = `Hi! I just placed an order (ID: ${orderDetails.orderId}) on Furever Steffie. I need to share my pup's exact measurements. Can you help me with the next steps?`;
+    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 };
 
 // Generate order details HTML
 const generateOrderDetailsHTML = (orderData) => {
-  const { customer, items, amount, orderId, razorpay_payment_id } = orderData;
-  
-  const itemsHTML = items.map(item => `
+    const { customer, items, amount, orderId, razorpay_payment_id } = orderData;
+
+    const itemsHTML = items.map(item => `
     <tr style="border-bottom: 1px solid #e5e7eb;">
       <td style="padding: 12px 8px;">
         <div style="display: flex; align-items: center;">
@@ -47,9 +47,9 @@ const generateOrderDetailsHTML = (orderData) => {
     </tr>
   `).join('');
 
-  const whatsappLink = generateWhatsAppLink({ orderId });
+    const whatsappLink = generateWhatsAppLink({ orderId });
 
-  return `
+    return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -62,10 +62,8 @@ const generateOrderDetailsHTML = (orderData) => {
         
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 24px; text-align: center;">
-          <div style="display: inline-block; background-color: rgba(255,255,255,0.2); padding: 16px; border-radius: 50%; margin-bottom: 16px;">
-            <div style="width: 40px; height: 40px; background-color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-              <span style="color: #667eea; font-size: 24px; font-weight: bold;">🐾</span>
-            </div>
+          <div style="margin-bottom: 16px;">
+            <img src="https://furever-steffie.vercel.app/images/logo.jpg" alt="Furever Steffie Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.3); object-fit: cover;">
           </div>
           <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">Order Confirmed!</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Thank you for choosing Furever Steffie</p>
@@ -171,50 +169,50 @@ const generateOrderDetailsHTML = (orderData) => {
 };
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Only POST method allowed' });
-  }
-
-  try {
-    const orderData = req.body;
-    const { customer, orderId } = orderData;
-
-    if (!customer?.fullName || !customer?.email || !customer?.addressLine1) {
-      return res.status(400).json({ message: 'Missing required customer information (name, email, or address)' });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Only POST method allowed' });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customer.email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
+    try {
+        const orderData = req.body;
+        const { customer, orderId } = orderData;
+
+        if (!customer?.fullName || !customer?.email || !customer?.addressLine1) {
+            return res.status(400).json({ message: 'Missing required customer information (name, email, or address)' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(customer.email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
+        const transporter = createTransporter();
+
+        const mailOptions = {
+            from: '"Furever Steffie" <fureversteffie@gmail.com>',
+            to: customer.email, // Use the email from the form
+            subject: `🎉 Order Confirmed - ${orderId} | Furever Steffie`,
+            html: generateOrderDetailsHTML(orderData),
+        };
+
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log('✅ Order confirmation email sent:', info.messageId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Order confirmation email sent successfully',
+            messageId: info.messageId
+        });
+
+    } catch (error) {
+        console.error('❌ Error sending order confirmation email:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send confirmation email',
+            error: error.message
+        });
     }
-
-    const transporter = createTransporter();
-
-    const mailOptions = {
-      from: '"Furever Steffie" <fureversteffie@gmail.com>',
-      to: customer.email, // Use the email from the form
-      subject: `🎉 Order Confirmed - ${orderId} | Furever Steffie`,
-      html: generateOrderDetailsHTML(orderData),
-    };
-
-    // Send email
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('✅ Order confirmation email sent:', info.messageId);
-
-    res.status(200).json({ 
-      success: true, 
-      message: 'Order confirmation email sent successfully',
-      messageId: info.messageId 
-    });
-
-  } catch (error) {
-    console.error('❌ Error sending order confirmation email:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to send confirmation email',
-      error: error.message 
-    });
-  }
 }

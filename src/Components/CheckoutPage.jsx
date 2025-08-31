@@ -30,7 +30,6 @@ const CheckoutPage = () => {
     state: "",
     pincode: "",
     mobileNumber: "",
-    alternateMobile: "",
     specialInstructions: "",
     deliveryOption: "standard",
     country: "india", // NEW: Add country selection
@@ -559,6 +558,9 @@ const CheckoutPage = () => {
                       {errors.email}
                     </p>
                   )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    💡 We recommend providing a valid email as we&apos;ll share order updates and further steps through email communication.
+                  </p>
                 </div>
 
                 <div>
@@ -807,34 +809,9 @@ const CheckoutPage = () => {
                       {errors.mobileNumber}
                     </p>
                   )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="alternateMobile"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Whats App Mobile Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="alternateMobile"
-                    name="alternateMobile"
-                    value={formData.alternateMobile}
-                    onChange={handleChange}
-                    maxLength={10}
-                    className={`w-full p-2 border ${
-                      errors.alternateMobile
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder="Alternate number (Optional)"
-                  />
-                  {errors.alternateMobile && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.alternateMobile}
-                    </p>
-                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    💡 We recommend providing a valid mobile number for WhatsApp communication and order updates.
+                  </p>
                 </div>
               </div>
             </div>
