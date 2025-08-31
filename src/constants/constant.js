@@ -890,6 +890,12 @@ export const validateForm = (formData, setErrors) => {
     newErrors.fullName = "Full name is required";
   }
 
+  if (!formData.email.trim()) {
+    newErrors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    newErrors.email = "Enter a valid email address";
+  }
+
   if (!formData.addressLine1.trim()) {
     newErrors.addressLine1 = "Address is required";
   }

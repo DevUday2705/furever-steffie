@@ -57,6 +57,7 @@ import FemaleBandanas from "./Components/BandanaListing";
 import MaleBandanas from "./Components/MaleBandanas";
 import DailyTaskSheet from "./Components/TaskSheet";
 import PaymentFailed from "./Components/PaymentFailed";
+import EmailTest from "./Components/EmailTest";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
@@ -137,6 +138,7 @@ const App = () => {
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />
+              <Route path="/test-email" element={<EmailTest />} />
 
               <Route
                 path="/admin/edit/:category/:id"
