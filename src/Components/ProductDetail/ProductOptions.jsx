@@ -261,10 +261,9 @@ const ProductOptions = ({
                   isFullSet && !isRoyalSet && !isDupattaSet
                     ? "border-gray-800 bg-gray-100"
                     : "border-gray-200 bg-gray-50 hover:border-gray-300"
-                } border text-gray-600`}
+                } border text-gray-800`}
               >
-                <span className="opacity-60">Kurta + Dhoti</span>
-                <Clock className="w-3 h-3 absolute top-1 right-1 text-gray-400" />
+                Kurta + Dhoti
               </button>
 
               {/* NEW: Kurta + Dupatta Option */}
@@ -295,10 +294,8 @@ const ProductOptions = ({
                   `}
                 >
                   <Crown className="w-5 h-5 mr-2 opacity-60" />
-                  <span className="opacity-60">
-                    {isRoyalSet ? "Royal Set Selected ✓" : "Get Full Royal Set"}
-                  </span>
-                  <Clock className="w-4 h-4 ml-2 text-gray-200" />
+
+                  {isRoyalSet ? "Royal Set Selected ✓" : "Get Full Royal Set"}
                 </button>
 
                 <motion.div
