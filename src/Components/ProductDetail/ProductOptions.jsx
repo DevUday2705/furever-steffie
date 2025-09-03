@@ -56,7 +56,6 @@ const ProductOptions = ({
     setShowRoyalDescription(true);
     // Trigger confetti animation
     setShowConfetti(true);
-
     // Hide confetti after 3 seconds
     setTimeout(() => {
       setShowConfetti(false);
@@ -257,7 +256,7 @@ const ProductOptions = ({
 
               {/* Regular Kurta + Dhoti Option */}
               <button
-                onClick={handleDhotiUnavailableClick}
+                onClick={() => handleRegularOptionClick(true, false)}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
                   isFullSet && !isRoyalSet && !isDupattaSet
                     ? "border-gray-800 bg-gray-100"
@@ -285,7 +284,7 @@ const ProductOptions = ({
             {product.isRoyal && (
               <div className="relative w-full overflow-hidden rounded-md">
                 <button
-                  onClick={handleDhotiUnavailableClick}
+                  onClick={handleRoyalSetClick}
                   onMouseEnter={triggerShine}
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
                     ${
