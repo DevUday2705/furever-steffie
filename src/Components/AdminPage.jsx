@@ -18,8 +18,17 @@ const AdminPage = () => {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [customDate, setCustomDate] = useState(null);
+  const [startDate, setStartDate] = useState(() => {
+    // Default to current month start
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+      .toISOString()
+      .split("T")[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    // Default to today
+    return new Date().toISOString().split("T")[0];
+  });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
@@ -145,10 +154,11 @@ const AdminPage = () => {
     }
   };
 
-  const handleCalendarDateChange = (selectedDate) => {
-    setCustomDate(selectedDate ? new Date(selectedDate) : null);
+  const handleDateRangeChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
   };
-
+  console.log(orders);
   // Filter and sort orders
   const filteredAndSortedOrders = orders
     .filter((order) => {
@@ -167,24 +177,14 @@ const AdminPage = () => {
 
       // Date filter
       const orderDate = new Date(order.createdAt);
-      const now = new Date();
+      // Check date range
       let matchesDate = true;
+      if (startDate && endDate) {
+        // Create start and end date objects for comparison
+        const startDateObj = new Date(startDate + 'T00:00:00');
+        const endDateObj = new Date(endDate + 'T23:59:59');
 
-      if (dateFilter === "today") {
-        matchesDate = orderDate.toDateString() === now.toDateString();
-      } else if (dateFilter === "last7") {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        matchesDate = orderDate >= sevenDaysAgo;
-      } else if (dateFilter === "last30") {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - 30);
-        matchesDate = orderDate >= thirtyDaysAgo;
-      } else if (dateFilter === "custom" && customDate) {
-        matchesDate =
-          orderDate.getFullYear() === customDate.getFullYear() &&
-          orderDate.getMonth() === customDate.getMonth() &&
-          orderDate.getDate() === customDate.getDate();
+        matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
       return matchesSearch && matchesStatus && matchesDate;
@@ -279,17 +279,56 @@ const AdminPage = () => {
       <OrderFilters
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        dateFilter={dateFilter}
-        setDateFilter={setDateFilter}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         sortBy={sortBy}
         setSortBy={setSortBy}
-        onCalendarDateChange={handleCalendarDateChange}
+        onDateRangeChange={handleDateRangeChange}
       />
+
+      {/* Revenue Summary */}
+      {filteredAndSortedOrders.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Total Orders</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {filteredAndSortedOrders.length}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Total Revenue</p>
+              <p className="text-2xl font-bold text-green-600">
+                ₹
+                {filteredAndSortedOrders
+                  .reduce((sum, order) => sum + (order.amount || 0), 0)
+                  .toLocaleString()}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Average Order Value</p>
+              <p className="text-2xl font-bold text-purple-600">
+                ₹
+                {Math.round(
+                  filteredAndSortedOrders.reduce(
+                    (sum, order) => sum + (order.amount || 0),
+                    0
+                  ) / filteredAndSortedOrders.length
+                ).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 text-center text-sm text-gray-600">
+            Date Range: {new Date(startDate).toLocaleDateString()} to{" "}
+            {new Date(endDate).toLocaleDateString()}
+          </div>
+        </div>
+      )}
+
       {
         <span className="my-2 text-gray-500 inline-block italic">
-          {orders.length} orders
+          {orders.length} total orders • {filteredAndSortedOrders.length}{" "}
+          filtered orders
         </span>
       }
       {loading ? (
