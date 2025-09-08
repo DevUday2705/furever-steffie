@@ -831,9 +831,8 @@ const CheckoutPage = () => {
                   <p className="mt-1 text-xs text-gray-500">
                     💡 We recommend providing a valid mobile number for WhatsApp
                     communication and order updates.
-                    {formData.country !== "india" && 
-                      " Include country code (e.g., +1234567890)"
-                    }
+                    {formData.country !== "india" &&
+                      " Include country code (e.g., +1234567890)"}
                   </p>
                 </div>
               </div>
