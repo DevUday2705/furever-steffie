@@ -340,8 +340,7 @@ const ProductOptions = ({
                     Royal Experience for Your Pet
                   </h4>
                   <p className="text-xs text-gray-600 mt-1">
-                    Comes with Premium packaging, Kurta, Dhoti, Tassels, Dupatta
-                    and a Free gift.
+                    Comes with Kurta, Dhoti, Tassels, Dupatta and a Free gift.
                   </p>
                 </div>
               </div>

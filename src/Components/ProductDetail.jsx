@@ -210,9 +210,14 @@ const ProductDetail = () => {
         if (product.pricing.beadedAdditional) {
           price += product.pricing.beadedAdditional;
         }
-        // if (product.pricing.tasselsAdditional) {
-        //   price += product.pricing.tasselsAdditional;
-        // }
+        if (product.pricing.tasselsAdditional) {
+          price += product.pricing.tasselsAdditional;
+        }
+        break;
+      case "tassels":
+        if (product.pricing.tasselsAdditional) {
+          price += product.pricing.tasselsAdditional;
+        }
         break;
       default:
         break;
@@ -224,6 +229,7 @@ const ProductDetail = () => {
 
     return price;
   };
+  console.log(selectedStyle);
   const handleGoBack = () => navigate(-1);
 
   if (isLoading) {
