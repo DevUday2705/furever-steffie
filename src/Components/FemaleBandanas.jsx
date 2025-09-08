@@ -21,10 +21,10 @@ const FemaleBandanas = () => {
 
   return (
     <ProductListing
-      title="Female Bandanas"
+      title="Bandanas"
       subtitle="Explore our exclusive range of handcrafted Female bandanas for pets!"
       category="female-bandanas"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1746007679/banner-min_pbtnwp.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1745436600/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png"
       products={femaleBandanas}
       bannerTitle="Elegant  Bandanas for Every Pet Personality"
     />

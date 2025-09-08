@@ -83,6 +83,14 @@ const CheckoutPage = () => {
     newzealand: "NZD",
     canada: "CAD",
     dubai: "AED",
+    australia: "AUD",
+    germany: "EUR",
+    france: "EUR",
+    netherlands: "EUR",
+    japan: "JPY",
+    southkorea: "KRW",
+    hongkong: "HKD",
+    thailand: "THB",
   };
 
   const applyCoupon = () => {
@@ -626,9 +634,17 @@ const CheckoutPage = () => {
                     <option value="malaysia">🇲🇾 Malaysia</option>
                     <option value="usa">🇺🇸 United States</option>
                     <option value="uk">🇬🇧 United Kingdom</option>
-                    <option value="newzealand">🇳🇿 New Zealand</option>
                     <option value="canada">🇨🇦 Canada</option>
+                    <option value="australia">🇦🇺 Australia</option>
+                    <option value="newzealand">🇳🇿 New Zealand</option>
                     <option value="dubai">🇦🇪 UAE (Dubai)</option>
+                    <option value="germany">🇩🇪 Germany</option>
+                    <option value="france">🇫🇷 France</option>
+                    <option value="netherlands">�� Netherlands</option>
+                    <option value="japan">🇯🇵 Japan</option>
+                    <option value="southkorea">🇰🇷 South Korea</option>
+                    <option value="hongkong">�� Hong Kong</option>
+                    <option value="thailand">🇹🇭 Thailand</option>
                   </select>
                   {errors.country && formSubmitted && (
                     <p className="mt-1 text-xs text-red-500">
@@ -797,11 +813,15 @@ const CheckoutPage = () => {
                     name="mobileNumber"
                     value={formData.mobileNumber}
                     onChange={handleChange}
-                    maxLength={10}
+                    maxLength={formData.country === "india" ? 10 : 20}
                     className={`w-full p-2 border ${
                       errors.mobileNumber ? "border-red-500" : "border-gray-300"
                     } rounded-md text-sm`}
-                    placeholder="10-digit mobile number"
+                    placeholder={
+                      formData.country === "india"
+                        ? "10-digit mobile number"
+                        : "Mobile number with country code"
+                    }
                   />
                   {errors.mobileNumber && formSubmitted && (
                     <p className="mt-1 text-xs text-red-500">
@@ -811,6 +831,9 @@ const CheckoutPage = () => {
                   <p className="mt-1 text-xs text-gray-500">
                     💡 We recommend providing a valid mobile number for WhatsApp
                     communication and order updates.
+                    {formData.country !== "india" && 
+                      " Include country code (e.g., +1234567890)"
+                    }
                   </p>
                 </div>
               </div>

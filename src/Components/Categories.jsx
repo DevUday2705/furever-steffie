@@ -11,6 +11,7 @@ const Categories = () => {
     {
       id: 1,
       name: "KURTA",
+      link: "kurta",
       description: "Contemporary Styles",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1753112137/Regal_Green_Kurta_with_Zari_Detailing_evmojy.webp  ",
@@ -18,13 +19,15 @@ const Categories = () => {
     {
       id: 2,
       name: "TUXEDO",
+      link: "tuxedo",
       description: "Classic Fits",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
     },
     {
       id: 3,
-      name: "MALE BANDANAS",
+      name: "BANDANAS",
+      link: "Male Bandanas",
       description: "Trendy Accessories",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
@@ -32,6 +35,7 @@ const Categories = () => {
     {
       id: 4,
       name: "BOW TIE",
+      link: "Bow Tie",
       description: "Suit Up!",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
@@ -42,6 +46,7 @@ const Categories = () => {
     {
       id: 7,
       name: "Frock",
+      link: "Frock",
       description: "Playful Frills",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/cherry_red_polka_dot_frock_d3cspz.webp",
@@ -49,19 +54,22 @@ const Categories = () => {
     {
       id: 6,
       name: "Tutu Dress",
+      link: "Tutu Dress",
       description: "Traditional Elegance",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/White_Whisper_with_Bow_dce8nr.webp",
     },
     {
       id: 8,
-      name: "Female Bandanas",
+      name: "Bandanas",
+      link: "Female Bandanas",
       description: "Trendy Accessories",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1745436600/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png",
     },
     {
       id: 9,
+      link: "Bow Tie",
       name: "Bow Tie",
       description: "Cute Touch",
       image:
@@ -118,7 +126,7 @@ const Categories = () => {
               className="w-full"
             >
               <Link
-                to={`/${generateSlug(category.name)}?sort=popularity`}
+                to={`/${generateSlug(category.link)}?sort=popularity`}
                 className="block relative group"
               >
                 <div className="relative h-[280px] rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">

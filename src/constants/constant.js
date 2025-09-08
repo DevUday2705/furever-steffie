@@ -904,20 +904,44 @@ export const validateForm = (formData, setErrors) => {
     newErrors.city = "City is required";
   }
 
-  if (!formData.state.trim()) {
+  // Only require state for India
+  if (formData.country === "india" && !formData.state.trim()) {
     newErrors.state = "State is required";
   }
 
-  if (!formData.pincode.trim()) {
-    newErrors.pincode = "Pincode is required";
-  } else if (!/^\d{6}$/.test(formData.pincode)) {
-    newErrors.pincode = "Enter a valid 6-digit pincode";
+  // Validate pincode/postal code based on country
+  if (formData.country === "india") {
+    if (!formData.pincode.trim()) {
+      newErrors.pincode = "PIN code is required";
+    } else if (!/^\d{6}$/.test(formData.pincode)) {
+      newErrors.pincode = "Enter a valid 6-digit PIN code";
+    }
+  } else {
+    // For international addresses, postal code is optional but if provided should be reasonable
+    if (formData.pincode.trim() && formData.pincode.trim().length < 3) {
+      newErrors.pincode = "Enter a valid postal code";
+    }
   }
 
   if (!formData.mobileNumber.trim()) {
     newErrors.mobileNumber = "Mobile number is required";
-  } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
-    newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+  } else {
+    // More flexible mobile number validation for international numbers
+    const cleanNumber = formData.mobileNumber.replace(/[\s\-()+ ]/g, '');
+    if (formData.country === "india") {
+      if (!/^\d{10}$/.test(cleanNumber)) {
+        newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+      }
+    } else {
+      // International numbers can be 7-15 digits
+      if (!/^\d{7,15}$/.test(cleanNumber)) {
+        newErrors.mobileNumber = "Enter a valid mobile number (7-15 digits)";
+      }
+    }
+  }
+
+  if (!formData.country.trim()) {
+    newErrors.country = "Country is required";
   }
 
   setErrors(newErrors);
