@@ -196,16 +196,16 @@ export default async function handler(req, res) {
                 };
 
                 console.log("📧 Sending order confirmation email...");
-                
+
                 // Import and call the email handler directly
                 const { default: sendOrderConfirmation } = await import('./send-order-confirmation.js');
-                
+
                 // Create a mock request object for the email handler
                 const mockReq = {
                     method: 'POST',
                     body: emailPayload
                 };
-                
+
                 const mockRes = {
                     status: (code) => ({
                         json: (data) => {
@@ -257,16 +257,16 @@ export default async function handler(req, res) {
                     };
 
                     console.log("📧 Sending order confirmation email for fallback order...");
-                    
+
                     // Import and call the email handler directly
                     const { default: sendOrderConfirmation } = await import('./send-order-confirmation.js');
-                    
+
                     // Create a mock request object for the email handler
                     const mockReq = {
                         method: 'POST',
                         body: emailPayload
                     };
-                    
+
                     const mockRes = {
                         status: (code) => ({
                             json: (data) => {

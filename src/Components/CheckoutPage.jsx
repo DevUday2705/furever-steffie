@@ -554,12 +554,11 @@ const CheckoutPage = () => {
                     placeholder="Enter your email address"
                   />
                   {errors.email && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.email}
-                    </p>
+                    <p className="mt-1 text-xs text-red-500">{errors.email}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
-                    💡 We recommend providing a valid email as we&apos;ll share order updates and further steps through email communication.
+                    💡 We recommend providing a valid email as we&apos;ll share
+                    order updates and further steps through email communication.
                   </p>
                 </div>
 
@@ -810,7 +809,8 @@ const CheckoutPage = () => {
                     </p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
-                    💡 We recommend providing a valid mobile number for WhatsApp communication and order updates.
+                    💡 We recommend providing a valid mobile number for WhatsApp
+                    communication and order updates.
                   </p>
                 </div>
               </div>

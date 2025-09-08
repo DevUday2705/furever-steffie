@@ -84,10 +84,13 @@ const DailyTaskSheet = () => {
   }; // No dependencies to prevent loops
 
   // Memoize date filter values to prevent unnecessary re-renders
-  const memoizedDateFilter = useMemo(() => ({
-    fromDate: dateFilter.fromDate,
-    toDate: dateFilter.toDate
-  }), [dateFilter.fromDate, dateFilter.toDate]);
+  const memoizedDateFilter = useMemo(
+    () => ({
+      fromDate: dateFilter.fromDate,
+      toDate: dateFilter.toDate,
+    }),
+    [dateFilter.fromDate, dateFilter.toDate]
+  );
 
   // Apply date filter whenever dateFilter changes (optimize to prevent unnecessary re-renders)
   useEffect(() => {
@@ -98,16 +101,18 @@ const DailyTaskSheet = () => {
     if (memoizedDateFilter.fromDate || memoizedDateFilter.toDate) {
       filtered = reports.filter((report) => {
         if (!report.date) return false; // Skip reports without date
-        
+
         const reportDate = new Date(report.date);
-        
+
         // Validate date
         if (isNaN(reportDate.getTime())) return false;
-        
+
         const fromDate = memoizedDateFilter.fromDate
           ? new Date(memoizedDateFilter.fromDate)
           : null;
-        const toDate = memoizedDateFilter.toDate ? new Date(memoizedDateFilter.toDate) : null;
+        const toDate = memoizedDateFilter.toDate
+          ? new Date(memoizedDateFilter.toDate)
+          : null;
 
         // Set time to start/end of day for accurate comparison
         if (fromDate) {
@@ -118,7 +123,7 @@ const DailyTaskSheet = () => {
           toDate.setHours(23, 59, 59, 999);
           if (isNaN(toDate.getTime())) return false;
         }
-        
+
         reportDate.setHours(0, 0, 0, 0);
 
         const afterFromDate = !fromDate || reportDate >= fromDate;
@@ -129,9 +134,12 @@ const DailyTaskSheet = () => {
     }
 
     // Only update if the filtered results actually changed
-    setFilteredReports(prevFiltered => {
-      const isSame = prevFiltered.length === filtered.length && 
-        prevFiltered.every((report, index) => report.id === filtered[index]?.id);
+    setFilteredReports((prevFiltered) => {
+      const isSame =
+        prevFiltered.length === filtered.length &&
+        prevFiltered.every(
+          (report, index) => report.id === filtered[index]?.id
+        );
       return isSame ? prevFiltered : filtered;
     });
   }, [memoizedDateFilter, reports]);

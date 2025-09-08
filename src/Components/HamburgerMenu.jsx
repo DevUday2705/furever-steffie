@@ -31,6 +31,10 @@ const HamburgerMenu = () => {
       title: "Why Us?",
       items: [],
     },
+    {
+      title: "Size Guide",
+      items: [],
+    },
   ];
 
   const toggleMenu = () => {
@@ -92,6 +96,9 @@ const HamburgerMenu = () => {
         break;
       case "bow-set":
         navigate("/bow-tie");
+        break;
+      case "size-guide":
+        navigate("/size-guide");
         break;
 
       default:

@@ -15,11 +15,11 @@ const OrderFilters = ({
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1)
       .toISOString()
-      .split('T')[0];
+      .split("T")[0];
   };
 
   const getTodaysDate = () => {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split("T")[0];
   };
 
   const [startDate, setStartDate] = useState(getCurrentMonthStart());
@@ -35,7 +35,7 @@ const OrderFilters = ({
   const handleStartDateChange = (e) => {
     const newStartDate = e.target.value;
     setStartDate(newStartDate);
-    
+
     // If start date is after end date, update end date
     if (newStartDate > endDate) {
       setEndDate(newStartDate);
@@ -45,7 +45,7 @@ const OrderFilters = ({
   const handleEndDateChange = (e) => {
     const newEndDate = e.target.value;
     setEndDate(newEndDate);
-    
+
     // If end date is before start date, update start date
     if (newEndDate < startDate) {
       setStartDate(newEndDate);
@@ -67,8 +67,8 @@ const OrderFilters = ({
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
-    
-    setStartDate(sevenDaysAgo.toISOString().split('T')[0]);
+
+    setStartDate(sevenDaysAgo.toISOString().split("T")[0]);
     setEndDate(getTodaysDate());
   };
 
@@ -76,8 +76,8 @@ const OrderFilters = ({
     const today = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    setStartDate(thirtyDaysAgo.toISOString().split('T')[0]);
+
+    setStartDate(thirtyDaysAgo.toISOString().split("T")[0]);
     setEndDate(getTodaysDate());
   };
 
@@ -135,7 +135,9 @@ const OrderFilters = ({
       {/* Date Range Section */}
       <div className="border-t pt-3 mt-4">
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">Date Range</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Date Range
+          </label>
           <div className="flex gap-2">
             <button
               onClick={resetToCurrentMonth}
@@ -167,7 +169,9 @@ const OrderFilters = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Start Date */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">From Date</label>
+            <label className="block text-xs text-gray-500 mb-1">
+              From Date
+            </label>
             <input
               type="date"
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
@@ -191,11 +195,17 @@ const OrderFilters = ({
 
         {/* Date Range Info */}
         <div className="mt-2 text-xs text-gray-600">
-          <span className="font-medium">Selected Range:</span> {' '}
-          {new Date(startDate).toLocaleDateString()} to {new Date(endDate).toLocaleDateString()}
+          <span className="font-medium">Selected Range:</span>{" "}
+          {new Date(startDate).toLocaleDateString()} to{" "}
+          {new Date(endDate).toLocaleDateString()}
           {startDate && endDate && (
             <span className="ml-2 text-blue-600">
-              ({Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1} days)
+              (
+              {Math.ceil(
+                (new Date(endDate) - new Date(startDate)) /
+                  (1000 * 60 * 60 * 24)
+              ) + 1}{" "}
+              days)
             </span>
           )}
         </div>
