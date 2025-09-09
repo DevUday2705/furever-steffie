@@ -262,7 +262,7 @@ const ProductListing = ({
 
             // Get stock status
             const stockStatus = getProductStockStatus(product);
-
+            console.log(product.category);
             return (
               <motion.div
                 key={product.id}
@@ -284,11 +284,32 @@ const ProductListing = ({
                     />
 
                     {/* Stock Status Indicators */}
-                    {stockStatus.soldOut && (
+                    {stockStatus.soldOut && product.category !== "tut" && (
                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-gray-900/10 flex items-center justify-center ">
                         <div className=" text-white px-4 py-2 rounded-lg font-semibold text-2xl text-center ">
                           SOLD <br /> OUT
                         </div>
+                      </div>
+                    )}
+
+                    {stockStatus.soldOut && product.category == "tut" && (
+                      <div
+                        style={{
+                          background: "#63B8B7",
+                        }}
+                        className="absolute overflow-hidden top-0 left-0 px-2 py-1 text-white text-xs rounded-br-lg"
+                      >
+                        <Flame size={10} className="inline-block mr-1" />
+                        Coming Soon
+                        <motion.div
+                          className="absolute left-[-30%] top-0 w-[60%] h-full bg-white opacity-10 rotate-60"
+                          animate={{ left: "130%" }}
+                          transition={{
+                            duration: 3,
+                            ease: "easeInOut",
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
+                        />
                       </div>
                     )}
 
