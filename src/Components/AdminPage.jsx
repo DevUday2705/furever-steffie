@@ -32,6 +32,14 @@ const AdminPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
+  // Measurements editing states
+  const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
+  const [measurementValues, setMeasurementValues] = useState({
+    neck: "",
+    chest: "",
+    back: ""
+  });
+
   // Helper function to get dhoti details from product data
   const getDhotiDetails = (item) => {
     if (item.selectedDhotiDetails) {
@@ -152,6 +160,76 @@ const AdminPage = () => {
       console.error("Error updating status:", err);
       alert("Failed to update status. Try again.");
     }
+  };
+
+  // Handle measurements editing
+  const startEditingMeasurements = (orderId, itemIndex, currentMeasurements) => {
+    setEditingMeasurements({ orderId, itemIndex });
+    setMeasurementValues({
+      neck: currentMeasurements?.neck || "",
+      chest: currentMeasurements?.chest || "",
+      back: currentMeasurements?.back || ""
+    });
+  };
+
+  const cancelEditingMeasurements = () => {
+    setEditingMeasurements(null);
+    setMeasurementValues({ neck: "", chest: "", back: "" });
+  };
+
+  const saveMeasurements = async () => {
+    if (!editingMeasurements) return;
+
+    const { orderId, itemIndex } = editingMeasurements;
+
+    try {
+      // Find the order and update the measurements for the specific item
+      const orderToUpdate = orders.find(order => order.id === orderId);
+      if (!orderToUpdate) {
+        toast.error("Order not found");
+        return;
+      }
+
+      // Create updated items array
+      const updatedItems = [...orderToUpdate.items];
+      updatedItems[itemIndex] = {
+        ...updatedItems[itemIndex],
+        measurements: {
+          neck: measurementValues.neck,
+          chest: measurementValues.chest,
+          back: measurementValues.back
+        }
+      };
+
+      // Update in Firebase
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        items: updatedItems
+      });
+
+      // Update local state
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId
+            ? { ...order, items: updatedItems }
+            : order
+        )
+      );
+
+      toast.success("Measurements updated successfully!");
+      cancelEditingMeasurements();
+      
+    } catch (err) {
+      console.error("Error updating measurements:", err);
+      toast.error("Failed to update measurements. Please try again.");
+    }
+  };
+
+  const handleMeasurementChange = (field, value) => {
+    setMeasurementValues(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleDateRangeChange = (newStartDate, newEndDate) => {
@@ -558,17 +636,94 @@ const AdminPage = () => {
                               </div>
                             </div>
 
-                            {/* Measurements */}
-                            {item.measurements && (
-                              <div className="text-xs text-gray-600 mt-2 p-2 bg-blue-50 rounded">
-                                <p className="font-medium">📏 Measurements:</p>
-                                <p>
-                                  Neck: {item.measurements.neck}&quot; • Chest:{" "}
-                                  {item.measurements.chest}&quot; • Back:{" "}
-                                  {item.measurements.back}&quot;
-                                </p>
+                            {/* Measurements Section */}
+                            <div className="text-xs text-gray-600 mt-2 p-3 bg-blue-50 rounded border">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="font-medium text-sm">📏 Measurements</p>
+                                {editingMeasurements?.orderId === order.id && editingMeasurements?.itemIndex === idx ? (
+                                  <div className="flex gap-1">
+                                    <button
+                                      onClick={saveMeasurements}
+                                      className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      onClick={cancelEditingMeasurements}
+                                      className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => startEditingMeasurements(order.id, idx, item.measurements)}
+                                    className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                                  >
+                                    {item.measurements?.neck || item.measurements?.chest || item.measurements?.back ? 'Edit' : 'Add'}
+                                  </button>
+                                )}
                               </div>
-                            )}
+
+                              {editingMeasurements?.orderId === order.id && editingMeasurements?.itemIndex === idx ? (
+                                // Editing Mode
+                                <div className="space-y-2">
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Neck (inches)</label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.neck}
+                                        onChange={(e) => handleMeasurementChange('neck', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Chest (inches)</label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.chest}
+                                        onChange={(e) => handleMeasurementChange('chest', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">Back (inches)</label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.back}
+                                        onChange={(e) => handleMeasurementChange('back', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    💡 Enter measurements in inches as provided by customer
+                                  </p>
+                                </div>
+                              ) : (
+                                // Display Mode
+                                <div>
+                                  {item.measurements?.neck || item.measurements?.chest || item.measurements?.back ? (
+                                    <div className="text-sm">
+                                      <span className="font-medium">Neck:</span> {item.measurements.neck || 'N/A'}&quot;  •  
+                                      <span className="font-medium">Chest:</span> {item.measurements.chest || 'N/A'}&quot;  •  
+                                      <span className="font-medium">Back:</span> {item.measurements.back || 'N/A'}&quot;
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm text-gray-500 italic">
+                                      No measurements added yet. Click &quot;Add&quot; to enter customer measurements.
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
