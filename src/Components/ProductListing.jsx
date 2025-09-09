@@ -293,11 +293,7 @@ const ProductListing = ({
                     )}
 
                     {!stockStatus.soldOut && stockStatus.lowStock && (
-                      <div
-                        className={`absolute top-2 ${
-                          product.isTrending ? "right-16" : "right-2"
-                        }`}
-                      >
+                      <div className="absolute top-2 right-2">
                         <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
                           <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
@@ -307,23 +303,25 @@ const ProductListing = ({
                       </div>
                     )}
 
-                    {/* Trending Icon */}
+                    {/* Trending Label */}
                     {product.isTrending && (
-                      <div className="absolute top-2 right-2">
-                        <div className="relative">
-                          <div
-                            className="bg-gradient-to-r from-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, #ff6b6b, #ff8e53, #ff6b6b)",
-                              boxShadow: "0 4px 15px rgba(255, 107, 107, 0.4)",
-                            }}
-                          >
-                            <Flame size={12} className="text-white" />
-                          </div>
-                          {/* Pulsing ring effect */}
-                          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 opacity-30 animate-ping"></div>
-                        </div>
+                      <div
+                        style={{
+                          background: "#63B8B7",
+                        }}
+                        className="absolute overflow-hidden top-0 right-0 px-2 py-1 text-white text-xs rounded-bl-lg"
+                      >
+                        <Flame size={10} className="inline-block mr-1" />
+                        Trending
+                        <motion.div
+                          className="absolute left-[-30%] top-0 w-[60%] h-full bg-white opacity-10 rotate-60"
+                          animate={{ left: "130%" }}
+                          transition={{
+                            duration: 3,
+                            ease: "easeInOut",
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
+                        />
                       </div>
                     )}
 
