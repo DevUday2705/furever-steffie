@@ -295,7 +295,9 @@ const ProductListing = ({
                     {stockStatus.soldOut && product.category == "tut" && (
                       <div
                         style={{
-                          background: "#63B8B7",
+                          background:
+                            "linear-gradient(90deg, #c9a94e, #b5892e)",
+                          boxShadow: "0 2px 6px rgba(201, 169, 78, 0.35)",
                         }}
                         className="absolute overflow-hidden top-0 left-0 px-2 py-1 text-white text-xs rounded-br-lg"
                       >
