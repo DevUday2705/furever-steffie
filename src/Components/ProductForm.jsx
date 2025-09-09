@@ -17,6 +17,7 @@ const defaultSchema = {
   isBeadedAvailable: false,
   isNonBeadedAvailable: true,
   isRoyal: false, // Add this line
+  isTrending: false, // Add trending status
   sizeStock: {
     XS: 5,
     S: 5,
@@ -384,6 +385,14 @@ const ProductForm = () => {
             <span>Is Royal</span>
           </label>
         )}
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={formData.isTrending}
+            onChange={(e) => handleChange("isTrending", e.target.checked)}
+          />
+          <span>🔥 Is Trending</span>
+        </label>
         <div>
           <label className="block text-sm font-medium mb-1">Category</label>
           <input

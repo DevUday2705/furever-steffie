@@ -221,7 +221,7 @@ const ProductListing = ({
           alt="Kurta Banner"
           className="w-full rounded-md h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-md flex items-end justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-md flex items-end justify-center">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -293,7 +293,7 @@ const ProductListing = ({
                     )}
 
                     {!stockStatus.soldOut && stockStatus.lowStock && (
-                      <div className="absolute top-2 right-2">
+                      <div className={`absolute top-2 ${product.isTrending ? 'right-16' : 'right-2'}`}>
                         <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
                           <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
@@ -302,6 +302,26 @@ const ProductListing = ({
                         </div>
                       </div>
                     )}
+
+                    {/* Trending Icon */}
+                    {product.isTrending && (
+                      <div className="absolute top-2 right-2">
+                        <div className="relative">
+                          <div 
+                            className="bg-gradient-to-r from-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                            style={{
+                              background: "linear-gradient(135deg, #ff6b6b, #ff8e53, #ff6b6b)",
+                              boxShadow: "0 4px 15px rgba(255, 107, 107, 0.4)"
+                            }}
+                          >
+                            <Flame size={12} className="text-white" />
+                          </div>
+                          {/* Pulsing ring effect */}
+                          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 opacity-30 animate-ping"></div>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* {product.priorityScore >= 90 && (
                       <div className="absolute top-0 left-0">
                         <div className="flex items-center bg-amber-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">
