@@ -293,7 +293,11 @@ const ProductListing = ({
                     )}
 
                     {!stockStatus.soldOut && stockStatus.lowStock && (
-                      <div className={`absolute top-2 ${product.isTrending ? 'right-16' : 'right-2'}`}>
+                      <div
+                        className={`absolute top-2 ${
+                          product.isTrending ? "right-16" : "right-2"
+                        }`}
+                      >
                         <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
                           <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
@@ -307,11 +311,12 @@ const ProductListing = ({
                     {product.isTrending && (
                       <div className="absolute top-2 right-2">
                         <div className="relative">
-                          <div 
+                          <div
                             className="bg-gradient-to-r from-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                             style={{
-                              background: "linear-gradient(135deg, #ff6b6b, #ff8e53, #ff6b6b)",
-                              boxShadow: "0 4px 15px rgba(255, 107, 107, 0.4)"
+                              background:
+                                "linear-gradient(135deg, #ff6b6b, #ff8e53, #ff6b6b)",
+                              boxShadow: "0 4px 15px rgba(255, 107, 107, 0.4)",
                             }}
                           >
                             <Flame size={12} className="text-white" />
@@ -321,7 +326,7 @@ const ProductListing = ({
                         </div>
                       </div>
                     )}
-                    
+
                     {/* {product.priorityScore >= 90 && (
                       <div className="absolute top-0 left-0">
                         <div className="flex items-center bg-amber-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">
