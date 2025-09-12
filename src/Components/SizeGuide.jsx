@@ -1,6 +1,13 @@
 import { Play, VideoOff, Search, Save, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
 
@@ -41,15 +48,15 @@ const SizeGuide = () => {
     setLoading(true);
     try {
       const searchTerm = orderNumber.trim();
-      
+
       // Search for order by orderNumber field (e.g., "ORD-478542")
       const q = query(
         collection(db, "orders"),
         where("orderNumber", "==", searchTerm)
       );
-      
+
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
         // Get the first matching document
         const orderDoc = querySnapshot.docs[0];
@@ -74,9 +81,9 @@ const SizeGuide = () => {
           collection(db, "orders"),
           where("razorpay_order_id", "==", searchTerm)
         );
-        
+
         const fallbackSnapshot = await getDocs(fallbackQuery);
-        
+
         if (!fallbackSnapshot.empty) {
           const orderDoc = fallbackSnapshot.docs[0];
           const orderData = { id: orderDoc.id, ...orderDoc.data() };
@@ -95,7 +102,9 @@ const SizeGuide = () => {
 
           toast.success("Order found! You can now update measurements");
         } else {
-          toast.error("Order not found. Please check your order number (e.g., ORD-478542)");
+          toast.error(
+            "Order not found. Please check your order number (e.g., ORD-478542)"
+          );
           setOrder(null);
         }
       }
@@ -222,7 +231,8 @@ const SizeGuide = () => {
 
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-600 mb-3">
-              Enter your order number (e.g., ORD-478542) to update measurements for your ordered items:
+              Enter your order number (e.g., ORD-478542) to update measurements
+              for your ordered items:
             </p>
 
             <div className="flex gap-2">
