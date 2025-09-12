@@ -278,6 +278,16 @@ const AdminPage = () => {
         return b.amount - a.amount;
       } else if (sortBy === "amount-low") {
         return a.amount - b.amount;
+      } else if (sortBy === "dispatch-earliest") {
+        // Sort by dispatch date - earliest first
+        const dateA = a.dispatchDate ? new Date(a.dispatchDate) : new Date('9999-12-31');
+        const dateB = b.dispatchDate ? new Date(b.dispatchDate) : new Date('9999-12-31');
+        return dateA - dateB;
+      } else if (sortBy === "dispatch-latest") {
+        // Sort by dispatch date - latest first
+        const dateA = a.dispatchDate ? new Date(a.dispatchDate) : new Date('1900-01-01');
+        const dateB = b.dispatchDate ? new Date(b.dispatchDate) : new Date('1900-01-01');
+        return dateB - dateA;
       }
       return 0;
     });
@@ -452,6 +462,17 @@ const AdminPage = () => {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
+                  </div>
+                  {/* Dispatch Date - Prominent Display */}
+                  <div className="text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-md mt-1 inline-block">
+                    🚚 Dispatch: {order.dispatchDate ? 
+                      new Date(order.dispatchDate).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      }) : 
+                      "Not set"
+                    }
                   </div>
                 </div>
                 <div className="text-right">

@@ -18,6 +18,14 @@ import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
 import mixpanel from "../hooks/mixpanel";
 
+// Utility function to calculate dispatch date (3 days from today)
+const calculateDispatchDate = () => {
+  const today = new Date();
+  const dispatchDate = new Date(today);
+  dispatchDate.setDate(today.getDate() + 3);
+  return dispatchDate.toISOString();
+};
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -384,6 +392,7 @@ const CheckoutPage = () => {
                       ],
                   amount: data.amount / 100,
                   coupon: couponCode,
+                  dispatchDate: calculateDispatchDate(), // Add dispatch date (3 days from today)
                 }),
               });
 

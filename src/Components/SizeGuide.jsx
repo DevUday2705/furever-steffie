@@ -1,9 +1,17 @@
-import { Play, VideoOff } from "lucide-react";
-import React, { useState } from "react";
+import { Play, VideoOff, Search, Save, CheckCircle } from "lucide-react";
+import { useState } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import toast from "react-hot-toast";
 
 const SizeGuide = () => {
   const [videoError, setVideoError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [orderNumber, setOrderNumber] = useState("");
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [measurements, setMeasurements] = useState({});
+  const [savingMeasurements, setSavingMeasurements] = useState(false);
 
   const handleVideoError = () => {
     setVideoError(true);
@@ -13,6 +21,7 @@ const SizeGuide = () => {
   const handleVideoLoad = () => {
     setIsLoading(false);
   };
+
   const handleWhatsAppClick = () => {
     const phoneNumber = "918828145667";
     const message =
@@ -23,20 +32,307 @@ const SizeGuide = () => {
     window.open(whatsappUrl, "_blank");
   };
 
+  const fetchOrder = async () => {
+    if (!orderNumber.trim()) {
+      toast.error("Please enter your order number");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Try to fetch by order ID
+      const orderRef = doc(db, "orders", orderNumber.trim());
+      const orderSnap = await getDoc(orderRef);
+
+      if (orderSnap.exists()) {
+        const orderData = { id: orderSnap.id, ...orderSnap.data() };
+        setOrder(orderData);
+
+        // Initialize measurements state
+        const initialMeasurements = {};
+        orderData.items?.forEach((item, index) => {
+          initialMeasurements[index] = {
+            neck: item.measurements?.neck || "",
+            chest: item.measurements?.chest || "",
+            back: item.measurements?.back || "",
+          };
+        });
+        setMeasurements(initialMeasurements);
+
+        toast.success("Order found! You can now update measurements");
+      } else {
+        toast.error("Order not found. Please check your order number");
+        setOrder(null);
+      }
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      toast.error("Error fetching order. Please try again");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateMeasurement = (itemIndex, field, value) => {
+    setMeasurements((prev) => ({
+      ...prev,
+      [itemIndex]: {
+        ...prev[itemIndex],
+        [field]: value,
+      },
+    }));
+  };
+
+  const saveMeasurements = async () => {
+    if (!order) return;
+
+    setSavingMeasurements(true);
+    try {
+      // Update the order with new measurements
+      const updatedItems = order.items.map((item, index) => ({
+        ...item,
+        measurements: measurements[index] || item.measurements || {},
+      }));
+
+      const orderRef = doc(db, "orders", order.id);
+      await updateDoc(orderRef, {
+        items: updatedItems,
+      });
+
+      toast.success("✅ Measurements saved successfully!");
+
+      // Update local order state
+      setOrder((prev) => ({
+        ...prev,
+        items: updatedItems,
+      }));
+    } catch (error) {
+      console.error("Error saving measurements:", error);
+      toast.error("Error saving measurements. Please try again");
+    } finally {
+      setSavingMeasurements(false);
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold mb-2">📏 Size Guide</h1>
+        <h1 className="text-2xl font-bold mb-2">
+          📏 Size Guide & Measurements
+        </h1>
         <p className="text-purple-100">
-          Get the perfect fit for your furry friend
+          Learn how to measure &amp; update your pet&apos;s measurements
         </p>
       </div>
 
       {/* Main Content */}
       <div className="p-6">
+        {/* Video Tutorial Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            📹 How to Measure Your Pet
+          </h2>
+
+          <div className="relative bg-gray-900 rounded-lg overflow-hidden shadow-lg">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-white"></div>
+              </div>
+            )}
+
+            {videoError ? (
+              <div className="aspect-video flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+                <VideoOff size={48} className="mb-2" />
+                <p className="text-sm">Video unavailable</p>
+                <p className="text-xs mt-1">Please contact us for guidance</p>
+              </div>
+            ) : (
+              <video
+                className="w-full aspect-video object-cover"
+                controls
+                onLoadedData={handleVideoLoad}
+                onError={handleVideoError}
+                poster="/images/video-thumbnail.jpg"
+              >
+                <source src="/images/measurement-guide.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
+
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-800 mb-2">
+              Key Measurement Points:
+            </h3>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>
+                • <strong>Neck:</strong> Around the base of the neck where
+                collar sits
+              </li>
+              <li>
+                • <strong>Chest:</strong> Around the widest part of the chest
+              </li>
+              <li>
+                • <strong>Back:</strong> From base of neck to base of tail
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Order Lookup Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            🔍 Update Your Pet&apos;s Measurements
+          </h2>
+
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Enter your order number to update measurements for your ordered
+              items:
+            </p>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter your order number"
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onKeyPress={(e) => e.key === "Enter" && fetchOrder()}
+              />
+              <button
+                onClick={fetchOrder}
+                disabled={loading}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-1"
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
+                ) : (
+                  <Search size={16} />
+                )}
+                {loading ? "Searching..." : "Find Order"}
+              </button>
+            </div>
+          </div>
+
+          {/* Order Items & Measurements */}
+          {order && (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle size={20} className="text-green-600" />
+                  <h3 className="font-semibold text-green-800">Order Found!</h3>
+                </div>
+                <p className="text-sm text-green-700">
+                  <strong>Customer:</strong> {order.customer?.fullName}
+                  <br />
+                  <strong>Order Date:</strong>{" "}
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-800">
+                  Update Measurements for Your Items:
+                </h3>
+
+                {order.items?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg p-4 bg-white"
+                  >
+                    <div className="flex gap-3 mb-4">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded border"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800">
+                          {item.name}
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {item.subcategory} • Size {item.selectedSize}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Neck (cm)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={measurements[index]?.neck || ""}
+                          onChange={(e) =>
+                            updateMeasurement(index, "neck", e.target.value)
+                          }
+                          className="w-full px-2 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Chest (cm)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={measurements[index]?.chest || ""}
+                          onChange={(e) =>
+                            updateMeasurement(index, "chest", e.target.value)
+                          }
+                          className="w-full px-2 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Back (cm)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={measurements[index]?.back || ""}
+                          onChange={(e) =>
+                            updateMeasurement(index, "back", e.target.value)
+                          }
+                          className="w-full px-2 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  onClick={saveMeasurements}
+                  disabled={savingMeasurements}
+                  className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {savingMeasurements ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={18} />
+                      Save All Measurements
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Measurement Guide Image */}
         <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-3 text-center">
+            📐 Visual Measurement Guide
+          </h2>
           <div className="bg-gray-100 rounded-lg p-6 text-center border-2 border-dashed border-gray-300">
             <img
               src="/images/size-chart.jpg"

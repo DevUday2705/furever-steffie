@@ -128,6 +128,8 @@ const OrderFilters = ({
             <option value="oldest">Oldest First</option>
             <option value="amount-high">Amount (High to Low)</option>
             <option value="amount-low">Amount (Low to High)</option>
+            <option value="dispatch-earliest">Dispatch Date (Earliest)</option>
+            <option value="dispatch-latest">Dispatch Date (Latest)</option>
           </select>
         </div>
       </div>
