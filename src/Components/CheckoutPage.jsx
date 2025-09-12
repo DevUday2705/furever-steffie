@@ -1,7 +1,14 @@
 import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { addDoc, collection, doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  updateDoc,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
 import { ChevronLeft, AlertTriangle } from "lucide-react";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
@@ -97,7 +104,7 @@ const CheckoutPage = () => {
 
   const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
-    
+
     if (code === SINGLE_USE_COUPON) {
       // Check Firestore if this global single-use coupon is still available
       try {
@@ -106,11 +113,13 @@ const CheckoutPage = () => {
 
         if (couponSnap.exists() && couponSnap.data().used) {
           setDiscount(0);
-          setCouponError("This coupon has already been used and is no longer available.");
+          setCouponError(
+            "This coupon has already been used and is no longer available."
+          );
           toast.error("❌ Coupon already used");
           return;
         }
-        
+
         // Coupon is available - apply flat ₹750 discount
         setDiscount(0); // Set to 0 for percentage discount as we'll handle flat discount separately
         setCouponError("");
@@ -183,7 +192,7 @@ const CheckoutPage = () => {
     }
 
     let discountAmount = 0;
-    
+
     // Check if it's the special single-use coupon for flat ₹750 discount
     if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {
       discountAmount = 750;
@@ -337,13 +346,17 @@ const CheckoutPage = () => {
               // Mark single-use coupon as used globally in Firestore
               if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {
                 try {
-                  const couponRef = doc(db, "singleUseCoupons", SINGLE_USE_COUPON);
+                  const couponRef = doc(
+                    db,
+                    "singleUseCoupons",
+                    SINGLE_USE_COUPON
+                  );
                   await setDoc(couponRef, {
                     used: true,
                     usedBy: formData.email,
                     usedAt: new Date().toISOString(),
                     customerName: formData.fullName,
-                    orderId: response.razorpay_order_id
+                    orderId: response.razorpay_order_id,
                   });
                 } catch (error) {
                   console.error("Error marking coupon as used:", error);
@@ -1085,12 +1098,15 @@ const CheckoutPage = () => {
                     })()}
                   </span>
                 </div>
-                {(discount > 0 || couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) && (
+                {(discount > 0 ||
+                  couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) && (
                   <div className="flex justify-between text-green-600">
                     <span>Coupon Discount:</span>
                     <span>
                       {(() => {
-                        if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {
+                        if (
+                          couponCode.trim().toUpperCase() === SINGLE_USE_COUPON
+                        ) {
                           // Flat ₹750 discount
                           return convertCurrency(750, currency);
                         } else {
