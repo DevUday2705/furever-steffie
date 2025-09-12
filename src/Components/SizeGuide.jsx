@@ -1,6 +1,6 @@
 import { Play, VideoOff, Search, Save, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
 
@@ -40,12 +40,20 @@ const SizeGuide = () => {
 
     setLoading(true);
     try {
-      // Try to fetch by order ID
-      const orderRef = doc(db, "orders", orderNumber.trim());
-      const orderSnap = await getDoc(orderRef);
-
-      if (orderSnap.exists()) {
-        const orderData = { id: orderSnap.id, ...orderSnap.data() };
+      const searchTerm = orderNumber.trim();
+      
+      // Search for order by orderNumber field (e.g., "ORD-478542")
+      const q = query(
+        collection(db, "orders"),
+        where("orderNumber", "==", searchTerm)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        // Get the first matching document
+        const orderDoc = querySnapshot.docs[0];
+        const orderData = { id: orderDoc.id, ...orderDoc.data() };
         setOrder(orderData);
 
         // Initialize measurements state
@@ -61,8 +69,35 @@ const SizeGuide = () => {
 
         toast.success("Order found! You can now update measurements");
       } else {
-        toast.error("Order not found. Please check your order number");
-        setOrder(null);
+        // If not found by orderNumber, try searching by razorpay_order_id as fallback
+        const fallbackQuery = query(
+          collection(db, "orders"),
+          where("razorpay_order_id", "==", searchTerm)
+        );
+        
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+        
+        if (!fallbackSnapshot.empty) {
+          const orderDoc = fallbackSnapshot.docs[0];
+          const orderData = { id: orderDoc.id, ...orderDoc.data() };
+          setOrder(orderData);
+
+          // Initialize measurements state
+          const initialMeasurements = {};
+          orderData.items?.forEach((item, index) => {
+            initialMeasurements[index] = {
+              neck: item.measurements?.neck || "",
+              chest: item.measurements?.chest || "",
+              back: item.measurements?.back || "",
+            };
+          });
+          setMeasurements(initialMeasurements);
+
+          toast.success("Order found! You can now update measurements");
+        } else {
+          toast.error("Order not found. Please check your order number (e.g., ORD-478542)");
+          setOrder(null);
+        }
       }
     } catch (error) {
       console.error("Error fetching order:", error);
@@ -187,14 +222,13 @@ const SizeGuide = () => {
 
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-600 mb-3">
-              Enter your order number to update measurements for your ordered
-              items:
+              Enter your order number (e.g., ORD-478542) to update measurements for your ordered items:
             </p>
 
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter your order number"
+                placeholder="Enter order number (e.g., ORD-478542)"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
