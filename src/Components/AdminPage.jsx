@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
 import { doc, updateDoc } from "firebase/firestore";
@@ -237,6 +237,35 @@ const AdminPage = () => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
+
+  // Delete order function
+  const handleDeleteOrder = async (orderId, customerName) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the order for ${customerName}? This action cannot be undone.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      // Delete from Firebase
+      const orderRef = doc(db, "orders", orderId);
+      await deleteDoc(orderRef);
+
+      // Update local state
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+
+      toast.success("Order deleted successfully!");
+      
+      // If the deleted order was expanded, close it
+      if (expandedOrderId === orderId) {
+        setExpandedOrderId(null);
+      }
+    } catch (err) {
+      console.error("Error deleting order:", err);
+      toast.error("Failed to delete order. Please try again.");
+    }
+  };
+
   console.log(orders);
   // Filter and sort orders
   const filteredAndSortedOrders = orders
@@ -535,6 +564,14 @@ const AdminPage = () => {
                       <option value="ready-to-ship">Ready to Ship</option>
                       <option value="shipped">shipped</option>
                     </select>
+
+                    <button
+                      onClick={() => handleDeleteOrder(order.id, order.customer?.fullName)}
+                      className="ml-2 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors duration-200"
+                      title="Delete Order"
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 </div>
               </div>
