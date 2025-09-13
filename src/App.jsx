@@ -63,7 +63,7 @@ import PopupPoster from "./Components/PopupPoster";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const ready = true;
+  const ready = false;
   return (
     <div className=" max-w-md mx-auto ">
       {ready ? (
@@ -154,7 +154,7 @@ const App = () => {
       ) : (
         <ComingSoonPage />
       )}
-      <PopupPoster />
+      {ready ? <PopupPoster /> : null}
       <Toaster />
     </div>
   );
