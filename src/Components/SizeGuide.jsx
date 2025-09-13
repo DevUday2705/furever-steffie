@@ -272,6 +272,14 @@ const SizeGuide = () => {
                   <br />
                   <strong>Order Date:</strong>{" "}
                   {new Date(order.createdAt).toLocaleDateString()}
+                  <br />
+                  <strong>Dispatch Date:</strong>{" "}
+                  <span className="text-orange-600 font-semibold">
+                    {order.dispatchDate ? 
+                      new Date(order.dispatchDate).toLocaleDateString() : 
+                      "Not set"
+                    }
+                  </span>
                 </p>
               </div>
 

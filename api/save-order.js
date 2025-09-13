@@ -30,6 +30,8 @@ export default async function handler(req, res) {
             customer,
             items,
             amount,
+            coupon,
+            dispatchDate,
         } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !customer || !items || !amount) {
@@ -157,6 +159,8 @@ export default async function handler(req, res) {
             paymentStatus: "paid",
             orderStatus: "pending",
             createdAt: new Date().toISOString(),
+            dispatchDate: dispatchDate || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now if not provided
+            coupon: coupon || null,
         };
 
         console.log(`🔄 Creating order with number: ${orderNumber}`);
