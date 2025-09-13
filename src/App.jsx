@@ -58,6 +58,7 @@ import MaleBandanas from "./Components/MaleBandanas";
 import DailyTaskSheet from "./Components/TaskSheet";
 import PaymentFailed from "./Components/PaymentFailed";
 import EmailTest from "./Components/EmailTest";
+import WhatsAppTest from "./Components/WhatsAppTest";
 import SizeGuide from "./Components/SizeGuide";
 import PopupPoster from "./Components/PopupPoster";
 const App = () => {
@@ -141,6 +142,7 @@ const App = () => {
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />
               <Route path="/test-email" element={<EmailTest />} />
+              <Route path="/test-whatsapp" element={<WhatsAppTest />} />
               <Route path="/size-guide" element={<SizeGuide />} />
 
               <Route

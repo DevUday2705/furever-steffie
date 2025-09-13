@@ -229,6 +229,47 @@ export default async function handler(req, res) {
                 // Don't fail the order if email fails
             }
 
+            // Send WhatsApp confirmation
+            try {
+                const whatsappPayload = {
+                    customerName: customer.fullName,
+                    customerPhone: customer.mobileNumber,
+                    orderId: razorpay_order_id,
+                    items: items,
+                    totalAmount: amount,
+                    orderDate: new Date().toISOString()
+                };
+
+                console.log("📱 Sending WhatsApp confirmation...");
+
+                // Import and call the WhatsApp handler directly
+                const { default: sendWhatsAppConfirmation } = await import('./send-whatsapp-confirmation.js');
+
+                // Create a mock request object for the WhatsApp handler
+                const mockWhatsAppReq = {
+                    method: 'POST',
+                    body: whatsappPayload
+                };
+
+                const mockWhatsAppRes = {
+                    status: (code) => ({
+                        json: (data) => {
+                            if (code === 200) {
+                                console.log("✅ WhatsApp confirmation sent successfully");
+                            } else {
+                                console.warn("⚠️ Failed to send WhatsApp confirmation, but order was saved");
+                            }
+                            return data;
+                        }
+                    })
+                };
+
+                await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
+            } catch (whatsappError) {
+                console.error("❌ WhatsApp service error:", whatsappError);
+                // Don't fail the order if WhatsApp fails
+            }
+
             return res.status(200).json({
                 success: true,
                 orderId: orderRef.id,
@@ -288,6 +329,47 @@ export default async function handler(req, res) {
                 } catch (emailError) {
                     console.error("❌ Email service error:", emailError);
                     // Don't fail the order if email fails
+                }
+
+                // Send WhatsApp confirmation for fallback order
+                try {
+                    const whatsappPayload = {
+                        customerName: customer.fullName,
+                        customerPhone: customer.mobileNumber,
+                        orderId: razorpay_order_id,
+                        items: items,
+                        totalAmount: amount,
+                        orderDate: new Date().toISOString()
+                    };
+
+                    console.log("📱 Sending WhatsApp confirmation for fallback order...");
+
+                    // Import and call the WhatsApp handler directly
+                    const { default: sendWhatsAppConfirmation } = await import('./send-whatsapp-confirmation.js');
+
+                    // Create a mock request object for the WhatsApp handler
+                    const mockWhatsAppReq = {
+                        method: 'POST',
+                        body: whatsappPayload
+                    };
+
+                    const mockWhatsAppRes = {
+                        status: (code) => ({
+                            json: (data) => {
+                                if (code === 200) {
+                                    console.log("✅ WhatsApp confirmation sent successfully");
+                                } else {
+                                    console.warn("⚠️ Failed to send WhatsApp confirmation, but order was saved");
+                                }
+                                return data;
+                            }
+                        })
+                    };
+
+                    await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
+                } catch (whatsappError) {
+                    console.error("❌ WhatsApp service error:", whatsappError);
+                    // Don't fail the order if WhatsApp fails
                 }
 
                 return res.status(200).json({
