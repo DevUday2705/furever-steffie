@@ -295,7 +295,9 @@ const ProductOptions = ({
                 >
                   <Crown className="w-5 h-5 mr-2 opacity-60" />
 
-                  {isRoyalSet ? "Royal Set Selected ✓" : "Get Full Royal Set"}
+                  {isRoyalSet
+                    ? "Royal Set Selected ✓"
+                    : "Click here for  Royal Set"}
                 </button>
 
                 <motion.div
