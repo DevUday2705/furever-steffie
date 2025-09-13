@@ -5,16 +5,15 @@ import { useNavigate } from "react-router-dom";
 
 const PopupPoster = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [progress, setProgress] = useState(100);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check if popup has been shown recently (within 24 hours)
     const lastShown = localStorage.getItem("posterLastShown");
     const now = Date.now();
-    const twentyFourHours = 24 * 60 * 60 * 1000;
+    const twoHours = 2 * 60 * 60 * 1000;
 
-    if (!lastShown || now - parseInt(lastShown) > twentyFourHours) {
+    if (!lastShown || now - parseInt(lastShown) > twoHours) {
       // Show popup after a short delay
       const showTimer = setTimeout(() => {
         setIsVisible(true);
@@ -24,23 +23,6 @@ const PopupPoster = () => {
       return () => clearTimeout(showTimer);
     }
   }, []);
-
-  useEffect(() => {
-    if (isVisible) {
-      // Start countdown from 100 to 0 over 5 seconds
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev <= 0) {
-            setIsVisible(false);
-            return 0;
-          }
-          return prev - 1; // Decrease by 2 every 100ms (5 seconds total)
-        });
-      }, 100);
-
-      return () => clearInterval(interval);
-    }
-  }, [isVisible]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -105,20 +87,6 @@ const PopupPoster = () => {
           </div>
 
           {/* Progress Bar */}
-          <div className="px-6 pb-6">
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-gray-600 to-gray-800 rounded-full"
-                initial={{ width: "100%" }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-            <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-              <span>Auto-closes in {Math.ceil(progress / 20)}s</span>
-              <span>{progress.toFixed(0)}%</span>
-            </div>
-          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
