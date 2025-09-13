@@ -14,9 +14,9 @@ export default async function handler(req, res) {
         } = req.body;
 
         if (!customerName || !orderNumber || !items || !totalAmount || !estimatedDelivery || !mobileNumber) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: "Missing required fields" 
+                message: "Missing required fields"
             });
         }
 
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
         if (whatsappResponse.ok) {
             console.log(`✅ WhatsApp notification sent successfully to ${formattedMobile}`);
             console.log(`📱 Response:`, whatsappResult);
-            
+
             return res.status(200).json({
                 success: true,
                 message: "WhatsApp notification sent successfully",
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
             });
         } else {
             console.error(`❌ Failed to send WhatsApp notification:`, whatsappResult);
-            
+
             return res.status(500).json({
                 success: false,
                 message: "Failed to send WhatsApp notification",
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error("❌ Error sending WhatsApp notification:", error);
-        
+
         return res.status(500).json({
             success: false,
             message: "Error sending WhatsApp notification",

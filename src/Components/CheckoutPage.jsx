@@ -406,11 +406,14 @@ const CheckoutPage = () => {
                 try {
                   const saveData = await saveRes.json();
                   const dispatchDate = new Date(calculateDispatchDate());
-                  const formattedDispatchDate = dispatchDate.toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                  });
+                  const formattedDispatchDate = dispatchDate.toLocaleDateString(
+                    "en-IN",
+                    {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }
+                  );
 
                   await fetch("/api/send-whatsapp-notification", {
                     method: "POST",
@@ -421,24 +424,29 @@ const CheckoutPage = () => {
                       items: isCartCheckout
                         ? cart.map((item) => ({
                             name: item.name,
-                            quantity: item.quantity || 1
+                            quantity: item.quantity || 1,
                           }))
-                        : [{
-                            name: orderDetails.name,
-                            quantity: 1
-                          }],
+                        : [
+                            {
+                              name: orderDetails.name,
+                              quantity: 1,
+                            },
+                          ],
                       totalAmount: data.amount / 100,
                       estimatedDelivery: formattedDispatchDate,
-                      mobileNumber: formData.mobileNumber
+                      mobileNumber: formData.mobileNumber,
                     }),
                   });
                   console.log("📱 WhatsApp notification sent");
                 } catch (whatsappError) {
-                  console.error("❌ WhatsApp notification failed:", whatsappError);
+                  console.error(
+                    "❌ WhatsApp notification failed:",
+                    whatsappError
+                  );
                   // Don't fail the order if WhatsApp fails
                 }
               }
-              
+
               setLoadingPayment(false);
               navigate({
                 pathname: "/thank-you",

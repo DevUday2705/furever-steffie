@@ -18,8 +18,9 @@ AISENSY_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YWY2NTFmNmI2M2Q
 ## Template Parameters
 
 The WhatsApp template receives these parameters:
+
 1. Customer Name (e.g., "Uday")
-2. Order Number (e.g., "ORD-478542") 
+2. Order Number (e.g., "ORD-478542")
 3. Items List (e.g., "Kurta x1, Bandana x1")
 4. Total Amount (e.g., "1234")
 5. Estimated Delivery (e.g., "14 Sep 2025")
@@ -27,6 +28,7 @@ The WhatsApp template receives these parameters:
 ## Testing
 
 To test the WhatsApp integration:
+
 1. Place a test order
 2. Check console logs for WhatsApp API response
 3. Verify message received on customer's WhatsApp
