@@ -13,15 +13,15 @@ const PopupPoster = () => {
     const now = Date.now();
     const twoHours = 2 * 60 * 60 * 1000;
 
-    if (!lastShown || now - parseInt(lastShown) > twoHours) {
-      // Show popup after a short delay
-      const showTimer = setTimeout(() => {
-        setIsVisible(true);
-        localStorage.setItem("posterLastShown", now.toString());
-      }, 2000);
+    // if (!lastShown || now - parseInt(lastShown) > twoHours) {
+    // Show popup after a short delay
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+      localStorage.setItem("posterLastShown", now.toString());
+    }, 2000);
 
-      return () => clearTimeout(showTimer);
-    }
+    return () => clearTimeout(showTimer);
+    // }
   }, []);
 
   const handleClose = () => {
