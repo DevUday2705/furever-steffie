@@ -8,6 +8,9 @@ import {
   updateDoc,
   getDoc,
   setDoc,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import { ChevronLeft, AlertTriangle } from "lucide-react";
 import { db } from "../firebase";
@@ -67,6 +70,13 @@ const CheckoutPage = () => {
 
   const SINGLE_USE_COUPON = "SPECIAL750"; // ₹750 flat discount
 
+  // Customer validation coupons with ₹100 flat discount
+  const CUSTOMER_VALIDATION_COUPONS = {
+    FLAT100: "any",        // ₹100 flat off for any customer
+    WELCOME100: "first",   // ₹100 flat off for first-time customers
+    RETURN100: "repeat"    // ₹100 flat off for repeat customers
+  };
+
   // International delivery charges
   const internationalDelivery = {
     singapore: { charge: 21, currency: "SGD", symbol: "$" },
@@ -110,6 +120,37 @@ const CheckoutPage = () => {
     thailand: "THB",
   };
 
+  // Function to check customer's purchase history
+  const checkCustomerType = async (email, mobile) => {
+    try {
+      // Query orders collection for existing customers
+      const ordersRef = collection(db, "orders");
+      
+      // Create queries to check for both email and mobile number
+      const emailQuery = query(ordersRef, where("email", "==", email.toLowerCase()));
+      const mobileQuery = query(ordersRef, where("mobile", "==", mobile));
+      
+      // Execute both queries
+      const [emailSnapshot, mobileSnapshot] = await Promise.all([
+        getDocs(emailQuery),
+        getDocs(mobileQuery)
+      ]);
+      
+      // Check if customer has any previous orders
+      const hasEmailOrders = !emailSnapshot.empty;
+      const hasMobileOrders = !mobileSnapshot.empty;
+      
+      if (hasEmailOrders || hasMobileOrders) {
+        return "repeat"; // Customer has made previous purchases
+      } else {
+        return "first";  // First-time customer
+      }
+    } catch (error) {
+      console.error("Error checking customer history:", error);
+      return "unknown"; // Return unknown on error - will allow any customer coupons but not specific ones
+    }
+  };
+
   const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
 
@@ -134,6 +175,55 @@ const CheckoutPage = () => {
         toast.success("🎉 Coupon applied: ₹750 off");
       } catch (error) {
         console.error("Error checking coupon:", error);
+        setCouponError("Error validating coupon. Please try again.");
+        toast.error("❌ Error validating coupon");
+        return;
+      }
+    } else if (CUSTOMER_VALIDATION_COUPONS[code]) {
+      // Handle customer validation coupons (₹100 flat discount)
+      const requiredCustomerType = CUSTOMER_VALIDATION_COUPONS[code];
+      
+      // Check if email and mobile are provided
+      if (!formData.email || !formData.mobile) {
+        setCouponError("Please enter your email and mobile number to use this coupon.");
+        toast.error("❌ Email and mobile required for coupon validation");
+        return;
+      }
+
+      try {
+        // Check customer type
+        const customerType = await checkCustomerType(formData.email, formData.mobile);
+        
+        if (requiredCustomerType === "any") {
+          // FLAT100 - available for any customer
+          setDiscount(0); // Set to 0 for percentage discount as we'll handle flat discount separately
+          setCouponError("");
+          toast.success("🎉 Coupon applied: ₹100 off");
+        } else if (requiredCustomerType === "first" && customerType === "first") {
+          // WELCOME100 - only for first-time customers
+          setDiscount(0);
+          setCouponError("");
+          toast.success("🎉 Welcome! Coupon applied: ₹100 off");
+        } else if (requiredCustomerType === "repeat" && customerType === "repeat") {
+          // RETURN100 - only for repeat customers
+          setDiscount(0);
+          setCouponError("");
+          toast.success("🎉 Welcome back! Coupon applied: ₹100 off");
+        } else if (requiredCustomerType === "first" && customerType === "repeat") {
+          setCouponError("This coupon is only valid for first-time customers.");
+          toast.error("❌ First-time customer coupon not applicable");
+          return;
+        } else if (requiredCustomerType === "repeat" && customerType === "first") {
+          setCouponError("This coupon is only valid for returning customers.");
+          toast.error("❌ Returning customer coupon not applicable");
+          return;
+        } else {
+          setCouponError("Unable to validate customer eligibility for this coupon.");
+          toast.error("❌ Customer validation failed");
+          return;
+        }
+      } catch (error) {
+        console.error("Error validating customer coupon:", error);
         setCouponError("Error validating coupon. Please try again.");
         toast.error("❌ Error validating coupon");
         return;
@@ -204,6 +294,9 @@ const CheckoutPage = () => {
     // Check if it's the special single-use coupon for flat ₹750 discount
     if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {
       discountAmount = 750;
+    } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
+      // Customer validation coupons for flat ₹100 discount
+      discountAmount = 100;
     } else {
       // Regular percentage discount
       discountAmount = (subtotal * discount) / 100;
