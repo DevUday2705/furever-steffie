@@ -30,7 +30,7 @@ const PopupPoster = () => {
 
   const handleBuyNow = () => {
     setIsVisible(false);
-    navigate("/product/RK3HIdVWttBglFr6j8cg+kurta");
+    navigate("/product/G604GyHMqL7s7RK10Ma6+kurta");
   };
 
   if (!isVisible) return null;
