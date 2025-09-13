@@ -59,6 +59,7 @@ import DailyTaskSheet from "./Components/TaskSheet";
 import PaymentFailed from "./Components/PaymentFailed";
 import EmailTest from "./Components/EmailTest";
 import SizeGuide from "./Components/SizeGuide";
+import PopupPoster from "./Components/PopupPoster";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
@@ -153,6 +154,7 @@ const App = () => {
       ) : (
         <ComingSoonPage />
       )}
+      <PopupPoster />
       <Toaster />
     </div>
   );
