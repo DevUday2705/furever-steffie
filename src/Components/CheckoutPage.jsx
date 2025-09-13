@@ -401,7 +401,44 @@ const CheckoutPage = () => {
                   "Failed to save order, but payment was successful"
                 );
                 // Still redirect to success page since payment went through
+              } else {
+                // Order saved successfully, send WhatsApp notification
+                try {
+                  const saveData = await saveRes.json();
+                  const dispatchDate = new Date(calculateDispatchDate());
+                  const formattedDispatchDate = dispatchDate.toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  });
+
+                  await fetch("/api/send-whatsapp-notification", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      customerName: formData.fullName,
+                      orderNumber: saveData.orderNumber, // Use the order number from save-order API response
+                      items: isCartCheckout
+                        ? cart.map((item) => ({
+                            name: item.name,
+                            quantity: item.quantity || 1
+                          }))
+                        : [{
+                            name: orderDetails.name,
+                            quantity: 1
+                          }],
+                      totalAmount: data.amount / 100,
+                      estimatedDelivery: formattedDispatchDate,
+                      mobileNumber: formData.mobileNumber
+                    }),
+                  });
+                  console.log("📱 WhatsApp notification sent");
+                } catch (whatsappError) {
+                  console.error("❌ WhatsApp notification failed:", whatsappError);
+                  // Don't fail the order if WhatsApp fails
+                }
               }
+              
               setLoadingPayment(false);
               navigate({
                 pathname: "/thank-you",
