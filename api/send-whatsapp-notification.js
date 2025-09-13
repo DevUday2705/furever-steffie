@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         // Prepare WhatsApp API payload
         const whatsappPayload = {
             apiKey: process.env.AISENSY_API_KEY,
-            campaignName: "order_confirmation_v1",
+            campaignName: "order_confirmation",
             destination: formattedMobile,
             userName: customerName,
             templateParams: [
