@@ -1,4 +1,4 @@
-import { Play, VideoOff, Search, Save, CheckCircle } from "lucide-react";
+import { Play, Search, Save, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import {
   doc,
@@ -41,26 +41,115 @@ const SizeGuide = () => {
 
   const fetchOrder = async () => {
     if (!orderNumber.trim()) {
-      toast.error("Please enter your order number");
+      toast.error("Please enter your order number or mobile number");
       return;
     }
 
     setLoading(true);
     try {
       const searchTerm = orderNumber.trim();
+      let orderFound = false;
+      let orderData = null;
 
-      // Search for order by orderNumber field (e.g., "ORD-478542")
-      const q = query(
-        collection(db, "orders"),
-        where("orderNumber", "==", searchTerm)
-      );
+      // Check if search term looks like a mobile number (only digits, 10-13 characters)
+      const isLikelyMobileNumber = /^\+?[0-9]{10,13}$/.test(searchTerm);
 
-      const querySnapshot = await getDocs(q);
+      if (isLikelyMobileNumber) {
+        // Mobile number search with flexible formatting
+        const cleanNumber = searchTerm.replace(/^\+?91?/, ""); // Remove +91 or 91 prefix
+        const possibleFormats = [
+          cleanNumber, // 9920271866
+          `+91${cleanNumber}`, // +919920271866
+          `91${cleanNumber}`, // 919920271866
+          `+${cleanNumber}`, // +9920271866 (in case someone adds + without country code)
+        ];
 
-      if (!querySnapshot.empty) {
-        // Get the first matching document
-        const orderDoc = querySnapshot.docs[0];
-        const orderData = { id: orderDoc.id, ...orderDoc.data() };
+        // Search for orders with any of these mobile number formats
+        for (const format of possibleFormats) {
+          if (orderFound) break;
+
+          // Search in customer.mobileNumber field
+          const mobileQuery = query(
+            collection(db, "orders"),
+            where("customer.mobileNumber", "==", format)
+          );
+
+          const mobileSnapshot = await getDocs(mobileQuery);
+
+          if (!mobileSnapshot.empty) {
+            // If multiple orders found, get the most recent one
+            const orders = mobileSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+
+            // Sort by creation date (most recent first)
+            orders.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            orderData = orders[0]; // Get the most recent order
+            orderFound = true;
+            break;
+          }
+        }
+
+        if (orderFound) {
+          setOrder(orderData);
+
+          // Initialize measurements state
+          const initialMeasurements = {};
+          orderData.items?.forEach((item, index) => {
+            initialMeasurements[index] = {
+              neck: item.measurements?.neck || "",
+              chest: item.measurements?.chest || "",
+              back: item.measurements?.back || "",
+            };
+          });
+          setMeasurements(initialMeasurements);
+
+          toast.success(
+            `Order found for mobile number! Showing most recent order: ${orderData.orderNumber}`
+          );
+          return;
+        }
+      }
+
+      // If not found by mobile number or not a mobile number, try order number search
+      if (!orderFound) {
+        // Search for order by orderNumber field (e.g., "ORD-478542")
+        const orderNumberQuery = query(
+          collection(db, "orders"),
+          where("orderNumber", "==", searchTerm)
+        );
+
+        const orderNumberSnapshot = await getDocs(orderNumberQuery);
+
+        if (!orderNumberSnapshot.empty) {
+          // Get the first matching document
+          const orderDoc = orderNumberSnapshot.docs[0];
+          orderData = { id: orderDoc.id, ...orderDoc.data() };
+          orderFound = true;
+        }
+      }
+
+      // If still not found, try searching by razorpay_order_id as fallback
+      if (!orderFound) {
+        const fallbackQuery = query(
+          collection(db, "orders"),
+          where("razorpay_order_id", "==", searchTerm)
+        );
+
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+
+        if (!fallbackSnapshot.empty) {
+          const orderDoc = fallbackSnapshot.docs[0];
+          orderData = { id: orderDoc.id, ...orderDoc.data() };
+          orderFound = true;
+        }
+      }
+
+      if (orderFound) {
         setOrder(orderData);
 
         // Initialize measurements state
@@ -76,37 +165,10 @@ const SizeGuide = () => {
 
         toast.success("Order found! You can now update measurements");
       } else {
-        // If not found by orderNumber, try searching by razorpay_order_id as fallback
-        const fallbackQuery = query(
-          collection(db, "orders"),
-          where("razorpay_order_id", "==", searchTerm)
+        toast.error(
+          "Order not found. Please check your order number (e.g., order_RGsHOSs2903WqQ) or mobile number with country code eg. +91123456789 "
         );
-
-        const fallbackSnapshot = await getDocs(fallbackQuery);
-
-        if (!fallbackSnapshot.empty) {
-          const orderDoc = fallbackSnapshot.docs[0];
-          const orderData = { id: orderDoc.id, ...orderDoc.data() };
-          setOrder(orderData);
-
-          // Initialize measurements state
-          const initialMeasurements = {};
-          orderData.items?.forEach((item, index) => {
-            initialMeasurements[index] = {
-              neck: item.measurements?.neck || "",
-              chest: item.measurements?.chest || "",
-              back: item.measurements?.back || "",
-            };
-          });
-          setMeasurements(initialMeasurements);
-
-          toast.success("Order found! You can now update measurements");
-        } else {
-          toast.error(
-            "Order not found. Please check your order number (e.g., ORD-478542)"
-          );
-          setOrder(null);
-        }
+        setOrder(null);
       }
     } catch (error) {
       console.error("Error fetching order:", error);
@@ -173,35 +235,50 @@ const SizeGuide = () => {
       <div className="p-6">
         {/* Video Tutorial Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
-            📹 How to Measure Your Pet
-          </h2>
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              📹 Watch Our Measurement Tutorial
+            </h3>
 
-          <div className="relative bg-gray-900 rounded-lg overflow-hidden shadow-lg">
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-white"></div>
-              </div>
-            )}
+            <div className="bg-gray-100 rounded-lg p-6 text-center border-2 border-dashed border-gray-300">
+              {/* Video Container with 4:5 Aspect Ratio */}
+              <div className="relative w-full max-w-md mx-auto">
+                {/* Aspect Ratio Container */}
+                <div
+                  className="relative w-full"
+                  style={{ paddingBottom: "125%" }}
+                >
+                  <video
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-md"
+                    controls
+                    poster="/images/thumbnail.avif"
+                    onError={handleVideoError}
+                    onLoadedData={handleVideoLoad}
+                    preload="metadata"
+                  >
+                    <source src="/images/measurements.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
 
-            {videoError ? (
-              <div className="aspect-video flex flex-col items-center justify-center bg-gray-100 text-gray-500">
-                <VideoOff size={48} className="mb-2" />
-                <p className="text-sm">Video unavailable</p>
-                <p className="text-xs mt-1">Please contact us for guidance</p>
+                  {/* Loading state */}
+                  {isLoading && !videoError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
+                      <div className="flex flex-col items-center">
+                        <Play className="w-12 h-12 text-gray-400 mb-2" />
+                        <p className="text-gray-500 text-sm">
+                          Loading video...
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            ) : (
-              <video
-                className="w-full aspect-video object-cover"
-                controls
-                onLoadedData={handleVideoLoad}
-                onError={handleVideoError}
-                poster="/images/video-thumbnail.jpg"
-              >
-                <source src="/images/measurement-guide.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            )}
+
+              {/* Additional Info */}
+              <p className="text-sm text-gray-600 mt-4">
+                Learn the proper techniques for taking accurate measurements
+              </p>
+            </div>
           </div>
 
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -231,14 +308,14 @@ const SizeGuide = () => {
 
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-600 mb-3">
-              Enter your order number (e.g., ORD-478542) to update measurements
-              for your ordered items:
+              Enter your order number (e.g., order_RGsHOSs2903WqQ) or mobile
+              number to update measurements for your ordered items:
             </p>
 
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter order number (e.g., ORD-478542)"
+                placeholder="Enter order number or mobile number"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -457,63 +534,6 @@ const SizeGuide = () => {
         </div>
 
         {/* Video Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-            📹 Watch Our Measurement Tutorial
-          </h3>
-
-          <div className="bg-gray-100 rounded-lg p-6 text-center border-2 border-dashed border-gray-300">
-            {/* Video Container with 4:5 Aspect Ratio */}
-            <div className="relative w-full max-w-md mx-auto">
-              {/* Aspect Ratio Container */}
-              <div
-                className="relative w-full"
-                style={{ paddingBottom: "125%" }}
-              >
-                {!videoError ? (
-                  <video
-                    className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-md"
-                    controls
-                    poster="/images/thumbnail.avif"
-                    onError={handleVideoError}
-                    onLoadedData={handleVideoLoad}
-                    preload="metadata"
-                  >
-                    <source src="/images/measurements.mp4" type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  // Fallback content when video fails to load
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-200 rounded-lg shadow-md">
-                    <VideoOff className="w-12 h-12 text-gray-400 mb-3" />
-                    <p className="text-gray-600 text-sm mb-2">
-                      Video not available
-                    </p>
-                    <p className="text-xs text-gray-500 px-4">
-                      The measurement tutorial video is currently unavailable.
-                      Please check back later or contact support.
-                    </p>
-                  </div>
-                )}
-
-                {/* Loading state */}
-                {isLoading && !videoError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
-                    <div className="flex flex-col items-center">
-                      <Play className="w-12 h-12 text-gray-400 mb-2" />
-                      <p className="text-gray-500 text-sm">Loading video...</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Additional Info */}
-            <p className="text-sm text-gray-600 mt-4">
-              Learn the proper techniques for taking accurate measurements
-            </p>
-          </div>
-        </div>
 
         {/* Important Tips */}
         <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
