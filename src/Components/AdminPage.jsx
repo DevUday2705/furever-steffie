@@ -255,7 +255,7 @@ const AdminPage = () => {
       setOrders((prev) => prev.filter((order) => order.id !== orderId));
 
       toast.success("Order deleted successfully!");
-      
+
       // If the deleted order was expanded, close it
       if (expandedOrderId === orderId) {
         setExpandedOrderId(null);
@@ -566,7 +566,9 @@ const AdminPage = () => {
                     </select>
 
                     <button
-                      onClick={() => handleDeleteOrder(order.id, order.customer?.fullName)}
+                      onClick={() =>
+                        handleDeleteOrder(order.id, order.customer?.fullName)
+                      }
                       className="ml-2 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors duration-200"
                       title="Delete Order"
                     >
