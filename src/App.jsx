@@ -63,7 +63,7 @@ import PopupPoster from "./Components/PopupPoster";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const ready = false;
+  const ready = true;
   return (
     <div className=" max-w-md mx-auto ">
       {ready ? (
