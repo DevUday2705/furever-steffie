@@ -10,18 +10,21 @@ const predefinedDhotis = [
   {
     id: 1,
     name: "White",
-    image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp"
+    image:
+      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp",
   },
   {
     id: 2,
     name: "Gold",
-    image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp"
+    image:
+      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
   },
   {
     id: 3,
     name: "Black",
-    image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp"
-  }
+    image:
+      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+  },
 ];
 
 const defaultSchema = {
@@ -147,7 +150,7 @@ const ProductForm = () => {
   const [formData, setFormData] = useState(() =>
     generateSchemaForCategory(category)
   );
-  
+
   // State for selected dhoti IDs
   const [selectedDhotiIds, setSelectedDhotiIds] = useState([]);
 
@@ -191,10 +194,12 @@ const ProductForm = () => {
             const finalData = deepMerge(merged, data);
             console.log("Final merged data:", finalData);
             setFormData(finalData);
-            
+
             // Initialize selected dhoti IDs from existing data
             if (finalData.dhotis && Array.isArray(finalData.dhotis)) {
-              const selectedIds = finalData.dhotis.map(dhoti => dhoti.id).filter(id => id);
+              const selectedIds = finalData.dhotis
+                .map((dhoti) => dhoti.id)
+                .filter((id) => id);
               setSelectedDhotiIds(selectedIds);
             }
           } else {
@@ -260,10 +265,10 @@ const ProductForm = () => {
 
   // Handle dhoti selection
   const toggleDhotiSelection = (dhodiId) => {
-    setSelectedDhotiIds(prev => {
+    setSelectedDhotiIds((prev) => {
       if (prev.includes(dhodiId)) {
         // Remove from selection
-        return prev.filter(id => id !== dhodiId);
+        return prev.filter((id) => id !== dhodiId);
       } else {
         // Add to selection
         return [...prev, dhodiId];
@@ -273,7 +278,7 @@ const ProductForm = () => {
 
   // Update formData.dhotis based on selected dhoti IDs
   useEffect(() => {
-    const selectedDhotis = predefinedDhotis.filter(dhoti => 
+    const selectedDhotis = predefinedDhotis.filter((dhoti) =>
       selectedDhotiIds.includes(dhoti.id)
     );
     handleChange("dhotis", selectedDhotis);
@@ -622,8 +627,10 @@ const ProductForm = () => {
         ) && (
           <div className="border p-4 rounded">
             <h2 className="font-semibold mb-2">Dhotis</h2>
-            <p className="text-sm text-gray-600 mb-3">Select the dhoti options available for this product:</p>
-            
+            <p className="text-sm text-gray-600 mb-3">
+              Select the dhoti options available for this product:
+            </p>
+
             <div className="flex flex-wrap gap-3 mb-4">
               {predefinedDhotis.map((dhoti) => (
                 <button
@@ -632,9 +639,10 @@ const ProductForm = () => {
                   onClick={() => toggleDhotiSelection(dhoti.id)}
                   className={`
                     px-4 py-2 rounded-full border-2 font-medium transition-all duration-200
-                    ${selectedDhotiIds.includes(dhoti.id)
-                      ? 'bg-blue-500 text-white border-blue-500 shadow-md transform scale-105'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                    ${
+                      selectedDhotiIds.includes(dhoti.id)
+                        ? "bg-blue-500 text-white border-blue-500 shadow-md transform scale-105"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
                     }
                   `}
                 >
@@ -645,20 +653,27 @@ const ProductForm = () => {
 
             {selectedDhotiIds.length > 0 && (
               <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 mb-2">Selected Dhotis:</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Selected Dhotis:
+                </p>
                 <div className="space-y-2">
-                  {selectedDhotiIds.map(id => {
-                    const dhoti = predefinedDhotis.find(d => d.id === id);
+                  {selectedDhotiIds.map((id) => {
+                    const dhoti = predefinedDhotis.find((d) => d.id === id);
                     return dhoti ? (
-                      <div key={id} className="flex items-center gap-3 bg-white p-2 rounded border">
-                        <img 
-                          src={dhoti.image} 
+                      <div
+                        key={id}
+                        className="flex items-center gap-3 bg-white p-2 rounded border"
+                      >
+                        <img
+                          src={dhoti.image}
                           alt={dhoti.name}
                           className="w-12 h-12 object-cover rounded"
                         />
                         <div>
                           <p className="font-medium text-sm">{dhoti.name}</p>
-                          <p className="text-xs text-gray-500">ID: {dhoti.id}</p>
+                          <p className="text-xs text-gray-500">
+                            ID: {dhoti.id}
+                          </p>
                         </div>
                       </div>
                     ) : null;
