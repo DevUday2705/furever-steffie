@@ -10,6 +10,15 @@ const MobileHeroCarousel = () => {
   const { gender } = useAppContext();
   const maleSlides = [
     {
+      id: 0,
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1757757237/Poster_2_xhtqai.jpg",
+      title: "",
+      subtitle: "",
+      cta: "Grab Now",
+      link: "product/RK3HIdVWttBglFr6j8cg+kurta",
+    },
+    {
       id: 1,
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
@@ -113,7 +122,7 @@ const MobileHeroCarousel = () => {
                 <img
                   src={slide.image}
                   alt={slide.title}
-                  className="w-full h-full object-cover rounded-md"
+                  className="w-full h-full object-cover object-[25%_75%] rounded-md"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t  from-black/40 to-transparent rounded-md" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 rounded-md">
