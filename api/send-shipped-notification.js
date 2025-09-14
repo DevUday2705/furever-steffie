@@ -6,14 +6,13 @@ export default async function handler(req, res) {
     try {
         const {
             customerName,
-            razorpayOrderId,
             trackingId,
             expectedDelivery,
             customerCity,
             mobileNumber
         } = req.body;
 
-        if (!customerName || !razorpayOrderId || !trackingId || !expectedDelivery || !customerCity || !mobileNumber) {
+        if (!customerName || !trackingId || !expectedDelivery || !customerCity || !mobileNumber) {
             return res.status(400).json({
                 success: false,
                 message: "Missing required fields for shipped notification"
@@ -34,13 +33,13 @@ export default async function handler(req, res) {
 
         // Prepare WhatsApp API payload for shipped notification
         const whatsappPayload = {
-            apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YWY2NTFmNmI2M2Q3MTAxMjEyNWQzMyIsIm5hbWUiOiJGdXJldmVyIFN0ZWZmaWUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjhhZjY1MWY2YjYzZDcxMDEyMTI1ZDJlIiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc1NjMyNTE1MX0.E2uQFrfRq3hvRvGRK4-3fROUtc7pgrDLIOyoLXZ4Y98",
+            apiKey: process.env.AISENSY_API_KEY,
             campaignName: "order_shipped",
             destination: formattedMobile,
             userName: customerName,
             templateParams: [
-                razorpayOrderId,      // tracking_id (razorpay order ID)
-                trackingId,           // tracking_id (delivery tracking ID)
+                trackingId,           // tracking_id
+                trackingId,           // tracking_id (appears twice in template)
                 expectedDelivery,     // expected delivery date
                 customerCity,         // customer city
                 "www.fureversteffie.com/contact"  // support_link
