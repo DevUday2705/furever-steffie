@@ -46,12 +46,9 @@ export default async function handler(req, res) {
                 neckMeasurement || "N/A",    // neck measurement
                 chestMeasurement || "N/A",   // chest measurement
                 backMeasurement || "N/A",    // back measurement
-                "www.fureversteffie.com/contact"  // support_link
             ]
         };
 
-        console.log(`📱 Sending in-progress notification to ${formattedMobile}`);
-        console.log(`📋 Payload:`, JSON.stringify(whatsappPayload, null, 2));
 
         // Send WhatsApp message via AI Sensy API
         const whatsappResponse = await fetch('https://backend.aisensy.com/campaign/t1/api/v2', {
