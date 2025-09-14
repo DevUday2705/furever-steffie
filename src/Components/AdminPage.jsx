@@ -119,7 +119,7 @@ const AdminPage = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       // Find the order to get customer details
-      const currentOrder = orders.find(order => order.id === orderId);
+      const currentOrder = orders.find((order) => order.id === orderId);
       if (!currentOrder) {
         toast.error("Order not found");
         return;
@@ -154,11 +154,14 @@ const AdminPage = () => {
           const today = new Date();
           const expectedDelivery = new Date(today);
           expectedDelivery.setDate(today.getDate() + 5); // 3 working days + 2 for weekends
-          const formattedDeliveryDate = expectedDelivery.toLocaleDateString('en-IN', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          });
+          const formattedDeliveryDate = expectedDelivery.toLocaleDateString(
+            "en-IN",
+            {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }
+          );
 
           await fetch("/api/send-shipped-notification", {
             method: "POST",
@@ -194,13 +197,13 @@ const AdminPage = () => {
         // Send in-progress WhatsApp notification
         try {
           // Get dispatch date from order
-          const dispatchDate = currentOrder.dispatchDate 
-            ? new Date(currentOrder.dispatchDate).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
+          const dispatchDate = currentOrder.dispatchDate
+            ? new Date(currentOrder.dispatchDate).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
               })
-            : 'TBD';
+            : "TBD";
 
           // Get measurements from the first item (assuming all items have similar measurements)
           const firstItem = currentOrder.items?.[0];
@@ -211,7 +214,8 @@ const AdminPage = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customerName: currentOrder.customer?.fullName,
-              orderId: currentOrder.razorpay_order_id || currentOrder.orderNumber,
+              orderId:
+                currentOrder.razorpay_order_id || currentOrder.orderNumber,
               dispatchDate: dispatchDate,
               neckMeasurement: measurements.neck,
               chestMeasurement: measurements.chest,
