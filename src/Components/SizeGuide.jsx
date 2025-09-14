@@ -53,12 +53,13 @@ const SizeGuide = () => {
 
       // Check if search term looks like a mobile number (only digits, 10-13 characters)
       // Accept 10-digit numbers (without country code) or 10-13 digit numbers (with country code)
-      const isLikelyMobileNumber = /^\+?[0-9]{10,13}$/.test(searchTerm) || /^[0-9]{10}$/.test(searchTerm);
+      const isLikelyMobileNumber =
+        /^\+?[0-9]{10,13}$/.test(searchTerm) || /^[0-9]{10}$/.test(searchTerm);
 
       if (isLikelyMobileNumber) {
         // Mobile number search with flexible formatting
         let cleanNumber = searchTerm.replace(/^\+?91?/, ""); // Remove +91 or 91 prefix
-        
+
         // If the original search term was just 10 digits, keep it as is
         // If it had country code, extract just the 10-digit part
         if (searchTerm.length === 10 && /^[0-9]{10}$/.test(searchTerm)) {
@@ -67,7 +68,7 @@ const SizeGuide = () => {
           // For numbers with country codes, extract the last 10 digits
           cleanNumber = searchTerm.replace(/^\+?91?/, "").slice(-10);
         }
-        
+
         const possibleFormats = [
           cleanNumber, // 9920271866
           `+91${cleanNumber}`, // +919920271866
@@ -320,7 +321,8 @@ const SizeGuide = () => {
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-600 mb-3">
               Enter your order number (e.g., order_RGsHOSs2903WqQ) or mobile
-              number (with or without country code) to update measurements for your ordered items:
+              number (with or without country code) to update measurements for
+              your ordered items:
             </p>
 
             <div className="flex gap-2">
