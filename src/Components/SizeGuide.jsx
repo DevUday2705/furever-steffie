@@ -52,11 +52,22 @@ const SizeGuide = () => {
       let orderData = null;
 
       // Check if search term looks like a mobile number (only digits, 10-13 characters)
-      const isLikelyMobileNumber = /^\+?[0-9]{10,13}$/.test(searchTerm);
+      // Accept 10-digit numbers (without country code) or 10-13 digit numbers (with country code)
+      const isLikelyMobileNumber = /^\+?[0-9]{10,13}$/.test(searchTerm) || /^[0-9]{10}$/.test(searchTerm);
 
       if (isLikelyMobileNumber) {
         // Mobile number search with flexible formatting
-        const cleanNumber = searchTerm.replace(/^\+?91?/, ""); // Remove +91 or 91 prefix
+        let cleanNumber = searchTerm.replace(/^\+?91?/, ""); // Remove +91 or 91 prefix
+        
+        // If the original search term was just 10 digits, keep it as is
+        // If it had country code, extract just the 10-digit part
+        if (searchTerm.length === 10 && /^[0-9]{10}$/.test(searchTerm)) {
+          cleanNumber = searchTerm; // Keep original 10-digit number
+        } else {
+          // For numbers with country codes, extract the last 10 digits
+          cleanNumber = searchTerm.replace(/^\+?91?/, "").slice(-10);
+        }
+        
         const possibleFormats = [
           cleanNumber, // 9920271866
           `+91${cleanNumber}`, // +919920271866
@@ -166,7 +177,7 @@ const SizeGuide = () => {
         toast.success("Order found! You can now update measurements");
       } else {
         toast.error(
-          "Order not found. Please check your order number (e.g., order_RGsHOSs2903WqQ) or mobile number with country code eg. +91123456789 "
+          "Order not found. Please check your order number (e.g., order_RGsHOSs2903WqQ) or mobile number (e.g., 9920271866 or +919920271866)"
         );
         setOrder(null);
       }
@@ -309,13 +320,13 @@ const SizeGuide = () => {
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-600 mb-3">
               Enter your order number (e.g., order_RGsHOSs2903WqQ) or mobile
-              number to update measurements for your ordered items:
+              number (with or without country code) to update measurements for your ordered items:
             </p>
 
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter order number or mobile number"
+                placeholder="Order number or mobile (e.g., 9920271866)"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
