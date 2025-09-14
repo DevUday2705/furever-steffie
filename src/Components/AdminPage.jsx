@@ -168,7 +168,8 @@ const AdminPage = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customerName: currentOrder.customer?.fullName,
-              razorpayOrderId: currentOrder.razorpay_order_id || currentOrder.orderNumber,
+              razorpayOrderId:
+                currentOrder.razorpay_order_id || currentOrder.orderNumber,
               trackingId: trackingID,
               expectedDelivery: formattedDeliveryDate,
               customerCity: currentOrder.customer?.city,
