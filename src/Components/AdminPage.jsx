@@ -118,6 +118,13 @@ const AdminPage = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
+      // Find the order to get customer details
+      const currentOrder = orders.find(order => order.id === orderId);
+      if (!currentOrder) {
+        toast.error("Order not found");
+        return;
+      }
+
       if (newStatus === "shipped") {
         const trackingID = prompt(
           "Enter tracking ID before marking as shipped:"
@@ -140,7 +147,85 @@ const AdminPage = () => {
               : order
           )
         );
+
+        // Send shipped WhatsApp notification
+        try {
+          // Calculate expected delivery (3 working days from today)
+          const today = new Date();
+          const expectedDelivery = new Date(today);
+          expectedDelivery.setDate(today.getDate() + 5); // 3 working days + 2 for weekends
+          const formattedDeliveryDate = expectedDelivery.toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+
+          await fetch("/api/send-shipped-notification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerName: currentOrder.customer?.fullName,
+              trackingId: trackingID,
+              expectedDelivery: formattedDeliveryDate,
+              customerCity: currentOrder.customer?.city,
+              mobileNumber: currentOrder.customer?.mobileNumber,
+            }),
+          });
+          console.log("📱 Shipped notification sent");
+        } catch (whatsappError) {
+          console.error("❌ Shipped notification failed:", whatsappError);
+          // Don't fail the status update if WhatsApp fails
+        }
+
         toast.success("Tracking ID saved & status updated");
+        fetchOrders();
+      } else if (newStatus === "work-in-progress") {
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, {
+          orderStatus: newStatus,
+        });
+
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId ? { ...order, orderStatus: newStatus } : order
+          )
+        );
+
+        // Send in-progress WhatsApp notification
+        try {
+          // Get dispatch date from order
+          const dispatchDate = currentOrder.dispatchDate 
+            ? new Date(currentOrder.dispatchDate).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+              })
+            : 'TBD';
+
+          // Get measurements from the first item (assuming all items have similar measurements)
+          const firstItem = currentOrder.items?.[0];
+          const measurements = firstItem?.measurements || {};
+
+          await fetch("/api/send-inprogress-notification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerName: currentOrder.customer?.fullName,
+              orderId: currentOrder.razorpay_order_id || currentOrder.orderNumber,
+              dispatchDate: dispatchDate,
+              neckMeasurement: measurements.neck,
+              chestMeasurement: measurements.chest,
+              backMeasurement: measurements.back,
+              mobileNumber: currentOrder.customer?.mobileNumber,
+            }),
+          });
+          console.log("📱 In-progress notification sent");
+        } catch (whatsappError) {
+          console.error("❌ In-progress notification failed:", whatsappError);
+          // Don't fail the status update if WhatsApp fails
+        }
+
+        toast.success("Status updated");
         fetchOrders();
       } else {
         const orderRef = doc(db, "orders", orderId);
