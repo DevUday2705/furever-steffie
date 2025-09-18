@@ -320,7 +320,7 @@ const ProductListing = ({
                         <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
                           <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                            Low Stock
+                            Few Left!
                           </div>
                         </div>
                       </div>
