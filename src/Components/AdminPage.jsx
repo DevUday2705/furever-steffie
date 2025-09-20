@@ -660,7 +660,7 @@ const AdminPage = () => {
                       onClick={() =>
                         handleDeleteOrder(order.id, order.customer?.fullName)
                       }
-                      className="ml-2 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors duration-200"
+                      className="ml-2 px-2 py-1 bg-white hover:bg-red-600 hover:text-white text-black text-xs rounded transition-colors duration-200"
                       title="Delete Order"
                     >
                       🗑️ Delete
