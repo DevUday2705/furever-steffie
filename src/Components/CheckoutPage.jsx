@@ -64,6 +64,7 @@ const CheckoutPage = () => {
   const [couponError, setCouponError] = useState("");
 
   const availableCoupons = {
+    FUREVER5:5,
     FUREVER10: 10, // 10% off
     STEFFIE20: 20, // 20% off
   };
