@@ -689,113 +689,186 @@ const AdminPage = () => {
                         return (
                           <div
                             key={idx}
-                            className="border p-3 rounded bg-gray-50"
+                            className={`border p-4 rounded-lg ${
+                              item.isRoyalSet
+                                ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 shadow-md"
+                                : "bg-gray-50"
+                            }`}
                           >
-                            <div className="flex gap-3">
-                              {/* Main Product Image */}
-                              {item.image && (
-                                <div className="flex-shrink-0">
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-20 h-20 object-cover rounded border"
-                                    onError={(e) => {
-                                      e.target.style.display = "none";
-                                    }}
-                                  />
-                                </div>
-                              )}
-
-                              {/* Dhoti Image if selected */}
-                              {dhotiBrother && (
-                                <div className="flex-shrink-0">
-                                  <img
-                                    src={dhotiBrother.image}
-                                    alt={`${dhotiBrother.name} dhoti`}
-                                    className="w-20 h-20 object-cover rounded border border-blue-200"
-                                    onError={(e) => {
-                                      e.target.style.display = "none";
-                                    }}
-                                  />
-                                  <p className="text-xs text-center text-blue-600 mt-1">
-                                    {dhotiBrother.name} Dhoti
-                                  </p>
-                                </div>
-                              )}
-
-                              {/* Product Details */}
-                              <div className="flex-1">
-                                <p className="font-medium text-base">
-                                  {item.name}
-                                </p>
-                                <p className="text-sm">
-                                  Size:{" "}
-                                  <span className="font-medium">
-                                    {item.selectedSize}
-                                  </span>
-                                </p>
-                                <p className="text-sm">
-                                  Price:{" "}
-                                  <span className="font-medium text-green-600">
-                                    ₹{item.price}
-                                  </span>
-                                </p>
-                                <p className="text-sm">
-                                  Full Royal Set:{" "}
-                                  <span className="font-medium">
-                                    {item.isRoyalSet ? "Yes" : "No"}
-                                  </span>
-                                </p>
-                                <p className="text-sm">
-                                  Beaded:{" "}
-                                  <span className="font-medium">
-                                    {item.isBeaded ? "Yes" : "No"}
-                                  </span>
-                                  , Full Set:{" "}
-                                  <span className="font-medium">
-                                    {item.isFullSet ? "Yes" : "No"}
-                                  </span>
-                                  {item.isDupattaSet && (
-                                    <>
-                                      , Dupatta Set:{" "}
-                                      <span className="font-medium text-purple-600">
-                                        Yes
-                                      </span>
-                                    </>
+                            {/* Two Column Layout */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                              {/* Left Column: Images Grid (2 images per row) */}
+                              <div className="lg:col-span-1">
+                                <div className="grid grid-cols-2 gap-2">
+                                  {/* Main Product Image */}
+                                  {item.image && (
+                                    <div className="flex flex-col items-center">
+                                      <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        className="w-16 h-16 object-cover rounded-lg border-2 border-gray-300 shadow-sm"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                      <p className="text-xs text-center text-gray-600 mt-1 font-medium">
+                                        Main
+                                      </p>
+                                    </div>
                                   )}
-                                  {item.selectedStyle && (
-                                    <>
-                                      , Style:{" "}
-                                      <span className="font-medium text-orange-600">
-                                        {getStyleDisplayName(
-                                          item.selectedStyle
-                                        )}
-                                      </span>
-                                    </>
+
+                                  {/* Dhoti Image if selected */}
+                                  {dhotiBrother && (
+                                    <div className="flex flex-col items-center">
+                                      <img
+                                        src={dhotiBrother.image}
+                                        alt={`${dhotiBrother.name} dhoti`}
+                                        className="w-16 h-16 object-cover rounded-lg border-2 border-blue-300 shadow-sm"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                      <p className="text-xs text-center text-blue-600 mt-1 font-medium">
+                                        Dhoti
+                                      </p>
+                                    </div>
                                   )}
-                                </p>
-                                {(item.selectedDhoti || dhotiBrother) && (
-                                  <p className="text-sm">
-                                    Dhoti:{" "}
-                                    <span className="font-medium text-blue-600">
-                                      {dhotiBrother?.name || item.selectedDhoti}
-                                    </span>
-                                    {item.selectedDhoti && !dhotiBrother && (
-                                      <span className="text-xs text-gray-500 ml-2">
-                                        (lookup failed - product data not
-                                        loaded)
+
+                                  {/* Dupatta Image if isDupattaSet or isRoyalSet */}
+                                  {(item.isDupattaSet || item.isRoyalSet) && (
+                                    <div className="flex flex-col items-center">
+                                      <img
+                                        src="https://res.cloudinary.com/di6unrpjw/image/upload/v1758442036/Dupatta-Photoroom_fstzde.png"
+                                        alt="Dupatta"
+                                        className="w-16 h-16 object-cover rounded-lg border-2 border-purple-300 shadow-sm"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                      <p className="text-xs text-center text-purple-600 mt-1 font-medium">
+                                        Dupatta
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Right Column: Product Details */}
+                              <div className="lg:col-span-2">
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4
+                                      className={`font-semibold text-lg ${
+                                        item.isRoyalSet
+                                          ? "text-yellow-700"
+                                          : "text-gray-800"
+                                      }`}
+                                    >
+                                      {item.name}
+                                    </h4>
+                                    {item.isRoyalSet && (
+                                      <span className="inline-flex items-center px-3 py-1 text-xs font-bold text-yellow-800 bg-gradient-to-r from-yellow-200 to-yellow-300 rounded-full border border-yellow-400 shadow-sm">
+                                        👑 ROYAL
                                       </span>
                                     )}
-                                  </p>
-                                )}
-                                {item.selectedColor && (
-                                  <p className="text-sm">
-                                    Color:{" "}
-                                    <span className="font-medium">
-                                      {item.selectedColor}
-                                    </span>
-                                  </p>
-                                )}
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                      <span className="text-gray-600">
+                                        Size:
+                                      </span>
+                                      <span className="font-medium ml-1">
+                                        {item.selectedSize}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">
+                                        Price:
+                                      </span>
+                                      <span className="font-semibold text-green-600 ml-1">
+                                        ₹{item.price}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">
+                                        Full Royal Set:
+                                      </span>
+                                      <span className="font-medium ml-1">
+                                        {item.isRoyalSet ? "Yes" : "No"}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">
+                                        Beaded:
+                                      </span>
+                                      <span className="font-medium ml-1">
+                                        {item.isBeaded ? "Yes" : "No"}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">
+                                        Full Set:
+                                      </span>
+                                      <span className="font-medium ml-1">
+                                        {item.isFullSet ? "Yes" : "No"}
+                                      </span>
+                                    </div>
+                                    {item.isDupattaSet && (
+                                      <div>
+                                        <span className="text-gray-600">
+                                          Dupatta Set:
+                                        </span>
+                                        <span className="font-medium text-purple-600 ml-1">
+                                          Yes
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Additional Details Row */}
+                                  <div className="space-y-1 text-sm">
+                                    {item.selectedStyle && (
+                                      <div>
+                                        <span className="text-gray-600">
+                                          Style:
+                                        </span>
+                                        <span className="font-medium text-orange-600 ml-1">
+                                          {getStyleDisplayName(
+                                            item.selectedStyle
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {(item.selectedDhoti || dhotiBrother) && (
+                                      <div>
+                                        <span className="text-gray-600">
+                                          Dhoti:
+                                        </span>
+                                        <span className="font-medium text-blue-600 ml-1">
+                                          {dhotiBrother?.name ||
+                                            item.selectedDhoti}
+                                        </span>
+                                        {item.selectedDhoti &&
+                                          !dhotiBrother && (
+                                            <span className="text-xs text-gray-500 ml-2">
+                                              (lookup failed)
+                                            </span>
+                                          )}
+                                      </div>
+                                    )}
+                                    {item.selectedColor && (
+                                      <div>
+                                        <span className="text-gray-600">
+                                          Color:
+                                        </span>
+                                        <span className="font-medium ml-1">
+                                          {item.selectedColor}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             </div>
 

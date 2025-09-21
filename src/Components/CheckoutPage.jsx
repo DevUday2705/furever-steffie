@@ -256,21 +256,24 @@ const CheckoutPage = () => {
     } else if (code === NAVRATRI_COUPON) {
       // Special Navratri coupon - check if cart contains NAVRATRI items
       let hasNavratriItems = false;
-      
+
       if (isCartCheckout) {
         // Check cart items for NAVRATRI in name
-        hasNavratriItems = cart.some(item => 
-          item.name && item.name.toUpperCase().includes("NAVRATRI")
+        hasNavratriItems = cart.some(
+          (item) => item.name && item.name.toUpperCase().includes("NAVRATRI")
         );
       } else {
         // Check single order item for NAVRATRI in name
-        hasNavratriItems = orderDetails.name && 
+        hasNavratriItems =
+          orderDetails.name &&
           orderDetails.name.toUpperCase().includes("NAVRATRI");
       }
 
       if (!hasNavratriItems) {
         setDiscount(0);
-        setCouponError("This coupon is valid only for Navratri special outfits");
+        setCouponError(
+          "This coupon is valid only for Navratri special outfits"
+        );
         toast.error("❌ Code valid only for Navratri special outfits");
         return;
       }
@@ -351,22 +354,25 @@ const CheckoutPage = () => {
     } else if (couponCode.trim().toUpperCase() === NAVRATRI_COUPON) {
       // GARBA5 - 5% discount only on Navratri items
       let navratriSubtotal = 0;
-      
+
       if (isCartCheckout) {
         // Calculate subtotal only for Navratri items in cart
         navratriSubtotal = cart.reduce((total, item) => {
           if (item.name && item.name.toUpperCase().includes("NAVRATRI")) {
-            return total + (item.price * item.quantity);
+            return total + item.price * item.quantity;
           }
           return total;
         }, 0);
       } else {
         // Single item checkout - check if it's a Navratri item
-        if (orderDetails.name && orderDetails.name.toUpperCase().includes("NAVRATRI")) {
+        if (
+          orderDetails.name &&
+          orderDetails.name.toUpperCase().includes("NAVRATRI")
+        ) {
           navratriSubtotal = orderDetails.price;
         }
       }
-      
+
       // Apply 5% discount only on Navratri items
       discountAmount = (navratriSubtotal * 5) / 100;
     } else {
