@@ -15,7 +15,7 @@ import ComingSoonSection from "./ComingSoonSection";
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const phoneNumber = "918828145667"; // change to your WhatsApp business number (with country code)
+  const phoneNumber = "917042212942"; // change to your WhatsApp business number (with country code)
   const message = encodeURIComponent(
     "Hi! I'm interested in your pet outfits on Furever Steffie. Can you help me place an order?"
   );

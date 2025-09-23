@@ -30,7 +30,7 @@ const SizeGuide = () => {
   };
 
   const handleWhatsAppClick = () => {
-    const phoneNumber = "918828145667";
+    const phoneNumber = "917042212942";
     const message =
       "Hi! I need help with taking my pet's measurements for the perfect fit. Can you guide me through the process?";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(

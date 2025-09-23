@@ -436,7 +436,7 @@ export default function TermsAndConditionsPage() {
                     <strong>Email:</strong> fureversteffie@gmail.com
                   </p>
                   <p className="text-gray-700">
-                    <strong>Phone:</strong> 8828145667
+                    <strong>Phone:</strong> +917042212942
                   </p>
                   <p className="text-gray-700">
                     <strong>Address:</strong> Bharat Apartment, 302, Shivsena

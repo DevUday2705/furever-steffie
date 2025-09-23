@@ -13,7 +13,7 @@ const createTransporter = () => {
 
 // Generate WhatsApp link
 const generateWhatsAppLink = (orderDetails) => {
-  const phoneNumber = '918828145667'; // Replace with your actual WhatsApp business number
+  const phoneNumber = '917042212942'; // Replace with your actual WhatsApp business number
   const message = `Hi! I just placed an order (ID: ${orderDetails.orderId}) on Furever Steffie. I need to share my pup's exact measurements. Can you help me with the next steps?`;
   return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 };

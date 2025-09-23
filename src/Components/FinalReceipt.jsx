@@ -145,7 +145,7 @@ const FinalReceipt = () => {
       <h1 className="mt-2 flex items-center">
         Need help? Drop me a message on Whatsapp{" "}
         <a
-          href="https://wa.me/918828145667"
+          href="https://wa.me/917042212942"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center cursor-pointer shrink-0 justify-center w-8 h-8 rounded-full hover:bg-green-600 transition-colors"

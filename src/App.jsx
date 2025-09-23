@@ -29,11 +29,10 @@ import CartNav from "./Components/CartNav";
 import MaleBowCategories from "./Components/MaleBowCategories";
 import ThankYouPage from "./Components/ThankYouPage";
 import BowTieCategories from "./Components/BowTieCategories";
-import ComingSoonPoster from "./Components/ComingSoon";
 
 import KurtaListing from "./Components/KurtaListing";
 import TuxedoListing from "./Components/TuxedoListing";
-import BandanaListing from "./Components/BandanaListing";
+
 import LehengaListing from "./Components/LehengaListing";
 import FrockListing from "./Components/FrockListing";
 import StockManager from "./Components/StockManager";
@@ -41,13 +40,14 @@ import FabricManagementSystem from "./Components/FabricManagementSystem";
 import { useContext } from "react";
 import { CurrencyContext } from "./context/currencyContext";
 import CurrencySelector from "./Components/CurrencySelector";
-import { Menu, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import HamburgerMenu from "./Components/HamburgerMenu";
 import TrackOrder from "./Components/TrackOrder";
 import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
+import InternationalPaymentPage from "./Components/InternationalPaymentPage";
 import WhyUs from "./Components/WhyUs";
 import AboutUs from "./Components/AboutUs";
 import AdminProducts from "./Components/AdminProducts";
@@ -65,10 +65,29 @@ const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const ready = true;
+  const ready = false; // Set to false to show coming soon for non-admin pages
+
+  // Admin routes that should always be accessible
+  const adminRoutes = [
+    "/admin",
+    "/inventory",
+    "/stock",
+    "/admin/orders",
+    "/admin/product",
+    "/admin/add",
+    "/admin/edit",
+    "/daily-task",
+    "/test-email",
+    "/test-whatsapp",
+  ];
+
+  // Check if current route is admin route
+  const isAdminRoute = adminRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
   return (
     <div className=" max-w-md mx-auto ">
-      {ready ? (
+      {ready || isAdminRoute ? (
         <>
           <nav className="flex items-center justify-between px-4 py-3 sticky top-0 z-[70] bg-white">
             {/* Left: Hamburger & Search */}
@@ -113,6 +132,10 @@ const App = () => {
               <Route path="/product/:productId" element={<ProductDetail />} />
               <Route path="/review" element={<OrderReviewPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route
+                path="/international-payment"
+                element={<InternationalPaymentPage />}
+              />
               <Route path="/gender" element={<SelectGender />} />
               <Route path="/style" element={<SelectStyle />} />
               <Route path="/traditional" element={<FabricOptions />} />
@@ -157,7 +180,9 @@ const App = () => {
       ) : (
         <ComingSoonPage />
       )}
-      {ready && location.pathname === "/" ? <PopupPoster /> : null}
+      {(ready || isAdminRoute) && location.pathname === "/" ? (
+        <PopupPoster />
+      ) : null}
       <Toaster />
     </div>
   );

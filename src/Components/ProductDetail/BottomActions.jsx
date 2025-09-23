@@ -119,7 +119,7 @@ const BottomActions = ({
   };
 
   const handleWhatsAppChat = () => {
-    const businessWhatsAppNumber = "+918828145667";
+    const businessWhatsAppNumber = "+917042212942";
 
     const message = `Hi, I need help with my dog's dress - 
 Name: ${product.name}

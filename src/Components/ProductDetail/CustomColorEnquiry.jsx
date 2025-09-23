@@ -12,7 +12,7 @@ const CustomColorEnquiry = ({ product }) => {
 
     const message = `Hi, I need help with ${product.name} (ID: ${product.id}).`;
     window.open(
-      `https://wa.me/+918828145667?text=${encodeURIComponent(message)}`,
+      `https://wa.me/+917042212942?text=${encodeURIComponent(message)}`,
       "_blank"
     );
   };

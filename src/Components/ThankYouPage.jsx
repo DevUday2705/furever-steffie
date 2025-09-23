@@ -44,7 +44,7 @@ Please guide me through the measuring process so you can custom stitch the outfi
 Looking forward to hearing from you! 🎉`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/918828145667?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/917042212942?text=${encodedMessage}`;
     window.open(whatsappUrl, "_blank");
   };
 

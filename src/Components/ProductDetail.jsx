@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, Check } from "lucide-react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
-// import { frocks } from "../constants/constant"; // Import all types separately
 import { useAppContext } from "../context/AppContext";
-import { toast } from "react-hot-toast";
 import BackButton from "../Components/ProductDetail/BackButton";
 import ImageCarousel from "../Components/ProductDetail/ImageCarousel";
 import ProductInfo from "../Components/ProductDetail/ProductInfo";
 import ProductOptions from "../Components/ProductDetail/ProductOptions";
 import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
-import ProductMeasurements from "../Components/ProductDetail/ProductMeasurements";
-import ReadyMadeSizeSelector from "../Components/ReadyMadeSizeSelector";
-import SmartPetSizing from "../Components/SmartPetSizing";
-import { useFirestoreCollection } from "../hooks/fetchCollection";
+import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 const ProductDetail = () => {
@@ -36,18 +29,10 @@ const ProductDetail = () => {
     product?.dhotis?.length ? product.dhotis[0].name : null
   );
   const [images, setImages] = useState([]);
-  const [measurementsValid, setMeasurementsValid] = useState(false);
-  const [petInfo, setPetInfo] = useState(null); // ADD THIS LINE
-  const [measurements, setMeasurements] = useState({
-    neck: "",
-    chest: "",
-    back: "",
-  });
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState([]);
-  const { data: kurtas } = useFirestoreCollection("kurtas");
 
   const scrollTo = useCallback(
     (index) => emblaApi?.scrollTo(index),
@@ -66,22 +51,6 @@ const ProductDetail = () => {
     emblaApi.on("select", onSelect);
     return () => emblaApi.off("select", onSelect);
   }, [emblaApi, onSelect]);
-
-  const [hasSavedSize, setHasSavedSize] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("savedPetSize");
-    setHasSavedSize(!!saved);
-    if (saved) {
-      const { size } = JSON.parse(saved);
-      setSelectedSize(size);
-    }
-  }, [productId]);
-
-  const handleClearSavedSize = () => {
-    setHasSavedSize(false);
-    setSelectedSize("");
-  };
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -142,7 +111,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [productId, idPart, typePart]);
 
   useEffect(() => {
     if (!product || product.type === "kurta") return; // ⛔ Skip if kurta
@@ -261,17 +230,6 @@ const ProductDetail = () => {
     );
   }
 
-  const categoriesThatRequireMeasurements = [
-    "kurta",
-    "lehnga",
-    "frock",
-    "tuxedo",
-    "dress",
-    "tut",
-  ];
-
-  const requiresMeasurements =
-    categoriesThatRequireMeasurements.includes(typePart);
   console.log(product);
   return (
     <div className="bg-gray-50 min-h-screen pb-4">
@@ -308,33 +266,27 @@ const ProductDetail = () => {
               selectedStyle={selectedStyle}
               setSelectedStyle={setSelectedStyle}
             />
-            {requiresMeasurements ? (
-              hasSavedSize ? (
-                <ReadyMadeSizeSelector
-                  selectedSize={selectedSize}
-                  setSelectedSize={setSelectedSize}
-                  sizes={product.sizes || ["S", "M", "L", "XL"]}
-                  onClearSavedSize={handleClearSavedSize}
-                  product={product} // NEW: Pass product for stock checking
-                />
-              ) : (
-                <SmartPetSizing
-                  onSizeDetected={(size, petInfo) => {
-                    setSelectedSize(size);
-                    setPetInfo(petInfo);
-                    setHasSavedSize(!!localStorage.getItem("savedPetSize"));
-                  }}
-                  setMeasurementsValid={setMeasurementsValid}
-                />
-              )
-            ) : (
-              <ReadyMadeSizeSelector
-                selectedSize={selectedSize}
-                setSelectedSize={setSelectedSize}
-                sizes={product.sizes || ["S", "M", "L", "XL"]}
-                product={product} // NEW: Pass product for stock checking
-              />
-            )}
+
+            {/* Simple Size Selector - replaces smart sizing logic */}
+            <SimpleSizeSelector
+              selectedSize={selectedSize}
+              setSelectedSize={setSelectedSize}
+              product={product}
+              // Action button props
+              images={images}
+              isBeaded={isBeaded}
+              isFullSet={isFullSet}
+              isDupattaSet={isDupattaSet}
+              isRoyalSet={isRoyalSet}
+              selectedDhoti={selectedDhoti}
+              selectedStyle={selectedStyle}
+              selectedColor={selectedColor}
+              calculatePrice={calculatePrice}
+              navigate={navigate}
+              addToCart={addToCart}
+              setIsOpen={setIsOpen}
+            />
+
             {product.contactForCustomColors && (
               <CustomColorEnquiry product={product} />
             )}
@@ -357,9 +309,6 @@ const ProductDetail = () => {
         navigate={navigate}
         addToCart={addToCart}
         setIsOpen={setIsOpen}
-        measurements={measurements}
-        measurementsValid={measurementsValid}
-        requiresMeasurements={requiresMeasurements}
       />
     </div>
   );

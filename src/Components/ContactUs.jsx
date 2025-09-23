@@ -77,10 +77,10 @@ export default function ContactUsPage() {
                     Phone
                   </h3>
                   <a
-                    href="tel:+918828145667"
+                    href="tel:+917042212942"
                     className="text-gray-600 hover:text-gray-800 transition-colors text-sm"
                   >
-                    +91 8828145667
+                    +917042212942
                   </a>
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function ContactUsPage() {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <a
-                href={`https://wa.me/918828145667?text=${encodeURIComponent(
+                href={`https://wa.me/917042212942?text=${encodeURIComponent(
                   "Hi! I'm interested in your pet outfits. Can you help me?"
                 )}`}
                 target="_blank"

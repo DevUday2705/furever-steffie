@@ -460,18 +460,83 @@ const CheckoutPage = () => {
   const handlePayment = async () => {
     const totalAmount = calculateTotal(); // Always in INR for Razorpay
 
-    // For international customers, show a note about INR conversion
+    // For international customers, redirect to bank transfer page
     if (formData.country !== "india") {
       const currentCurrency = countryToCurrency[formData.country];
       const displayAmount = convertCurrency(totalAmount, currentCurrency);
+      
+      // Extract currency symbol from currency.js
+      const currencySymbols = {
+        INR: "₹",
+        SGD: "S$",
+        MYR: "RM",
+        USD: "$",
+        GBP: "£",
+        NZD: "NZ$",
+        CAD: "C$",
+        AED: "د.إ",
+      };
+      const currencySymbol = currencySymbols[currentCurrency] || currentCurrency;
 
-      const confirmPayment = window.confirm(
-        `Payment will be processed in Indian Rupees (₹${totalAmount}) which is approximately ${displayAmount} in your local currency. The exact amount charged may vary slightly due to exchange rate fluctuations. Do you want to proceed?`
-      );
-
-      if (!confirmPayment) {
-        return;
+      // Calculate subtotal, discount, and shipping charges
+      let subtotal = 0;
+      if (isCartCheckout) {
+        subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+      } else {
+        subtotal = orderDetails.price;
       }
+
+      // Calculate discount amount
+      let discountAmount = 0;
+      if (couponCode.trim().toUpperCase() === "SINGLE750") {
+        discountAmount = 750;
+      } else if (discount > 0) {
+        discountAmount = (subtotal * discount) / 100;
+      }
+
+      // Calculate shipping charge for international delivery
+      let shippingCharge = 0;
+      const deliveryInfo = internationalDelivery[formData.country];
+      if (deliveryInfo) {
+        const chargeInINR = deliveryInfo.charge / currencyRates[deliveryInfo.currency];
+        shippingCharge = Math.round(chargeInINR);
+      }
+
+      // Prepare order summary for international payment page
+      const orderSummary = {
+        items: isCartCheckout ? [
+          ...cart.map(item => ({
+            name: item.name,
+            price: Number(convertCurrency(item.price, currentCurrency).replace(/[^\d.-]/g, '')),
+            selectedSize: item.selectedSize,
+            quantity: item.quantity || 1,
+            isRoyalSet: item.isRoyalSet
+          }))
+        ] : [{
+          name: orderDetails.name,
+          price: Number(convertCurrency(orderDetails.price, currentCurrency).replace(/[^\d.-]/g, '')),
+          selectedSize: orderDetails.selectedSize,
+          quantity: 1,
+          isRoyalSet: orderDetails.isRoyalSet
+        }],
+        subtotal: Number(convertCurrency(subtotal, currentCurrency).replace(/[^\d.-]/g, '')),
+        discount: Number(convertCurrency(discountAmount, currentCurrency).replace(/[^\d.-]/g, '')),
+        shipping: Number(convertCurrency(shippingCharge, currentCurrency).replace(/[^\d.-]/g, ''))
+      };
+
+      const finalAmount = Number(displayAmount.replace(/[^\d.-]/g, ''));
+
+      // Navigate to international payment page with order data
+      navigate('/international-payment', {
+        state: {
+          orderSummary,
+          customerDetails: formData,
+          finalAmount: finalAmount.toFixed(2),
+          currency: currentCurrency,
+          currencySymbol: currencySymbol
+        }
+      });
+      return;
     }
 
     try {
