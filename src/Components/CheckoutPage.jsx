@@ -464,7 +464,7 @@ const CheckoutPage = () => {
     if (formData.country !== "india") {
       const currentCurrency = countryToCurrency[formData.country];
       const displayAmount = convertCurrency(totalAmount, currentCurrency);
-      
+
       // Extract currency symbol from currency.js
       const currencySymbols = {
         INR: "₹",
@@ -476,12 +476,16 @@ const CheckoutPage = () => {
         CAD: "C$",
         AED: "د.إ",
       };
-      const currencySymbol = currencySymbols[currentCurrency] || currentCurrency;
+      const currencySymbol =
+        currencySymbols[currentCurrency] || currentCurrency;
 
       // Calculate subtotal, discount, and shipping charges
       let subtotal = 0;
       if (isCartCheckout) {
-        subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+        subtotal = cart.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        );
       } else {
         subtotal = orderDetails.price;
       }
@@ -498,43 +502,70 @@ const CheckoutPage = () => {
       let shippingCharge = 0;
       const deliveryInfo = internationalDelivery[formData.country];
       if (deliveryInfo) {
-        const chargeInINR = deliveryInfo.charge / currencyRates[deliveryInfo.currency];
+        const chargeInINR =
+          deliveryInfo.charge / currencyRates[deliveryInfo.currency];
         shippingCharge = Math.round(chargeInINR);
       }
 
       // Prepare order summary for international payment page
       const orderSummary = {
-        items: isCartCheckout ? [
-          ...cart.map(item => ({
-            name: item.name,
-            price: Number(convertCurrency(item.price, currentCurrency).replace(/[^\d.-]/g, '')),
-            selectedSize: item.selectedSize,
-            quantity: item.quantity || 1,
-            isRoyalSet: item.isRoyalSet
-          }))
-        ] : [{
-          name: orderDetails.name,
-          price: Number(convertCurrency(orderDetails.price, currentCurrency).replace(/[^\d.-]/g, '')),
-          selectedSize: orderDetails.selectedSize,
-          quantity: 1,
-          isRoyalSet: orderDetails.isRoyalSet
-        }],
-        subtotal: Number(convertCurrency(subtotal, currentCurrency).replace(/[^\d.-]/g, '')),
-        discount: Number(convertCurrency(discountAmount, currentCurrency).replace(/[^\d.-]/g, '')),
-        shipping: Number(convertCurrency(shippingCharge, currentCurrency).replace(/[^\d.-]/g, ''))
+        items: isCartCheckout
+          ? [
+              ...cart.map((item) => ({
+                name: item.name,
+                price: Number(
+                  convertCurrency(item.price, currentCurrency).replace(
+                    /[^\d.-]/g,
+                    ""
+                  )
+                ),
+                selectedSize: item.selectedSize,
+                quantity: item.quantity || 1,
+                isRoyalSet: item.isRoyalSet,
+              })),
+            ]
+          : [
+              {
+                name: orderDetails.name,
+                price: Number(
+                  convertCurrency(orderDetails.price, currentCurrency).replace(
+                    /[^\d.-]/g,
+                    ""
+                  )
+                ),
+                selectedSize: orderDetails.selectedSize,
+                quantity: 1,
+                isRoyalSet: orderDetails.isRoyalSet,
+              },
+            ],
+        subtotal: Number(
+          convertCurrency(subtotal, currentCurrency).replace(/[^\d.-]/g, "")
+        ),
+        discount: Number(
+          convertCurrency(discountAmount, currentCurrency).replace(
+            /[^\d.-]/g,
+            ""
+          )
+        ),
+        shipping: Number(
+          convertCurrency(shippingCharge, currentCurrency).replace(
+            /[^\d.-]/g,
+            ""
+          )
+        ),
       };
 
-      const finalAmount = Number(displayAmount.replace(/[^\d.-]/g, ''));
+      const finalAmount = Number(displayAmount.replace(/[^\d.-]/g, ""));
 
       // Navigate to international payment page with order data
-      navigate('/international-payment', {
+      navigate("/international-payment", {
         state: {
           orderSummary,
           customerDetails: formData,
           finalAmount: finalAmount.toFixed(2),
           currency: currentCurrency,
-          currencySymbol: currencySymbol
-        }
+          currencySymbol: currencySymbol,
+        },
       });
       return;
     }

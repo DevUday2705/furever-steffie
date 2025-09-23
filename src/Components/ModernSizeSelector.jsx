@@ -499,7 +499,10 @@ const SimpleSizeSelector = ({
                         className="w-full max-w-md mx-auto rounded-lg shadow-sm"
                         poster="/images/2.png"
                       >
-                        <source src="/images/measurements.mp4" type="video/mp4" />
+                        <source
+                          src="/images/measurements.mp4"
+                          type="video/mp4"
+                        />
                         Your browser does not support the video tag.
                       </video>
                       <p className="text-xs text-gray-500 text-center mt-2">
