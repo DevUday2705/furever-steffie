@@ -33,30 +33,20 @@ const SIZE_CHART = {
     length: 19,
     breed: "Golden doodle, pugs, frenchie, Pomeranian",
   },
-  XXL: {
+  "2XL": {
     neck: 22,
     chest: "26-28",
     length: 20.5,
     breed: "Cocker spaniel, beagle",
   },
-  XXXL: {
-    neck: 24,
-    chest: "28-30",
-    length: 21,
-    breed: "Indie",
-  },
+
   "4XL": {
     neck: "26-29",
     chest: "31-36",
     length: "22-26",
     breed: "Labrador, golden retriever, husky",
   },
-  "5XL": {
-    neck: "26-29",
-    chest: "31-36",
-    length: "22-26",
-    breed: "Large breeds",
-  },
+
   "6XL": {
     neck: "26-29",
     chest: "31-36",
@@ -65,18 +55,7 @@ const SIZE_CHART = {
   },
 };
 
-const AVAILABLE_SIZES = [
-  "XS",
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL",
-  "XXXL",
-  "4XL",
-  "5XL",
-  "6XL",
-];
+const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"];
 
 const SimpleSizeSelector = ({
   selectedSize,
@@ -208,7 +187,7 @@ const SimpleSizeSelector = ({
       </div>
 
       {/* Size Options - Myntra Style Horizontal Layout */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="grid grid-cols-4 gap-3">
         {AVAILABLE_SIZES.map((size) => {
           const isAvailable = isSizeAvailable(size);
           const stockCount = getStockCount(size);
@@ -221,7 +200,7 @@ const SimpleSizeSelector = ({
                 onClick={() => handleSizeSelect(size)}
                 disabled={!isAvailable}
                 className={`
-                  w-12 h-12 rounded-full border-2 text-sm font-semibold transition-all relative
+                  w-full h-full rounded-xs border-1 text-sm font-semibold transition-all flex flex-col px-3 py-3 relative
                   ${
                     isSelected
                       ? "border-gray-600 bg-gray-50 text-gray-600"
@@ -229,16 +208,17 @@ const SimpleSizeSelector = ({
                       ? "border-gray-300 bg-white text-gray-900 hover:border-gray-400 hover:shadow-sm"
                       : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                   }
+                  
                 `}
               >
                 {size}
 
-                {/* Stock indicator for low stock */}
                 {isAvailable && stockCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gray-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                    {stockCount}
+                  <span className="text-red-300 font-thin text-xs">
+                    {stockCount} left
                   </span>
                 )}
+                {/* Stock indicator for low stock */}
 
                 {/* Out of stock indicator */}
               </button>
@@ -484,17 +464,10 @@ const SimpleSizeSelector = ({
                       How to measure your pet
                     </h3>
 
-                    <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                      <img
-                        src="/images/2.png"
-                        alt="Pet measurement guide - How to measure neck, chest, and length"
-                        className="w-full max-w-md mx-auto rounded-lg shadow-sm"
-                      />
-                    </div>
-
                     {/* Measurement Video */}
                     <div className="bg-gray-50 p-6 rounded-lg mb-6">
                       <video
+                        autoPlay
                         controls
                         className="w-full max-w-md mx-auto rounded-lg shadow-sm"
                         poster="/images/2.png"
@@ -509,7 +482,13 @@ const SimpleSizeSelector = ({
                         Video guide: How to measure your pet correctly
                       </p>
                     </div>
-
+                    <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                      <img
+                        src="/images/2.png"
+                        alt="Pet measurement guide - How to measure neck, chest, and length"
+                        className="w-full max-w-md mx-auto rounded-lg shadow-sm"
+                      />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-gray-50 rounded-lg">
                         <div className="font-semibold text-gray-900 mb-2">

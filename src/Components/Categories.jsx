@@ -14,7 +14,7 @@ const Categories = () => {
       link: "kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1753112137/Regal_Green_Kurta_with_Zari_Detailing_evmojy.webp  ",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1753112945/Rani_Pink_nqcsl7.webp  ",
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ const Categories = () => {
       link: "Male Bandanas",
       description: "Trendy Accessories",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744095269/ChatGPT_Image_Apr_8_2025_11_39_17_AM_fuvhxw.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1755713280/IMG_9469_txpsl9.webp",
     },
     {
       id: 4,

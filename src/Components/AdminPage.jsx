@@ -689,7 +689,7 @@ const AdminPage = () => {
                         return (
                           <div
                             key={idx}
-                            className={`border p-4 rounded-lg ${
+                            className={` p-4 rounded-lg ${
                               item.isRoyalSet
                                 ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 shadow-md"
                                 : "bg-gray-50"

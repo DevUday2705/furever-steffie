@@ -65,7 +65,7 @@ const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const ready = false; // Set to false to show coming soon for non-admin pages
+  const ready = true; // Set to false to show coming soon for non-admin pages
 
   // Admin routes that should always be accessible
   const adminRoutes = [
