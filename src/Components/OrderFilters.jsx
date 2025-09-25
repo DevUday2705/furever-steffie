@@ -112,7 +112,7 @@ const OrderFilters = ({
             <option value="pending">Pending</option>
             <option value="work-in-progress">Work in Progress</option>
             <option value="ready-to-ship">Ready to Ship</option>
-            <option value="delivered">Delivered</option>
+            <option value="shipped">Shipped</option>
           </select>
         </div>
 

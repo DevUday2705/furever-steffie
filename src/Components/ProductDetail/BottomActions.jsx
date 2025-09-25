@@ -137,36 +137,36 @@ Thanks`;
   const isActionsEnabled = shouldEnableActions();
 
   // If custom size is selected, show WhatsApp button
-  if (isCustomSize) {
-    return (
-      <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
-          <p className="text-sm text-amber-800 font-medium">
-            🐕 Custom Tailoring Required
-          </p>
-          <p className="text-xs text-amber-700 mt-1">
-            For {selectedSize} size, we provide custom fitting to ensure perfect
-            comfort for your dog
-          </p>
-        </div>
+  // if (isCustomSize) {
+  //   return (
+  //     <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+  //       <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+  //         <p className="text-sm text-amber-800 font-medium">
+  //           🐕 Custom Tailoring Required
+  //         </p>
+  //         <p className="text-xs text-amber-700 mt-1">
+  //           For {selectedSize} size, we provide custom fitting to ensure perfect
+  //           comfort for your dog
+  //         </p>
+  //       </div>
 
-        <motion.button
-          className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors duration-200"
-          whileTap={{ scale: 0.98 }}
-          onClick={handleWhatsAppChat}
-        >
-          <MessageCircle className="w-5 h-5" />
-          Chat with Us for Custom Fitting
-        </motion.button>
+  //       <motion.button
+  //         className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors duration-200"
+  //         whileTap={{ scale: 0.98 }}
+  //         onClick={handleWhatsAppChat}
+  //       >
+  //         <MessageCircle className="w-5 h-5" />
+  //         Chat with Us for Custom Fitting
+  //       </motion.button>
 
-        <div className="text-center mt-2">
-          <p className="text-xs text-gray-600">
-            Get personalized assistance for the perfect fit
-          </p>
-        </div>
-      </div>
-    );
-  }
+  //       <div className="text-center mt-2">
+  //         <p className="text-xs text-gray-600">
+  //           Get personalized assistance for the perfect fit
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Regular flow for standard sizes
   return (

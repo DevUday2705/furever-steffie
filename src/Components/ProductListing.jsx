@@ -58,7 +58,7 @@ const ProductListing = ({
   // Helper function to check product stock status
   const getProductStockStatus = (product) => {
     // Check XS, S, M stock
-    const managedSizes = ["XS", "S", "M"];
+    const managedSizes = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"];
     const stockInfo = managedSizes.map((size) => ({
       size,
       stock: product?.sizeStock?.[size] || 0,
@@ -315,16 +315,15 @@ const ProductListing = ({
                       </div>
                     )}
 
-                    {!stockStatus.soldOut && stockStatus.lowStock && (
-                      <div className="absolute top-2 right-2">
-                        <div className="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md">
+                    {/* {!stockStatus.soldOut && stockStatus.lowStock && (
+                      <div className="absolute top-0 left-0">
+                        <div className="bg-amber-500 text-white px-2 py-1 rounded-br-sm  text-xs font-semibold shadow-md">
                           <div className="flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
                             Few Left!
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                     {/* Trending Label */}
                     {product.isTrending && (
