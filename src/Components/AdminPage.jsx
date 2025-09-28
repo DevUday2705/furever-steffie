@@ -376,41 +376,45 @@ const AdminPage = () => {
   };
 
   // Send measurement reminder function
-  const handleSendMeasurementReminder = (order) => {
+  const handleSendMeasurementReminder = async (order) => {
     const customerName = order.customer?.fullName || "Customer";
-    const mobileNumber = order.customer?.mobileNumber || "";
+    const customerEmail = order.customer?.email || "";
 
-    // Create WhatsApp message
-    const message = `Hi ${customerName}! 
-
-We have received your order (Order #${
-      order.orderNumber || order.id
-    }) and we're ready to start working on it. 
-
-To ensure the perfect fit for your pet, we need their measurements:
-• Neck circumference
-• Chest circumference  
-• Back length (neck to tail base)
-
-Please share a photo with these measurements marked or reply with the measurements in cm.
-
-Thank you! 
-Team Furever`;
-
-    // Create WhatsApp URL
-    const whatsappUrl = `https://wa.me/91${mobileNumber.replace(
-      /\D/g,
-      ""
-    )}?text=${encodeURIComponent(message)}`;
-
-    // Show confirmation before opening WhatsApp
+    // Show confirmation before sending
     const confirmSend = window.confirm(
-      `Send measurement reminder to ${customerName} (${mobileNumber})?`
+      `Send measurement reminder to ${customerName} (${customerEmail})?`
     );
 
-    if (confirmSend) {
-      window.open(whatsappUrl, "_blank");
-      toast.success(`Opening WhatsApp to send reminder to ${customerName}`);
+    if (!confirmSend) return;
+
+    try {
+      // Show loading state
+      toast.loading(`Sending reminder to ${customerName}...`);
+
+      // Call the measurement reminder API
+      const response = await fetch("/api/send-measurement-reminder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+          orderNumber: order.orderNumber || order.id,
+          customer: order.customer,
+          items: order.items,
+        }),
+      });
+
+      if (response.ok) {
+        toast.dismiss();
+        toast.success(`Measurement reminder sent to ${customerName}`);
+      } else {
+        throw new Error("Failed to send reminder");
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error(`Failed to send reminder to ${customerName}`);
+      console.error("Error sending measurement reminder:", error);
     }
   };
 
@@ -436,7 +440,9 @@ Team Furever`;
       if (measurementFilter === "has-measurements") {
         matchesMeasurements = orderHasMeasurements(order);
       } else if (measurementFilter === "no-measurements") {
-        matchesMeasurements = !orderHasMeasurements(order);
+        // Only show non-shipped orders that don't have measurements
+        matchesMeasurements =
+          !orderHasMeasurements(order) && order.orderStatus !== "shipped";
       }
 
       // Date filter

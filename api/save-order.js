@@ -159,7 +159,7 @@ export default async function handler(req, res) {
             paymentStatus: "paid",
             orderStatus: "pending",
             createdAt: new Date().toISOString(),
-            dispatchDate: dispatchDate || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now if not provided
+            dispatchDate: dispatchDate || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now if not provided
             coupon: coupon || null,
         };
 
