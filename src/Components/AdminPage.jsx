@@ -76,13 +76,17 @@ const AdminPage = () => {
   // Helper function to check if an order has measurements
   const orderHasMeasurements = (order) => {
     if (!order.items || order.items.length === 0) return false;
-    
-    return order.items.some(item => {
+
+    return order.items.some((item) => {
       const measurements = item.measurements;
       if (!measurements) return false;
-      
+
       // Check if any of the measurement fields have values
-      return measurements.neck?.trim() || measurements.chest?.trim() || measurements.back?.trim();
+      return (
+        measurements.neck?.trim() ||
+        measurements.chest?.trim() ||
+        measurements.back?.trim()
+      );
     });
   };
 
@@ -373,13 +377,15 @@ const AdminPage = () => {
 
   // Send measurement reminder function
   const handleSendMeasurementReminder = (order) => {
-    const customerName = order.customer?.fullName || 'Customer';
-    const mobileNumber = order.customer?.mobileNumber || '';
-    
+    const customerName = order.customer?.fullName || "Customer";
+    const mobileNumber = order.customer?.mobileNumber || "";
+
     // Create WhatsApp message
     const message = `Hi ${customerName}! 
 
-We have received your order (Order #${order.orderNumber || order.id}) and we're ready to start working on it. 
+We have received your order (Order #${
+      order.orderNumber || order.id
+    }) and we're ready to start working on it. 
 
 To ensure the perfect fit for your pet, we need their measurements:
 • Neck circumference
@@ -392,15 +398,18 @@ Thank you!
 Team Furever`;
 
     // Create WhatsApp URL
-    const whatsappUrl = `https://wa.me/91${mobileNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-    
+    const whatsappUrl = `https://wa.me/91${mobileNumber.replace(
+      /\D/g,
+      ""
+    )}?text=${encodeURIComponent(message)}`;
+
     // Show confirmation before opening WhatsApp
     const confirmSend = window.confirm(
       `Send measurement reminder to ${customerName} (${mobileNumber})?`
     );
 
     if (confirmSend) {
-      window.open(whatsappUrl, '_blank');
+      window.open(whatsappUrl, "_blank");
       toast.success(`Opening WhatsApp to send reminder to ${customerName}`);
     }
   };
@@ -442,7 +451,9 @@ Team Furever`;
         matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
-      return matchesSearch && matchesStatus && matchesMeasurements && matchesDate;
+      return (
+        matchesSearch && matchesStatus && matchesMeasurements && matchesDate
+      );
     })
     .sort((a, b) => {
       // Sort by date or amount
