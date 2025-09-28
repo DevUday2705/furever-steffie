@@ -31,6 +31,7 @@ const AdminPage = () => {
   });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [measurementFilter, setMeasurementFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -70,6 +71,19 @@ const AdminPage = () => {
       "beaded-tassels": "Beaded + Tassels",
     };
     return styleMap[selectedStyle] || selectedStyle;
+  };
+
+  // Helper function to check if an order has measurements
+  const orderHasMeasurements = (order) => {
+    if (!order.items || order.items.length === 0) return false;
+    
+    return order.items.some(item => {
+      const measurements = item.measurements;
+      if (!measurements) return false;
+      
+      // Check if any of the measurement fields have values
+      return measurements.neck?.trim() || measurements.chest?.trim() || measurements.back?.trim();
+    });
   };
 
   const handleLogin = () => {
@@ -357,6 +371,40 @@ const AdminPage = () => {
     }
   };
 
+  // Send measurement reminder function
+  const handleSendMeasurementReminder = (order) => {
+    const customerName = order.customer?.fullName || 'Customer';
+    const mobileNumber = order.customer?.mobileNumber || '';
+    
+    // Create WhatsApp message
+    const message = `Hi ${customerName}! 
+
+We have received your order (Order #${order.orderNumber || order.id}) and we're ready to start working on it. 
+
+To ensure the perfect fit for your pet, we need their measurements:
+• Neck circumference
+• Chest circumference  
+• Back length (neck to tail base)
+
+Please share a photo with these measurements marked or reply with the measurements in cm.
+
+Thank you! 
+Team Furever`;
+
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/91${mobileNumber.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    
+    // Show confirmation before opening WhatsApp
+    const confirmSend = window.confirm(
+      `Send measurement reminder to ${customerName} (${mobileNumber})?`
+    );
+
+    if (confirmSend) {
+      window.open(whatsappUrl, '_blank');
+      toast.success(`Opening WhatsApp to send reminder to ${customerName}`);
+    }
+  };
+
   console.log(orders);
   // Filter and sort orders
   const filteredAndSortedOrders = orders
@@ -374,6 +422,14 @@ const AdminPage = () => {
       const matchesStatus =
         statusFilter === "all" || order.orderStatus === statusFilter;
 
+      // Measurement filter
+      let matchesMeasurements = true;
+      if (measurementFilter === "has-measurements") {
+        matchesMeasurements = orderHasMeasurements(order);
+      } else if (measurementFilter === "no-measurements") {
+        matchesMeasurements = !orderHasMeasurements(order);
+      }
+
       // Date filter
       const orderDate = new Date(order.createdAt);
       // Check date range
@@ -386,7 +442,7 @@ const AdminPage = () => {
         matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
-      return matchesSearch && matchesStatus && matchesDate;
+      return matchesSearch && matchesStatus && matchesMeasurements && matchesDate;
     })
     .sort((a, b) => {
       // Sort by date or amount
@@ -500,6 +556,8 @@ const AdminPage = () => {
         setStatusFilter={setStatusFilter}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        measurementFilter={measurementFilter}
+        setMeasurementFilter={setMeasurementFilter}
         onDateRangeChange={handleDateRangeChange}
       />
 
@@ -655,6 +713,17 @@ const AdminPage = () => {
                       <option value="ready-to-ship">Ready to Ship</option>
                       <option value="shipped">shipped</option>
                     </select>
+
+                    {/* Measurement reminder button for orders without measurements */}
+                    {!orderHasMeasurements(order) && (
+                      <button
+                        onClick={() => handleSendMeasurementReminder(order)}
+                        className="ml-2 px-2 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded transition-colors duration-200 flex items-center gap-1"
+                        title="Send Measurement Reminder"
+                      >
+                        ⚠️ Remind
+                      </button>
+                    )}
 
                     <button
                       onClick={() =>

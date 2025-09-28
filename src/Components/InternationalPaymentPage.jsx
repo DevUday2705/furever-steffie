@@ -26,12 +26,11 @@ const InternationalPaymentPage = () => {
   // HDFC Bank Details
   const bankDetails = {
     bankName: "HDFC Bank",
-    accountName: "Furever Steffie",
-    accountNumber: "12345678901234", // Replace with actual account number
-    ifscCode: "HDFC0001234", // Replace with actual IFSC code
-    swiftCode: "HDFCINBB", // HDFC Bank Swift Code
-    bankAddress: "HDFC Bank Branch, Mumbai, India",
-    branch: "Mumbai Main Branch", // Replace with actual branch
+    accountName: "Chetna Bhati",
+    accountNumber: "50100603672281", // Replace with actual account number
+    ifscCode: "HDFC0001019", // Replace with actual IFSC code
+    bankAddress: "Unnati Building, Plot No 23, Police Station Rd",
+    branch: "Jogeshwari East, Mumbai, Maharashtra 400060", // Replace with actual branch
   };
 
   const copyToClipboard = (text, field) => {
