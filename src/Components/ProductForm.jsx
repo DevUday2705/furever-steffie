@@ -1,5 +1,5 @@
 // File: src/pages/admin/ProductForm.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
@@ -41,11 +41,16 @@ const defaultSchema = {
   isRoyal: false, // Add this line
   isTrending: false, // Add trending status
   sizeStock: {
-    XS: 5,
-    S: 5,
-    M: 5,
+    XS: 0,
+    S: 0,
+    M: 0,
+    L: 0,
+    XL: 0,
+    "2XL": 0,
+    "4XL": 0,
+    "6XL": 0,
   },
-  sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"],
   dhotis: [],
   pricing: {
     basePrice: 0,
@@ -59,7 +64,9 @@ const defaultSchema = {
       M: 0,
       L: 0,
       XL: 0,
-      XXL: 0,
+      "2XL": 0,
+      "4XL": 0,
+      "6XL": 0,
     },
   },
   defaultOptions: {
@@ -192,6 +199,34 @@ const ProductForm = () => {
             };
 
             const finalData = deepMerge(merged, data);
+
+            // Ensure all size stock entries exist with default value 0
+            const allSizes = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"];
+            if (!finalData.sizeStock) {
+              finalData.sizeStock = {};
+            }
+            allSizes.forEach((size) => {
+              if (
+                finalData.sizeStock[size] === undefined ||
+                finalData.sizeStock[size] === null
+              ) {
+                finalData.sizeStock[size] = 0;
+              }
+            });
+
+            // Ensure all pricing size increments exist with default value 0
+            if (!finalData.pricing.sizeIncrements) {
+              finalData.pricing.sizeIncrements = {};
+            }
+            allSizes.forEach((size) => {
+              if (
+                finalData.pricing.sizeIncrements[size] === undefined ||
+                finalData.pricing.sizeIncrements[size] === null
+              ) {
+                finalData.pricing.sizeIncrements[size] = 0;
+              }
+            });
+
             console.log("Final merged data:", finalData);
             setFormData(finalData);
 
@@ -300,7 +335,7 @@ const ProductForm = () => {
         const docRef = await addDoc(collection(db, `${category}s`), dataToSave);
         console.log("Product added successfully with ID:", docRef.id);
       }
-      navigate("/admin/product");
+      navigate(`/admin/product?category=${category}s`);
     } catch (err) {
       console.error("Error saving product:", err);
       setError("Failed to save product");
@@ -574,6 +609,29 @@ const ProductForm = () => {
               )}
             </div>
           </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-2">Size Stock</label>
+            <div className="grid grid-cols-4 gap-2">
+              {Object.entries(formData.sizeStock).map(([size, stock]) => (
+                <div key={size}>
+                  <label className="block text-xs font-medium mb-1">
+                    {size}
+                  </label>
+                  <input
+                    type="number"
+                    placeholder={`${size} stock`}
+                    value={stock}
+                    onChange={(e) =>
+                      handleChange(`sizeStock.${size}`, Number(e.target.value))
+                    }
+                    className="w-full border px-2 py-1 rounded text-sm"
+                    min="0"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Beaded / Non-Beaded Images */}
@@ -820,7 +878,7 @@ const ProductForm = () => {
             {isEditMode ? "Update" : "Add"} Product
           </button>
           <button
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate(`/admin/product?category=${category}`)}
             className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700"
           >
             Cancel

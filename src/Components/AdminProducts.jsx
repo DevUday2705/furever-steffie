@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { db } from "../firebase";
 const ADMIN_KEY = "What@270598";
 const collections = [
@@ -13,7 +13,10 @@ const collections = [
 ];
 
 const AdminProducts = () => {
-  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCollection, setSelectedCollection] = useState(
+    searchParams.get('category') || null
+  );
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +29,18 @@ const AdminProducts = () => {
     } else {
       alert("Wrong admin key!");
     }
+  };
+
+  // Helper function to handle collection selection
+  const handleCollectionSelect = (collectionName) => {
+    setSelectedCollection(collectionName);
+    setSearchParams({ category: collectionName });
+  };
+
+  // Helper function to go back to collection selection
+  const handleBackToCollections = () => {
+    setSelectedCollection(null);
+    setSearchParams({});
   };
 
   const fetchProducts = async (collectionName) => {
@@ -106,7 +121,7 @@ const AdminProducts = () => {
           {collections.map((col) => (
             <div
               key={col}
-              onClick={() => setSelectedCollection(col)}
+              onClick={() => handleCollectionSelect(col)}
               className={`
                 relative cursor-pointer p-6 rounded-2xl border-2 transition-all duration-300
                 ${
@@ -149,7 +164,7 @@ const AdminProducts = () => {
         {selectedCollection && (
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => setSelectedCollection(null)}
+              onClick={() => handleBackToCollections()}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg
@@ -275,7 +290,7 @@ const AdminProducts = () => {
                   No products found
                 </h3>
                 <p className="text-gray-500">
-                  This collection doesn't have any products yet.
+                  This collection doesn&apos;t have any products yet.
                 </p>
               </div>
             )}
