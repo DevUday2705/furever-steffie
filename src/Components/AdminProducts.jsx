@@ -15,7 +15,7 @@ const collections = [
 const AdminProducts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCollection, setSelectedCollection] = useState(
-    searchParams.get('category') || null
+    searchParams.get("category") || null
   );
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
