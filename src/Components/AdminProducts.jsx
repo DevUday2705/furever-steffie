@@ -252,9 +252,6 @@ const AdminProducts = () => {
                         <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
                           {item.name} {item.isRoyal && "R"}
                         </h3>
-                        <p className="text-sm text-gray-500">
-                          Click to edit details
-                        </p>
                       </div>
                     </div>
 
