@@ -37,6 +37,7 @@ export default function TermsAndConditionsPage() {
     { id: "introduction", title: "Introduction" },
     { id: "services", title: "Services" },
     { id: "account", title: "User Account" },
+    { id: "replacement", title: "Replacement & Exchange Policy" },
     { id: "intellectual", title: "Intellectual Property" },
     { id: "liability", title: "Limitation of Liability" },
     { id: "privacy", title: "Privacy & Data" },
@@ -198,8 +199,67 @@ export default function TermsAndConditionsPage() {
                   <p>
                     We reserve the right to refuse service, terminate accounts,
                     remove or edit content, or cancel orders at our sole
-                    discretion if we believe that user conduct violates
-                    applicable laws or is harmful to our interests.
+                    discretion.
+                  </p>
+                </div>
+              </motion.section>
+
+              {/* Replacement & Exchange Policy */}
+              <motion.section
+                id="replacement"
+                variants={itemVariants}
+                className="mb-10"
+              >
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                  <ShieldCheck className="w-6 h-6 mr-2 text-green-600" />
+                  4. Replacement & Exchange Policy
+                </h2>
+                <div className="prose prose-blue max-w-none text-gray-700">
+                  <h3 className="text-lg font-medium text-gray-800 mb-3">Size Exchange Guarantee</h3>
+                  <p>
+                    We offer a hassle-free size exchange policy to ensure you get the perfect fit for your furry friend. 
+                    If the size doesn't fit properly, we will provide a replacement at no additional cost.
+                  </p>
+                  
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 mt-6">Exchange Process & Timeline</h3>
+                  <ul className="space-y-2">
+                    <li>• Exchange requests must be initiated within <strong>7 days</strong> of delivery</li>
+                    <li>• Products must be in original condition with all tags attached</li>
+                    <li>• Custom-made items with specific measurements cannot be exchanged unless there's a manufacturing defect</li>
+                    <li>• Replacement will be shipped within 3-5 business days of receiving the returned item</li>
+                  </ul>
+
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 mt-6">Return Shipping Policy</h3>
+                  <div className="bg-amber-50 border-l-4 border-amber-400 p-4 my-4">
+                    <div className="flex">
+                      <AlertTriangle className="w-5 h-5 text-amber-400 mr-2 mt-0.5" />
+                      <div>
+                        <p className="text-amber-800 font-medium">Important Notice:</p>
+                        <p className="text-amber-700">
+                          The customer is responsible for bearing the cost of returning the product to us. 
+                          We recommend using a trackable shipping method for your protection.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 mt-6">Measurement Requirements</h3>
+                  <p>
+                    To ensure accurate sizing and reduce the need for exchanges, customers must provide pet measurements within 
+                    <strong> 24 hours of placing the order</strong>. Failure to provide measurements may result in order delays or cancellation.
+                  </p>
+
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 mt-6">Quality Assurance</h3>
+                  <p>
+                    All products are carefully inspected before shipping. In the rare case of a manufacturing defect or 
+                    damage during shipping, we will provide a full replacement or refund at no cost to the customer, 
+                    including return shipping.
+                  </p>
+
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 mt-6">Contact for Exchanges</h3>
+                  <p>
+                    To initiate an exchange, please contact our customer service team with your order number and 
+                    photos of the product. We're here to help ensure you and your pet are completely satisfied with your purchase.
                   </p>
                 </div>
               </motion.section>
@@ -212,7 +272,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <ShieldCheck className="w-6 h-6 mr-2 text-blue-600" />
-                  4. Intellectual Property
+                  5. Intellectual Property
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -246,7 +306,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <AlertTriangle className="w-6 h-6 mr-2 text-blue-600" />
-                  5. Limitation of Liability
+                  6. Limitation of Liability
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -279,7 +339,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <ShieldCheck className="w-6 h-6 mr-2 text-blue-600" />
-                  6. Privacy & Data
+                  7. Privacy & Data
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -310,7 +370,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <CheckCircle className="w-6 h-6 mr-2 text-blue-600" />
-                  7. Payment Terms
+                  8. Payment Terms
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -340,7 +400,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <AlertTriangle className="w-6 h-6 mr-2 text-blue-600" />
-                  8. Termination
+                  9. Termination
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -367,7 +427,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <ShieldCheck className="w-6 h-6 mr-2 text-blue-600" />
-                  9. Governing Law
+                  10. Governing Law
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>
@@ -397,7 +457,7 @@ export default function TermsAndConditionsPage() {
               >
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
                   <Clock className="w-6 h-6 mr-2 text-blue-600" />
-                  10. Changes to Terms
+                  11. Changes to Terms
                 </h2>
                 <div className="prose prose-blue max-w-none text-gray-700">
                   <p>

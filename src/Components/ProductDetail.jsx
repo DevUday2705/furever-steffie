@@ -8,6 +8,7 @@ import ProductInfo from "../Components/ProductDetail/ProductInfo";
 import ProductOptions from "../Components/ProductDetail/ProductOptions";
 import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
+import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -266,6 +267,9 @@ const ProductDetail = () => {
               selectedStyle={selectedStyle}
               setSelectedStyle={setSelectedStyle}
             />
+
+            {/* Trust Signals Section */}
+            <TrustSignals />
 
             {/* Simple Size Selector - replaces smart sizing logic */}
             <SimpleSizeSelector
