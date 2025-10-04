@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         if (!customerName || !customerEmail || !orderId || !trackingId || !expectedDelivery || !customerCity) {
             return res.status(400).json({
                 success: false,
-                message: "Missing required fields for shipped notification"
+                message: "Missing required fields for delivery notification"
             });
         }
 
