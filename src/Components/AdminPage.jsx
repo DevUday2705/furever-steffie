@@ -429,29 +429,29 @@ const AdminPage = () => {
         // Update the order with reminder history
         const orderRef = doc(db, "orders", order.id);
         const currentTime = new Date().toISOString();
-        
+
         // Add reminder to history array
         const existingHistory = order.reminderHistory || [];
         const newReminder = {
           sentAt: currentTime,
           sentBy: "admin", // You can update this with actual admin user info
           type: "measurement_reminder",
-          status: "sent"
+          status: "sent",
         };
 
         await updateDoc(orderRef, {
           reminderHistory: [...existingHistory, newReminder],
-          lastReminderSent: currentTime
+          lastReminderSent: currentTime,
         });
 
         // Update local state
-        setOrders(prevOrders => 
-          prevOrders.map(o => 
-            o.id === order.id 
-              ? { 
-                  ...o, 
+        setOrders((prevOrders) =>
+          prevOrders.map((o) =>
+            o.id === order.id
+              ? {
+                  ...o,
                   reminderHistory: [...existingHistory, newReminder],
-                  lastReminderSent: currentTime
+                  lastReminderSent: currentTime,
                 }
               : o
           )
@@ -794,41 +794,55 @@ const AdminPage = () => {
                     )}
 
                     {/* Reminder History Display */}
-                    {order.reminderHistory && order.reminderHistory.length > 0 && (
-                      <div className="ml-2 relative group">
-                        <button className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded transition-colors duration-200 flex items-center gap-1">
-                          📧 {order.reminderHistory.length}
-                        </button>
-                        
-                        {/* Tooltip with reminder history */}
-                        <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-                          <h4 className="text-xs font-semibold text-gray-800 mb-2">Reminder History</h4>
-                          <div className="space-y-2 max-h-32 overflow-y-auto">
-                            {order.reminderHistory.slice(-3).reverse().map((reminder, index) => (
-                              <div key={index} className="flex items-center justify-between text-xs">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                  <span className="text-gray-600">Measurement reminder</span>
+                    {order.reminderHistory &&
+                      order.reminderHistory.length > 0 && (
+                        <div className="ml-2 relative group">
+                          <button className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded transition-colors duration-200 flex items-center gap-1">
+                            📧 {order.reminderHistory.length}
+                          </button>
+
+                          {/* Tooltip with reminder history */}
+                          <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                            <h4 className="text-xs font-semibold text-gray-800 mb-2">
+                              Reminder History
+                            </h4>
+                            <div className="space-y-2 max-h-32 overflow-y-auto">
+                              {order.reminderHistory
+                                .slice(-3)
+                                .reverse()
+                                .map((reminder, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between text-xs"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                      <span className="text-gray-600">
+                                        Measurement reminder
+                                      </span>
+                                    </div>
+                                    <span className="text-gray-500">
+                                      {formatReminderTime(reminder.sentAt)}
+                                    </span>
+                                  </div>
+                                ))}
+                              {order.reminderHistory.length > 3 && (
+                                <div className="text-xs text-gray-400 text-center pt-1 border-t">
+                                  +{order.reminderHistory.length - 3} more
                                 </div>
-                                <span className="text-gray-500">{formatReminderTime(reminder.sentAt)}</span>
-                              </div>
-                            ))}
-                            {order.reminderHistory.length > 3 && (
-                              <div className="text-xs text-gray-400 text-center pt-1 border-t">
-                                +{order.reminderHistory.length - 3} more
+                              )}
+                            </div>
+                            {order.lastReminderSent && (
+                              <div className="mt-2 pt-2 border-t border-gray-100">
+                                <p className="text-xs text-gray-500">
+                                  Last sent:{" "}
+                                  {formatReminderTime(order.lastReminderSent)}
+                                </p>
                               </div>
                             )}
                           </div>
-                          {order.lastReminderSent && (
-                            <div className="mt-2 pt-2 border-t border-gray-100">
-                              <p className="text-xs text-gray-500">
-                                Last sent: {formatReminderTime(order.lastReminderSent)}
-                              </p>
-                            </div>
-                          )}
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     <button
                       onClick={() =>

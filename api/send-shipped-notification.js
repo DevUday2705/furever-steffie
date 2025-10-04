@@ -184,9 +184,9 @@ export default async function handler(req, res) {
         };
 
         console.log(`📧 Sending delivery notification email to ${customerEmail}`);
-        
+
         await transporter.sendMail(mailOptions);
-        
+
         console.log(`✅ Delivery notification email sent successfully to ${customerEmail}`);
 
         return res.status(200).json({
