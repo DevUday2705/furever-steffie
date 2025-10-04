@@ -187,7 +187,7 @@ const ProductListing = ({
     );
 
     return regularFiltered.filter((product) =>
-      activeQuickFilters.some((filter) => filter.filterFn(product))
+      activeQuickFilters.every((filter) => filter.filterFn(product))
     );
   }, [regularFiltered, quickFilters, quickFilterOptions]);
   const activeFilterCount = useMemo(() => {
