@@ -2,16 +2,16 @@ import { useState, useEffect, useMemo } from "react";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { db } from "../firebase";
-import { 
-  FaCheck, 
-  FaExclamationTriangle, 
-  FaTimes, 
-  FaCrown, 
-  FaStar, 
-  FaFire, 
+import {
+  FaCheck,
+  FaExclamationTriangle,
+  FaTimes,
+  FaCrown,
+  FaStar,
+  FaFire,
   FaGem,
   FaRupeeSign,
-  FaFilter
+  FaFilter,
 } from "react-icons/fa";
 const ADMIN_KEY = "What@270598";
 const collections = [
@@ -73,108 +73,123 @@ const AdminProducts = () => {
   };
 
   // Define quick filters
-  const quickFilters = useMemo(() => [
-    {
-      id: 'in-stock',
-      label: 'In Stock',
-      icon: FaCheck,
-      color: 'bg-green-100 text-green-800 border-green-200',
-      activeColor: 'bg-green-500 text-white border-green-500',
-      filterFn: (product) => {
-        const sizeStock = product.sizeStock || {};
-        return Object.values(sizeStock).some(stock => stock > 0) || product.availableStock > 0;
-      }
-    },
-    {
-      id: 'low-stock',
-      label: 'Low Stock',
-      icon: FaExclamationTriangle,
-      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      activeColor: 'bg-yellow-500 text-white border-yellow-500',
-      filterFn: (product) => {
-        const sizeStock = product.sizeStock || {};
-        const totalStock = Object.values(sizeStock).reduce((sum, stock) => sum + (stock || 0), 0);
-        return totalStock > 0 && totalStock <= 5;
-      }
-    },
-    {
-      id: 'out-of-stock',
-      label: 'Out of Stock',
-      icon: FaTimes,
-      color: 'bg-red-100 text-red-800 border-red-200',
-      activeColor: 'bg-red-500 text-white border-red-500',
-      filterFn: (product) => {
-        const sizeStock = product.sizeStock || {};
-        const totalStock = Object.values(sizeStock).reduce((sum, stock) => sum + (stock || 0), 0);
-        return totalStock === 0 && (!product.availableStock || product.availableStock === 0);
-      }
-    },
-    {
-      id: 'royal',
-      label: 'Royal',
-      icon: FaCrown,
-      color: 'bg-purple-100 text-purple-800 border-purple-200',
-      activeColor: 'bg-purple-500 text-white border-purple-500',
-      filterFn: (product) => product.isRoyal === true
-    },
-    {
-      id: 'trending',
-      label: 'Trending',
-      icon: FaFire,
-      color: 'bg-orange-100 text-orange-800 border-orange-200',
-      activeColor: 'bg-orange-500 text-white border-orange-500',
-      filterFn: (product) => product.isTrending === true
-    },
-    {
-      id: 'top-rated',
-      label: 'Top Rated',
-      icon: FaStar,
-      color: 'bg-blue-100 text-blue-800 border-blue-200',
-      activeColor: 'bg-blue-500 text-white border-blue-500',
-      filterFn: (product) => (product.priorityScore || 0) >= 80
-    },
-    {
-      id: 'beaded',
-      label: 'Beaded',
-      icon: FaGem,
-      color: 'bg-pink-100 text-pink-800 border-pink-200',
-      activeColor: 'bg-pink-500 text-white border-pink-500',
-      filterFn: (product) => product.isBeadedAvailable === true
-    },
-    {
-      id: 'budget',
-      label: '< ₹1000',
-      icon: FaRupeeSign,
-      color: 'bg-gray-100 text-gray-800 border-gray-200',
-      activeColor: 'bg-gray-500 text-white border-gray-500',
-      filterFn: (product) => (product.pricing?.basePrice || 0) < 1000
-    },
-    {
-      id: 'premium',
-      label: '₹1000-2000',
-      icon: FaGem,
-      color: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      activeColor: 'bg-indigo-500 text-white border-indigo-500',
-      filterFn: (product) => {
-        const price = product.pricing?.basePrice || 0;
-        return price >= 1000 && price <= 2000;
-      }
-    },
-    {
-      id: 'luxury',
-      label: '> ₹2000',
-      icon: FaCrown,
-      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      activeColor: 'bg-yellow-500 text-white border-yellow-500',
-      filterFn: (product) => (product.pricing?.basePrice || 0) > 2000
-    }
-  ], []);
+  const quickFilters = useMemo(
+    () => [
+      {
+        id: "in-stock",
+        label: "In Stock",
+        icon: FaCheck,
+        color: "bg-green-100 text-green-800 border-green-200",
+        activeColor: "bg-green-500 text-white border-green-500",
+        filterFn: (product) => {
+          const sizeStock = product.sizeStock || {};
+          return (
+            Object.values(sizeStock).some((stock) => stock > 0) ||
+            product.availableStock > 0
+          );
+        },
+      },
+      {
+        id: "low-stock",
+        label: "Low Stock",
+        icon: FaExclamationTriangle,
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        activeColor: "bg-yellow-500 text-white border-yellow-500",
+        filterFn: (product) => {
+          const sizeStock = product.sizeStock || {};
+          const totalStock = Object.values(sizeStock).reduce(
+            (sum, stock) => sum + (stock || 0),
+            0
+          );
+          return totalStock > 0 && totalStock <= 5;
+        },
+      },
+      {
+        id: "out-of-stock",
+        label: "Out of Stock",
+        icon: FaTimes,
+        color: "bg-red-100 text-red-800 border-red-200",
+        activeColor: "bg-red-500 text-white border-red-500",
+        filterFn: (product) => {
+          const sizeStock = product.sizeStock || {};
+          const totalStock = Object.values(sizeStock).reduce(
+            (sum, stock) => sum + (stock || 0),
+            0
+          );
+          return (
+            totalStock === 0 &&
+            (!product.availableStock || product.availableStock === 0)
+          );
+        },
+      },
+      {
+        id: "royal",
+        label: "Royal",
+        icon: FaCrown,
+        color: "bg-purple-100 text-purple-800 border-purple-200",
+        activeColor: "bg-purple-500 text-white border-purple-500",
+        filterFn: (product) => product.isRoyal === true,
+      },
+      {
+        id: "trending",
+        label: "Trending",
+        icon: FaFire,
+        color: "bg-orange-100 text-orange-800 border-orange-200",
+        activeColor: "bg-orange-500 text-white border-orange-500",
+        filterFn: (product) => product.isTrending === true,
+      },
+      {
+        id: "top-rated",
+        label: "Top Rated",
+        icon: FaStar,
+        color: "bg-blue-100 text-blue-800 border-blue-200",
+        activeColor: "bg-blue-500 text-white border-blue-500",
+        filterFn: (product) => (product.priorityScore || 0) >= 80,
+      },
+      {
+        id: "beaded",
+        label: "Beaded",
+        icon: FaGem,
+        color: "bg-pink-100 text-pink-800 border-pink-200",
+        activeColor: "bg-pink-500 text-white border-pink-500",
+        filterFn: (product) => product.isBeadedAvailable === true,
+      },
+      {
+        id: "budget",
+        label: "< ₹1000",
+        icon: FaRupeeSign,
+        color: "bg-gray-100 text-gray-800 border-gray-200",
+        activeColor: "bg-gray-500 text-white border-gray-500",
+        filterFn: (product) => (product.pricing?.basePrice || 0) < 1000,
+      },
+      {
+        id: "premium",
+        label: "₹1000-2000",
+        icon: FaGem,
+        color: "bg-indigo-100 text-indigo-800 border-indigo-200",
+        activeColor: "bg-indigo-500 text-white border-indigo-500",
+        filterFn: (product) => {
+          const price = product.pricing?.basePrice || 0;
+          return price >= 1000 && price <= 2000;
+        },
+      },
+      {
+        id: "luxury",
+        label: "> ₹2000",
+        icon: FaCrown,
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        activeColor: "bg-yellow-500 text-white border-yellow-500",
+        filterFn: (product) => (product.pricing?.basePrice || 0) > 2000,
+      },
+    ],
+    []
+  );
 
   // Filter toggle handler
   const toggleFilter = (filterId) => {
-    setActiveFilters(prev => 
-      prev.includes(filterId) 
-        ? prev.filter(id => id !== filterId)
+    setActiveFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((id) => id !== filterId)
         : [...prev, filterId]
     );
   };
@@ -182,17 +197,17 @@ const AdminProducts = () => {
   // Apply filters to products
   useEffect(() => {
     let filtered = [...products];
-    
+
     if (activeFilters.length > 0) {
-      const activeFilterObjects = quickFilters.filter(filter => 
+      const activeFilterObjects = quickFilters.filter((filter) =>
         activeFilters.includes(filter.id)
       );
-      
-      filtered = products.filter(product => 
-        activeFilterObjects.some(filter => filter.filterFn(product))
+
+      filtered = products.filter((product) =>
+        activeFilterObjects.some((filter) => filter.filterFn(product))
       );
     }
-    
+
     setFilteredProducts(filtered);
   }, [products, activeFilters, quickFilters]);
 
@@ -360,7 +375,9 @@ const AdminProducts = () => {
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <FaFilter className="text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Quick Filters</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Quick Filters
+                </span>
                 {activeFilters.length > 0 && (
                   <button
                     onClick={() => setActiveFilters([])}
@@ -370,7 +387,10 @@ const AdminProducts = () => {
                   </button>
                 )}
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+              <div
+                className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
                 {quickFilters.map((filter) => {
                   const Icon = filter.icon;
                   const isActive = activeFilters.includes(filter.id);

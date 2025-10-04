@@ -110,81 +110,84 @@ const ProductListing = ({
   const { currency, rate } = useContext(CurrencyContext);
 
   // Define quick filters with classy gray theme
-  const quickFilterOptions = useMemo(() => [
-    {
-      id: 'in-stock',
-      label: 'In Stock',
-      icon: Check,
-      filterFn: (product) => {
-        const sizeStock = product.sizeStock || {};
-        // Check if ANY size has stock > 0
-        return Object.values(sizeStock).some(stock => (stock || 0) > 0);
-      }
-    },
-    {
-      id: 'royal',
-      label: 'Royal',
-      icon: CrownIcon,
-      filterFn: (product) => product.isRoyal === true
-    },
-    {
-      id: 'trending',
-      label: 'Trending',
-      icon: Flame,
-      filterFn: (product) => product.isTrending === true
-    },
-    {
-      id: 'top-rated',
-      label: 'Top Rated',
-      icon: Star,
-      filterFn: (product) => (product.priorityScore || 0) >= 80
-    },
-    {
-      id: 'beaded',
-      label: 'Beaded',
-      icon: Gem,
-      filterFn: (product) => product.isBeadedAvailable === true
-    },
-    {
-      id: 'budget',
-      label: '< ₹1000',
-      icon: DollarSign,
-      filterFn: (product) => (product.pricing?.basePrice || 0) < 1000
-    },
-    {
-      id: 'discount',
-      label: '40%+ Off',
-      icon: Percent,
-      filterFn: (product) => (product.pricing?.discountPercent || 0) >= 40
-    }
-  ], []);
+  const quickFilterOptions = useMemo(
+    () => [
+      {
+        id: "in-stock",
+        label: "In Stock",
+        icon: Check,
+        filterFn: (product) => {
+          const sizeStock = product.sizeStock || {};
+          // Check if ANY size has stock > 0
+          return Object.values(sizeStock).some((stock) => (stock || 0) > 0);
+        },
+      },
+      {
+        id: "royal",
+        label: "Royal",
+        icon: CrownIcon,
+        filterFn: (product) => product.isRoyal === true,
+      },
+      {
+        id: "trending",
+        label: "Trending",
+        icon: Flame,
+        filterFn: (product) => product.isTrending === true,
+      },
+      {
+        id: "top-rated",
+        label: "Top Rated",
+        icon: Star,
+        filterFn: (product) => (product.priorityScore || 0) >= 80,
+      },
+      {
+        id: "beaded",
+        label: "Beaded",
+        icon: Gem,
+        filterFn: (product) => product.isBeadedAvailable === true,
+      },
+      {
+        id: "budget",
+        label: "< ₹1000",
+        icon: DollarSign,
+        filterFn: (product) => (product.pricing?.basePrice || 0) < 1000,
+      },
+      {
+        id: "discount",
+        label: "40%+ Off",
+        icon: Percent,
+        filterFn: (product) => (product.pricing?.discountPercent || 0) >= 40,
+      },
+    ],
+    []
+  );
 
   // Quick filter toggle handler
   const toggleQuickFilter = (filterId) => {
-    setQuickFilters(prev => 
-      prev.includes(filterId) 
-        ? prev.filter(id => id !== filterId)
+    setQuickFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((id) => id !== filterId)
         : [...prev, filterId]
     );
   };
 
   const baseList = useMemo(() => [...products], [products]);
-  
+
   // Apply regular filters first
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
-  
+
   // Then apply quick filters
   const filtered = useMemo(() => {
     if (quickFilters.length === 0) {
       return regularFiltered;
     }
-    
-    const activeQuickFilters = quickFilterOptions.filter(filter => 
+
+    const activeQuickFilters = quickFilterOptions.filter((filter) =>
       quickFilters.includes(filter.id)
     );
-    
-    return regularFiltered.filter(product => 
-      activeQuickFilters.some(filter => filter.filterFn(product))
+
+    return regularFiltered.filter((product) =>
+      activeQuickFilters.some((filter) => filter.filterFn(product))
     );
   }, [regularFiltered, quickFilters, quickFilterOptions]);
   const activeFilterCount = useMemo(() => {
@@ -322,7 +325,10 @@ const ProductListing = ({
       {/* Quick Filters */}
       <div className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+          <div
+            className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
             {quickFilterOptions.map((filter) => {
               const Icon = filter.icon;
               const isActive = quickFilters.includes(filter.id);
@@ -333,9 +339,10 @@ const ProductListing = ({
                   className={`
                     flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-200 
                     whitespace-nowrap text-sm font-medium min-w-max
-                    ${isActive 
-                      ? 'bg-gray-800 text-white border-gray-800 shadow-sm' 
-                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                    ${
+                      isActive
+                        ? "bg-gray-800 text-white border-gray-800 shadow-sm"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
                     }
                   `}
                 >
