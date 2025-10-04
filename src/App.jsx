@@ -180,9 +180,9 @@ const App = () => {
       ) : (
         <ComingSoonPage />
       )}
-      {(ready || isAdminRoute) && location.pathname === "/" ? (
+      {/* {(ready || isAdminRoute) && location.pathname === "/" ? (
         <PopupPoster />
-      ) : null}
+      ) : null} */}
       <Toaster />
     </div>
   );

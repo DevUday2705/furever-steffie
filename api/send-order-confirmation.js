@@ -11,13 +11,6 @@ const createTransporter = () => {
   });
 };
 
-// Generate WhatsApp link
-const generateWhatsAppLink = (orderDetails) => {
-  const phoneNumber = '917042212942'; // Replace with your actual WhatsApp business number
-  const message = `Hi! I just placed an order (ID: ${orderDetails.orderId}) on Furever Steffie. I need to share my pup's exact measurements. Can you help me with the next steps?`;
-  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-};
-
 // Generate order details HTML
 const generateOrderDetailsHTML = (orderData) => {
   const { customer, items, amount, orderId, razorpay_payment_id } = orderData;
@@ -46,8 +39,6 @@ const generateOrderDetailsHTML = (orderData) => {
       </td>
     </tr>
   `).join('');
-
-  const whatsappLink = generateWhatsAppLink({ orderId });
 
   return `
     <!DOCTYPE html>
@@ -80,13 +71,25 @@ const generateOrderDetailsHTML = (orderData) => {
           </p>
 
           <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 18px; font-weight: 600;">📏 Next Step: Share Your Pup's Measurements</h3>
-            <p style="color: #92400e; margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">
-              To ensure the perfect fit, please contact us on WhatsApp to share your pet's exact measurements. Our team will guide you through the process!
+            <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 18px; font-weight: 600;">📏 IMPORTANT: Final Step Required</h3>
+            <p style="color: #92400e; margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; font-weight: 600;">
+              To ensure the perfect fit, you need to share your pup's exact measurements within <strong>24 hours</strong> of placing this order.
             </p>
-            <a href="${whatsappLink}" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              📱 Contact us on WhatsApp
+            <div style="background-color: #fff8dc; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0;">
+              <p style="color: #92400e; margin: 0 0 12px 0; font-size: 13px; line-height: 1.4;">
+                <strong>⚠️ Important Policy:</strong><br>
+                • We'll send you 2 reminders over the next 2 days<br>
+                • If measurements aren't provided within 2 days, we'll dispatch the selected size<br>
+                • No returns/refunds will be possible if proper measurements aren't shared<br>
+                • Delayed measurements may cause delivery delays (we won't be responsible)
+              </p>
+            </div>
+            <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 8px;">
+              � Share Measurements Now
             </a>
+            <p style="color: #92400e; margin: 12px 0 0 0; font-size: 12px;">
+              Visit the size guide to update measurements for your order directly.
+            </p>
           </div>
         </div>
 
@@ -153,8 +156,8 @@ const generateOrderDetailsHTML = (orderData) => {
           </p>
           
           <div style="margin-top: 20px;">
-            <a href="${whatsappLink}" style="display: inline-block; background-color: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 0 8px;">
-              Continue on WhatsApp
+            <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 0 8px;">
+              📐 Complete Your Order - Add Measurements
             </a>
           </div>
           

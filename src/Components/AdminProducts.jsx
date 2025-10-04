@@ -1,7 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { db } from "../firebase";
+import { 
+  FaCheck, 
+  FaExclamationTriangle, 
+  FaTimes, 
+  FaCrown, 
+  FaStar, 
+  FaFire, 
+  FaGem,
+  FaRupeeSign,
+  FaFilter
+} from "react-icons/fa";
 const ADMIN_KEY = "What@270598";
 const collections = [
   "kurtas",
@@ -18,6 +29,8 @@ const AdminProducts = () => {
     searchParams.get("category") || null
   );
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [activeFilters, setActiveFilters] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [passkey, setPasskey] = useState("");
@@ -58,6 +71,130 @@ const AdminProducts = () => {
       setLoading(false);
     }
   };
+
+  // Define quick filters
+  const quickFilters = useMemo(() => [
+    {
+      id: 'in-stock',
+      label: 'In Stock',
+      icon: FaCheck,
+      color: 'bg-green-100 text-green-800 border-green-200',
+      activeColor: 'bg-green-500 text-white border-green-500',
+      filterFn: (product) => {
+        const sizeStock = product.sizeStock || {};
+        return Object.values(sizeStock).some(stock => stock > 0) || product.availableStock > 0;
+      }
+    },
+    {
+      id: 'low-stock',
+      label: 'Low Stock',
+      icon: FaExclamationTriangle,
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      activeColor: 'bg-yellow-500 text-white border-yellow-500',
+      filterFn: (product) => {
+        const sizeStock = product.sizeStock || {};
+        const totalStock = Object.values(sizeStock).reduce((sum, stock) => sum + (stock || 0), 0);
+        return totalStock > 0 && totalStock <= 5;
+      }
+    },
+    {
+      id: 'out-of-stock',
+      label: 'Out of Stock',
+      icon: FaTimes,
+      color: 'bg-red-100 text-red-800 border-red-200',
+      activeColor: 'bg-red-500 text-white border-red-500',
+      filterFn: (product) => {
+        const sizeStock = product.sizeStock || {};
+        const totalStock = Object.values(sizeStock).reduce((sum, stock) => sum + (stock || 0), 0);
+        return totalStock === 0 && (!product.availableStock || product.availableStock === 0);
+      }
+    },
+    {
+      id: 'royal',
+      label: 'Royal',
+      icon: FaCrown,
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      activeColor: 'bg-purple-500 text-white border-purple-500',
+      filterFn: (product) => product.isRoyal === true
+    },
+    {
+      id: 'trending',
+      label: 'Trending',
+      icon: FaFire,
+      color: 'bg-orange-100 text-orange-800 border-orange-200',
+      activeColor: 'bg-orange-500 text-white border-orange-500',
+      filterFn: (product) => product.isTrending === true
+    },
+    {
+      id: 'top-rated',
+      label: 'Top Rated',
+      icon: FaStar,
+      color: 'bg-blue-100 text-blue-800 border-blue-200',
+      activeColor: 'bg-blue-500 text-white border-blue-500',
+      filterFn: (product) => (product.priorityScore || 0) >= 80
+    },
+    {
+      id: 'beaded',
+      label: 'Beaded',
+      icon: FaGem,
+      color: 'bg-pink-100 text-pink-800 border-pink-200',
+      activeColor: 'bg-pink-500 text-white border-pink-500',
+      filterFn: (product) => product.isBeadedAvailable === true
+    },
+    {
+      id: 'budget',
+      label: '< ₹1000',
+      icon: FaRupeeSign,
+      color: 'bg-gray-100 text-gray-800 border-gray-200',
+      activeColor: 'bg-gray-500 text-white border-gray-500',
+      filterFn: (product) => (product.pricing?.basePrice || 0) < 1000
+    },
+    {
+      id: 'premium',
+      label: '₹1000-2000',
+      icon: FaGem,
+      color: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      activeColor: 'bg-indigo-500 text-white border-indigo-500',
+      filterFn: (product) => {
+        const price = product.pricing?.basePrice || 0;
+        return price >= 1000 && price <= 2000;
+      }
+    },
+    {
+      id: 'luxury',
+      label: '> ₹2000',
+      icon: FaCrown,
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      activeColor: 'bg-yellow-500 text-white border-yellow-500',
+      filterFn: (product) => (product.pricing?.basePrice || 0) > 2000
+    }
+  ], []);
+
+  // Filter toggle handler
+  const toggleFilter = (filterId) => {
+    setActiveFilters(prev => 
+      prev.includes(filterId) 
+        ? prev.filter(id => id !== filterId)
+        : [...prev, filterId]
+    );
+  };
+
+  // Apply filters to products
+  useEffect(() => {
+    let filtered = [...products];
+    
+    if (activeFilters.length > 0) {
+      const activeFilterObjects = quickFilters.filter(filter => 
+        activeFilters.includes(filter.id)
+      );
+      
+      filtered = products.filter(product => 
+        activeFilterObjects.some(filter => filter.filterFn(product))
+      );
+    }
+    
+    setFilteredProducts(filtered);
+  }, [products, activeFilters, quickFilters]);
 
   useEffect(() => {
     if (selectedCollection) {
@@ -215,7 +352,44 @@ const AdminProducts = () => {
                 {selectedCollection}
               </h2>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                {products.length} items
+                {filteredProducts.length} of {products.length} items
+              </div>
+            </div>
+
+            {/* Quick Filters */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <FaFilter className="text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">Quick Filters</span>
+                {activeFilters.length > 0 && (
+                  <button
+                    onClick={() => setActiveFilters([])}
+                    className="text-xs text-red-600 hover:text-red-800 font-medium"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                {quickFilters.map((filter) => {
+                  const Icon = filter.icon;
+                  const isActive = activeFilters.includes(filter.id);
+                  return (
+                    <button
+                      key={filter.id}
+                      onClick={() => toggleFilter(filter.id)}
+                      className={`
+                        flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-200 
+                        whitespace-nowrap text-sm font-medium min-w-max
+                        ${isActive ? filter.activeColor : filter.color}
+                        hover:scale-105 hover:shadow-md
+                      `}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {filter.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -225,7 +399,7 @@ const AdminProducts = () => {
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-4">
-                {products.map((item) => (
+                {filteredProducts.map((item) => (
                   <div
                     key={item.id}
                     className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-blue-300"
