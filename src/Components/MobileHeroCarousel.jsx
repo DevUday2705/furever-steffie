@@ -9,15 +9,15 @@ const MobileHeroCarousel = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { gender } = useAppContext();
   const maleSlides = [
-    {
-      id: 0,
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1757757237/Poster_2_xhtqai.jpg",
-      title: "",
-      subtitle: "Curated styles for the season",
-      cta: "Get Now",
-      link: "product/G604GyHMqL7s7RK10Ma6+kurta",
-    },
+    // {
+    //   id: 0,
+    //   image:
+    //     "https://res.cloudinary.com/di6unrpjw/image/upload/v1757757237/Poster_2_xhtqai.jpg",
+    //   title: "",
+    //   subtitle: "Curated styles for the season",
+    //   cta: "Get Now",
+    //   link: "product/G604GyHMqL7s7RK10Ma6+kurta",
+    // },
     {
       id: 1,
       image:
