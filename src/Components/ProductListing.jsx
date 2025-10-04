@@ -8,6 +8,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import FilterDrawer from "./FilterDrawer";
+import NotifyMeModal from "./NotifyMeModal";
 import { useProductFilter } from "../hooks/useProductFilter";
 import {
   ChevronLeft,
@@ -21,6 +22,7 @@ import {
   Gem,
   DollarSign,
   Percent,
+  Bell,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { CurrencyContext } from "../context/currencyContext";
@@ -41,6 +43,10 @@ const ProductListing = ({
   const [isLoading, setIsLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [quickFilters, setQuickFilters] = useState([]);
+  const [notifyMeModal, setNotifyMeModal] = useState({
+    isOpen: false,
+    product: null,
+  });
   const [filters, setFilters] = useState({
     sortBy: "",
     maxPrice: 2000,
@@ -405,10 +411,21 @@ const ProductListing = ({
 
                     {/* Stock Status Indicators */}
                     {stockStatus.soldOut && product.category !== "tut" && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-gray-900/10 flex items-center justify-center ">
-                        <div className=" text-white px-4 py-2 rounded-lg font-semibold text-2xl text-center ">
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-gray-900/20 flex flex-col items-center justify-center gap-3">
+                        <div className="text-white px-4 py-2 rounded-lg font-semibold text-xl text-center">
                           SOLD <br /> OUT
                         </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setNotifyMeModal({ isOpen: true, product });
+                          }}
+                          className="bg-white text-gray-800 px-3 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 transition-colors flex items-center gap-2 shadow-md"
+                        >
+                          <Bell className="w-4 h-4" />
+                          Notify Me
+                        </button>
                       </div>
                     )}
 
@@ -567,6 +584,13 @@ const ProductListing = ({
           </div>
         )}
       </div>
+
+      {/* NotifyMe Modal */}
+      <NotifyMeModal
+        isOpen={notifyMeModal.isOpen}
+        onClose={() => setNotifyMeModal({ isOpen: false, product: null })}
+        product={notifyMeModal.product}
+      />
     </div>
   );
 };
