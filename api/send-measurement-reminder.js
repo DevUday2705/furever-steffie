@@ -11,16 +11,9 @@ const createTransporter = () => {
     });
 };
 
-// Generate WhatsApp link for measurement reminder
-const generateMeasurementWhatsAppLink = (orderDetails) => {
-    const phoneNumber = '917042212942'; // Replace with your actual WhatsApp business number
-    const message = `Hi! I received a reminder about sharing measurements for my order (ID: ${orderDetails.orderId}). I need to provide my pet's measurements. Can you guide me?`;
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-};
-
 // Generate measurement reminder email HTML
 const generateMeasurementReminderHTML = (orderData) => {
-    const { customer, items, orderId, orderNumber } = orderData;
+    const { customer, items, orderNumber } = orderData;
 
     const itemsHTML = items.map(item => `
     <tr style="border-bottom: 1px solid #e5e7eb;">
@@ -38,8 +31,6 @@ const generateMeasurementReminderHTML = (orderData) => {
       </td>
     </tr>
   `).join('');
-
-    const whatsappLink = generateMeasurementWhatsAppLink({ orderId });
 
     return `
 <!DOCTYPE html>
@@ -99,9 +90,9 @@ const generateMeasurementReminderHTML = (orderData) => {
                 <div style="color: #1e40af; line-height: 1.6;">
                     <p style="margin: 0 0 12px 0;">You can share your pet's measurements in any of these ways:</p>
                     <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 8px;"><strong>Visit our website:</strong> <a href="https://www.fureversteffie.com/size-guide" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">www.fureversteffie.com/size-guide</a> to submit measurements directly</li>
                         <li style="margin-bottom: 8px;">Reply to this email with the measurements</li>
                         <li style="margin-bottom: 8px;">Send a photo with measurements marked</li>
-                        <li style="margin-bottom: 8px;">Contact us via WhatsApp (link below)</li>
                     </ul>
                 </div>
             </div>
@@ -109,12 +100,12 @@ const generateMeasurementReminderHTML = (orderData) => {
             <!-- CTA Buttons -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="display: inline-block; margin: 0 10px 15px 10px;">
-                    <a href="${whatsappLink}" style="display: inline-block; background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                        💬 WhatsApp Us
+                    <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        🌐 Submit on Website
                     </a>
                 </div>
                 <div style="display: inline-block; margin: 0 10px 15px 10px;">
-                    <a href="mailto:fureversteffie@gmail.com?subject=Measurements for Order ${orderNumber}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <a href="mailto:fureversteffie@gmail.com?subject=Measurements for Order ${orderNumber}" style="display: inline-block; background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                         📧 Reply via Email
                     </a>
                 </div>
@@ -135,7 +126,7 @@ const generateMeasurementReminderHTML = (orderData) => {
             <p style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;">Thank you for choosing Furever Steffie!</p>
             <p style="color: #6b7280; margin: 0; font-size: 12px;">
                 This is an automated reminder. Please don't reply directly to this email address.
-                <br>For support, contact us via WhatsApp or email fureversteffie@gmail.com
+                <br>For support, visit <a href="https://www.fureversteffie.com/size-guide" style="color: #6b7280;">www.fureversteffie.com/size-guide</a> or email fureversteffie@gmail.com
             </p>
         </div>
     </div>
@@ -182,65 +173,9 @@ export default async function handler(req, res) {
         const info = await transporter.sendMail(mailOptions);
         console.log('✅ Measurement reminder email sent:', info.messageId);
 
-        // Send WhatsApp message via Aisensy API
-        const customerPhone = customer.mobileNumber;
-        const customerName = customer.fullName || 'Customer';
-
-        if (customerPhone) {
-            try {
-                // Format phone number (ensure it starts with country code)
-                let formattedPhone = customerPhone;
-                if (!formattedPhone.startsWith('+')) {
-                    // If it's an Indian number starting with 9, add +91
-                    if (formattedPhone.startsWith('9') && formattedPhone.length === 10) {
-                        formattedPhone = '+91' + formattedPhone;
-                    } else if (formattedPhone.startsWith('91') && formattedPhone.length === 12) {
-                        formattedPhone = '+' + formattedPhone;
-                    } else if (!formattedPhone.startsWith('+91') && formattedPhone.length === 10) {
-                        formattedPhone = '+91' + formattedPhone;
-                    }
-                }
-
-                // Prepare WhatsApp API payload
-                const whatsappPayload = {
-                    apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YWY2NTFmNmI2M2Q3MTAxMjEyNWQzMyIsIm5hbWUiOiJGdXJldmVyIFN0ZWZmaWUiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjhhZjY1MWY2YjYzZDcxMDEyMTI1ZDJlIiwiYWN0aXZlUGxhbiI6IkZSRUVfRk9SRVZFUiIsImlhdCI6MTc1NjMyNTE1MX0.E2uQFrfRq3hvRvGRK4-3fROUtc7pgrDLIOyoLXZ4Y98",
-                    campaignName: "measurement_reminder_v1",
-                    destination: formattedPhone,
-                    userName: customerName,
-                    templateParams: [
-                        customerName,     // 1st param: Customer name
-                        orderNumber      // 2nd param: Order ID
-                    ]
-                };
-
-                console.log('📱 WhatsApp payload:', JSON.stringify(whatsappPayload, null, 2));
-
-                // Send WhatsApp message via AiSensy API
-                const whatsappResponse = await fetch('https://backend.aisensy.com/campaign/t1/api/v2', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(whatsappPayload)
-                });
-
-                const whatsappData = await whatsappResponse.json();
-                console.log('📱 WhatsApp API response:', whatsappData);
-
-                if (whatsappResponse.ok) {
-                    console.log('✅ WhatsApp measurement reminder sent successfully');
-                } else {
-                    console.error('❌ WhatsApp API error:', whatsappData);
-                }
-            } catch (whatsappError) {
-                console.error('❌ WhatsApp reminder error:', whatsappError);
-                // Don't fail the entire request if WhatsApp fails
-            }
-        }
-
         return res.status(200).json({
             success: true,
-            message: 'Measurement reminder sent successfully (Email + WhatsApp)',
+            message: 'Measurement reminder sent successfully via Email',
             emailId: info.messageId
         });
 
