@@ -239,7 +239,7 @@ const TrackOrder = () => {
                   className={`px-3 py-1 text-white rounded-full text-xs font-medium  ${
                     order.orderStatus === "pending"
                       ? "bg-gray-400"
-                      : order.orderStatus === "work-in-progress"
+                      : order.orderStatus === "cutting"
                       ? "bg-yellow-500"
                       : order.orderStatus === "ready-to-ship"
                       ? "bg-indigo-500"

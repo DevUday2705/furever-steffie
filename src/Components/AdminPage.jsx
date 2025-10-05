@@ -241,7 +241,7 @@ const AdminPage = () => {
 
         toast.success("Tracking ID saved & status updated");
         fetchOrders();
-      } else if (newStatus === "work-in-progress") {
+      } else if (newStatus === "cutting") {
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, {
           orderStatus: newStatus,
@@ -569,7 +569,7 @@ const AdminPage = () => {
     pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
       .length,
     workInProgress: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "work-in-progress"
+      (o) => o.orderStatus === "cutting"
     ).length,
     readyToShip: filteredAndSortedOrders.filter(
       (o) => o.orderStatus === "ready-to-ship"
@@ -818,7 +818,7 @@ const AdminPage = () => {
                       ${
                         order.orderStatus === "pending"
                           ? "bg-gray-400"
-                          : order.orderStatus === "work-in-progress"
+                          : order.orderStatus === "cutting"
                           ? "bg-yellow-500"
                           : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
@@ -839,9 +839,7 @@ const AdminPage = () => {
                           className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
                         >
                           <option value="pending">Pending</option>
-                          <option value="work-in-progress">
-                            Work in Progress
-                          </option>
+                          <option value="cutting">Cutting</option>
                           <option value="ready-to-ship">Ready to Ship</option>
                           <option value="shipped">shipped</option>
                         </select>
