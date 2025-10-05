@@ -6,7 +6,7 @@ const OrderProgressBar = ({ status }) => {
   const steps = [
     { key: "pending", label: "Order Placed", icon: Package },
     { key: "work-in-progress", label: "In Progress", icon: Wrench },
-    { key: "ready-to-ship", label: "Ready to Ship", icon: Truck },
+    { key: "cutting", label: "Cutting", icon: Truck },
     { key: "shipped", label: "Shipped", icon: CheckCircle },
   ];
 
