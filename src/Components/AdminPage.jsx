@@ -572,7 +572,7 @@ const AdminPage = () => {
       (o) => o.orderStatus === "cutting"
     ).length,
     readyToShip: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "ready-to-ship"
+      (o) => o.orderStatus === "cutting"
     ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
@@ -820,7 +820,7 @@ const AdminPage = () => {
                           ? "bg-gray-400"
                           : order.orderStatus === "cutting"
                           ? "bg-yellow-500"
-                          : order.orderStatus === "ready-to-ship"
+                          : order.orderStatus === "cutting"
                           ? "bg-indigo-500"
                           : order.orderStatus === "shipped"
                           ? "bg-green-600"
