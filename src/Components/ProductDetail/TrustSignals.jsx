@@ -1,10 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  Shield,
-  RefreshCw,
-  Clock,
-  Award,
-} from "lucide-react";
+import { Shield, RefreshCw, Clock, Award } from "lucide-react";
 
 const TrustSignals = () => {
   const trustFeatures = [
