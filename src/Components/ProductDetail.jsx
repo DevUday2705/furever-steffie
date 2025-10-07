@@ -268,9 +268,6 @@ const ProductDetail = () => {
               setSelectedStyle={setSelectedStyle}
             />
 
-            {/* Trust Signals Section */}
-            <TrustSignals />
-
             {/* Simple Size Selector - replaces smart sizing logic */}
             <SimpleSizeSelector
               selectedSize={selectedSize}
@@ -290,6 +287,9 @@ const ProductDetail = () => {
               addToCart={addToCart}
               setIsOpen={setIsOpen}
             />
+
+            {/* Trust Signals Section - now below sizing options */}
+            <TrustSignals />
 
             {product.contactForCustomColors && (
               <CustomColorEnquiry product={product} />

@@ -659,7 +659,7 @@ const AdminPage = () => {
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">In Progress</p>
+              <p className="text-xs text-gray-500">Cutting</p>
               <p className="text-lg font-bold text-yellow-500">
                 {orderStats.workInProgress}
               </p>

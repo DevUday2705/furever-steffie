@@ -199,7 +199,7 @@ const SelectedFabric = () => {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        Add To Cart
+        Add To Bag
       </motion.button> */}
     </motion.div>
   );

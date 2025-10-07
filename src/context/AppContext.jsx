@@ -26,7 +26,7 @@ export const AppProvider = ({ children }) => {
     setSelections((prev) => ({ ...prev, [key]: value }));
   };
 
-  // ADD TO CART
+  // ADD TO BAG
   const addToCart = (item) => {
     const existingIndex = cart.findIndex(
       (p) =>
