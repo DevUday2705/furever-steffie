@@ -195,20 +195,11 @@ Thanks`;
         onClick={handleAddToCart}
       >
         <span className="inline-flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 6h18M7 6V4a1 1 0 011-1h8a1 1 0 011 1v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z"
-            />
-          </svg>
+          <img
+            src="/images/bag.png"
+            className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 cursor-pointer object-contain"
+            alt="Cart"
+          />
           Add to Bag • {convertCurrency(calculatePrice(), currency)}
         </span>
       </motion.button>

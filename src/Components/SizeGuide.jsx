@@ -403,7 +403,7 @@ const SizeGuide = () => {
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
-                          Neck (cm)
+                          Neck (in)
                         </label>
                         <input
                           type="number"
@@ -417,7 +417,7 @@ const SizeGuide = () => {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
-                          Chest (cm)
+                          Chest (in)
                         </label>
                         <input
                           type="number"
@@ -431,7 +431,7 @@ const SizeGuide = () => {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
-                          Back (cm)
+                          Back (in)
                         </label>
                         <input
                           type="number"
