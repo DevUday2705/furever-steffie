@@ -21,19 +21,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
 
-  // Close reminder dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (expandedReminderId && !event.target.closest(".reminder-dropdown")) {
-        setExpandedReminderId(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [expandedReminderId]);
+  // Pin functionality state
+  const [pinnedOrders, setPinnedOrders] = useState(new Set());
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -152,6 +141,16 @@ const AdminPage = () => {
       ...doc.data(),
     }));
     setOrders(allOrders);
+
+    // Update pinned orders state based on orders data
+    const pinned = new Set();
+    allOrders.forEach((order) => {
+      if (order.pinned) {
+        pinned.add(order.id);
+      }
+    });
+    setPinnedOrders(pinned);
+
     setLoading(false);
   };
 
@@ -386,105 +385,42 @@ const AdminPage = () => {
     setEndDate(newEndDate);
   };
 
-  // Delete order function
-  const handleDeleteOrder = async (orderId, customerName) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete the order for ${customerName}? This action cannot be undone.`
-    );
-
-    if (!confirmDelete) return;
-
+  // Pin/Unpin functionality
+  const handlePinToggle = async (orderId) => {
     try {
-      // Delete from Firebase
+      const order = orders.find((o) => o.id === orderId);
+      const newPinnedState = !order?.pinned;
+
+      // Update Firebase
       const orderRef = doc(db, "orders", orderId);
-      await deleteDoc(orderRef);
-
-      // Update local state
-      setOrders((prev) => prev.filter((order) => order.id !== orderId));
-
-      toast.success("Order deleted successfully!");
-
-      // If the deleted order was expanded, close it
-      if (expandedOrderId === orderId) {
-        setExpandedOrderId(null);
-      }
-    } catch (err) {
-      console.error("Error deleting order:", err);
-      toast.error("Failed to delete order. Please try again.");
-    }
-  };
-
-  // Send measurement reminder function
-  const handleSendMeasurementReminder = async (order) => {
-    const customerName = order.customer?.fullName || "Customer";
-    const customerEmail = order.customer?.email || "";
-
-    // Show confirmation before sending
-    const confirmSend = window.confirm(
-      `Send measurement reminder to ${customerName} (${customerEmail})?`
-    );
-
-    if (!confirmSend) return;
-
-    try {
-      // Show loading state
-      toast.loading(`Sending reminder to ${customerName}...`);
-
-      // Call the measurement reminder API
-      const response = await fetch("/api/send-measurement-reminder", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderId: order.id,
-          orderNumber: order.orderNumber || order.id,
-          customer: order.customer,
-          items: order.items,
-        }),
+      await updateDoc(orderRef, {
+        pinned: newPinnedState,
       });
 
-      if (response.ok) {
-        // Update the order with reminder history
-        const orderRef = doc(db, "orders", order.id);
-        const currentTime = new Date().toISOString();
+      // Update local state
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, pinned: newPinnedState } : order
+        )
+      );
 
-        // Add reminder to history array
-        const existingHistory = order.reminderHistory || [];
-        const newReminder = {
-          sentAt: currentTime,
-          sentBy: "admin", // You can update this with actual admin user info
-          type: "measurement_reminder",
-          status: "sent",
-        };
+      // Update pinned orders set
+      setPinnedOrders((prev) => {
+        const newSet = new Set(prev);
+        if (newPinnedState) {
+          newSet.add(orderId);
+        } else {
+          newSet.delete(orderId);
+        }
+        return newSet;
+      });
 
-        await updateDoc(orderRef, {
-          reminderHistory: [...existingHistory, newReminder],
-          lastReminderSent: currentTime,
-        });
-
-        // Update local state
-        setOrders((prevOrders) =>
-          prevOrders.map((o) =>
-            o.id === order.id
-              ? {
-                  ...o,
-                  reminderHistory: [...existingHistory, newReminder],
-                  lastReminderSent: currentTime,
-                }
-              : o
-          )
-        );
-
-        toast.dismiss();
-        toast.success(`Measurement reminder sent to ${customerName}`);
-      } else {
-        throw new Error("Failed to send reminder");
-      }
+      toast.success(
+        newPinnedState ? "Order pinned to top!" : "Order unpinned!"
+      );
     } catch (error) {
-      toast.dismiss();
-      toast.error(`Failed to send reminder to ${customerName}`);
-      console.error("Error sending measurement reminder:", error);
+      console.error("Error updating pin status:", error);
+      toast.error("Failed to update pin status");
     }
   };
 
@@ -532,7 +468,11 @@ const AdminPage = () => {
       );
     })
     .sort((a, b) => {
-      // Sort by date or amount
+      // First priority: Pinned orders always come first
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+
+      // Second priority: Sort by selected criteria within pinned/unpinned groups
       if (sortBy === "newest") {
         return new Date(b.createdAt) - new Date(a.createdAt);
       } else if (sortBy === "oldest") {
@@ -566,6 +506,7 @@ const AdminPage = () => {
   // Dashboard statistics
   const orderStats = {
     total: filteredAndSortedOrders.length,
+    pinned: filteredAndSortedOrders.filter((o) => o.pinned).length,
     pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
       .length,
     workInProgress: filteredAndSortedOrders.filter(
@@ -612,115 +553,201 @@ const AdminPage = () => {
             : "🔔 Notification Requests"}
         </h1>
 
-        {/* Admin Navigation */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab("orders")}
-            className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-              activeTab === "orders"
-                ? "bg-blue-100 text-blue-700"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-            }`}
-          >
-            📦 Orders
-          </button>
-          <button
-            onClick={() => setActiveTab("notifications")}
-            className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-              activeTab === "notifications"
-                ? "bg-blue-100 text-blue-700"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-            }`}
-          >
-            � Notifications
-          </button>
-          <button
-            onClick={() => navigate("/admin-products")}
-            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition-colors"
-          >
-            � Products
-          </button>
+      {/* Stats Dashboard */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">📌 Pinned</p>
+          <p className="text-lg font-bold text-amber-600">
+            {orderStats.pinned}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Pending</p>
+          <p className="text-lg font-bold text-gray-600">
+            {orderStats.pending}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">In Progress</p>
+          <p className="text-lg font-bold text-yellow-500">
+            {orderStats.workInProgress}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Ready </p>
+          <p className="text-lg font-bold text-indigo-500">
+            {orderStats.readyToShip}
+          </p>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">Revenue</p>
+          <p className="text-lg font-bold text-green-600">
+            ₹{orderStats.totalAmount.toLocaleString()}
+          </p>
         </div>
       </div>
 
-      {/* Content based on active tab */}
-      {activeTab === "notifications" ? (
-        <NotificationRequestsAdmin />
-      ) : (
-        <>
-          {/* Orders Management Content */}
+      {/* Search and filters */}
+      <OrderFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        onDateRangeChange={handleDateRangeChange}
+      />
 
-          {/* Stats Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Pending</p>
-              <p className="text-lg font-bold text-gray-600">
-                {orderStats.pending}
+      {/* Revenue Summary */}
+      {filteredAndSortedOrders.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Total Orders</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {filteredAndSortedOrders.length}
               </p>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Cutting</p>
-              <p className="text-lg font-bold text-yellow-500">
-                {orderStats.workInProgress}
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Total Revenue</p>
+              <p className="text-2xl font-bold text-green-600">
+                ₹
+                {filteredAndSortedOrders
+                  .reduce((sum, order) => sum + (order.amount || 0), 0)
+                  .toLocaleString()}
               </p>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Ready </p>
-              <p className="text-lg font-bold text-indigo-500">
-                {orderStats.readyToShip}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Revenue</p>
-              <p className="text-lg font-bold text-green-600">
-                ₹{orderStats.totalAmount.toLocaleString()}
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Average Order Value</p>
+              <p className="text-2xl font-bold text-purple-600">
+                ₹
+                {Math.round(
+                  filteredAndSortedOrders.reduce(
+                    (sum, order) => sum + (order.amount || 0),
+                    0
+                  ) / filteredAndSortedOrders.length
+                ).toLocaleString()}
               </p>
             </div>
           </div>
+          <div className="mt-3 text-center text-sm text-gray-600">
+            Date Range: {new Date(startDate).toLocaleDateString()} to{" "}
+            {new Date(endDate).toLocaleDateString()}
+          </div>
+        </div>
+      )}
 
-          {/* Search and filters */}
-          <OrderFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            measurementFilter={measurementFilter}
-            setMeasurementFilter={setMeasurementFilter}
-            onDateRangeChange={handleDateRangeChange}
-          />
-
-          {/* Revenue Summary */}
-          {filteredAndSortedOrders.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {filteredAndSortedOrders.length}
-                  </p>
+      {
+        <div className="my-2 flex items-center justify-between">
+          <span className="text-gray-500 italic">
+            {orders.length} total orders • {filteredAndSortedOrders.length}{" "}
+            filtered orders
+            {orderStats.pinned > 0 && (
+              <>
+                {" "}
+                •{" "}
+                <span className="text-amber-600 font-medium">
+                  {orderStats.pinned} pinned
+                </span>
+              </>
+            )}
+          </span>
+          {orderStats.pinned > 0 && (
+            <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
+              📌 Pinned orders appear first
+            </span>
+          )}
+        </div>
+      }
+      {loading ? (
+        <p className="text-center text-gray-500">Loading orders...</p>
+      ) : orders.length === 0 ? (
+        <p className="text-center text-gray-500">No orders found.</p>
+      ) : filteredAndSortedOrders.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No orders match your filters.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {filteredAndSortedOrders.map((order) => (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`border rounded-lg p-4 shadow-sm ${
+                order.pinned
+                  ? "border-l-4 border-l-amber-400 bg-amber-50/30"
+                  : "border-gray-200"
+              }`}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <button
+                      onClick={() =>
+                        setExpandedOrderId(
+                          expandedOrderId === order.id ? null : order.id
+                        )
+                      }
+                      className="text-lg font-bold text-indigo-600 underline"
+                    >
+                      {order.customer?.fullName}
+                    </button>
+                    {order.pinned && (
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
+                        📌 Pinned
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm font-medium text-gray-800 mb-1">
+                    📞 {order.customer?.mobileNumber}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    📅{" "}
+                    {new Date(order.createdAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  {/* Dispatch Date - Prominent Display */}
+                  <div className="text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-md mt-1 inline-block">
+                    🚚 Dispatch:{" "}
+                    {order.dispatchDate
+                      ? new Date(order.dispatchDate).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )
+                      : "Not set"}
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Total Revenue</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    ₹
-                    {filteredAndSortedOrders
-                      .reduce((sum, order) => sum + (order.amount || 0), 0)
-                      .toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Average Order Value</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    ₹
-                    {Math.round(
-                      filteredAndSortedOrders.reduce(
-                        (sum, order) => sum + (order.amount || 0),
-                        0
-                      ) / filteredAndSortedOrders.length
-                    ).toLocaleString()}
-                  </p>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 justify-end mb-2">
+                    <button
+                      onClick={() => handlePinToggle(order.id)}
+                      className={`p-2 rounded-full transition-colors ${
+                        order.pinned
+                          ? "bg-amber-100 text-amber-600 hover:bg-amber-200"
+                          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      }`}
+                      title={order.pinned ? "Unpin order" : "Pin order to top"}
+                    >
+                      📌
+                    </button>
+                  </div>
+                  <div className="text-lg font-bold text-green-600">
+                    ₹{order.amount}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {order.items?.length} item(s)
+                  </div>
                 </div>
               </div>
               <div className="mt-3 text-center text-sm text-gray-600">
