@@ -16,6 +16,9 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
 
+  // Pin functionality state
+  const [pinnedOrders, setPinnedOrders] = useState(new Set());
+
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState(() => {
@@ -95,6 +98,16 @@ const AdminPage = () => {
       ...doc.data(),
     }));
     setOrders(allOrders);
+
+    // Update pinned orders state based on orders data
+    const pinned = new Set();
+    allOrders.forEach((order) => {
+      if (order.pinned) {
+        pinned.add(order.id);
+      }
+    });
+    setPinnedOrders(pinned);
+
     setLoading(false);
   };
 
@@ -237,6 +250,46 @@ const AdminPage = () => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
+
+  // Pin/Unpin functionality
+  const handlePinToggle = async (orderId) => {
+    try {
+      const order = orders.find((o) => o.id === orderId);
+      const newPinnedState = !order?.pinned;
+
+      // Update Firebase
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        pinned: newPinnedState,
+      });
+
+      // Update local state
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, pinned: newPinnedState } : order
+        )
+      );
+
+      // Update pinned orders set
+      setPinnedOrders((prev) => {
+        const newSet = new Set(prev);
+        if (newPinnedState) {
+          newSet.add(orderId);
+        } else {
+          newSet.delete(orderId);
+        }
+        return newSet;
+      });
+
+      toast.success(
+        newPinnedState ? "Order pinned to top!" : "Order unpinned!"
+      );
+    } catch (error) {
+      console.error("Error updating pin status:", error);
+      toast.error("Failed to update pin status");
+    }
+  };
+
   console.log(orders);
   // Filter and sort orders
   const filteredAndSortedOrders = orders
@@ -269,7 +322,11 @@ const AdminPage = () => {
       return matchesSearch && matchesStatus && matchesDate;
     })
     .sort((a, b) => {
-      // Sort by date or amount
+      // First priority: Pinned orders always come first
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+
+      // Second priority: Sort by selected criteria within pinned/unpinned groups
       if (sortBy === "newest") {
         return new Date(b.createdAt) - new Date(a.createdAt);
       } else if (sortBy === "oldest") {
@@ -303,6 +360,7 @@ const AdminPage = () => {
   // Dashboard statistics
   const orderStats = {
     total: filteredAndSortedOrders.length,
+    pinned: filteredAndSortedOrders.filter((o) => o.pinned).length,
     pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
       .length,
     workInProgress: filteredAndSortedOrders.filter(
@@ -345,7 +403,13 @@ const AdminPage = () => {
       <h1 className="text-xl font-bold mb-4">📦 Orders Management</h1>
 
       {/* Stats Dashboard */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs text-gray-500">📌 Pinned</p>
+          <p className="text-lg font-bold text-amber-600">
+            {orderStats.pinned}
+          </p>
+        </div>
         <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
           <p className="text-xs text-gray-500">Pending</p>
           <p className="text-lg font-bold text-gray-600">
@@ -423,10 +487,26 @@ const AdminPage = () => {
       )}
 
       {
-        <span className="my-2 text-gray-500 inline-block italic">
-          {orders.length} total orders • {filteredAndSortedOrders.length}{" "}
-          filtered orders
-        </span>
+        <div className="my-2 flex items-center justify-between">
+          <span className="text-gray-500 italic">
+            {orders.length} total orders • {filteredAndSortedOrders.length}{" "}
+            filtered orders
+            {orderStats.pinned > 0 && (
+              <>
+                {" "}
+                •{" "}
+                <span className="text-amber-600 font-medium">
+                  {orderStats.pinned} pinned
+                </span>
+              </>
+            )}
+          </span>
+          {orderStats.pinned > 0 && (
+            <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
+              📌 Pinned orders appear first
+            </span>
+          )}
+        </div>
       }
       {loading ? (
         <p className="text-center text-gray-500">Loading orders...</p>
@@ -444,20 +524,31 @@ const AdminPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="border rounded-lg p-4 shadow-sm"
+              className={`border rounded-lg p-4 shadow-sm ${
+                order.pinned
+                  ? "border-l-4 border-l-amber-400 bg-amber-50/30"
+                  : "border-gray-200"
+              }`}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <button
-                    onClick={() =>
-                      setExpandedOrderId(
-                        expandedOrderId === order.id ? null : order.id
-                      )
-                    }
-                    className="text-lg font-bold text-indigo-600 underline mb-1"
-                  >
-                    {order.customer?.fullName}
-                  </button>
+                  <div className="flex items-center gap-2 mb-1">
+                    <button
+                      onClick={() =>
+                        setExpandedOrderId(
+                          expandedOrderId === order.id ? null : order.id
+                        )
+                      }
+                      className="text-lg font-bold text-indigo-600 underline"
+                    >
+                      {order.customer?.fullName}
+                    </button>
+                    {order.pinned && (
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
+                        📌 Pinned
+                      </span>
+                    )}
+                  </div>
                   <div className="text-sm font-medium text-gray-800 mb-1">
                     📞 {order.customer?.mobileNumber}
                   </div>
@@ -487,6 +578,19 @@ const AdminPage = () => {
                   </div>
                 </div>
                 <div className="text-right">
+                  <div className="flex items-center gap-2 justify-end mb-2">
+                    <button
+                      onClick={() => handlePinToggle(order.id)}
+                      className={`p-2 rounded-full transition-colors ${
+                        order.pinned
+                          ? "bg-amber-100 text-amber-600 hover:bg-amber-200"
+                          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      }`}
+                      title={order.pinned ? "Unpin order" : "Pin order to top"}
+                    >
+                      📌
+                    </button>
+                  </div>
                   <div className="text-lg font-bold text-green-600">
                     ₹{order.amount}
                   </div>
