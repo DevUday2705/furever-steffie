@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
 import { doc, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
-import NotificationRequestsAdmin from "./NotificationRequestsAdmin";
 
 const ADMIN_KEY = "What@123";
 
 const AdminPage = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("orders"); // orders or notifications
   const [passkey, setPasskey] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [expandedReminderId, setExpandedReminderId] = useState(null); // New state for reminder history
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
@@ -39,7 +34,6 @@ const AdminPage = () => {
   });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [measurementFilter, setMeasurementFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -79,43 +73,6 @@ const AdminPage = () => {
       "beaded-tassels": "Beaded + Tassels",
     };
     return styleMap[selectedStyle] || selectedStyle;
-  };
-
-  // Helper function to format reminder timestamp
-  const formatReminderTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMs = now - date;
-    const diffInHours = diffInMs / (1000 * 60 * 60);
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-      return `${diffInMinutes}m ago`;
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
-    } else if (diffInDays < 7) {
-      return `${Math.floor(diffInDays)}d ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
-  };
-
-  // Helper function to check if an order has measurements
-  const orderHasMeasurements = (order) => {
-    if (!order.items || order.items.length === 0) return false;
-
-    return order.items.some((item) => {
-      const measurements = item.measurements;
-      if (!measurements) return false;
-
-      // Check if any of the measurement fields have values
-      return (
-        measurements.neck?.trim() ||
-        measurements.chest?.trim() ||
-        measurements.back?.trim()
-      );
-    });
   };
 
   const handleLogin = () => {
@@ -174,13 +131,6 @@ const AdminPage = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      // Find the order to get customer details
-      const currentOrder = orders.find((order) => order.id === orderId);
-      if (!currentOrder) {
-        toast.error("Order not found");
-        return;
-      }
-
       if (newStatus === "shipped") {
         const trackingID = prompt(
           "Enter tracking ID before marking as shipped:"
@@ -203,91 +153,7 @@ const AdminPage = () => {
               : order
           )
         );
-
-        // Send shipped WhatsApp notification
-        try {
-          // Calculate expected delivery (3 working days from today)
-          const today = new Date();
-          const expectedDelivery = new Date(today);
-          expectedDelivery.setDate(today.getDate() + 5); // 3 working days + 2 for weekends
-          const formattedDeliveryDate = expectedDelivery.toLocaleDateString(
-            "en-IN",
-            {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }
-          );
-
-          await fetch("/api/send-shipped-notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              customerName: currentOrder.customer?.fullName,
-              razorpayOrderId:
-                currentOrder.razorpay_order_id || currentOrder.orderNumber,
-              trackingId: trackingID,
-              expectedDelivery: formattedDeliveryDate,
-              customerCity: currentOrder.customer?.city,
-              mobileNumber: currentOrder.customer?.mobileNumber,
-            }),
-          });
-          console.log("📱 Shipped notification sent");
-        } catch (whatsappError) {
-          console.error("❌ Shipped notification failed:", whatsappError);
-          // Don't fail the status update if WhatsApp fails
-        }
-
         toast.success("Tracking ID saved & status updated");
-        fetchOrders();
-      } else if (newStatus === "cutting") {
-        const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, {
-          orderStatus: newStatus,
-        });
-
-        setOrders((prev) =>
-          prev.map((order) =>
-            order.id === orderId ? { ...order, orderStatus: newStatus } : order
-          )
-        );
-
-        // Send in-progress WhatsApp notification
-        try {
-          // Get dispatch date from order
-          const dispatchDate = currentOrder.dispatchDate
-            ? new Date(currentOrder.dispatchDate).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
-            : "TBD";
-
-          // Get measurements from the first item (assuming all items have similar measurements)
-          const firstItem = currentOrder.items?.[0];
-          const measurements = firstItem?.measurements || {};
-
-          await fetch("/api/send-inprogress-notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              customerName: currentOrder.customer?.fullName,
-              orderId:
-                currentOrder.razorpay_order_id || currentOrder.orderNumber,
-              dispatchDate: dispatchDate,
-              neckMeasurement: measurements.neck,
-              chestMeasurement: measurements.chest,
-              backMeasurement: measurements.back,
-              mobileNumber: currentOrder.customer?.mobileNumber,
-            }),
-          });
-          console.log("📱 In-progress notification sent");
-        } catch (whatsappError) {
-          console.error("❌ In-progress notification failed:", whatsappError);
-          // Don't fail the status update if WhatsApp fails
-        }
-
-        toast.success("Status updated");
         fetchOrders();
       } else {
         const orderRef = doc(db, "orders", orderId);
@@ -441,16 +307,6 @@ const AdminPage = () => {
       const matchesStatus =
         statusFilter === "all" || order.orderStatus === statusFilter;
 
-      // Measurement filter
-      let matchesMeasurements = true;
-      if (measurementFilter === "has-measurements") {
-        matchesMeasurements = orderHasMeasurements(order);
-      } else if (measurementFilter === "no-measurements") {
-        // Only show non-shipped orders that don't have measurements
-        matchesMeasurements =
-          !orderHasMeasurements(order) && order.orderStatus !== "shipped";
-      }
-
       // Date filter
       const orderDate = new Date(order.createdAt);
       // Check date range
@@ -463,9 +319,7 @@ const AdminPage = () => {
         matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
-      return (
-        matchesSearch && matchesStatus && matchesMeasurements && matchesDate
-      );
+      return matchesSearch && matchesStatus && matchesDate;
     })
     .sort((a, b) => {
       // First priority: Pinned orders always come first
@@ -510,10 +364,10 @@ const AdminPage = () => {
     pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
       .length,
     workInProgress: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "cutting"
+      (o) => o.orderStatus === "work-in-progress"
     ).length,
     readyToShip: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "cutting"
+      (o) => o.orderStatus === "ready-to-ship"
     ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
@@ -546,12 +400,7 @@ const AdminPage = () => {
 
   return (
     <div className="min-h-screen bg-white p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-        <h1 className="text-xl font-bold mb-2 sm:mb-0">
-          {activeTab === "orders"
-            ? "📦 Orders Management"
-            : "🔔 Notification Requests"}
-        </h1>
+      <h1 className="text-xl font-bold mb-4">📦 Orders Management</h1>
 
       {/* Stats Dashboard */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
@@ -750,645 +599,366 @@ const AdminPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-3 text-center text-sm text-gray-600">
-                Date Range: {new Date(startDate).toLocaleDateString()} to{" "}
-                {new Date(endDate).toLocaleDateString()}
-              </div>
-            </div>
-          )}
 
-          {
-            <span className="my-2 text-gray-500 inline-block italic">
-              {orders.length} total orders • {filteredAndSortedOrders.length}{" "}
-              filtered orders
-            </span>
-          }
-          {loading ? (
-            <p className="text-center text-gray-500">Loading orders...</p>
-          ) : orders.length === 0 ? (
-            <p className="text-center text-gray-500">No orders found.</p>
-          ) : filteredAndSortedOrders.length === 0 ? (
-            <p className="text-center text-gray-500">
-              No orders match your filters.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {filteredAndSortedOrders.map((order) => (
-                <motion.div
-                  key={order.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="border rounded-lg p-4 shadow-sm"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <button
-                        onClick={() =>
-                          setExpandedOrderId(
-                            expandedOrderId === order.id ? null : order.id
-                          )
-                        }
-                        className="text-lg font-bold text-indigo-600 underline mb-1"
-                      >
-                        {order.customer?.fullName}
-                      </button>
-                      <div className="text-sm font-medium text-gray-800 mb-1">
-                        📞 {order.customer?.mobileNumber}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        📅{" "}
-                        {new Date(order.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                      {/* Dispatch Date - Prominent Display */}
-                      <div className="text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-md mt-1 inline-block">
-                        🚚 Dispatch:{" "}
-                        {order.dispatchDate
-                          ? new Date(order.dispatchDate).toLocaleDateString(
-                              "en-IN",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )
-                          : "Not set"}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-green-600">
-                        ₹{order.amount}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {order.items?.length} item(s)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 text-xs">
-                    <label className="text-gray-500 font-semibold">
-                      {" "}
-                      Payment Status:{" "}
-                    </label>
-                    {order.paymentStatus}
-                    <div className="mt-3 text-xs">
-                      <label className="text-gray-500"> Order Status: </label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
+              <div className="mt-3 text-xs">
+                <label className="text-gray-500 font-semibold">
+                  {" "}
+                  Payment Status:{" "}
+                </label>
+                {order.paymentStatus}
+                <div className="mt-3 text-xs">
+                  <label className="text-gray-500"> Order Status: </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span
+                      className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
                       ${
                         order.orderStatus === "pending"
                           ? "bg-gray-400"
-                          : order.orderStatus === "cutting"
+                          : order.orderStatus === "work-in-progress"
                           ? "bg-yellow-500"
-                          : order.orderStatus === "cutting"
+                          : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
                           : order.orderStatus === "shipped"
                           ? "bg-green-600"
                           : "bg-gray-300"
                       }
                     `}
-                        >
-                          {order.orderStatus}
-                        </span>
+                    >
+                      {order.orderStatus}
+                    </span>
 
-                        <select
-                          value={order.orderStatus}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value)
-                          }
-                          className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="cutting">Cutting</option>
-                          <option value="ready-to-ship">Ready to Ship</option>
-                          <option value="shipped">shipped</option>
-                        </select>
+                    <select
+                      value={order.orderStatus}
+                      onChange={(e) =>
+                        handleStatusChange(order.id, e.target.value)
+                      }
+                      className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="work-in-progress">Work in Progress</option>
+                      <option value="ready-to-ship">Ready to Ship</option>
+                      <option value="shipped">shipped</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-                        {/* Measurement reminder button for orders without measurements */}
-                        {!orderHasMeasurements(order) && (
-                          <button
-                            onClick={() => handleSendMeasurementReminder(order)}
-                            className="ml-2 px-2 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded transition-colors duration-200 flex items-center gap-1"
-                            title="Send Measurement Reminder"
+              {expandedOrderId === order.id && (
+                <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
+                  <div>
+                    <p className="font-semibold mt-2">Items Ordered</p>
+                    <div className="space-y-1">
+                      {order.items?.map((item, idx) => {
+                        // Debug: Log item data to see what's being stored
+                        console.log("Order item data:", {
+                          name: item.name,
+                          selectedDhoti: item.selectedDhoti,
+                          selectedDhotiDetails: item.selectedDhotiDetails,
+                          hasImage: !!item.selectedDhotiDetails?.image,
+                        });
+
+                        // Get dhoti details using helper function
+                        const dhotiBrother = getDhotiDetails(item);
+
+                        return (
+                          <div
+                            key={idx}
+                            className="border p-3 rounded bg-gray-50"
                           >
-                            ⚠️ Remind
-                          </button>
-                        )}
+                            <div className="flex gap-3">
+                              {/* Main Product Image */}
+                              {item.image && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-20 h-20 object-cover rounded border"
+                                    onError={(e) => {
+                                      e.target.style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
 
-                        {/* Reminder History Display */}
-                        {order.reminderHistory &&
-                          order.reminderHistory.length > 0 && (
-                            <div className="ml-2 relative reminder-dropdown">
-                              <button
-                                onClick={() =>
-                                  setExpandedReminderId(
-                                    expandedReminderId === order.id
-                                      ? null
-                                      : order.id
-                                  )
-                                }
-                                className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded transition-colors duration-200 flex items-center gap-1"
-                              >
-                                📧 {order.reminderHistory.length}
-                                <span className="text-[10px]">
-                                  {expandedReminderId === order.id ? "▼" : "▶"}
-                                </span>
-                              </button>
+                              {/* Dhoti Image if selected */}
+                              {dhotiBrother && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={dhotiBrother.image}
+                                    alt={`${dhotiBrother.name} dhoti`}
+                                    className="w-20 h-20 object-cover rounded border border-blue-200"
+                                    onError={(e) => {
+                                      e.target.style.display = "none";
+                                    }}
+                                  />
+                                  <p className="text-xs text-center text-blue-600 mt-1">
+                                    {dhotiBrother.name} Dhoti
+                                  </p>
+                                </div>
+                              )}
 
-                              {/* Collapsible reminder history */}
-                              {expandedReminderId === order.id && (
-                                <div className="absolute top-full left-0 mt-1 z-10 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <h4 className="text-xs font-semibold text-gray-800">
-                                      Reminder History
-                                    </h4>
+                              {/* Product Details */}
+                              <div className="flex-1">
+                                <p className="font-medium text-base">
+                                  {item.name}
+                                </p>
+                                <p className="text-sm">
+                                  Size:{" "}
+                                  <span className="font-medium">
+                                    {item.selectedSize}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Price:{" "}
+                                  <span className="font-medium text-green-600">
+                                    ₹{item.price}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Full Royal Set:{" "}
+                                  <span className="font-medium">
+                                    {item.isRoyalSet ? "Yes" : "No"}
+                                  </span>
+                                </p>
+                                <p className="text-sm">
+                                  Beaded:{" "}
+                                  <span className="font-medium">
+                                    {item.isBeaded ? "Yes" : "No"}
+                                  </span>
+                                  , Full Set:{" "}
+                                  <span className="font-medium">
+                                    {item.isFullSet ? "Yes" : "No"}
+                                  </span>
+                                  {item.isDupattaSet && (
+                                    <>
+                                      , Dupatta Set:{" "}
+                                      <span className="font-medium text-purple-600">
+                                        Yes
+                                      </span>
+                                    </>
+                                  )}
+                                  {item.selectedStyle && (
+                                    <>
+                                      , Style:{" "}
+                                      <span className="font-medium text-orange-600">
+                                        {getStyleDisplayName(
+                                          item.selectedStyle
+                                        )}
+                                      </span>
+                                    </>
+                                  )}
+                                </p>
+                                {(item.selectedDhoti || dhotiBrother) && (
+                                  <p className="text-sm">
+                                    Dhoti:{" "}
+                                    <span className="font-medium text-blue-600">
+                                      {dhotiBrother?.name || item.selectedDhoti}
+                                    </span>
+                                    {item.selectedDhoti && !dhotiBrother && (
+                                      <span className="text-xs text-gray-500 ml-2">
+                                        (lookup failed - product data not
+                                        loaded)
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
+                                {item.selectedColor && (
+                                  <p className="text-sm">
+                                    Color:{" "}
+                                    <span className="font-medium">
+                                      {item.selectedColor}
+                                    </span>
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Measurements Section */}
+                            <div className="text-xs text-gray-600 mt-2 p-3 bg-blue-50 rounded border">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="font-medium text-sm">
+                                  📏 Measurements
+                                </p>
+                                {editingMeasurements?.orderId === order.id &&
+                                editingMeasurements?.itemIndex === idx ? (
+                                  <div className="flex gap-1">
                                     <button
-                                      onClick={() =>
-                                        setExpandedReminderId(null)
-                                      }
-                                      className="text-gray-400 hover:text-gray-600 text-xs"
+                                      onClick={saveMeasurements}
+                                      className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
                                     >
-                                      ✕
+                                      Save
+                                    </button>
+                                    <button
+                                      onClick={cancelEditingMeasurements}
+                                      className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
+                                    >
+                                      Cancel
                                     </button>
                                   </div>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      startEditingMeasurements(
+                                        order.id,
+                                        idx,
+                                        item.measurements
+                                      )
+                                    }
+                                    className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                                  >
+                                    {item.measurements?.neck ||
+                                    item.measurements?.chest ||
+                                    item.measurements?.back
+                                      ? "Edit"
+                                      : "Add"}
+                                  </button>
+                                )}
+                              </div>
 
-                                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                                    {order.reminderHistory
-                                      .slice()
-                                      .reverse()
-                                      .map((reminder, index) => (
-                                        <div
-                                          key={index}
-                                          className="bg-gray-50 rounded-lg p-2"
-                                        >
-                                          <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                              <span className="text-xs text-gray-700 font-medium">
-                                                Measurement reminder
-                                              </span>
-                                            </div>
-                                            <span className="text-xs text-gray-500">
-                                              {formatReminderTime(
-                                                reminder.sentAt
-                                              )}
-                                            </span>
-                                          </div>
-                                          <div className="mt-1 ml-4">
-                                            <p className="text-xs text-gray-500">
-                                              {new Date(
-                                                reminder.sentAt
-                                              ).toLocaleString()}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      ))}
+                              {editingMeasurements?.orderId === order.id &&
+                              editingMeasurements?.itemIndex === idx ? (
+                                // Editing Mode
+                                <div className="space-y-2">
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                                        Neck (inches)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.neck}
+                                        onChange={(e) =>
+                                          handleMeasurementChange(
+                                            "neck",
+                                            e.target.value
+                                          )
+                                        }
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                                        Chest (inches)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.chest}
+                                        onChange={(e) =>
+                                          handleMeasurementChange(
+                                            "chest",
+                                            e.target.value
+                                          )
+                                        }
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                                        Back (inches)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={measurementValues.back}
+                                        onChange={(e) =>
+                                          handleMeasurementChange(
+                                            "back",
+                                            e.target.value
+                                          )
+                                        }
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0.0"
+                                      />
+                                    </div>
                                   </div>
-
-                                  {order.lastReminderSent && (
-                                    <div className="mt-3 pt-2 border-t border-gray-100 bg-blue-50 rounded p-2">
-                                      <p className="text-xs text-blue-700 font-medium">
-                                        Last reminder:{" "}
-                                        {formatReminderTime(
-                                          order.lastReminderSent
-                                        )}
-                                      </p>
-                                      <p className="text-xs text-blue-600 mt-1">
-                                        {new Date(
-                                          order.lastReminderSent
-                                        ).toLocaleString()}
-                                      </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    💡 Enter measurements in inches as provided
+                                    by customer
+                                  </p>
+                                </div>
+                              ) : (
+                                // Display Mode
+                                <div>
+                                  {item.measurements?.neck ||
+                                  item.measurements?.chest ||
+                                  item.measurements?.back ? (
+                                    <div className="text-sm">
+                                      <span className="font-medium">Neck:</span>{" "}
+                                      {item.measurements.neck || "N/A"}&quot; •
+                                      <span className="font-medium">
+                                        Chest:
+                                      </span>{" "}
+                                      {item.measurements.chest || "N/A"}&quot; •
+                                      <span className="font-medium">Back:</span>{" "}
+                                      {item.measurements.back || "N/A"}&quot;
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm text-gray-500 italic">
+                                      No measurements added yet. Click
+                                      &quot;Add&quot; to enter customer
+                                      measurements.
                                     </div>
                                   )}
                                 </div>
                               )}
                             </div>
-                          )}
-
-                        <button
-                          onClick={() =>
-                            handleDeleteOrder(
-                              order.id,
-                              order.customer?.fullName
-                            )
-                          }
-                          className="ml-2 px-2 py-1 bg-white hover:bg-red-600 hover:text-white text-black text-xs rounded transition-colors duration-200"
-                          title="Delete Order"
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {expandedOrderId === order.id && (
-                    <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
-                      <div>
-                        <p className="font-semibold mt-2">Items Ordered</p>
-                        <div className="space-y-1">
-                          {order.items?.map((item, idx) => {
-                            // Debug: Log item data to see what's being stored
-                            console.log("Order item data:", {
-                              name: item.name,
-                              selectedDhoti: item.selectedDhoti,
-                              selectedDhotiDetails: item.selectedDhotiDetails,
-                              hasImage: !!item.selectedDhotiDetails?.image,
-                            });
+                  <div>
+                    <p className="font-semibold">Customer Details</p>
+                    <p>
+                      {" "}
+                      <span className="font-bold">Name:</span>{" "}
+                      {order.customer?.fullName}
+                    </p>
+                    <p>
+                      <span className="font-bold">Phone:</span>{" "}
+                      {order.customer?.mobileNumber}
+                    </p>
+                    <p>
+                      <span className="font-bold">WhatsApp Number :</span>{" "}
+                      {order.customer?.alternateMobile || "N/A"}
+                    </p>
+                    <p>
+                      <span className="font-bold">Address:</span>{" "}
+                      {order.customer?.addressLine1},{" "}
+                      {order.customer?.addressLine2}, {order.customer?.city},{" "}
+                      {order.customer?.state} - {order.customer?.pincode}
+                    </p>
+                    <p>
+                      <span className="font-bold">Instructions:</span>{" "}
+                      {order.customer?.specialInstructions}
+                    </p>
+                    <p>
+                      <span className="font-bold">Delivery:</span>{" "}
+                      {order.customer?.deliveryOption}
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <p className="font-semibold">Razorpay</p>
+                    <p>Order ID: {order.razorpay_order_id}</p>
 
-                            // Get dhoti details using helper function
-                            const dhotiBrother = getDhotiDetails(item);
-
-                            return (
-                              <div
-                                key={idx}
-                                className={` p-4 rounded-lg ${
-                                  item.isRoyalSet
-                                    ? "bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 shadow-md"
-                                    : "bg-gray-50"
-                                }`}
-                              >
-                                {/* Two Column Layout */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                  {/* Left Column: Images Grid (2 images per row) */}
-                                  <div className="lg:col-span-1">
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {/* Main Product Image */}
-                                      {item.image && (
-                                        <div className="flex flex-col items-center">
-                                          <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-16 h-16 object-cover rounded-lg border-2 border-gray-300 shadow-sm"
-                                            onError={(e) => {
-                                              e.target.style.display = "none";
-                                            }}
-                                          />
-                                          <p className="text-xs text-center text-gray-600 mt-1 font-medium">
-                                            Main
-                                          </p>
-                                        </div>
-                                      )}
-
-                                      {/* Dhoti Image if selected */}
-                                      {dhotiBrother && (
-                                        <div className="flex flex-col items-center">
-                                          <img
-                                            src={dhotiBrother.image}
-                                            alt={`${dhotiBrother.name} dhoti`}
-                                            className="w-16 h-16 object-cover rounded-lg border-2 border-blue-300 shadow-sm"
-                                            onError={(e) => {
-                                              e.target.style.display = "none";
-                                            }}
-                                          />
-                                          <p className="text-xs text-center text-blue-600 mt-1 font-medium">
-                                            Dhoti
-                                          </p>
-                                        </div>
-                                      )}
-
-                                      {/* Dupatta Image if isDupattaSet or isRoyalSet */}
-                                      {(item.isDupattaSet ||
-                                        item.isRoyalSet) && (
-                                        <div className="flex flex-col items-center">
-                                          <img
-                                            src="https://res.cloudinary.com/di6unrpjw/image/upload/v1758442036/Dupatta-Photoroom_fstzde.png"
-                                            alt="Dupatta"
-                                            className="w-16 h-16 object-cover rounded-lg border-2 border-purple-300 shadow-sm"
-                                            onError={(e) => {
-                                              e.target.style.display = "none";
-                                            }}
-                                          />
-                                          <p className="text-xs text-center text-purple-600 mt-1 font-medium">
-                                            Dupatta
-                                          </p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {/* Right Column: Product Details */}
-                                  <div className="lg:col-span-2">
-                                    <div className="space-y-2">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <h4
-                                          className={`font-semibold text-lg ${
-                                            item.isRoyalSet
-                                              ? "text-yellow-700"
-                                              : "text-gray-800"
-                                          }`}
-                                        >
-                                          {item.name}
-                                        </h4>
-                                        {item.isRoyalSet && (
-                                          <span className="inline-flex items-center px-3 py-1 text-xs font-bold text-yellow-800 bg-gradient-to-r from-yellow-200 to-yellow-300 rounded-full border border-yellow-400 shadow-sm">
-                                            👑 ROYAL
-                                          </span>
-                                        )}
-                                      </div>
-
-                                      <div className="grid grid-cols-2 gap-2 text-sm">
-                                        <div>
-                                          <span className="text-gray-600">
-                                            Size:
-                                          </span>
-                                          <span className="font-medium ml-1">
-                                            {item.selectedSize}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-600">
-                                            Price:
-                                          </span>
-                                          <span className="font-semibold text-green-600 ml-1">
-                                            ₹{item.price}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-600">
-                                            Full Royal Set:
-                                          </span>
-                                          <span className="font-medium ml-1">
-                                            {item.isRoyalSet ? "Yes" : "No"}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-600">
-                                            Beaded:
-                                          </span>
-                                          <span className="font-medium ml-1">
-                                            {item.isBeaded ? "Yes" : "No"}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-600">
-                                            Full Set:
-                                          </span>
-                                          <span className="font-medium ml-1">
-                                            {item.isFullSet ? "Yes" : "No"}
-                                          </span>
-                                        </div>
-                                        {item.isDupattaSet && (
-                                          <div>
-                                            <span className="text-gray-600">
-                                              Dupatta Set:
-                                            </span>
-                                            <span className="font-medium text-purple-600 ml-1">
-                                              Yes
-                                            </span>
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {/* Additional Details Row */}
-                                      <div className="space-y-1 text-sm">
-                                        {item.selectedStyle && (
-                                          <div>
-                                            <span className="text-gray-600">
-                                              Style:
-                                            </span>
-                                            <span className="font-medium text-orange-600 ml-1">
-                                              {getStyleDisplayName(
-                                                item.selectedStyle
-                                              )}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {(item.selectedDhoti ||
-                                          dhotiBrother) && (
-                                          <div>
-                                            <span className="text-gray-600">
-                                              Dhoti:
-                                            </span>
-                                            <span className="font-medium text-blue-600 ml-1">
-                                              {dhotiBrother?.name ||
-                                                item.selectedDhoti}
-                                            </span>
-                                            {item.selectedDhoti &&
-                                              !dhotiBrother && (
-                                                <span className="text-xs text-gray-500 ml-2">
-                                                  (lookup failed)
-                                                </span>
-                                              )}
-                                          </div>
-                                        )}
-                                        {item.selectedColor && (
-                                          <div>
-                                            <span className="text-gray-600">
-                                              Color:
-                                            </span>
-                                            <span className="font-medium ml-1">
-                                              {item.selectedColor}
-                                            </span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Measurements Section */}
-                                <div className="text-xs text-gray-600 mt-2 p-3 bg-blue-50 rounded border">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <p className="font-medium text-sm">
-                                      📏 Measurements
-                                    </p>
-                                    {editingMeasurements?.orderId ===
-                                      order.id &&
-                                    editingMeasurements?.itemIndex === idx ? (
-                                      <div className="flex gap-1">
-                                        <button
-                                          onClick={saveMeasurements}
-                                          className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
-                                        >
-                                          Save
-                                        </button>
-                                        <button
-                                          onClick={cancelEditingMeasurements}
-                                          className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
-                                        >
-                                          Cancel
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <button
-                                        onClick={() =>
-                                          startEditingMeasurements(
-                                            order.id,
-                                            idx,
-                                            item.measurements
-                                          )
-                                        }
-                                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-                                      >
-                                        {item.measurements?.neck ||
-                                        item.measurements?.chest ||
-                                        item.measurements?.back
-                                          ? "Edit"
-                                          : "Add"}
-                                      </button>
-                                    )}
-                                  </div>
-
-                                  {editingMeasurements?.orderId === order.id &&
-                                  editingMeasurements?.itemIndex === idx ? (
-                                    // Editing Mode
-                                    <div className="space-y-2">
-                                      <div className="grid grid-cols-3 gap-2">
-                                        <div>
-                                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                                            Neck (inches)
-                                          </label>
-                                          <input
-                                            type="number"
-                                            step="0.1"
-                                            value={measurementValues.neck}
-                                            onChange={(e) =>
-                                              handleMeasurementChange(
-                                                "neck",
-                                                e.target.value
-                                              )
-                                            }
-                                            className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            placeholder="0.0"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                                            Chest (inches)
-                                          </label>
-                                          <input
-                                            type="number"
-                                            step="0.1"
-                                            value={measurementValues.chest}
-                                            onChange={(e) =>
-                                              handleMeasurementChange(
-                                                "chest",
-                                                e.target.value
-                                              )
-                                            }
-                                            className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            placeholder="0.0"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                                            Back (inches)
-                                          </label>
-                                          <input
-                                            type="number"
-                                            step="0.1"
-                                            value={measurementValues.back}
-                                            onChange={(e) =>
-                                              handleMeasurementChange(
-                                                "back",
-                                                e.target.value
-                                              )
-                                            }
-                                            className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            placeholder="0.0"
-                                          />
-                                        </div>
-                                      </div>
-                                      <p className="text-xs text-gray-500 mt-1">
-                                        💡 Enter measurements in inches as
-                                        provided by customer
-                                      </p>
-                                    </div>
-                                  ) : (
-                                    // Display Mode
-                                    <div>
-                                      {item.measurements?.neck ||
-                                      item.measurements?.chest ||
-                                      item.measurements?.back ? (
-                                        <div className="text-sm">
-                                          <span className="font-medium">
-                                            Neck:
-                                          </span>{" "}
-                                          {item.measurements.neck || "N/A"}
-                                          &quot; •
-                                          <span className="font-medium">
-                                            Chest:
-                                          </span>{" "}
-                                          {item.measurements.chest || "N/A"}
-                                          &quot; •
-                                          <span className="font-medium">
-                                            Back:
-                                          </span>{" "}
-                                          {item.measurements.back || "N/A"}
-                                          &quot;
-                                        </div>
-                                      ) : (
-                                        <div className="text-sm text-gray-500 italic">
-                                          No measurements added yet. Click
-                                          &quot;Add&quot; to enter customer
-                                          measurements.
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <div>
-                        <p className="font-semibold">Customer Details</p>
-                        <p>
-                          {" "}
-                          <span className="font-bold">Name:</span>{" "}
-                          {order.customer?.fullName}
-                        </p>
-                        <p>
-                          <span className="font-bold">Phone:</span>{" "}
-                          {order.customer?.mobileNumber}
-                        </p>
-                        <p>
-                          <span className="font-bold">WhatsApp Number :</span>{" "}
-                          {order.customer?.alternateMobile || "N/A"}
-                        </p>
-                        <p>
-                          <span className="font-bold">Address:</span>{" "}
-                          {order.customer?.addressLine1},{" "}
-                          {order.customer?.addressLine2}, {order.customer?.city}
-                          , {order.customer?.state} - {order.customer?.pincode}
-                        </p>
-                        <p>
-                          <span className="font-bold">Instructions:</span>{" "}
-                          {order.customer?.specialInstructions}
-                        </p>
-                        <p>
-                          <span className="font-bold">Delivery:</span>{" "}
-                          {order.customer?.deliveryOption}
-                        </p>
-                      </div>
-                      <div className="pt-2 border-t">
-                        <p className="font-semibold">Razorpay</p>
-                        <p>Order ID: {order.razorpay_order_id}</p>
-
-                        <p>Payment ID: {order.razorpay_payment_id}</p>
-                        {order.tracking_id && (
-                          <p>
-                            <span className="font-semibold">Tracking ID:</span>{" "}
-                            {order.tracking_id}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </>
+                    <p>Payment ID: {order.razorpay_payment_id}</p>
+                    {order.tracking_id && (
+                      <p>
+                        <span className="font-semibold">Tracking ID:</span>{" "}
+                        {order.tracking_id}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
       )}
     </div>
   );
