@@ -87,29 +87,6 @@ const OrderPauseModal = ({ isOpen, onClose }) => {
                 <div className="p-6">
                   <div className="space-y-4 mb-6">
                     {/* Status indicators */}
-                    <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                      <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                      <div className="text-sm">
-                        <p className="font-medium text-amber-800">
-                          High Demand Alert
-                        </p>
-                        <p className="text-amber-700">
-                          Processing orders takes 8-10 days currently
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                      <div className="text-sm">
-                        <p className="font-medium text-blue-800">
-                          Limited Workforce
-                        </p>
-                        <p className="text-blue-700">
-                          Our small team is working around the clock
-                        </p>
-                      </div>
-                    </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4 mb-6">
