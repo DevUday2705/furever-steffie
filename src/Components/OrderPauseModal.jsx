@@ -57,7 +57,7 @@ const OrderPauseModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-3"
           onClick={handleClose}
         >
           <motion.div
@@ -66,53 +66,49 @@ const OrderPauseModal = ({ isOpen, onClose }) => {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden shadow-2xl"
+            className="bg-white rounded-xl max-w-sm w-full mx-3 overflow-hidden shadow-xl max-h-[85vh] overflow-y-auto"
           >
             {!isSubmitted ? (
               <>
                 {/* Header */}
-                <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-6 text-center border-b border-gray-100">
-                  <div className="w-16 h-16 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="w-8 h-8 text-rose-500" />
+                <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-4 text-center border-b border-gray-100">
+                  <div className="w-12 h-12 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Heart className="w-6 h-6 text-rose-500" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">
+                  <h2 className="text-lg font-bold text-gray-800 mb-1">
                     Pawsome Response! 🐾
                   </h2>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    We're overwhelmed by your love for furry fashion!
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    We&apos;re overwhelmed by your love for furry fashion!
                   </p>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
-                  <div className="space-y-4 mb-6">
-                    {/* Status indicators */}
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                    <h3 className="font-semibold text-gray-800 mb-2">
-                      What's happening?
+                <div className="p-4">
+                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                    <h3 className="font-semibold text-gray-800 text-sm mb-1">
+                      What&apos;s happening?
                     </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-xs text-gray-600 leading-relaxed">
                       Your incredible support has led to more orders than our
-                      tiny team can handle right now. We're taking a brief pause
-                      to catch up and ensure every furry friend gets the perfect
-                      fit they deserve! ✨
+                      tiny team can handle right now. We&apos;re taking a brief
+                      pause to catch up and ensure every furry friend gets the
+                      perfect fit they deserve! ✨
                     </p>
                   </div>
 
                   {/* Email collection form */}
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Be the first to know when we're back! 💌
+                      <label className="block text-xs font-medium text-gray-700 mb-2">
+                        Be the first to know when we&apos;re back! 💌
                       </label>
                       <input
                         type="text"
                         placeholder="Your name (optional)"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all text-sm"
                         disabled={isSubmitting}
                       />
                     </div>
@@ -122,7 +118,7 @@ const OrderPauseModal = ({ isOpen, onClose }) => {
                         placeholder="your.email@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all text-sm"
                         required
                         disabled={isSubmitting}
                       />
@@ -131,25 +127,25 @@ const OrderPauseModal = ({ isOpen, onClose }) => {
                     <button
                       type="submit"
                       disabled={isSubmitting || !email.trim()}
-                      className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white py-3 px-6 rounded-lg font-medium transition-all hover:from-rose-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white py-2.5 px-4 rounded-lg font-medium transition-all hover:from-rose-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           Adding you to the list...
                         </>
                       ) : (
                         <>
-                          <Mail className="w-5 h-5" />
+                          <Mail className="w-4 h-4" />
                           Notify Me First!
                         </>
                       )}
                     </button>
                   </form>
 
-                  <p className="text-xs text-gray-500 text-center mt-4">
-                    We'll only use your email to notify you when orders resume.
-                    No spam, we promise! 🤞
+                  <p className="text-xs text-gray-500 text-center mt-3">
+                    We&apos;ll only use your email to notify you when orders
+                    resume. No spam, we promise! 🤞
                   </p>
                 </div>
               </>
