@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useOrderPause } from "../context/OrderPauseContext";
 
 // Size chart data based on the provided chart
 const SIZE_CHART = {
@@ -77,6 +78,7 @@ const SimpleSizeSelector = ({
 }) => {
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeTab, setActiveTab] = useState("chart");
+  const { ordersArePaused } = useOrderPause();
 
   // Check if size is available in stock
   const isSizeAvailable = (size) => {
@@ -164,6 +166,9 @@ const SimpleSizeSelector = ({
 
   // Check if actions should be enabled
   const shouldEnableActions = () => {
+    // If orders are paused, disable all actions
+    if (ordersArePaused) return false;
+
     if (!selectedSize) return false;
     if (!isSizeAvailable(selectedSize)) return false;
     return true;
@@ -535,7 +540,9 @@ const SimpleSizeSelector = ({
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  Buy Now - ₹{calculatePrice()}
+                  {ordersArePaused
+                    ? "Orders Temporarily Paused"
+                    : `Buy Now - ₹${calculatePrice()}`}
                 </button>
                 <button
                   onClick={handleAddToCart}
@@ -561,7 +568,9 @@ const SimpleSizeSelector = ({
                         d="M3 6h18M7 6V4a1 1 0 011-1h8a1 1 0 011 1v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z"
                       />
                     </svg>
-                    Add to Bag
+                    {ordersArePaused
+                      ? "Orders Temporarily Paused"
+                      : "Add to Bag"}
                   </span>
                 </button>
               </div>

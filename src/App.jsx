@@ -48,6 +48,9 @@ import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
+import OrderPauseModal from "./Components/OrderPauseModal";
+import { useState, useEffect } from "react";
+import { useOrderPause } from "./context/OrderPauseContext";
 import WhyUs from "./Components/WhyUs";
 import AboutUs from "./Components/AboutUs";
 import AdminProducts from "./Components/AdminProducts";
@@ -63,9 +66,31 @@ import SizeGuide from "./Components/SizeGuide";
 import PopupPoster from "./Components/PopupPoster";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
+  const { ordersArePaused } = useOrderPause();
   const navigate = useNavigate();
   const location = useLocation();
   const ready = true; // Set to false to show coming soon for non-admin pages
+
+  // Order pause modal state
+  const [showOrderPauseModal, setShowOrderPauseModal] = useState(false);
+
+  // Check for order pause on certain routes (product pages, checkout)
+  const orderRelatedRoutes = ["/product/", "/checkout", "/cart"];
+  const isOrderRelatedRoute = orderRelatedRoutes.some((route) =>
+    location.pathname.includes(route)
+  );
+
+  // Show modal when user tries to access order-related pages
+  useEffect(() => {
+    if (ordersArePaused && isOrderRelatedRoute && !showOrderPauseModal) {
+      setShowOrderPauseModal(true);
+    }
+  }, [
+    location.pathname,
+    ordersArePaused,
+    isOrderRelatedRoute,
+    showOrderPauseModal,
+  ]);
 
   // Admin routes that should always be accessible
   const adminRoutes = [
@@ -183,6 +208,19 @@ const App = () => {
       {/* {(ready || isAdminRoute) && location.pathname === "/" ? (
         <PopupPoster />
       ) : null} */}
+
+      {/* Order Pause Modal */}
+      <OrderPauseModal
+        isOpen={showOrderPauseModal}
+        onClose={() => {
+          setShowOrderPauseModal(false);
+          // Redirect to home when modal is closed
+          if (isOrderRelatedRoute) {
+            navigate("/");
+          }
+        }}
+      />
+
       <Toaster />
     </div>
   );

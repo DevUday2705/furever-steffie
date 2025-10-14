@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { MessageCircle } from "lucide-react";
 import { CurrencyContext } from "../../context/currencyContext";
 import { convertCurrency } from "../../constants/currency";
+import { useOrderPause } from "../../context/OrderPauseContext";
 
 const BottomActions = ({
   product,
@@ -25,6 +26,7 @@ const BottomActions = ({
   selectedColor,
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
+  const { ordersArePaused } = useOrderPause();
 
   // Check if selected size requires custom tailoring
   const isCustomSize =
@@ -46,6 +48,9 @@ const BottomActions = ({
 
   // Determine if actions should be enabled
   const shouldEnableActions = () => {
+    // If orders are paused, disable all actions
+    if (ordersArePaused) return false;
+
     if (!selectedSize) return false;
 
     // Check stock for XS, S, M sizes
@@ -181,7 +186,9 @@ Thanks`;
         whileTap={{ scale: 0.98 }}
         onClick={handleBuyNow}
       >
-        Buy Now • {convertCurrency(calculatePrice(), currency)}
+        {ordersArePaused
+          ? "Orders Temporarily Paused"
+          : `Buy Now • ${convertCurrency(calculatePrice(), currency)}`}
       </motion.button>
 
       <motion.button
@@ -200,7 +207,9 @@ Thanks`;
             className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 cursor-pointer object-contain"
             alt="Cart"
           />
-          Add to Bag • {convertCurrency(calculatePrice(), currency)}
+          {ordersArePaused
+            ? "Orders Temporarily Paused"
+            : `Add to Bag • ${convertCurrency(calculatePrice(), currency)}`}
         </span>
       </motion.button>
     </div>
