@@ -397,7 +397,7 @@ const CheckoutPage = () => {
     } else {
       // Domestic delivery charges
       if (formData.deliveryOption === "express") {
-        deliveryCharge = 299;
+        deliveryCharge = 399;
       } else {
         deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0;
       }
@@ -1285,7 +1285,7 @@ const CheckoutPage = () => {
                             Express Delivery
                           </span>
                           <span className="block text-xs text-gray-500">
-                            Within 2 days • ₹299
+                            Within 2 days • ₹399
                           </span>
                         </div>
                       </label>
@@ -1412,7 +1412,7 @@ const CheckoutPage = () => {
                       const totalAfterDiscount = productPrice - discountAmount;
 
                       if (formData.deliveryOption === "express") {
-                        return convertCurrency(299, currency);
+                        return convertCurrency(399, currency);
                       }
                       if (totalAfterDiscount > 1499) {
                         return "Free";
