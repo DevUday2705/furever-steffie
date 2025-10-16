@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import FilterDrawer from "./FilterDrawer";
 import NotifyMeModal from "./NotifyMeModal";
+import SizeStockSlider from "./SizeStockSlider";
 import { useProductFilter } from "../hooks/useProductFilter";
 import {
   ChevronLeft,
@@ -47,6 +48,8 @@ const ProductListing = ({
     isOpen: false,
     product: null,
   });
+  const [sizeStockSlider, setSizeStockSlider] = useState(false);
+  const [selectedSizes, setSelectedSizes] = useState([]);
   const [filters, setFilters] = useState({
     sortBy: "",
     maxPrice: 2000,
@@ -56,6 +59,7 @@ const ProductListing = ({
     styleBeaded: false,
     styleSimple: false,
     inStockOnly: false,
+    smartStock: { styles: [], sizes: [], enabled: false },
     customColor: false,
     categories: ["all", "royal"],
     categoryOptions: ["all", "royal"],
@@ -104,6 +108,14 @@ const ProductListing = ({
     if (filters.styleBeaded) query.set("beaded", "1");
     if (filters.styleSimple) query.set("simple", "1");
     if (filters.inStockOnly) query.set("stock", "1");
+    if (filters.smartStock?.enabled) {
+      if (filters.smartStock.styles.length > 0) {
+        query.set("smartStyles", filters.smartStock.styles.join(","));
+      }
+      if (filters.smartStock.sizes.length > 0) {
+        query.set("smartSizes", filters.smartStock.sizes.join(","));
+      }
+    }
     if (filters.customColor) query.set("custom", "1");
 
     if (filters.maxPrice !== filters.priceLimit)
@@ -122,10 +134,17 @@ const ProductListing = ({
         id: "in-stock",
         label: "In Stock",
         icon: Check,
+        isSpecial: true, // This will open the size slider
         filterFn: (product) => {
-          const sizeStock = product.sizeStock || {};
-          // Check if ANY size has stock > 0
-          return Object.values(sizeStock).some((stock) => (stock || 0) > 0);
+          // If no sizes selected, show all products with any stock
+          if (selectedSizes.length === 0) {
+            const sizeStock = product.sizeStock || {};
+            return Object.values(sizeStock).some((stock) => (stock || 0) > 0);
+          }
+          // If sizes selected, show products with those specific sizes in stock
+          return selectedSizes.some(
+            (size) => (product.sizeStock?.[size] || 0) > 0
+          );
         },
       },
       {
@@ -165,16 +184,40 @@ const ProductListing = ({
         filterFn: (product) => (product.pricing?.discountPercent || 0) >= 40,
       },
     ],
-    []
+    [selectedSizes]
   );
 
   // Quick filter toggle handler
   const toggleQuickFilter = (filterId) => {
+    // Handle special "in-stock" filter
+    if (filterId === "in-stock") {
+      setSizeStockSlider(true);
+      return;
+    }
+
     setQuickFilters((prev) =>
       prev.includes(filterId)
         ? prev.filter((id) => id !== filterId)
         : [...prev, filterId]
     );
+  };
+
+  // Size toggle handler for the slider
+  const handleSizeToggle = (size) => {
+    setSelectedSizes((prev) => {
+      const newSizes = prev.includes(size)
+        ? prev.filter((s) => s !== size)
+        : [...prev, size];
+
+      // Auto-activate in-stock filter when sizes are selected
+      if (newSizes.length > 0 && !quickFilters.includes("in-stock")) {
+        setQuickFilters((current) => [...current, "in-stock"]);
+      } else if (newSizes.length === 0 && quickFilters.includes("in-stock")) {
+        setQuickFilters((current) => current.filter((id) => id !== "in-stock"));
+      }
+
+      return newSizes;
+    });
   };
 
   const baseList = useMemo(() => [...products], [products]);
@@ -331,13 +374,45 @@ const ProductListing = ({
       {/* Quick Filters */}
       <div className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 py-3">
+          {/* Show selected sizes info */}
+          {selectedSizes.length > 0 && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-gray-500">Filtering by sizes:</span>
+              <div className="flex gap-1">
+                {selectedSizes.map((size) => (
+                  <span
+                    key={size}
+                    className="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-medium"
+                  >
+                    {size}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedSizes([]);
+                  setQuickFilters((prev) =>
+                    prev.filter((id) => id !== "in-stock")
+                  );
+                }}
+                className="text-xs text-rose-600 hover:text-rose-700 font-medium ml-2"
+              >
+                Clear sizes
+              </button>
+            </div>
+          )}
+
           <div
             className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
+            {/* Regular Quick Filters */}
             {quickFilterOptions.map((filter) => {
               const Icon = filter.icon;
               const isActive = quickFilters.includes(filter.id);
+              const isInStockWithSizes =
+                filter.id === "in-stock" && selectedSizes.length > 0;
+
               return (
                 <button
                   key={filter.id}
@@ -347,19 +422,31 @@ const ProductListing = ({
                     whitespace-nowrap text-sm font-medium min-w-max
                     ${
                       isActive
-                        ? "bg-gray-800 text-white border-gray-800 shadow-sm"
+                        ? isInStockWithSizes
+                          ? "bg-rose-500 text-white border-rose-500 shadow-sm"
+                          : "bg-gray-800 text-white border-gray-800 shadow-sm"
                         : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
                     }
                   `}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {filter.label}
+                  {isInStockWithSizes && (
+                    <span className="bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full font-medium ml-1">
+                      {selectedSizes.length}
+                    </span>
+                  )}
                 </button>
               );
             })}
+
+            {/* Clear Button */}
             {quickFilters.length > 0 && (
               <button
-                onClick={() => setQuickFilters([])}
+                onClick={() => {
+                  setQuickFilters([]);
+                  setSelectedSizes([]);
+                }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap"
               >
                 Clear
@@ -590,6 +677,19 @@ const ProductListing = ({
         isOpen={notifyMeModal.isOpen}
         onClose={() => setNotifyMeModal({ isOpen: false, product: null })}
         product={notifyMeModal.product}
+      />
+
+      {/* Size Stock Slider */}
+      <SizeStockSlider
+        isOpen={sizeStockSlider}
+        onClose={() => setSizeStockSlider(false)}
+        products={regularFiltered}
+        selectedSizes={selectedSizes}
+        onSizeToggle={handleSizeToggle}
+        onClearSizes={() => {
+          setSelectedSizes([]);
+          setQuickFilters((prev) => prev.filter((id) => id !== "in-stock"));
+        }}
       />
     </div>
   );

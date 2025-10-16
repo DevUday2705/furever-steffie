@@ -15,6 +15,44 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
             list = list.filter((p) => p.availableStock > 0);
         }
 
+        // ✅ 2.5. Smart Stock Filter
+        if (filters.smartStock?.enabled) {
+            list = list.filter((product) => {
+                const { styles = [], sizes = [] } = filters.smartStock;
+
+                // If no styles or sizes selected, show all products
+                if (styles.length === 0 && sizes.length === 0) return true;
+
+                // Check style availability
+                let styleMatch = true;
+                if (styles.length > 0) {
+                    styleMatch = styles.some(style => {
+                        switch (style) {
+                            case 'traditional':
+                                return product.isNonBeadedAvailable;
+                            case 'modern':
+                                return product.isNonBeadedAvailable;
+                            case 'beaded':
+                                return product.isBeadedAvailable;
+                            default:
+                                return false;
+                        }
+                    });
+                }
+
+                // Check size availability
+                let sizeMatch = true;
+                if (sizes.length > 0) {
+                    sizeMatch = sizes.some(size => {
+                        const sizeStock = product.sizeStock?.[size] || 0;
+                        return sizeStock > 0;
+                    });
+                }
+
+                return styleMatch && sizeMatch;
+            });
+        }
+
         // ✅ 3. Price cap
         list = list.filter(
             (p) =>

@@ -485,13 +485,21 @@ const AdminPage = () => {
                 </p>
               </div>
               <button
-                onClick={() => {
-                  setOrdersArePaused(!ordersArePaused);
-                  toast.success(
-                    !ordersArePaused
-                      ? "Orders paused - customers will see notification modal"
-                      : "Orders resumed - customers can place orders normally"
-                  );
+                onClick={async () => {
+                  try {
+                    const newStatus = !ordersArePaused;
+                    await setOrdersArePaused(newStatus);
+                    toast.success(
+                      newStatus
+                        ? "Orders paused - customers will see notification modal"
+                        : "Orders resumed - customers can place orders normally"
+                    );
+                  } catch (error) {
+                    console.error("Error updating order pause status:", error);
+                    toast.error(
+                      "Failed to update order status. Please try again."
+                    );
+                  }
                 }}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   ordersArePaused

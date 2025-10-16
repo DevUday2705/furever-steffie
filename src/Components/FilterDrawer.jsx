@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ChevronRight } from "lucide-react";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
+import SmartStockFilter from "./SmartStockFilter";
 
 export default function FilterDrawer({
   open,
@@ -44,6 +45,7 @@ export default function FilterDrawer({
       if (key === "styleBeaded" && value) return count + 1;
       if (key === "styleSimple" && value) return count + 1;
       if (key === "inStockOnly" && value) return count + 1;
+      if (key === "smartStock" && value?.enabled) return count + 1;
       if (key === "customColor" && value) return count + 1;
       if (key === "maxPrice" && value < filters.priceLimit) return count + 1;
       return count;
@@ -260,30 +262,16 @@ export default function FilterDrawer({
                   </div>
                 )}
 
-                {/* 6) Availability */}
+                {/* 6) Smart Stock Filter */}
                 {activeFilters.includes("availability") && (
-                  <div className="border-b border-gray-100 pb-6">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
-                      Availability
-                    </h3>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <div
-                        className={`w-5 h-5 rounded flex items-center justify-center border ${
-                          filters.inStockOnly
-                            ? "bg-gray-800 border-gray-800"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          handleCheckbox("inStockOnly", !filters.inStockOnly)
-                        }
-                      >
-                        {filters.inStockOnly && (
-                          <Check size={14} className="text-white" />
-                        )}
-                      </div>
-                      <span className="text-gray-700">In Stock Only</span>
-                    </label>
-                  </div>
+                  <SmartStockFilter
+                    filters={filters}
+                    setFilters={setFilters}
+                    onSizeGuideOpen={() => {
+                      // Handle size guide modal opening
+                      console.log("Open size guide modal");
+                    }}
+                  />
                 )}
 
                 {/* 7) Custom Color */}
@@ -328,6 +316,7 @@ export default function FilterDrawer({
                     styleBeaded: false,
                     styleSimple: false,
                     inStockOnly: false,
+                    smartStock: { styles: [], sizes: [], enabled: false },
                     customColor: false,
                     priceLimit: filters.priceLimit,
                     sizeOptions: filters.sizeOptions,
