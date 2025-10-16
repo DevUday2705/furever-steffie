@@ -1,13 +1,15 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-// Configure nodemailer
-const transporter = nodemailer.createTransporter({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+// Create transporter using Gmail SMTP (same as other email APIs)
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'fureversteffie@gmail.com',
+            pass: 'htyq oijh ugoi echv', // App password
+        },
+    });
+};
 
 // HTML email template
 const createDiwaliEmailTemplate = (customerName) => `
@@ -126,12 +128,23 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: 'Recipients array is required' });
         }
 
-        // Send emails to all recipients
-        const emailPromises = recipients.map(async (recipient) => {
+        // Create transporter for this request
+        const transporter = createTransporter();
+
+        // Test the connection first
+        await transporter.verify();
+
+        // Send emails to all recipients with rate limiting
+        const emailPromises = recipients.map(async (recipient, index) => {
             const { email, name } = recipient;
 
+            // Add delay to prevent rate limiting (100ms between emails)
+            if (index > 0) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
             const mailOptions = {
-                from: `"Furever - Pet Fashion" <${process.env.EMAIL_USER}>`,
+                from: `"Furever - Pet Fashion" <fureversteffie@gmail.com>`,
                 to: email,
                 subject: "🎉 Diwali Magic is Here! Orders Are LIVE + Exclusive 5% OFF",
                 html: createDiwaliEmailTemplate(name || 'Pet Parent'),
@@ -141,11 +154,21 @@ export default async function handler(req, res) {
         });
 
         // Wait for all emails to be sent
-        await Promise.all(emailPromises);
+        const results = await Promise.allSettled(emailPromises);
+
+        // Count successful and failed emails
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+
+        if (failed > 0) {
+            console.error(`${failed} emails failed to send out of ${recipients.length}`);
+        }
 
         res.status(200).json({
-            message: `Successfully sent Diwali launch emails to ${recipients.length} customers`,
-            count: recipients.length
+            message: `Successfully sent Diwali launch emails to ${successful} customers`,
+            successful,
+            failed,
+            total: recipients.length
         });
 
     } catch (error) {
