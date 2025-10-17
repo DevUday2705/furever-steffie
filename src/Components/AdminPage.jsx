@@ -19,9 +19,6 @@ const AdminPage = () => {
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
   const { ordersArePaused, setOrdersArePaused } = useOrderPause();
 
-  // Pin functionality state
-  const [pinnedOrders, setPinnedOrders] = useState(new Set());
-
   // Tab state for admin navigation
   const [activeTab, setActiveTab] = useState("orders");
 
@@ -48,6 +45,9 @@ const AdminPage = () => {
     chest: "",
     back: "",
   });
+
+  // Reminder functionality states
+  const [sendingReminder, setSendingReminder] = useState(new Set());
 
   // Helper function to get dhoti details from product data
   const getDhotiDetails = (item) => {
@@ -104,16 +104,6 @@ const AdminPage = () => {
       ...doc.data(),
     }));
     setOrders(allOrders);
-
-    // Update pinned orders state based on orders data
-    const pinned = new Set();
-    allOrders.forEach((order) => {
-      if (order.pinned) {
-        pinned.add(order.id);
-      }
-    });
-    setPinnedOrders(pinned);
-
     setLoading(false);
   };
 
@@ -252,6 +242,69 @@ const AdminPage = () => {
     }));
   };
 
+  // Send measurement reminder function
+  const sendMeasurementReminder = async (orderId) => {
+    setSendingReminder((prev) => new Set(prev).add(orderId));
+
+    try {
+      const order = orders.find((o) => o.id === orderId);
+      if (!order) {
+        toast.error("Order not found");
+        return;
+      }
+
+      const response = await fetch("/api/send-measurement-reminder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderData: {
+            customer: order.customer,
+            items: order.items,
+            orderNumber: order.id,
+          },
+        }),
+      });
+
+      if (response.ok) {
+        // Update the order with reminder info
+        const currentTime = new Date().toISOString();
+        const orderRef = doc(db, "orders", orderId);
+        const reminderCount = (order.reminderCount || 0) + 1;
+
+        await updateDoc(orderRef, {
+          lastReminderSent: currentTime,
+          reminderCount: reminderCount,
+        });
+
+        // Update local state
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderId
+              ? { ...o, lastReminderSent: currentTime, reminderCount }
+              : o
+          )
+        );
+
+        toast.success(
+          `Measurement reminder sent successfully! (Reminder #${reminderCount})`
+        );
+      } else {
+        throw new Error("Failed to send reminder");
+      }
+    } catch (error) {
+      console.error("Error sending reminder:", error);
+      toast.error("Failed to send measurement reminder. Please try again.");
+    } finally {
+      setSendingReminder((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(orderId);
+        return newSet;
+      });
+    }
+  };
+
   const handleDateRangeChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
@@ -275,17 +328,6 @@ const AdminPage = () => {
           order.id === orderId ? { ...order, pinned: newPinnedState } : order
         )
       );
-
-      // Update pinned orders set
-      setPinnedOrders((prev) => {
-        const newSet = new Set(prev);
-        if (newPinnedState) {
-          newSet.add(orderId);
-        } else {
-          newSet.delete(orderId);
-        }
-        return newSet;
-      });
 
       toast.success(
         newPinnedState ? "Order pinned to top!" : "Order unpinned!"
@@ -372,6 +414,8 @@ const AdminPage = () => {
     workInProgress: filteredAndSortedOrders.filter(
       (o) => o.orderStatus === "work-in-progress"
     ).length,
+    cutting: filteredAndSortedOrders.filter((o) => o.orderStatus === "cutting")
+      .length,
     readyToShip: filteredAndSortedOrders.filter(
       (o) => o.orderStatus === "ready-to-ship"
     ).length,
@@ -438,7 +482,7 @@ const AdminPage = () => {
       {activeTab === "orders" && (
         <>
           {/* Stats Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
               <p className="text-xs text-gray-500">📌 Pinned</p>
               <p className="text-lg font-bold text-amber-600">
@@ -455,6 +499,12 @@ const AdminPage = () => {
               <p className="text-xs text-gray-500">In Progress</p>
               <p className="text-lg font-bold text-yellow-500">
                 {orderStats.workInProgress}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">Cutting</p>
+              <p className="text-lg font-bold text-orange-500">
+                {orderStats.cutting}
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -694,6 +744,8 @@ const AdminPage = () => {
                           ? "bg-gray-400"
                           : order.orderStatus === "work-in-progress"
                           ? "bg-yellow-500"
+                          : order.orderStatus === "cutting"
+                          ? "bg-orange-500"
                           : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
                           : order.orderStatus === "shipped"
@@ -716,6 +768,7 @@ const AdminPage = () => {
                           <option value="work-in-progress">
                             Work in Progress
                           </option>
+                          <option value="cutting">Cutting</option>
                           <option value="ready-to-ship">Ready to Ship</option>
                           <option value="shipped">shipped</option>
                         </select>
@@ -806,7 +859,13 @@ const AdminPage = () => {
                                         {item.isBeaded ? "Yes" : "No"}
                                       </span>
                                       , Full Set:{" "}
-                                      <span className="font-medium">
+                                      <span
+                                        className={`font-bold ${
+                                          item.isFullSet
+                                            ? "text-yellow-600"
+                                            : "text-red-600"
+                                        }`}
+                                      >
                                         {item.isFullSet ? "Yes" : "No"}
                                       </span>
                                       {item.isDupattaSet && (
@@ -861,41 +920,58 @@ const AdminPage = () => {
                                     <p className="font-medium text-sm">
                                       📏 Measurements
                                     </p>
-                                    {editingMeasurements?.orderId ===
-                                      order.id &&
-                                    editingMeasurements?.itemIndex === idx ? (
-                                      <div className="flex gap-1">
-                                        <button
-                                          onClick={saveMeasurements}
-                                          className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
-                                        >
-                                          Save
-                                        </button>
-                                        <button
-                                          onClick={cancelEditingMeasurements}
-                                          className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
-                                        >
-                                          Cancel
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <button
-                                        onClick={() =>
-                                          startEditingMeasurements(
-                                            order.id,
-                                            idx,
-                                            item.measurements
-                                          )
-                                        }
-                                        className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-                                      >
-                                        {item.measurements?.neck ||
-                                        item.measurements?.chest ||
-                                        item.measurements?.back
-                                          ? "Edit"
-                                          : "Add"}
-                                      </button>
-                                    )}
+                                    <div className="flex gap-1">
+                                      {editingMeasurements?.orderId ===
+                                        order.id &&
+                                      editingMeasurements?.itemIndex === idx ? (
+                                        <>
+                                          <button
+                                            onClick={saveMeasurements}
+                                            className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
+                                          >
+                                            Save
+                                          </button>
+                                          <button
+                                            onClick={cancelEditingMeasurements}
+                                            className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <button
+                                            onClick={() =>
+                                              startEditingMeasurements(
+                                                order.id,
+                                                idx,
+                                                item.measurements
+                                              )
+                                            }
+                                            className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                                          >
+                                            {item.measurements?.neck ||
+                                            item.measurements?.chest ||
+                                            item.measurements?.back
+                                              ? "Edit"
+                                              : "Add"}
+                                          </button>
+                                          <button
+                                            onClick={() =>
+                                              sendMeasurementReminder(order.id)
+                                            }
+                                            disabled={sendingReminder.has(
+                                              order.id
+                                            )}
+                                            className="px-2 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                          >
+                                            {sendingReminder.has(order.id)
+                                              ? "Sending..."
+                                              : "📧 Remind"}
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
 
                                   {editingMeasurements?.orderId === order.id &&
@@ -991,6 +1067,36 @@ const AdminPage = () => {
                                           No measurements added yet. Click
                                           &quot;Add&quot; to enter customer
                                           measurements.
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Reminder Tracking Info */}
+                                  {(order.lastReminderSent ||
+                                    order.reminderCount) && (
+                                    <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded text-xs">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-purple-700 font-medium">
+                                          📧 Reminder History
+                                        </span>
+                                        <span className="text-purple-600">
+                                          Sent {order.reminderCount || 0}{" "}
+                                          time(s)
+                                        </span>
+                                      </div>
+                                      {order.lastReminderSent && (
+                                        <div className="text-purple-600 mt-1">
+                                          Last sent:{" "}
+                                          {new Date(
+                                            order.lastReminderSent
+                                          ).toLocaleDateString("en-IN", {
+                                            day: "numeric",
+                                            month: "short",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })}
                                         </div>
                                       )}
                                     </div>
