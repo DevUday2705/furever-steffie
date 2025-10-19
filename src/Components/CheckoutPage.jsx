@@ -1272,7 +1272,6 @@ const CheckoutPage = () => {
 
                       <label className="flex items-center p-3 border border-gray-200 rounded-md">
                         <input
-                          disabled
                           type="radio"
                           name="deliveryOption"
                           value="express"
