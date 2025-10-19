@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const OrderUtility = () => {
-  const [jsonInput, setJsonInput] = useState('');
-  const [amount, setAmount] = useState('');
+  const [jsonInput, setJsonInput] = useState("");
+  const [amount, setAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const generateOrderId = () => {
@@ -17,18 +17,18 @@ const OrderUtility = () => {
     const paySuffix = Math.random().toString(36).substring(2, 12);
     return {
       razorpay_order_id: `order_${orderSuffix}`,
-      razorpay_payment_id: `pay_${paySuffix}`
+      razorpay_payment_id: `pay_${paySuffix}`,
     };
   };
 
   const transformJsonToOrder = (inputData, orderAmount) => {
     const { properties } = inputData;
     const razorpayIds = generateRazorpayIds();
-    
+
     // Generate dispatch date (7 days from now)
     const dispatchDate = new Date();
     dispatchDate.setDate(dispatchDate.getDate() + 7);
-    
+
     return {
       id: generateOrderId(),
       amount: parseInt(orderAmount),
@@ -52,68 +52,67 @@ const OrderUtility = () => {
         mobileNumber: properties.mobileNumber || "",
         deliveryOption: properties.deliveryOption || "standard",
         addressLine1: properties.addressLine1 || "",
-        pincode: properties.pincode || ""
+        pincode: properties.pincode || "",
       },
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!jsonInput.trim()) {
-      toast.error('Please enter JSON data');
+      toast.error("Please enter JSON data");
       return;
     }
-    
+
     if (!amount.trim()) {
-      toast.error('Please enter amount');
+      toast.error("Please enter amount");
       return;
     }
 
     try {
       setIsProcessing(true);
-      
+
       // Parse JSON input
       const inputData = JSON.parse(jsonInput);
-      
+
       // Validate JSON structure
       if (!inputData.properties || !inputData.properties.cart) {
-        toast.error('Invalid JSON structure. Missing properties.cart');
+        toast.error("Invalid JSON structure. Missing properties.cart");
         return;
       }
-      
+
       // Transform to order format
       const orderPayload = transformJsonToOrder(inputData, amount);
-      
-      console.log('Order Payload:', orderPayload);
-      
+
+      console.log("Order Payload:", orderPayload);
+
       // Send to API
-      const response = await fetch('/api/save-order', {
-        method: 'POST',
+      const response = await fetch("/api/save-order", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderPayload),
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         toast.success(`Order created successfully! ID: ${orderPayload.id}`);
-        console.log('API Response:', result);
-        
+        console.log("API Response:", result);
+
         // Clear form
-        setJsonInput('');
-        setAmount('');
+        setJsonInput("");
+        setAmount("");
       } else {
         const error = await response.text();
         toast.error(`API Error: ${error}`);
       }
-      
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       if (error instanceof SyntaxError) {
-        toast.error('Invalid JSON format. Please check your input.');
+        toast.error("Invalid JSON format. Please check your input.");
       } else {
         toast.error(`Error: ${error.message}`);
       }
@@ -130,16 +129,16 @@ const OrderUtility = () => {
     try {
       const parsed = JSON.parse(jsonInput);
       setJsonInput(JSON.stringify(parsed, null, 2));
-      toast.success('JSON formatted successfully');
+      toast.success("JSON formatted successfully");
     } catch {
-      toast.error('Invalid JSON - cannot format');
+      toast.error("Invalid JSON - cannot format");
     }
   };
 
   const clearForm = () => {
-    setJsonInput('');
-    setAmount('');
-    toast.success('Form cleared');
+    setJsonInput("");
+    setAmount("");
+    toast.success("Form cleared");
   };
 
   return (
@@ -209,7 +208,7 @@ const OrderUtility = () => {
                 disabled={isProcessing}
                 className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
               >
-                {isProcessing ? 'Processing...' : '🚀 Create Order'}
+                {isProcessing ? "Processing..." : "🚀 Create Order"}
               </button>
             </div>
           </form>
@@ -220,11 +219,22 @@ const OrderUtility = () => {
               📋 Instructions:
             </h3>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Paste JSON data with &quot;properties&quot; containing customer info and &quot;cart&quot; array</li>
+              <li>
+                • Paste JSON data with &quot;properties&quot; containing
+                customer info and &quot;cart&quot; array
+              </li>
               <li>• Enter the order amount in the amount field</li>
-              <li>• The tool will automatically map cart → items and properties → customer</li>
-              <li>• Auto-generates order ID, Razorpay IDs, and dispatch date</li>
-              <li>• Sets order status to &quot;pending&quot; and payment status to &quot;paid&quot;</li>
+              <li>
+                • The tool will automatically map cart → items and properties →
+                customer
+              </li>
+              <li>
+                • Auto-generates order ID, Razorpay IDs, and dispatch date
+              </li>
+              <li>
+                • Sets order status to &quot;pending&quot; and payment status to
+                &quot;paid&quot;
+              </li>
             </ul>
           </div>
 
@@ -234,7 +244,7 @@ const OrderUtility = () => {
               📝 Sample JSON Format:
             </h3>
             <pre className="text-xs text-gray-600 overflow-x-auto">
-{`{
+              {`{
   "event": "Address Submitted",
   "properties": {
     "addressLine1": "2 Amber Close",
