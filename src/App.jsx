@@ -48,6 +48,7 @@ import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
+import OrderUtility from "./Components/OrderUtility";
 import OrderPauseModal from "./Components/OrderPauseModal";
 import { useState, useEffect } from "react";
 import { useOrderPause } from "./context/OrderPauseContext";
@@ -195,6 +196,7 @@ const App = () => {
               <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
+              <Route path="/order-utility" element={<OrderUtility />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />
               <Route path="/test-email" element={<EmailTest />} />
               <Route path="/test-whatsapp" element={<WhatsAppTest />} />
