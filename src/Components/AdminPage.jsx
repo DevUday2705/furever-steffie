@@ -37,6 +37,7 @@ const AdminPage = () => {
   });
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [measurementFilter, setMeasurementFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -367,7 +368,26 @@ const AdminPage = () => {
         matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
-      return matchesSearch && matchesStatus && matchesDate;
+      // Measurement filter
+      let matchesMeasurement = true;
+      if (measurementFilter !== "all") {
+        const hasMeasurements = order.items?.some(
+          (item) =>
+            item.measurements?.neck ||
+            item.measurements?.chest ||
+            item.measurements?.back
+        );
+
+        if (measurementFilter === "has-measurements") {
+          matchesMeasurement = hasMeasurements;
+        } else if (measurementFilter === "no-measurements") {
+          matchesMeasurement = !hasMeasurements;
+        }
+      }
+
+      return (
+        matchesSearch && matchesStatus && matchesDate && matchesMeasurement
+      );
     })
     .sort((a, b) => {
       // First priority: Pinned orders always come first
@@ -570,6 +590,8 @@ const AdminPage = () => {
             setStatusFilter={setStatusFilter}
             sortBy={sortBy}
             setSortBy={setSortBy}
+            measurementFilter={measurementFilter}
+            setMeasurementFilter={setMeasurementFilter}
             onDateRangeChange={handleDateRangeChange}
           />
 
