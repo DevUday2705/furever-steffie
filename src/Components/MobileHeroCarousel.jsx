@@ -12,7 +12,8 @@ const MobileHeroCarousel = () => {
     {
       id: 1,
       type: "video",
-      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165575/V3_egjbpb.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165575/V3_egjbpb.mp4",
       title: "Timeless Attire",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
@@ -21,7 +22,8 @@ const MobileHeroCarousel = () => {
     {
       id: 2,
       type: "video",
-      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V2_c9vqud.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V2_c9vqud.mp4",
       title: "Tradition Tailored",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
@@ -30,7 +32,8 @@ const MobileHeroCarousel = () => {
     {
       id: 3,
       type: "video",
-      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
+      video:
+        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
       title: "Modern Heritage",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
@@ -77,7 +80,7 @@ const MobileHeroCarousel = () => {
     if (!emblaApi) return;
     const newIndex = emblaApi.selectedScrollSnap();
     setSelectedIndex(newIndex);
-    
+
     // Manage video playback - pause all videos except the current one
     videoRefs.current.forEach((video, index) => {
       if (video) {
@@ -98,7 +101,7 @@ const MobileHeroCarousel = () => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Pause all videos when page is not visible
-        videoRefs.current.forEach(video => {
+        videoRefs.current.forEach((video) => {
           if (video) video.pause();
         });
       } else {
@@ -112,10 +115,10 @@ const MobileHeroCarousel = () => {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [selectedIndex, slides]);
 
