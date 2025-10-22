@@ -1,6 +1,5 @@
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useAppContext } from "../context/AppContext";
 import { Link } from "react-router-dom";
 
@@ -8,20 +7,12 @@ const MobileHeroCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { gender } = useAppContext();
+  const videoRefs = useRef([]);
   const maleSlides = [
-    // {
-    //   id: 0,
-    //   image:
-    //     "https://res.cloudinary.com/di6unrpjw/image/upload/v1757757237/Poster_2_xhtqai.jpg",
-    //   title: "",
-    //   subtitle: "Curated styles for the season",
-    //   cta: "Get Now",
-    //   link: "product/G604GyHMqL7s7RK10Ma6+kurta",
-    // },
     {
       id: 1,
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
+      type: "video",
+      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165575/V3_egjbpb.mp4",
       title: "Timeless Attire",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
@@ -29,8 +20,8 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 2,
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104210/Rajwadi_Red_Kurta_for_Dogs_2_dljxzj.webp",
+      type: "video",
+      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V2_c9vqud.mp4",
       title: "Tradition Tailored",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
@@ -38,8 +29,8 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 3,
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1750104207/ChatGPT_Image_Jun_15_2025_12_50_08_AM_zjtjoc.webp",
+      type: "video",
+      video: "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
       title: "Modern Heritage",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
@@ -50,6 +41,7 @@ const MobileHeroCarousel = () => {
   const femaleSlides = [
     {
       id: 4,
+      type: "image",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9666_1_j33uu0.webp",
       title: "Festive Vibes",
@@ -59,6 +51,7 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 5,
+      type: "image",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9657_1_sz78s0.webp",
       title: "Elegant Threads",
@@ -68,6 +61,7 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 6,
+      type: "image",
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/blue-frock_lhb0ge.webp",
       title: "Summer Breeze",
@@ -79,18 +73,51 @@ const MobileHeroCarousel = () => {
 
   const slides = gender === "female" ? femaleSlides : maleSlides;
 
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
+    const newIndex = emblaApi.selectedScrollSnap();
+    setSelectedIndex(newIndex);
+    
+    // Manage video playback - pause all videos except the current one
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === newIndex && slides[index]?.type === "video") {
+          video.play().catch(() => {
+            // Autoplay might be prevented by browser policy
+            console.log("Video autoplay prevented");
+          });
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, [emblaApi, slides]);
+
+  // Add visibility observer for performance
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Pause all videos when page is not visible
+        videoRefs.current.forEach(video => {
+          if (video) video.pause();
+        });
+      } else {
+        // Resume active video when page becomes visible
+        const activeVideo = videoRefs.current[selectedIndex];
+        if (activeVideo && slides[selectedIndex]?.type === "video") {
+          activeVideo.play().catch(() => {
+            console.log("Video resume prevented");
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [selectedIndex, slides]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -103,28 +130,60 @@ const MobileHeroCarousel = () => {
       emblaApi.scrollNext();
     }, 5000);
 
+    // Initial video setup
+    if (slides[0]?.type === "video" && videoRefs.current[0]) {
+      videoRefs.current[0].play().catch(() => {
+        console.log("Initial video autoplay prevented");
+      });
+    }
+
     return () => {
       emblaApi.off("select", onSelect);
       clearInterval(autoplayInterval);
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, slides]);
 
   return (
     <section className="w-full bg-transparent rounded-md">
       <div className="relative w-full h-[65vh] overflow-hidden" ref={emblaRef}>
         <div className="flex h-full touch-pan-y">
-          {slides.map((slide) => (
+          {slides.map((slide, index) => (
             <div
               key={slide.id}
               className="flex-[0_0_100%] min-w-0 relative h-full transition-opacity duration-300"
             >
               <div className="relative w-full h-full">
-                <img
-                  src={slide.image}
-                  alt={slide.title}
-                  className="w-full h-full object-cover object-[25%_75%] rounded-md"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t  from-black/40 to-transparent rounded-md" />
+                {slide.type === "video" ? (
+                  <video
+                    ref={(el) => (videoRefs.current[index] = el)}
+                    src={slide.video}
+                    autoPlay={index === selectedIndex}
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-cover object-center rounded-md"
+                    style={{ objectPosition: "25% 75%" }}
+                    onLoadedData={() => {
+                      // Ensure the active video plays when loaded
+                      if (index === selectedIndex && videoRefs.current[index]) {
+                        videoRefs.current[index].play().catch(() => {
+                          console.log("Video autoplay prevented");
+                        });
+                      }
+                    }}
+                    onError={() => {
+                      console.warn("Video failed to load:", slide.video);
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={slide.image}
+                    alt={slide.title}
+                    className="w-full h-full object-cover object-[25%_75%] rounded-md"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-md" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 rounded-md">
                   <h2 className="text-3xl font-bold mb-2 text-white">
                     {slide.title}
