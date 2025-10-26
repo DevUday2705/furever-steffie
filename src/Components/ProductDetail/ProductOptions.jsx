@@ -25,6 +25,7 @@ const ProductOptions = ({
   setIsFullSet,
   isDupattaSet, // NEW
   setIsDupattaSet, // NEW
+  selectedSize, // NEW - to control availability of dhoti/royal
   selectedDhoti,
   setSelectedDhoti,
   selectedColor, // NEW
@@ -50,6 +51,13 @@ const ProductOptions = ({
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
 
   const handleRoyalSetClick = () => {
+    // guard: only allow royal set for XS/S/M
+    const allowed = ["XS", "S", "M"].includes(selectedSize);
+    if (!allowed) {
+      setShowDhotiUnavailableModal(true);
+      return;
+    }
+
     setIsRoyalSet(true);
     setIsFullSet(true); // Royal set includes dhoti
     setIsDupattaSet(false); // Reset dupatta when royal is selected
@@ -62,6 +70,20 @@ const ProductOptions = ({
     }, 3000);
     // Hide description after 5 seconds
   };
+
+  // Disable dhoti/royal options for sizes L and above
+  const isSizeAllowedForDhotiRoyal = ["XS", "S", "M"].includes(selectedSize);
+
+  // If user switches to a size where these options are not allowed, clear them
+  useEffect(() => {
+    if (!isSizeAllowedForDhotiRoyal) {
+      if (isRoyalSet) setIsRoyalSet(false);
+      if (isFullSet) setIsFullSet(false);
+      // reset selected dhoti since dhoti options should not be selectable
+      if (selectedDhoti) setSelectedDhoti(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSize]);
 
   useEffect(() => {
     const initialTimer = setTimeout(() => {
@@ -256,14 +278,26 @@ const ProductOptions = ({
 
               {/* Regular Kurta + Dhoti Option */}
               <button
-                onClick={() => handleRegularOptionClick(true, false)}
+                onClick={() =>
+                  isSizeAllowedForDhotiRoyal &&
+                  handleRegularOptionClick(true, false)
+                }
+                disabled={!isSizeAllowedForDhotiRoyal}
+                aria-disabled={!isSizeAllowedForDhotiRoyal}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
                   isFullSet && !isRoyalSet && !isDupattaSet
                     ? "border-gray-800 bg-gray-100"
-                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                    : isSizeAllowedForDhotiRoyal
+                    ? "border-gray-200 bg-gray-50 hover:border-gray-300"
+                    : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                 } border text-gray-800`}
               >
                 Kurta + Dhoti
+                {!isSizeAllowedForDhotiRoyal && (
+                  <span className="ml-2 text-xs text-orange-600">
+                    (XS/S/M only)
+                  </span>
+                )}
               </button>
 
               {/* NEW: Kurta + Dupatta Option */}
@@ -285,11 +319,15 @@ const ProductOptions = ({
                 <button
                   onClick={handleRoyalSetClick}
                   onMouseEnter={triggerShine}
+                  disabled={!isSizeAllowedForDhotiRoyal}
+                  aria-disabled={!isSizeAllowedForDhotiRoyal}
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
                     ${
                       isRoyalSet
                         ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
-                        : "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
+                        : isSizeAllowedForDhotiRoyal
+                        ? "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
+                        : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
                     }
                   `}
                 >
@@ -299,6 +337,12 @@ const ProductOptions = ({
                     ? "Royal Set Selected ✓"
                     : "Click here for  Royal Set"}
                 </button>
+
+                {!isSizeAllowedForDhotiRoyal && (
+                  <div className="text-xs text-orange-600 mt-2">
+                    Royal Set available only for sizes XS, S, M
+                  </div>
+                )}
 
                 <motion.div
                   className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-gray-200/80 to-transparent opacity-50"
