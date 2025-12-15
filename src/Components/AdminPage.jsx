@@ -260,11 +260,10 @@ const AdminPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          orderData: {
-            customer: order.customer,
-            items: order.items,
-            orderNumber: order.id,
-          },
+          orderId: order.id,
+          orderNumber: order.id,
+          customer: order.customer,
+          items: order.items,
         }),
       });
 
