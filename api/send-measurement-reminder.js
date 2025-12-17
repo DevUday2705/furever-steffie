@@ -90,7 +90,7 @@ const generateMeasurementReminderHTML = (orderData) => {
                 <div style="color: #1e40af; line-height: 1.6;">
                     <p style="margin: 0 0 12px 0;">You can share your pet's measurements in any of these ways:</p>
                     <ul style="margin: 0; padding-left: 20px;">
-                        <li style="margin-bottom: 8px;"><strong>Visit our website:</strong> <a href="https://www.fureversteffie.com/size-guide" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">www.fureversteffie.com/size-guide</a> to submit measurements directly</li>
+                        <li style="margin-bottom: 8px;"><strong>Visit our website:</strong> <a href="https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customer.mobileNumber)}" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">www.fureversteffie.com/size-guide</a> to submit measurements directly</li>
                         <li style="margin-bottom: 8px;">Reply to this email with the measurements</li>
                         <li style="margin-bottom: 8px;">Send a photo with measurements marked</li>
                     </ul>
@@ -100,7 +100,7 @@ const generateMeasurementReminderHTML = (orderData) => {
             <!-- CTA Buttons -->
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="display: inline-block; margin: 0 10px 15px 10px;">
-                    <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <a href="https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customer.mobileNumber)}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                         🌐 Submit on Website
                     </a>
                 </div>
@@ -126,7 +126,7 @@ const generateMeasurementReminderHTML = (orderData) => {
             <p style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;">Thank you for choosing Furever Steffie!</p>
             <p style="color: #6b7280; margin: 0; font-size: 12px;">
                 This is an automated reminder. Please don't reply directly to this email address.
-                <br>For support, visit <a href="https://www.fureversteffie.com/size-guide" style="color: #6b7280;">www.fureversteffie.com/size-guide</a> or email fureversteffie@gmail.com
+                <br>For support, visit <a href="https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customer.mobileNumber)}" style="color: #6b7280;">www.fureversteffie.com/size-guide</a> or email fureversteffie@gmail.com
             </p>
         </div>
     </div>

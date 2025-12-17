@@ -139,20 +139,9 @@ const FinalReceipt = () => {
         <p className="font-medium mb-1">Important Information About Delivery</p>
         <p>
           You can expect to get your order stitched and delivered within 5-6
-          days after payment.
+          days after payment. For measurements, please visit www.fureversteffie.com/size-guide
         </p>
       </div>
-      <h1 className="mt-2 flex items-center">
-        Need help? Drop me a message on Whatsapp{" "}
-        <a
-          href="https://wa.me/917042212942"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center cursor-pointer shrink-0 justify-center w-8 h-8 rounded-full hover:bg-green-600 transition-colors"
-        >
-          <img src="/images/wa.png" className="h-10 w-full shrink-0" />
-        </a>
-      </h1>
       <button
         onClick={handlePrint}
         className="w-full py-3 exclude cursor-pointer bg-black text-xl mt-5 text-white rounded-md"

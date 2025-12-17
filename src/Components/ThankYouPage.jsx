@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
-import { CheckCircle, Clock, Heart, MessageCircle, Ruler } from "lucide-react";
+import { CheckCircle, Clock, Heart, Ruler } from "lucide-react";
 import Lottie from "react-lottie";
 
 import success from "../../public/animation/success.json";
@@ -25,27 +25,6 @@ const ThankYouPage = () => {
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
-  };
-
-  const handleWhatsAppClick = () => {
-    const message = `Hi Furever Team! 🐾
-
-I've just placed an order (Order ID: ${
-      orderId || "Just placed"
-    }) and I'm ready to share my pup's measurements for the perfect fit!
-
-📦 Order Details:
-• Product: ${orderData?.name || "Custom outfit"}
-• Size: ${orderData?.selectedSize || "As selected"}
-• Customer: ${customerData?.fullName || ""}
-
-Please guide me through the measuring process so you can custom stitch the outfit according to my pup's measurements for perfect fitting and comfort.
-
-Looking forward to hearing from you! 🎉`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/917042212942?text=${encodedMessage}`;
-    window.open(whatsappUrl, "_blank");
   };
 
   useEffect(() => {
@@ -168,17 +147,16 @@ Looking forward to hearing from you! 🎉`;
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Final Step: Share Your Pup's Measurements
+                  Next Step: Provide Your Pup's Measurements
                 </h3>
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-gray-500" />
                   <p className="text-gray-600 text-sm">
-                    Quick & simple - takes less than 2 minutes
+                    Visit our size guide - takes less than 2 minutes
                   </p>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  We'll guide you through the entire process to ensure perfect
-                  fit and comfort for your furry friend.
+                  You can provide measurements using our detailed size guide, or update them later through the confirmation email we've sent you.
                 </p>
               </div>
             </div>
@@ -208,18 +186,20 @@ Looking forward to hearing from you! 🎉`;
               </p>
             </div>
 
-            <button
-              onClick={handleWhatsAppClick}
+            <a
+              href={`https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customerData?.mobileNumber || '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group shadow-sm hover:shadow-md"
             >
-              <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>Finalize Fit on WhatsApp</span>
-            </button>
+              <Ruler className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>Visit Size Guide</span>
+            </a>
 
             {/* Footer */}
             <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
               <Heart className="w-3 h-3" />
-              <span>Opens WhatsApp to +91 88281 45667</span>
+              <span>You can also update measurements later via confirmation email</span>
             </div>
           </div>
         </motion.div>

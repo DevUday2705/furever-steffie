@@ -84,7 +84,7 @@ const generateOrderDetailsHTML = (orderData) => {
                 • Delayed measurements may cause delivery delays (we won't be responsible)
               </p>
             </div>
-            <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 8px;">
+            <a href="https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customer.mobileNumber)}" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 8px;">
               � Share Measurements Now
             </a>
             <p style="color: #92400e; margin: 12px 0 0 0; font-size: 12px;">
@@ -156,7 +156,7 @@ const generateOrderDetailsHTML = (orderData) => {
           </p>
           
           <div style="margin-top: 20px;">
-            <a href="https://www.fureversteffie.com/size-guide" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 0 8px;">
+            <a href="https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customer.mobileNumber)}" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 0 8px;">
               📐 Complete Your Order - Add Measurements
             </a>
           </div>

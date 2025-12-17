@@ -1,5 +1,6 @@
 import { Play, Search, Save, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   doc,
   updateDoc,
@@ -12,6 +13,7 @@ import { db } from "../firebase";
 import toast from "react-hot-toast";
 
 const SizeGuide = () => {
+  const [searchParams] = useSearchParams();
   const [videoError, setVideoError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [orderNumber, setOrderNumber] = useState("");
@@ -19,6 +21,85 @@ const SizeGuide = () => {
   const [loading, setLoading] = useState(false);
   const [measurements, setMeasurements] = useState({});
   const [savingMeasurements, setSavingMeasurements] = useState(false);
+
+  // Auto-fetch order if mobile number is provided in URL
+  useEffect(() => {
+    const mobileFromUrl = searchParams.get("mobileNumber");
+    if (mobileFromUrl) {
+      setOrderNumber(mobileFromUrl);
+      // Auto-fetch the order
+      fetchOrderByMobile(mobileFromUrl);
+    }
+  }, [searchParams]);
+
+  const fetchOrderByMobile = async (mobileNumber) => {
+    setLoading(true);
+    try {
+      const searchTerm = mobileNumber.trim();
+      let orderFound = false;
+      let orderData = null;
+
+      // Clean mobile number - remove +91 or 91 prefix
+      let cleanNumber = searchTerm.replace(/^\+?91?/, "");
+      
+      // If the original search term was just 10 digits, keep it as is
+      // If it had country code, extract just the 10-digit part
+      if (searchTerm.length === 10 && /^[0-9]{10}$/.test(searchTerm)) {
+        cleanNumber = searchTerm;
+      } else {
+        // For numbers with country codes, extract the last 10 digits
+        cleanNumber = searchTerm.replace(/^\+?91?/, "").slice(-10);
+      }
+
+      const possibleFormats = [
+        cleanNumber, // 9920271866
+        `+91${cleanNumber}`, // +919920271866
+        `91${cleanNumber}`, // 919920271866
+        `+${cleanNumber}`, // +9920271866
+      ];
+
+      // Search for orders with any of these mobile number formats
+      for (const format of possibleFormats) {
+        if (orderFound) break;
+
+        const mobileQuery = query(
+          collection(db, "orders"),
+          where("customer.mobileNumber", "==", format)
+        );
+
+        const mobileSnapshot = await getDocs(mobileQuery);
+
+        if (!mobileSnapshot.empty) {
+          const orders = mobileSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          // Sort by creation date (most recent first)
+          orders.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
+          orderData = orders[0]; // Get most recent order
+          orderFound = true;
+          break;
+        }
+      }
+
+      if (orderFound) {
+        setOrder(orderData);
+        setMeasurements(orderData.measurements || {});
+        toast.success("Order found! You can now submit your measurements.");
+      } else {
+        toast.error("No order found with this mobile number");
+      }
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      toast.error("Error fetching order details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleVideoError = () => {
     setVideoError(true);
@@ -29,127 +110,51 @@ const SizeGuide = () => {
     setIsLoading(false);
   };
 
-  const handleWhatsAppClick = () => {
-    const phoneNumber = "917042212942";
-    const message =
-      "Hi! I need help with taking my pet's measurements for the perfect fit. Can you guide me through the process?";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(whatsappUrl, "_blank");
-  };
-
   const fetchOrder = async () => {
     if (!orderNumber.trim()) {
       toast.error("Please enter your order number or mobile number");
       return;
     }
 
+    const searchTerm = orderNumber.trim();
+    
+    // Check if search term looks like a mobile number
+    const isLikelyMobileNumber =
+      /^\+?[0-9]{10,13}$/.test(searchTerm) || /^[0-9]{10}$/.test(searchTerm);
+
+    if (isLikelyMobileNumber) {
+      await fetchOrderByMobile(searchTerm);
+    } else {
+      // Handle order ID search
+      await fetchOrderById(searchTerm);
+    }
+  };
+
+  const fetchOrderById = async (orderId) => {
     setLoading(true);
     try {
-      const searchTerm = orderNumber.trim();
       let orderFound = false;
       let orderData = null;
 
-      // Check if search term looks like a mobile number (only digits, 10-13 characters)
-      // Accept 10-digit numbers (without country code) or 10-13 digit numbers (with country code)
-      const isLikelyMobileNumber =
-        /^\+?[0-9]{10,13}$/.test(searchTerm) || /^[0-9]{10}$/.test(searchTerm);
+      // Search for order by orderNumber field (e.g., "ORD-478542")
+      const orderNumberQuery = query(
+        collection(db, "orders"),
+        where("orderNumber", "==", orderId)
+      );
 
-      if (isLikelyMobileNumber) {
-        // Mobile number search with flexible formatting
-        let cleanNumber = searchTerm.replace(/^\+?91?/, ""); // Remove +91 or 91 prefix
+      const orderNumberSnapshot = await getDocs(orderNumberQuery);
 
-        // If the original search term was just 10 digits, keep it as is
-        // If it had country code, extract just the 10-digit part
-        if (searchTerm.length === 10 && /^[0-9]{10}$/.test(searchTerm)) {
-          cleanNumber = searchTerm; // Keep original 10-digit number
-        } else {
-          // For numbers with country codes, extract the last 10 digits
-          cleanNumber = searchTerm.replace(/^\+?91?/, "").slice(-10);
-        }
-
-        const possibleFormats = [
-          cleanNumber, // 9920271866
-          `+91${cleanNumber}`, // +919920271866
-          `91${cleanNumber}`, // 919920271866
-          `+${cleanNumber}`, // +9920271866 (in case someone adds + without country code)
-        ];
-
-        // Search for orders with any of these mobile number formats
-        for (const format of possibleFormats) {
-          if (orderFound) break;
-
-          // Search in customer.mobileNumber field
-          const mobileQuery = query(
-            collection(db, "orders"),
-            where("customer.mobileNumber", "==", format)
-          );
-
-          const mobileSnapshot = await getDocs(mobileQuery);
-
-          if (!mobileSnapshot.empty) {
-            // If multiple orders found, get the most recent one
-            const orders = mobileSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-
-            // Sort by creation date (most recent first)
-            orders.sort(
-              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-            );
-
-            orderData = orders[0]; // Get the most recent order
-            orderFound = true;
-            break;
-          }
-        }
-
-        if (orderFound) {
-          setOrder(orderData);
-
-          // Initialize measurements state
-          const initialMeasurements = {};
-          orderData.items?.forEach((item, index) => {
-            initialMeasurements[index] = {
-              neck: item.measurements?.neck || "",
-              chest: item.measurements?.chest || "",
-              back: item.measurements?.back || "",
-            };
-          });
-          setMeasurements(initialMeasurements);
-
-          toast.success(
-            `Order found for mobile number! Showing most recent order: ${orderData.orderNumber}`
-          );
-          return;
-        }
+      if (!orderNumberSnapshot.empty) {
+        const orderDoc = orderNumberSnapshot.docs[0];
+        orderData = { id: orderDoc.id, ...orderDoc.data() };
+        orderFound = true;
       }
 
-      // If not found by mobile number or not a mobile number, try order number search
-      if (!orderFound) {
-        // Search for order by orderNumber field (e.g., "ORD-478542")
-        const orderNumberQuery = query(
-          collection(db, "orders"),
-          where("orderNumber", "==", searchTerm)
-        );
-
-        const orderNumberSnapshot = await getDocs(orderNumberQuery);
-
-        if (!orderNumberSnapshot.empty) {
-          // Get the first matching document
-          const orderDoc = orderNumberSnapshot.docs[0];
-          orderData = { id: orderDoc.id, ...orderDoc.data() };
-          orderFound = true;
-        }
-      }
-
-      // If still not found, try searching by razorpay_order_id as fallback
+      // If not found, try searching by razorpay_order_id as fallback
       if (!orderFound) {
         const fallbackQuery = query(
           collection(db, "orders"),
-          where("razorpay_order_id", "==", searchTerm)
+          where("razorpay_order_id", "==", orderId)
         );
 
         const fallbackSnapshot = await getDocs(fallbackQuery);
@@ -163,33 +168,26 @@ const SizeGuide = () => {
 
       if (orderFound) {
         setOrder(orderData);
-
-        // Initialize measurements state
-        const initialMeasurements = {};
-        orderData.items?.forEach((item, index) => {
-          initialMeasurements[index] = {
-            neck: item.measurements?.neck || "",
-            chest: item.measurements?.chest || "",
-            back: item.measurements?.back || "",
-          };
-        });
-        setMeasurements(initialMeasurements);
-
+        setMeasurements(orderData.measurements || {});
         toast.success("Order found! You can now update measurements");
       } else {
-        toast.error(
-          "Order not found. Please check your order number (e.g., order_RGsHOSs2903WqQ) or mobile number (e.g., 9920271866 or +919920271866)"
-        );
+        toast.error("Order not found. Please check your order number");
         setOrder(null);
       }
     } catch (error) {
       console.error("Error fetching order:", error);
-      toast.error("Error fetching order. Please try again");
+      toast.error("Error fetching order details");
     } finally {
       setLoading(false);
     }
   };
+        }
 
+        const possibleFormats = [
+          cleanNumber, // 9920271866
+          `+91${cleanNumber}`, // +919920271866
+          `91${cleanNumber}`, // 919920271866
+          `+${cleanNumber}`, // +9920271866 (in case someone adds + without country code)
   const updateMeasurement = (itemIndex, field, value) => {
     setMeasurements((prev) => ({
       ...prev,

@@ -191,7 +191,7 @@ const CheckoutPage = () => {
       const requiredCustomerType = CUSTOMER_VALIDATION_COUPONS[code];
 
       // Check if email and mobile are provided
-      if (!formData.email || !formData.mobile) {
+      if (!formData.email || !formData.mobileNumber) {
         setCouponError(
           "Please enter your email and mobile number to use this coupon."
         );
@@ -203,7 +203,7 @@ const CheckoutPage = () => {
         // Check customer type
         const customerType = await checkCustomerType(
           formData.email,
-          formData.mobile
+          formData.mobileNumber
         );
 
         if (requiredCustomerType === "any") {
@@ -1217,8 +1217,7 @@ const CheckoutPage = () => {
                     </p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
-                    💡 We recommend providing a valid mobile number for WhatsApp
-                    communication and order updates.
+                    Required for order updates and delivery coordination.
                     {formData.country !== "india" &&
                       " Include country code (e.g., +1234567890)"}
                   </p>
