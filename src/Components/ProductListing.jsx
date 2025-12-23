@@ -127,6 +127,14 @@ const ProductListing = ({
 
   const { currency, rate } = useContext(CurrencyContext);
 
+  // Function to check if the file is a video
+  const isVideo = (url) => {
+    if (!url) return false;
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v'];
+    const urlPath = url.toLowerCase();
+    return videoExtensions.some(ext => urlPath.includes(ext));
+  };
+
   // Define quick filters with classy gray theme
   const quickFilterOptions = useMemo(
     () => [
@@ -344,11 +352,22 @@ const ProductListing = ({
 
       {/* Banner */}
       <div className="relative bg-white w-full h-[250px] md:h-[300px] overflow-hidden">
-        <img
-          src={bannerImage}
-          alt="Kurta Banner"
-          className="w-full rounded-md h-full object-cover"
-        />
+        {bannerImage && isVideo(bannerImage) ? (
+          <video
+            src={bannerImage}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full rounded-md h-full object-cover"
+          />
+        ) : (
+          <img
+            src={bannerImage}
+            alt="Kurta Banner"
+            className="w-full rounded-md h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-md flex items-end justify-center">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
@@ -489,12 +508,24 @@ const ProductListing = ({
               >
                 <Link to={`/product/${product.id}+${product.type}`}>
                   <div className="relative pb-[125%] overflow-hidden">
-                    <motion.img
-                      src={product.mainImage}
-                      alt={product.name}
-                      className="absolute w-full h-full object-cover"
-                      whileHover={{ scale: 1.05 }}
-                    />
+                    {product.mainImage && isVideo(product.mainImage) ? (
+                      <motion.video
+                        src={product.mainImage}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute w-full h-full object-cover"
+                        whileHover={{ scale: 1.05 }}
+                      />
+                    ) : (
+                      <motion.img
+                        src={product.mainImage}
+                        alt={product.name}
+                        className="absolute w-full h-full object-cover"
+                        whileHover={{ scale: 1.05 }}
+                      />
+                    )}
 
                     {/* Stock Status Indicators */}
                     {stockStatus.soldOut && product.category !== "tut" && (

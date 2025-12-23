@@ -7,18 +7,35 @@ const ImageCarousel = ({
   scrollSnaps,
   emblaRef,
 }) => {
+  // Function to check if the file is a video
+  const isVideo = (url) => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v'];
+    const urlPath = url.toLowerCase();
+    return videoExtensions.some(ext => urlPath.includes(ext));
+  };
   return (
     <>
-      {/* Image Carousel */}
+      {/* Media Carousel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {images.map((img, idx) => (
+          {images.map((media, idx) => (
             <div className="min-w-full relative pb-[133%]" key={idx}>
-              <img
-                src={img}
-                alt={`Product Image ${idx + 1}`}
-                className="absolute w-full h-full object-cover object-[0%_25%]"
-              />
+              {isVideo(media) ? (
+                <video
+                  src={media}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute w-full h-full object-cover object-[0%_25%]"
+                />
+              ) : (
+                <img
+                  src={media}
+                  alt={`Product Media ${idx + 1}`}
+                  className="absolute w-full h-full object-cover object-[0%_25%]"
+                />
+              )}
             </div>
           ))}
         </div>

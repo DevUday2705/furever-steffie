@@ -181,13 +181,7 @@ const SizeGuide = () => {
       setLoading(false);
     }
   };
-        }
 
-        const possibleFormats = [
-          cleanNumber, // 9920271866
-          `+91${cleanNumber}`, // +919920271866
-          `91${cleanNumber}`, // 919920271866
-          `+${cleanNumber}`, // +9920271866 (in case someone adds + without country code)
   const updateMeasurement = (itemIndex, field, value) => {
     setMeasurements((prev) => ({
       ...prev,
