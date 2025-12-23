@@ -17,6 +17,27 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart, setIsOpen } = useAppContext();
   const [idPart, typePart] = productId.split("+");
+
+  // Function to check if the file is a video
+  const isVideo = (url) => {
+    if (!url) return false;
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v'];
+    const urlPath = url.toLowerCase();
+    return videoExtensions.some(ext => urlPath.includes(ext));
+  };
+
+  // Function to filter images - skip first element if it's a video
+  const filterImagesForGallery = (imageArray) => {
+    if (!imageArray || imageArray.length === 0) return [];
+    
+    // If first image is a video, skip it and return the rest
+    if (isVideo(imageArray[0])) {
+      return imageArray.slice(1);
+    }
+    
+    // Otherwise return all images
+    return imageArray;
+  };
   const [selectedColor, setSelectedColor] = useState(null);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,26 +100,25 @@ const ProductDetail = () => {
           if (isKurta) {
             const beadedImgs = foundProduct.options?.beaded?.images || [];
             const nonBeadedImgs = foundProduct.options?.nonBeaded?.images || [];
-            setImages([...beadedImgs, ...nonBeadedImgs]);
+            const allImages = [...beadedImgs, ...nonBeadedImgs];
+            setImages(filterImagesForGallery(allImages));
           } else if (foundProduct.colors?.length > 0) {
             const colorData = foundProduct.colors.find(
               (c) => c.id === defaultColor
             );
             if (colorData?.options) {
-              setImages(
-                defaultIsBeaded
-                  ? colorData.options.beaded?.images ?? []
-                  : colorData.options.nonBeaded?.images ?? []
-              );
+              const selectedImages = defaultIsBeaded
+                ? colorData.options.beaded?.images ?? []
+                : colorData.options.nonBeaded?.images ?? [];
+              setImages(filterImagesForGallery(selectedImages));
             }
           } else if (foundProduct.options) {
-            setImages(
-              defaultIsBeaded
-                ? foundProduct.options.beaded?.images ?? []
-                : foundProduct.options.nonBeaded?.images ?? []
-            );
+            const selectedImages = defaultIsBeaded
+              ? foundProduct.options.beaded?.images ?? []
+              : foundProduct.options.nonBeaded?.images ?? [];
+            setImages(filterImagesForGallery(selectedImages));
           } else {
-            setImages([foundProduct.mainImage]);
+            setImages(filterImagesForGallery([foundProduct.mainImage]));
           }
         } else {
           setProduct(null);
@@ -120,23 +140,21 @@ const ProductDetail = () => {
     if (product.colors && selectedColor) {
       const colorData = product.colors.find((c) => c.id === selectedColor);
       if (colorData?.options) {
-        setImages(
-          isBeaded
-            ? colorData.options.beaded?.images ?? []
-            : colorData.options.nonBeaded?.images ?? []
-        );
+        const selectedImages = isBeaded
+          ? colorData.options.beaded?.images ?? []
+          : colorData.options.nonBeaded?.images ?? [];
+        setImages(filterImagesForGallery(selectedImages));
         return;
       }
     }
 
     if (product.options) {
-      setImages(
-        isBeaded
-          ? product.options.beaded?.images ?? []
-          : product.options.nonBeaded?.images ?? []
-      );
+      const selectedImages = isBeaded
+        ? product.options.beaded?.images ?? []
+        : product.options.nonBeaded?.images ?? [];
+      setImages(filterImagesForGallery(selectedImages));
     } else {
-      setImages([product.mainImage]);
+      setImages(filterImagesForGallery([product.mainImage]));
     }
   }, [isBeaded, product, selectedColor]);
 
