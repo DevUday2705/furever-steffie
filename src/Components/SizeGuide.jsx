@@ -22,6 +22,15 @@ const SizeGuide = () => {
   const [measurements, setMeasurements] = useState({});
   const [savingMeasurements, setSavingMeasurements] = useState(false);
 
+  // Handle WhatsApp click for measurement help
+  const handleWhatsAppClick = () => {
+    const message = `Hi, I need help with taking measurements for my pet's clothing order${order ? ` (Order ID: ${order.id})` : ''}. Can you guide me through the process?`;
+    window.open(
+      `https://wa.me/+918828145667?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+  };
+
   // Auto-fetch order if mobile number is provided in URL
   useEffect(() => {
     const mobileFromUrl = searchParams.get("mobileNumber");
