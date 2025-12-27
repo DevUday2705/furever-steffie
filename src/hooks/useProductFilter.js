@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 export const useProductFilter = (products, filters, searchQuery = "") => {
+
     return useMemo(() => {
         let list = [...products];
 
@@ -9,12 +10,12 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
             const q = searchQuery.toLowerCase();
             list = list.filter((p) => p.name.toLowerCase().includes(q));
         }
-
+        console.log("After Search Filter:", list);
         // ✅ 2. In Stock Only
         if (filters.inStockOnly) {
             list = list.filter((p) => p.availableStock > 0);
         }
-
+        console.log("After In Stock Filter:", list);
         // ✅ 2.5. Smart Stock Filter
         if (filters.smartStock?.enabled) {
             list = list.filter((product) => {
@@ -52,14 +53,15 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
                 return styleMatch && sizeMatch;
             });
         }
-
+        console.log("After Smart Stock Filter:", list);
         // ✅ 3. Price cap
         list = list.filter(
             (p) =>
                 p.pricing.basePrice + (p.pricing.beadedAdditional || 0) <=
                 filters.maxPrice
         );
-
+        console.log("After Price Cap Filter:", list);
+        console.log("Filters max price", filters.maxPrice);
         // ✅ 4. Sizes
         if (filters.sizes.length) {
             list = list.filter((p) =>

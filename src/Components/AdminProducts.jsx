@@ -19,7 +19,7 @@ const collections = [
   "frocks",
   "tuxedos",
   "tuts",
-  "female-bandanas",
+  "lehengas",
   "male-bandanas",
 ];
 

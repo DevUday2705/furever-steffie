@@ -52,8 +52,8 @@ const ProductListing = ({
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [filters, setFilters] = useState({
     sortBy: "",
-    maxPrice: 2000,
-    priceLimit: 2000,
+    maxPrice: 5000,
+    priceLimit: 5000,
     sizes: [],
     sizeOptions: ["XS", "S", "M", "L", "XL", "XXL"],
     styleBeaded: false,
@@ -232,7 +232,7 @@ const ProductListing = ({
 
   // Apply regular filters first
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
-
+  
   // Then apply quick filters
   const filtered = useMemo(() => {
     if (quickFilters.length === 0) {
@@ -289,10 +289,10 @@ const ProductListing = ({
       styleSimple: getBoolean(searchParams.get("simple")),
       inStockOnly: getBoolean(searchParams.get("stock")),
       customColor: getBoolean(searchParams.get("custom")),
-      maxPrice: Number(searchParams.get("price")) || 2000,
+      maxPrice: Number(searchParams.get("price")) || 5000,
 
       // Keep static values intact
-      priceLimit: 2000,
+      priceLimit: 5000,
       sizeOptions: ["XS", "S", "M", "L", "XL", "XXL"],
       categoryOptions: ["all", "royal"],
     };
