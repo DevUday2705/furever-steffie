@@ -73,7 +73,7 @@ const Categories = () => {
       name: "Lehenga",
       description: "Cute Touch",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_02_11_AM_sp7jye.png",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1766770954/IMG_9443_tz3nkr.webp",
     },
   ];
 
