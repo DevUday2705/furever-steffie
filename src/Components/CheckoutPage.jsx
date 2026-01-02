@@ -164,6 +164,10 @@ const CheckoutPage = () => {
   const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
 
+    // Clear any existing custom coupon data
+    window.customCouponData = null;
+    window.customCouponId = null;
+
     if (code === SINGLE_USE_COUPON) {
       // Check Firestore if this global single-use coupon is still available
       try {
@@ -297,9 +301,66 @@ const CheckoutPage = () => {
       setCouponError("");
       toast.success(`🎉 Coupon applied: ${discountPercent}% off`);
     } else {
-      setDiscount(0);
-      setCouponError("Invalid coupon code");
-      toast.error("❌ Invalid coupon code");
+      // Check for custom coupons in Firestore
+      try {
+        const customCouponRef = collection(db, "customCoupons");
+        const q = query(customCouponRef, where("couponCode", "==", code));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const couponDoc = querySnapshot.docs[0];
+          const couponData = couponDoc.data();
+          
+          // Check if coupon is already used
+          if (couponData.isUsed) {
+            setDiscount(0);
+            setCouponError("This coupon has already been used.");
+            toast.error("❌ Coupon already used");
+            return;
+          }
+          
+          // Check if coupon is expired
+          const expiryDate = new Date(couponData.expiryDate);
+          const now = new Date();
+          if (expiryDate < now) {
+            setDiscount(0);
+            setCouponError("This coupon has expired.");
+            toast.error("❌ Coupon expired");
+            return;
+          }
+          
+          // Check if customer email/phone matches (optional validation)
+          const customerMatches = 
+            !couponData.customerEmail || 
+            !couponData.customerPhone || 
+            formData.email === couponData.customerEmail ||
+            formData.mobileNumber === couponData.customerPhone;
+          
+          if (!customerMatches && (couponData.customerEmail || couponData.customerPhone)) {
+            // If customer details are provided but don't match, show a gentle warning but still allow
+            toast.success(`🎉 Custom coupon applied: ₹${couponData.discountAmount} off`);
+          } else {
+            toast.success(`🎉 Custom coupon applied: ₹${couponData.discountAmount} off`);
+          }
+          
+          // Apply the discount (store discount amount in a special way for custom coupons)
+          setDiscount(0); // Set percentage discount to 0
+          setCouponError("");
+          
+          // Store the custom coupon data for later use in calculateTotal
+          window.customCouponData = couponData;
+          window.customCouponId = couponDoc.id;
+          
+        } else {
+          setDiscount(0);
+          setCouponError("Invalid coupon code");
+          toast.error("❌ Invalid coupon code");
+        }
+      } catch (error) {
+        console.error("Error checking custom coupon:", error);
+        setCouponError("Error validating coupon. Please try again.");
+        toast.error("❌ Error validating coupon");
+      }
     }
   };
 
@@ -360,6 +421,9 @@ const CheckoutPage = () => {
     } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
       // Customer validation coupons for flat ₹100 discount
       discountAmount = 100;
+    } else if (window.customCouponData) {
+      // Custom coupon discount
+      discountAmount = window.customCouponData.discountAmount;
     } else if (couponCode.trim().toUpperCase() === NAVRATRI_COUPON) {
       // GARBA5 - 5% discount only on Navratri items
       let navratriSubtotal = 0;
@@ -617,6 +681,7 @@ const CheckoutPage = () => {
             coupon: couponCode,
             dispatchDate: calculateDispatchDate(),
             isCollaboration: true, // Add collaboration flag
+            customCouponId: window.customCouponId || null, // Pass custom coupon ID
           }),
         });
 
@@ -734,6 +799,7 @@ const CheckoutPage = () => {
                   amount: data.amount / 100,
                   coupon: couponCode,
                   dispatchDate: calculateDispatchDate(), // Add dispatch date (3 days from today)
+                  customCouponId: window.customCouponId || null, // Pass custom coupon ID
                 }),
               });
 
@@ -1493,7 +1559,9 @@ const CheckoutPage = () => {
                   </span>
                 </div>
                 {(discount > 0 ||
-                  couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) && (
+                  couponCode.trim().toUpperCase() === SINGLE_USE_COUPON ||
+                  CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()] ||
+                  window.customCouponData) && (
                   <div className="flex justify-between text-green-600">
                     <span>Coupon Discount:</span>
                     <span>
@@ -1503,6 +1571,12 @@ const CheckoutPage = () => {
                         ) {
                           // Flat ₹750 discount
                           return convertCurrency(750, currency);
+                        } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
+                          // Customer validation coupons - ₹100 flat discount
+                          return convertCurrency(100, currency);
+                        } else if (window.customCouponData) {
+                          // Custom coupon discount
+                          return convertCurrency(window.customCouponData.discountAmount, currency);
                         } else {
                           // Percentage discount
                           let subtotal = isCartCheckout

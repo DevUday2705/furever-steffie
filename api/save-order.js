@@ -33,6 +33,7 @@ export default async function handler(req, res) {
             coupon,
             dispatchDate,
             isCollaboration, // Add isCollaboration flag
+            customCouponId, // Add custom coupon ID for marking as used
         } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !customer || !items || !amount) {
@@ -188,6 +189,23 @@ export default async function handler(req, res) {
             // Commit all changes atomically
             await batch.commit();
             console.log(`✅ Batch committed successfully!`);
+
+            // Mark custom coupon as used if provided
+            if (customCouponId) {
+                try {
+                    const customCouponRef = db.collection('customCoupons').doc(customCouponId);
+                    await customCouponRef.update({
+                        isUsed: true,
+                        usedAt: new Date().toISOString(),
+                        usedBy: customer.email || customer.fullName,
+                        orderId: razorpay_order_id
+                    });
+                    console.log(`✅ Custom coupon ${customCouponId} marked as used`);
+                } catch (couponError) {
+                    console.error("❌ Error marking custom coupon as used:", couponError);
+                    // Don't fail the order if coupon update fails
+                }
+            }
 
             // Send order confirmation email
             try {
