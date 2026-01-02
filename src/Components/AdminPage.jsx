@@ -38,6 +38,7 @@ const AdminPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [measurementFilter, setMeasurementFilter] = useState("all");
+  const [collaborationFilter, setCollaborationFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -384,8 +385,18 @@ const AdminPage = () => {
         }
       }
 
+      // Collaboration filter
+      let matchesCollaboration = true;
+      if (collaborationFilter !== "all") {
+        if (collaborationFilter === "collaboration") {
+          matchesCollaboration = order.isCollaboration === true;
+        } else if (collaborationFilter === "regular") {
+          matchesCollaboration = order.isCollaboration !== true;
+        }
+      }
+
       return (
-        matchesSearch && matchesStatus && matchesDate && matchesMeasurement
+        matchesSearch && matchesStatus && matchesDate && matchesMeasurement && matchesCollaboration
       );
     })
     .sort((a, b) => {
@@ -428,6 +439,7 @@ const AdminPage = () => {
   const orderStats = {
     total: filteredAndSortedOrders.length,
     pinned: filteredAndSortedOrders.filter((o) => o.pinned).length,
+    collaboration: filteredAndSortedOrders.filter((o) => o.isCollaboration === true).length,
     pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
       .length,
     workInProgress: filteredAndSortedOrders.filter(
@@ -591,6 +603,8 @@ const AdminPage = () => {
             setSortBy={setSortBy}
             measurementFilter={measurementFilter}
             setMeasurementFilter={setMeasurementFilter}
+            collaborationFilter={collaborationFilter}
+            setCollaborationFilter={setCollaborationFilter}
             onDateRangeChange={handleDateRangeChange}
           />
 
@@ -693,6 +707,11 @@ const AdminPage = () => {
                         {order.pinned && (
                           <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
                             📌 Pinned
+                          </span>
+                        )}
+                        {order.isCollaboration && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-800 bg-purple-100 border border-purple-200 rounded-full">
+                            🤝 Collaboration
                           </span>
                         )}
                       </div>

@@ -10,6 +10,8 @@ const OrderFilters = ({
   setSortBy,
   measurementFilter,
   setMeasurementFilter,
+  collaborationFilter,
+  setCollaborationFilter,
   onDateRangeChange,
 }) => {
   // Get current month start and today's date as defaults
@@ -90,7 +92,7 @@ const OrderFilters = ({
     <div className="space-y-3 mb-4 bg-gray-50 p-4 rounded-lg border">
       <h2 className="font-medium text-gray-700 mb-2">Filter Orders</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
         {/* Search by name or phone */}
         <div>
           <label className="block text-xs text-gray-500 mb-1">Search</label>
@@ -118,6 +120,22 @@ const OrderFilters = ({
             <option value="cutting">Cutting</option>
             <option value="ready-to-ship">Ready to Ship</option>
             <option value="shipped">Shipped</option>
+          </select>
+        </div>
+
+        {/* Collaboration filter */}
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">
+            Order Type
+          </label>
+          <select
+            value={collaborationFilter}
+            onChange={(e) => setCollaborationFilter(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+          >
+            <option value="all">All Orders</option>
+            <option value="collaboration">🤝 Collaboration</option>
+            <option value="regular">💳 Regular Orders</option>
           </select>
         </div>
 

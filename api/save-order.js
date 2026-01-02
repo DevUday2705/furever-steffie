@@ -32,6 +32,7 @@ export default async function handler(req, res) {
             amount,
             coupon,
             dispatchDate,
+            isCollaboration, // Add isCollaboration flag
         } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !customer || !items || !amount) {
@@ -156,11 +157,12 @@ export default async function handler(req, res) {
             items, // Should contain: productId, name, selectedSize, price, quantity, etc.
             amount,
             orderSource: items.length > 1 ? "cart" : "buy-now",
-            paymentStatus: "paid",
+            paymentStatus: isCollaboration ? "collaboration" : "paid", // Set different payment status for collaboration orders
             orderStatus: "pending",
             createdAt: new Date().toISOString(),
             dispatchDate: dispatchDate || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now if not provided
             coupon: coupon || null,
+            isCollaboration: isCollaboration || false, // Add isCollaboration flag
         };
 
         console.log(`🔄 Creating order with number: ${orderNumber}`);

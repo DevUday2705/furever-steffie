@@ -69,6 +69,9 @@ const CheckoutPage = () => {
     STEFFIE20: 20, // 20% off
   };
 
+  // Collaboration coupon - bypasses payment
+  const COLLABORATION_COUPON = "FUREVERXCOLLAB";
+
   const SINGLE_USE_COUPON = "SPECIAL750"; // ₹750 flat discount
 
   // Customer validation coupons with ₹100 flat discount
@@ -254,6 +257,11 @@ const CheckoutPage = () => {
         toast.error("❌ Error validating coupon");
         return;
       }
+    } else if (code === COLLABORATION_COUPON) {
+      // Collaboration coupon - bypasses payment
+      setDiscount(0); // No discount applied, just bypasses payment
+      setCouponError("");
+      toast.success("🎉 Collaboration coupon applied! Payment will be bypassed.");
     } else if (code === NAVRATRI_COUPON) {
       // Special Navratri coupon - check if cart contains NAVRATRI items
       let hasNavratriItems = false;
@@ -568,6 +576,71 @@ const CheckoutPage = () => {
         },
       });
       return;
+    }
+
+    // Check if collaboration coupon is applied - bypass payment
+    if (couponCode.trim().toUpperCase() === COLLABORATION_COUPON) {
+      try {
+        setLoadingPayment(true);
+        
+        // Generate a mock order ID for collaboration orders
+        const mockOrderId = `COLLAB-${Date.now()}`;
+        const mockPaymentId = `COLLAB-PAY-${Date.now()}`;
+        
+        mixpanel.track("Collaboration Order Created", {
+          country: formData.country,
+          currency: currency,
+          amount: totalAmount,
+          coupon: COLLABORATION_COUPON,
+        });
+
+        // Save the order directly without payment
+        const saveRes = await fetch("/api/save-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: mockOrderId,
+            razorpay_payment_id: mockPaymentId,
+            customer: formData,
+            items: isCartCheckout
+              ? cart.map((item) => ({
+                  ...item,
+                  measurements: item.measurements || {},
+                }))
+              : [
+                  {
+                    ...orderDetails,
+                    measurements: orderDetails.measurements || {},
+                  },
+                ],
+            amount: calculateTotal(),
+            coupon: couponCode,
+            dispatchDate: calculateDispatchDate(),
+            isCollaboration: true, // Add collaboration flag
+          }),
+        });
+
+        if (!saveRes.ok) {
+          throw new Error(`Failed to save collaboration order: ${saveRes.status}`);
+        }
+
+        const saveData = await saveRes.json();
+        
+        setLoadingPayment(false);
+        
+        // Navigate to success page
+        navigate({
+          pathname: "/thank-you",
+          search: `?razorpay_order_id=${mockOrderId}&razorpay_payment_id=${mockPaymentId}&collaboration=true`,
+        });
+        
+        return;
+      } catch (error) {
+        console.error("Error creating collaboration order:", error);
+        setLoadingPayment(false);
+        toast.error("❌ Failed to create collaboration order. Please try again.");
+        return;
+      }
     }
 
     try {
