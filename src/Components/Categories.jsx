@@ -94,7 +94,9 @@ const Categories = () => {
               className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 border relative overflow-hidden
       ${
         gender === type
-          ? "bg-black text-white border-black scale-105 shadow-lg"
+          ? type === "female" 
+            ? "bg-[#E89DB9]  scale-105 shadow-lg"
+            : "bg-black text-white border-black scale-105 shadow-lg"
           : "bg-white text-black border-gray-300 hover:border-black hover:shadow-md"
       }`}
             >

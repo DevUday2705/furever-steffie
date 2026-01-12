@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
 import OrderResumeNotifications from "./OrderResumeNotifications";
@@ -171,6 +171,27 @@ const AdminPage = () => {
     } catch (err) {
       console.error("Error updating status:", err);
       alert("Failed to update status. Try again.");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId, customerName) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the order for ${customerName}? This action cannot be undone.`
+    );
+    
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await deleteDoc(orderRef);
+
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+      toast.success("Order deleted successfully");
+    } catch (err) {
+      console.error("Error deleting order:", err);
+      toast.error("Failed to delete order. Please try again.");
     }
   };
 
@@ -690,14 +711,19 @@ const AdminPage = () => {
             </p>
           ) : (
             <div className="space-y-4">
-              {filteredAndSortedOrders.map((order) => (
+              {filteredAndSortedOrders.map((order) => {
+                const hasRoyalSet = order.items?.some(item => item.isRoyalSet);
+                
+                return (
                 <motion.div
                   key={order.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className={`border rounded-lg p-4 shadow-sm ${
-                    order.pinned
+                    hasRoyalSet
+                      ? "bg-yellow-50 border-yellow-300"
+                      : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
                       : "border-gray-200"
                   }`}
@@ -768,6 +794,13 @@ const AdminPage = () => {
                           }
                         >
                           📌
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOrder(order.id, order.customer?.fullName)}
+                          className="p-2 rounded-full transition-colors bg-red-100 text-red-600 hover:bg-red-200"
+                          title="Delete order"
+                        >
+                          🗑️
                         </button>
                       </div>
                       <div className="text-lg font-bold text-green-600">
@@ -1204,7 +1237,8 @@ const AdminPage = () => {
                     </div>
                   )}
                 </motion.div>
-              ))}
+              );
+              })}
             </div>
           )}
         </>
