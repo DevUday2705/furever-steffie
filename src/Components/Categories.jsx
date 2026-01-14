@@ -44,12 +44,12 @@ const Categories = () => {
 
   const femaleCategories = [
     {
-      id: 7,
-      name: "Frock",
-      link: "Frock",
-      description: "Playful Frills",
+      id: 9,
+      link: "lehenga",
+      name: "Lehenga",
+      description: "Cute Touch",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/cherry_red_polka_dot_frock_d3cspz.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1766770954/IMG_9443_tz3nkr.webp",
     },
     {
       id: 6,
@@ -59,6 +59,14 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/White_Whisper_with_Bow_dce8nr.webp",
     },
+      {
+      id: 7,
+      name: "Frock",
+      link: "Frock",
+      description: "Playful Frills",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/cherry_red_polka_dot_frock_d3cspz.webp",
+    },
     {
       id: 8,
       name: "Bandanas",
@@ -67,14 +75,7 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1745436600/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png",
     },
-    {
-      id: 9,
-      link: "lehenga",
-      name: "Lehenga",
-      description: "Cute Touch",
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1766770954/IMG_9443_tz3nkr.webp",
-    },
+  
   ];
 
   const categories = gender === "male" ? maleCategories : femaleCategories;
@@ -91,7 +92,7 @@ const Categories = () => {
             <button
               key={type}
               onClick={() => setGender(type)}
-              className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 border relative overflow-hidden
+              className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden
       ${
         gender === type
           ? type === "female" 
