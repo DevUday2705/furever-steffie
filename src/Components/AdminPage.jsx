@@ -346,58 +346,86 @@ const AdminPage = () => {
           <style>
             @page {
               size: A4;
-              margin: 20mm;
+              margin: 10mm;
             }
             body {
               font-family: Arial, sans-serif;
               font-size: 14px;
               line-height: 1.6;
+              margin: 0;
+              padding: 0;
             }
-            .address-container {
-              margin-bottom: 30px;
-              page-break-inside: avoid;
+            .grid-container {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              grid-template-rows: 1fr 1fr;
+              gap: 8mm;
+              height: 277mm;
+              width: 190mm;
             }
             .address-box {
               border: 2px solid #333;
-              padding: 15px;
-              margin-bottom: 20px;
+              padding: 12px;
+              box-sizing: border-box;
+              page-break-inside: avoid;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+            }
+            .header-message {
+              text-align: center;
+              font-weight: bold;
+              font-size: 15px;
+              margin-bottom: 12px;
+              padding: 8px;
+              background-color: #f0f0f0;
+              border-radius: 4px;
             }
             .label {
               font-weight: bold;
               margin-right: 5px;
             }
             .name {
-              font-size: 18px;
+              font-size: 20px;
               font-weight: bold;
-              margin-bottom: 10px;
+              margin-bottom: 12px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 8px;
             }
-            .separator {
-              border-bottom: 1px dashed #999;
-              margin: 20px 0;
+            .address-line {
+              margin-bottom: 8px;
+            }
+            .order-id {
+              margin-top: auto;
+              padding-top: 10px;
+              border-top: 1px dashed #999;
+              font-size: 11px;
+              color: #666;
             }
           </style>
         </head>
         <body>
-          ${selectedOrdersData
-            .map(
-              (order) => `
-            <div class="address-container">
+          <div class="grid-container">
+            ${selectedOrdersData
+              .map(
+                (order) => `
               <div class="address-box">
+                <div class="header-message">Sorry human, this package is for the pet! Woof. 🐾</div>
                 <div class="name">${order.customer?.fullName || "N/A"}</div>
-                <div><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
-                ${order.customer?.alternateMobile ? `<div><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
-                <div><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
-                ${order.customer?.addressLine2 ? `<div style="margin-left: 70px;">${order.customer.addressLine2}</div>` : ""}
-                <div><span class="label">City:</span>${order.customer?.city || ""}</div>
-                <div><span class="label">State:</span>${order.customer?.state || ""}</div>
-                <div><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
-                ${order.customer?.specialInstructions ? `<div style="margin-top: 10px;"><span class="label">Instructions:</span>${order.customer.specialInstructions}</div>` : ""}
-                <div style="margin-top: 10px;"><span class="label">Order ID:</span>${order.id}</div>
+                <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
+                ${order.customer?.alternateMobile ? `<div class="address-line"><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
+                <div class="address-line"><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
+                ${order.customer?.addressLine2 ? `<div class="address-line" style="margin-left: 60px;">${order.customer.addressLine2}</div>` : ""}
+                <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
+                <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
+                <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
+                ${order.customer?.specialInstructions ? `<div class="address-line" style="margin-top: 8px;"><span class="label">Instructions:</span>${order.customer.specialInstructions}</div>` : ""}
+                <div class="order-id">Order ID: ${order.id}</div>
               </div>
-            </div>
-          `
-            )
-            .join('<div class="separator"></div>')}
+            `
+              )
+              .join("")}
+          </div>
         </body>
       </html>
     `;
