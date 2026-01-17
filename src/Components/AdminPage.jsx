@@ -52,6 +52,9 @@ const AdminPage = () => {
   // Reminder functionality states
   const [sendingReminder, setSendingReminder] = useState(new Set());
 
+  // Selected orders for printing
+  const [selectedOrders, setSelectedOrders] = useState(new Set());
+
   // Helper function to get dhoti details from product data
   const getDhotiDetails = (item) => {
     if (item.selectedDhotiDetails) {
@@ -153,6 +156,40 @@ const AdminPage = () => {
           )
         );
         toast.success("Tracking ID saved & status updated");
+
+        // Send shipped notification email to customer
+        try {
+          const order = orders.find((o) => o.id === orderId) || {};
+
+          const resp = await fetch("/api/send-shipped-notification", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              customerName: order.customer?.fullName || "",
+              customerEmail: order.customer?.email || order.customer?.mobileNumber || "",
+              orderId: orderId,
+              trackingId: trackingID,
+              expectedDelivery: order.dispatchDate || "",
+              customerCity: order.customer?.city || "",
+              courierPartner: order.courierPartner || "",
+              items: order.items || [],
+            }),
+          });
+
+          if (resp.ok) {
+            toast.success("Shipment email sent to customer");
+          } else {
+            const err = await resp.json().catch(() => null);
+            console.error("Failed to send shipped email:", err);
+            toast.error("Failed to send shipped email to customer");
+          }
+        } catch (emailErr) {
+          console.error("Error sending shipped email:", emailErr);
+          toast.error("Error sending shipped email");
+        }
+
         fetchOrders();
       } else {
         const orderRef = doc(db, "orders", orderId);
@@ -264,6 +301,145 @@ const AdminPage = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Handle order selection for printing
+  const handleOrderSelect = (orderId) => {
+    setSelectedOrders((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        if (newSet.size >= 5) {
+          toast.error("You can select a maximum of 5 orders at a time");
+          return prev;
+        }
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  // Clear all selections
+  const handleClearSelection = () => {
+    setSelectedOrders(new Set());
+  };
+
+  // Print selected orders' addresses
+  const handlePrintAddresses = () => {
+    if (selectedOrders.size === 0) {
+      toast.error("Please select at least one order to print");
+      return;
+    }
+
+    // Get selected order data
+    const selectedOrdersData = orders.filter((order) =>
+      selectedOrders.has(order.id)
+    );
+
+    // Create print window content
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Addresses</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              line-height: 1.6;
+              margin: 0;
+              padding: 0;
+            }
+            .grid-container {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              grid-template-rows: 1fr 1fr;
+              gap: 8mm;
+              height: 277mm;
+              width: 190mm;
+            }
+            .address-box {
+              border: 2px solid #333;
+              padding: 12px;
+              box-sizing: border-box;
+              page-break-inside: avoid;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+            }
+            .header-message {
+              text-align: center;
+              font-weight: bold;
+              font-size: 15px;
+              margin-bottom: 12px;
+              padding: 8px;
+              background-color: #f0f0f0;
+              border-radius: 4px;
+            }
+            .label {
+              font-weight: bold;
+              margin-right: 5px;
+            }
+            .name {
+              font-size: 20px;
+              font-weight: bold;
+              margin-bottom: 12px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 8px;
+            }
+            .address-line {
+              margin-bottom: 8px;
+            }
+            .order-id {
+              margin-top: auto;
+              padding-top: 10px;
+              border-top: 1px dashed #999;
+              font-size: 11px;
+              color: #666;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="grid-container">
+            ${selectedOrdersData
+              .map(
+                (order) => `
+              <div class="address-box">
+                <div class="header-message">Sorry human, this package is for the pet! Woof. 🐾</div>
+                <div class="name">${order.customer?.fullName || "N/A"}</div>
+                <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
+                ${order.customer?.alternateMobile ? `<div class="address-line"><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
+                <div class="address-line"><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
+                ${order.customer?.addressLine2 ? `<div class="address-line" style="margin-left: 60px;">${order.customer.addressLine2}</div>` : ""}
+                <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
+                <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
+                <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
+                ${order.customer?.specialInstructions ? `<div class="address-line" style="margin-top: 8px;"><span class="label">Instructions:</span>${order.customer.specialInstructions}</div>` : ""}
+                <div class="order-id">Order ID: ${order.id}</div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Open print window
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Trigger print dialog after content loads
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
   };
 
   // Send measurement reminder function
@@ -640,6 +816,31 @@ const AdminPage = () => {
             onDateRangeChange={handleDateRangeChange}
           />
 
+          {/* Print Selection Controls */}
+          {selectedOrders.size > 0 && (
+            <div className="mb-4 p-2 bg-blue-50 border border-blue-300 rounded-lg flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-800 text-sm font-medium">
+                  {selectedOrders.size} selected
+                </span>
+                <button
+                  onClick={handleClearSelection}
+                  className="p-1.5 text-lg rounded  transition-colors"
+                  title="Clear Selection"
+                >
+                  ✕
+                </button>
+              </div>
+              <button
+                onClick={handlePrintAddresses}
+                className="p-1.5 text-lg bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                title="Print Addresses"
+              >
+                🖨️
+              </button>
+            </div>
+          )}
+
           {/* Revenue Summary */}
           {filteredAndSortedOrders.length > 0 && (
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
@@ -726,9 +927,23 @@ const AdminPage = () => {
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
                       : "border-gray-200"
+                  } ${
+                    selectedOrders.has(order.id)
+                      ? "ring-2 ring-blue-500 bg-blue-50/50"
+                      : ""
                   }`}
                 >
                   <div className="flex justify-between items-start">
+                    {/* Checkbox for selection */}
+                    <div className="mr-3 mt-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.has(order.id)}
+                        onChange={() => handleOrderSelect(order.id)}
+                        className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        title="Select for printing"
+                      />
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <button
