@@ -153,6 +153,40 @@ const AdminPage = () => {
           )
         );
         toast.success("Tracking ID saved & status updated");
+
+        // Send shipped notification email to customer
+        try {
+          const order = orders.find((o) => o.id === orderId) || {};
+
+          const resp = await fetch("/api/send-shipped-notification", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              customerName: order.customer?.fullName || "",
+              customerEmail: order.customer?.email || order.customer?.mobileNumber || "",
+              orderId: orderId,
+              trackingId: trackingID,
+              expectedDelivery: order.dispatchDate || "",
+              customerCity: order.customer?.city || "",
+              courierPartner: order.courierPartner || "",
+              items: order.items || [],
+            }),
+          });
+
+          if (resp.ok) {
+            toast.success("Shipment email sent to customer");
+          } else {
+            const err = await resp.json().catch(() => null);
+            console.error("Failed to send shipped email:", err);
+            toast.error("Failed to send shipped email to customer");
+          }
+        } catch (emailErr) {
+          console.error("Error sending shipped email:", emailErr);
+          toast.error("Error sending shipped email");
+        }
+
         fetchOrders();
       } else {
         const orderRef = doc(db, "orders", orderId);

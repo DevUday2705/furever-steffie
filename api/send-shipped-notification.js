@@ -17,7 +17,8 @@ export default async function handler(req, res) {
             items = []
         } = req.body;
 
-        if (!customerName || !customerEmail || !orderId || !trackingId || !expectedDelivery || !customerCity) {
+        // Require only the essential fields for a shipped notification
+        if (!customerName || !customerEmail || !orderId || !trackingId) {
             return res.status(400).json({
                 success: false,
                 message: "Missing required fields for shipped notification"
@@ -33,140 +34,68 @@ export default async function handler(req, res) {
             }
         });
 
-        // Generate items list HTML
+        // Generate items list HTML (if any)
         const itemsListHtml = items.map(item => `
             <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                 <img src="${item.image || ''}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-right: 12px;">
                 <div>
                     <p style="margin: 0; font-weight: 600; color: #333;">${item.name}</p>
-                    <p style="margin: 2px 0 0 0; font-size: 14px; color: #666;">Size: ${item.size} | Qty: ${item.quantity}</p>
+                    <p style="margin: 2px 0 0 0; font-size: 14px; color: #666;">Size: ${item.size || item.selectedSize || 'N/A'} | Qty: ${item.quantity || 1}</p>
                 </div>
             </div>
         `).join('');
 
+        // Simple, clear shipped email mentioning Shree Maruti and tracking link
         const emailHtml = `
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Your Order is On The Way! 🚚</title>
+            <title>Your Order Has Been Dispatched</title>
             <style>
-                body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; }
-                .content { padding: 30px 20px; }
-                .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
-                .btn { display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 10px 5px; }
-                .tracking-card { background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; }
-                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-                .info-item { background: #f8f9fa; padding: 15px; border-radius: 8px; }
-                .items-container { background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0; }
-                .status-badge { background: #28a745; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+                body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f7fafc; }
+                .container { max-width: 600px; margin: 24px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+                .header { background: #10b981; padding: 20px; text-align: center; color: white; }
+                .content { padding: 20px; color: #333; }
+                .btn { display: inline-block; padding: 10px 16px; background: #0b74e0; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; }
+                .items { background: #f8fafc; padding: 12px; border-radius: 6px; margin-top: 12px; }
+                .footer { padding: 14px; text-align: center; font-size: 13px; color: #888; }
             </style>
         </head>
         <body>
             <div class="container">
-                <!-- Header -->
                 <div class="header">
-                    <h1 style="color: white; margin: 0; font-size: 28px;">🚚 Your Order is On The Way!</h1>
-                    <p style="color: #e0e6ff; margin: 10px 0 0 0; font-size: 16px;">Your furry friend's outfit is coming soon!</p>
+                    <h2 style="margin:0;">Your Order Has Been Dispatched</h2>
                 </div>
-
-                <!-- Content -->
                 <div class="content">
-                    <p>Dear <strong>${customerName}</strong>,</p>
-                    
-                    <p>Great news! Your order has been dispatched and is on its way to you. Here are your shipping details:</p>
+                    <p>Hi <strong>${customerName}</strong>,</p>
 
-                    <!-- Tracking Information -->
-                    <div class="tracking-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="margin: 0; color: #333;">📦 Tracking Information</h3>
-                            <span class="status-badge">SHIPPED</span>
-                        </div>
-                        
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <p style="margin: 0; font-size: 14px; color: #666;">Order ID</p>
-                                <p style="margin: 5px 0 0 0; font-weight: 600; color: #333;">#${orderId}</p>
-                            </div>
-                            <div class="info-item">
-                                <p style="margin: 0; font-size: 14px; color: #666;">Tracking ID</p>
-                                <p style="margin: 5px 0 0 0; font-weight: 600; color: #333;">${trackingId}</p>
-                            </div>
-                            <div class="info-item">
-                                <p style="margin: 0; font-size: 14px; color: #666;">Expected Delivery</p>
-                                <p style="margin: 5px 0 0 0; font-weight: 600; color: #333;">${expectedDelivery}</p>
-                            </div>
-                            <div class="info-item">
-                                <p style="margin: 0; font-size: 14px; color: #666;">Delivery City</p>
-                                <p style="margin: 5px 0 0 0; font-weight: 600; color: #333;">${customerCity}</p>
-                            </div>
-                        </div>
+                    <p>Good news — your order <strong>#${orderId}</strong> has been dispatched via <strong>Shree Maruti Courier Service</strong>. The tracking reference for your shipment is:</p>
 
-                        ${courierPartner ? `
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                            <p style="margin: 0; font-size: 14px; color: #666;">Courier Partner</p>
-                            <p style="margin: 5px 0 0 0; font-weight: 600; color: #333;">${courierPartner}</p>
-                        </div>
-                        ` : ''}
-                    </div>
+                    <p style="font-family: monospace; font-weight: 700; font-size: 16px;">${trackingId}</p>
+
+                    <p>You can track your package directly on Shree Maruti's tracking page:</p>
+
+                    <p style="text-align:center; margin: 16px 0;">
+                        <a class="btn" href="https://shreemaruti.com/track-shipment/" target="_blank" rel="noopener">Track Your Shipment</a>
+                    </p>
+
+                    <p>If the tracking page asks for your reference, please enter the tracking reference shown above.</p>
 
                     ${items.length > 0 ? `
-                    <!-- Order Items -->
-                    <div class="items-container">
-                        <h3 style="margin: 0 0 15px 0; color: #333;">📋 Your Order Items</h3>
+                    <div class="items">
+                        <strong>Items in this shipment</strong>
                         ${itemsListHtml}
                     </div>
                     ` : ''}
 
-                    <!-- Action Buttons -->
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="https://www.fureversteffie.com/track-order?tracking=${trackingId}" class="btn" style="background: #007bff;">
-                            🔍 Track Your Package
-                        </a>
-                        <a href="https://www.fureversteffie.com/contact" class="btn" style="background: #28a745;">
-                            💬 Contact Support
-                        </a>
-                    </div>
+                    <p style="margin-top: 16px;">If you have any questions, reply to this email or contact our support and we'll help you out.</p>
 
-                    <!-- Delivery Instructions -->
-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                        <h4 style="margin: 0 0 10px 0; color: #856404;">📋 Delivery Instructions</h4>
-                        <ul style="margin: 0; padding-left: 20px; color: #856404;">
-                            <li>Please ensure someone is available at the delivery address</li>
-                            <li>Valid ID proof may be required at the time of delivery</li>
-                            <li>In case of non-delivery, the package will be returned to the local office</li>
-                            <li>Contact our support team for any delivery concerns</li>
-                        </ul>
-                    </div>
-
-                    <!-- Care Instructions -->
-                    <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                        <h4 style="margin: 0 0 10px 0; color: #0c5460;">🧼 Care Instructions</h4>
-                        <p style="margin: 0; color: #0c5460;">
-                            To keep your pet's outfit in perfect condition, please follow the care instructions included in the package. 
-                            Hand wash with mild detergent and air dry for best results.
-                        </p>
-                    </div>
-
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-                        <p>Thank you for choosing Furever Steffie! We hope your pet loves their new outfit.</p>
-                        <p style="color: #666; font-size: 14px; margin-top: 20px;">
-                            <em>If you have any questions about your order, please don't hesitate to contact our customer support team.</em>
-                        </p>
-                    </div>
+                    <p style="margin-top: 8px; color: #666; font-size: 13px;">Thanks for choosing Furever Steffie — we hope your furry friend loves it!</p>
                 </div>
-
-                <!-- Footer -->
                 <div class="footer">
-                    <p style="margin: 0 0 10px 0;"><strong>Furever Steffie</strong></p>
-                    <p style="margin: 0;">Making every pet look pawsome! 🐾</p>
-                    <p style="margin: 10px 0 0 0;">
-                        <a href="https://www.fureversteffie.com" style="color: #007bff; text-decoration: none;">www.fureversteffie.com</a> | 
-                        <a href="https://www.fureversteffie.com/contact" style="color: #007bff; text-decoration: none;">Contact Us</a>
-                    </p>
+                    © Furever Steffie
                 </div>
             </div>
         </body>
@@ -179,28 +108,28 @@ export default async function handler(req, res) {
                 address: process.env.EMAIL_USER
             },
             to: customerEmail,
-            subject: `🚚 Your Order #${orderId} is On The Way! - Tracking: ${trackingId}`,
+            subject: `🚚 Your Order #${orderId} has been dispatched | Tracking: ${trackingId}`,
             html: emailHtml
         };
 
-        console.log(`📧 Sending delivery notification email to ${customerEmail}`);
+        console.log(`📧 Sending shipped notification email to ${customerEmail}`);
 
         await transporter.sendMail(mailOptions);
 
-        console.log(`✅ Delivery notification email sent successfully to ${customerEmail}`);
+        console.log(`✅ Shipped notification email sent successfully to ${customerEmail}`);
 
         return res.status(200).json({
             success: true,
-            message: "Delivery notification email sent successfully",
+            message: "Shipped notification email sent successfully",
             trackingId: trackingId
         });
 
     } catch (error) {
-        console.error("❌ Error sending delivery notification email:", error);
+        console.error("❌ Error sending shipped notification email:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Error sending delivery notification email",
+            message: "Error sending shipped notification email",
             error: error.message
         });
     }
