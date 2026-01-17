@@ -84,7 +84,7 @@ const ProductListing = ({
     return {
       stockInfo,
       totalManagedStock,
-      hasAnyStock: inStockSizes.length > 0 || true, // L, XL, XXL always available
+      hasAnyStock: inStockSizes.length > 0, // Only show if has actual stock
       lowStock: totalManagedStock > 0 && totalManagedStock <= 5,
       soldOut: totalManagedStock === 0,
     };
@@ -233,20 +233,28 @@ const ProductListing = ({
   // Apply regular filters first
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
   
+  // Filter out products with no stock for any size
+  const stockFiltered = useMemo(() => {
+    return regularFiltered.filter((product) => {
+      const stockStatus = getProductStockStatus(product);
+      return stockStatus.hasAnyStock; // Only show products that have stock for at least one size
+    });
+  }, [regularFiltered]);
+
   // Then apply quick filters
   const filtered = useMemo(() => {
     if (quickFilters.length === 0) {
-      return regularFiltered;
+      return stockFiltered;
     }
 
     const activeQuickFilters = quickFilterOptions.filter((filter) =>
       quickFilters.includes(filter.id)
     );
 
-    return regularFiltered.filter((product) =>
+    return stockFiltered.filter((product) =>
       activeQuickFilters.every((filter) => filter.filterFn(product))
     );
-  }, [regularFiltered, quickFilters, quickFilterOptions]);
+  }, [stockFiltered, quickFilters, quickFilterOptions]);
   const activeFilterCount = useMemo(() => {
     return Object.entries(filters).reduce((count, [key, value]) => {
       const ignoredKeys = [
@@ -494,7 +502,7 @@ const ProductListing = ({
 
             // Get stock status
             const stockStatus = getProductStockStatus(product);
-            console.log(product.category);
+           
             return (
               <motion.div
                 key={product.id}
