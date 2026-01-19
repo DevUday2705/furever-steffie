@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
 
 // Create Context
 export const AppContext = createContext();
@@ -22,7 +24,6 @@ export const AppProvider = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [gender, setGender] = useState("male");
-  const [showNotificationPermission, setShowNotificationPermission] = useState(false);
   const [selections, setSelections] = useState({
     gender: "",
     style: "",
@@ -47,24 +48,77 @@ export const AppProvider = ({ children }) => {
   };
 
   // Notification permission functions
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      setShowNotificationPermission(false);
+  const trackNotificationPermission = async (granted, userAgent = null) => {
+    try {
+      const analyticsData = {
+        permissionGranted: granted,
+        timestamp: serverTimestamp(),
+        userAgent: userAgent || navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        sessionId: Date.now().toString(), // Simple session tracking
+      };
+
+      await addDoc(collection(db, 'notificationAnalytics'), analyticsData);
       
-      if (permission === 'granted') {
-        localStorage.setItem('notificationPermissionAsked', 'true');
-        return true;
+      console.log(`📊 Notification permission ${granted ? 'GRANTED' : 'DENIED'} - logged to Firebase`);
+    } catch (error) {
+      console.error('Error tracking notification permission:', error);
+      // Fallback to localStorage if Firebase fails
+      try {
+        const fallbackStats = JSON.parse(localStorage.getItem('notificationStats') || '{ "enabled": 0, "disabled": 0 }');
+        if (granted) fallbackStats.enabled += 1;
+        else fallbackStats.disabled += 1;
+        localStorage.setItem('notificationStats', JSON.stringify(fallbackStats));
+      } catch (e) {
+        console.error('Fallback tracking also failed:', e);
       }
     }
-    return false;
   };
 
-  const checkAndShowNotificationRequest = () => {
+  // Optional: Get basic stats from localStorage for immediate display (Firebase queries would need more setup)
+  const getNotificationStats = () => {
+    try {
+      const stats = JSON.parse(localStorage.getItem('notificationStats') || '{ "enabled": 0, "disabled": 0 }');
+      const total = stats.enabled + stats.disabled;
+      return {
+        ...stats,
+        total,
+        acceptanceRate: total > 0 ? ((stats.enabled / total) * 100).toFixed(1) : '0',
+        note: 'Full analytics available in Firebase Console -> notificationAnalytics collection'
+      };
+    } catch (error) {
+      return { enabled: 0, disabled: 0, total: 0, acceptanceRate: '0', note: 'Analytics stored in Firebase' };
+    }
+  };
+
+  const checkAndShowNotificationRequest = async () => {
     const hasAsked = localStorage.getItem('notificationPermissionAsked');
     if (!hasAsked && 'Notification' in window && Notification.permission === 'default') {
-      setShowNotificationPermission(true);
+      // Directly request browser permission without custom dialog
+      try {
+        const permission = await Notification.requestPermission();
+        localStorage.setItem('notificationPermissionAsked', 'true');
+        
+        // Track the permission decision in Firebase
+        const granted = permission === 'granted';
+        await trackNotificationPermission(granted);
+        
+        if (granted) {
+          console.log('🔔 User enabled notifications! Perfect for cart reminders and special offers.');
+        } else {
+          console.log('🔕 User declined notifications. They can still shop normally.');
+        }
+        
+        return granted;
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        localStorage.setItem('notificationPermissionAsked', 'true');
+        await trackNotificationPermission(false, `Error: ${error.message}`); // Track errors too
+        return false;
+      }
     }
+    return Notification.permission === 'granted';
   };
 
   // n
@@ -130,10 +184,8 @@ export const AppProvider = ({ children }) => {
         updateQuantity,
         isOpen,
         setIsOpen,
-        showNotificationPermission,
-        setShowNotificationPermission,
-        requestNotificationPermission,
         checkAndShowNotificationRequest,
+        getNotificationStats,
       }}
     >
       {children}
