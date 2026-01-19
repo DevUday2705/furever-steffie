@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 // Create Context
 export const AppContext = createContext();
@@ -8,7 +8,17 @@ export const useAppContext = () => useContext(AppContext);
 
 // Provider Component
 export const AppProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  // Initialize cart from localStorage
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem('furever_cart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error);
+      return [];
+    }
+  });
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [gender, setGender] = useState("male");
@@ -22,11 +32,20 @@ export const AppProvider = ({ children }) => {
     size: "",
   });
 
+  // Persist cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('furever_cart', JSON.stringify(cart));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  }, [cart]);
+
   const updateSelections = (key, value) => {
     setSelections((prev) => ({ ...prev, [key]: value }));
   };
 
-  // ADD TO BAG
+  // n
   const addToCart = (item) => {
     const existingIndex = cart.findIndex(
       (p) =>

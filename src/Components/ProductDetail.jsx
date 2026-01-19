@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import { useAppContext } from "../context/AppContext";
-import BackButton from "../Components/ProductDetail/BackButton";
 import ImageCarousel from "../Components/ProductDetail/ImageCarousel";
 import ProductInfo from "../Components/ProductDetail/ProductInfo";
 import ProductOptions from "../Components/ProductDetail/ProductOptions";
@@ -252,8 +251,6 @@ const ProductDetail = () => {
   console.log(product);
   return (
     <div className="bg-gray-50 min-h-screen pb-4">
-      <BackButton onClick={handleGoBack} />
-
       <div className="container mx-auto px-3 pt-2 pb-4">
         <div className="bg-white rounded-lg shadow-md overflow-visible">
           <ImageCarousel
@@ -262,6 +259,7 @@ const ProductDetail = () => {
             scrollTo={scrollTo}
             scrollSnaps={scrollSnaps}
             emblaRef={emblaRef}
+            navigate={navigate}
           />
 
           <div className="">

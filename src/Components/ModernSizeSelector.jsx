@@ -139,7 +139,7 @@ const SimpleSizeSelector = ({
         ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
         : null;
 
-    addToCart({
+    const cartItem = {
       productId: product.id,
       name: product.name,
       category: product.category || product.type,
@@ -157,9 +157,14 @@ const SimpleSizeSelector = ({
       image: images[0],
       quantity: 1,
       measurements: null, // For simplified sizing, we don't need measurements
-    });
+      addedAt: Date.now(),
+    };
 
-    toast.success("Added To Cart");
+    addToCart(cartItem);
+    toast.success("🐕 Product has been added to cart! Your furry friend's style is secured.", {
+      duration: 4000,
+      position: 'top-center',
+    });
     setShowSizeGuide(false); // Close modal
     setIsOpen(true);
   };
@@ -530,50 +535,35 @@ const SimpleSizeSelector = ({
 
             {/* Action Buttons - Fixed at Bottom */}
             <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white">
-              <div className="flex gap-3">
-                <button
-                  onClick={handleBuyNow}
-                  disabled={!shouldEnableActions()}
-                  className={`flex-1 py-3 px-6 rounded-lg font-semibold text-sm transition-all ${
-                    shouldEnableActions()
-                      ? "bg-gray-600 text-white hover:bg-gray-700 shadow-md hover:shadow-lg"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
+              <button
+                onClick={handleAddToCart}
+                disabled={!shouldEnableActions()}
+                className={`w-full py-3 px-6 rounded-lg font-semibold text-sm transition-all ${
+                  shouldEnableActions()
+                    ? "bg-gray-800 text-white hover:bg-gray-900 shadow-md hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <span className="inline-flex items-center justify-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 6h18M7 6V4a1 1 0 011-1h8a1 1 0 011 1v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z"
+                    />
+                  </svg>
                   {ordersArePaused
                     ? "Orders Temporarily Paused"
-                    : `Buy Now - ₹${calculatePrice()}`}
-                </button>
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!shouldEnableActions()}
-                  className={`flex-1 py-3 px-6 rounded-lg font-semibold text-sm transition-all border-2 ${
-                    shouldEnableActions()
-                      ? "border-pink-600 text-pink-600 hover:bg-pink-50"
-                      : "border-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 6h18M7 6V4a1 1 0 011-1h8a1 1 0 011 1v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z"
-                      />
-                    </svg>
-                    {ordersArePaused
-                      ? "Orders Temporarily Paused"
-                      : "Add to Bag"}
-                  </span>
-                </button>
-              </div>
+                    : `Add to Bag - ₹${calculatePrice()}`}
+                </span>
+              </button>
 
               {!selectedSize && (
                 <p className="text-xs text-gray-500 text-center mt-2">

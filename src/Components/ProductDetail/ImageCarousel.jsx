@@ -1,4 +1,5 @@
 import React from "react";
+import { ChevronLeft } from "lucide-react";
 
 const ImageCarousel = ({
   images,
@@ -6,6 +7,7 @@ const ImageCarousel = ({
   scrollTo,
   scrollSnaps,
   emblaRef,
+  navigate,
 }) => {
   // Function to check if the file is a video
   const isVideo = (url) => {
@@ -13,10 +15,19 @@ const ImageCarousel = ({
     const urlPath = url.toLowerCase();
     return videoExtensions.some(ext => urlPath.includes(ext));
   };
+
+  const handleGoBack = () => navigate(-1);
   return (
     <>
-      {/* Media Carousel */}
-      <div className="overflow-hidden" ref={emblaRef}>
+      {/* Media Carousel with Back Button */}
+      <div className="overflow-hidden relative" ref={emblaRef}>
+        {/* Back Icon */}
+        <button
+          onClick={handleGoBack}
+          className="absolute top-3 left-3 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors duration-200"
+        >
+          <ChevronLeft size={18} className="text-gray-700" />
+        </button>
         <div className="flex">
           {images.map((media, idx) => (
             <div className="min-w-full relative pb-[133%]" key={idx}>

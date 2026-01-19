@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ShoppingBag } from "lucide-react";
 import { CurrencyContext } from "../../context/currencyContext";
 import { convertCurrency } from "../../constants/currency";
 import { useOrderPause } from "../../context/OrderPauseContext";
+import { useAppContext } from "../../context/AppContext";
 
 const BottomActions = ({
   product,
@@ -27,6 +28,25 @@ const BottomActions = ({
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
+  const { cart } = useAppContext();
+
+  // Check if current product configuration is already in cart
+  const isProductInCart = () => {
+    return cart.some(
+      (item) =>
+        item.productId === product.id &&
+        item.isBeaded === isBeaded &&
+        item.isFullSet === isFullSet &&
+        item.isDupattaSet === isDupattaSet &&
+        item.isRoyalSet === isRoyalSet &&
+        item.selectedSize === selectedSize &&
+        item.selectedColor === selectedColor &&
+        item.selectedDhoti === selectedDhoti &&
+        item.selectedStyle === selectedStyle
+    );
+  };
+
+  const productInCart = isProductInCart();
 
   // Check if selected size requires custom tailoring
   const isCustomSize =
@@ -94,13 +114,19 @@ const BottomActions = ({
   };
 
   const handleAddToCart = () => {
+    // If product is already in cart, open cart instead of adding
+    if (productInCart) {
+      setIsOpen(true);
+      return;
+    }
+
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails =
       selectedDhoti && product.dhotis
         ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
         : null;
 
-    addToCart({
+    const cartItem = {
       productId: product.id,
       name: product.name,
       category: product.category || product.type, // Use category from your JSON structure
@@ -118,9 +144,40 @@ const BottomActions = ({
       image: images[0],
       quantity: 1,
       measurements: requiresMeasurements ? measurements : null,
+      addedAt: Date.now(),
+    };
+
+    addToCart(cartItem);
+    toast.success("🐕 Product has been added to cart! Your furry friend's style is secured.", {
+      duration: 4000,
+      position: 'top-center',
     });
-    toast.success("Added To Cart");
-    setIsOpen(true);
+    // setIsOpen(true);
+
+    // Schedule browser notification for abandoned cart (15 minutes)
+    setTimeout(() => {
+      scheduleAbandonedCartNotification();
+    }, 15 * 60 * 1000); // 15 minutes
+  };
+
+  const scheduleAbandonedCartNotification = () => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const cartItems = JSON.parse(localStorage.getItem('furever_cart') || '[]');
+      if (cartItems.length > 0) {
+        // Check if any items haven't been ordered yet
+        const hasUnorderedItems = cartItems.some(item => !item.ordered);
+        if (hasUnorderedItems) {
+          new Notification('🐾 Your Furry Friend is Waiting!', {
+            body: 'That perfect outfit is still in your cart - your pup\'s style moment awaits!',
+            icon: '/images/thumbnail.avif',
+            tag: 'abandoned-cart'
+          });
+        }
+      }
+    } else if ('Notification' in window) {
+      // Request permission for future notifications
+      Notification.requestPermission();
+    }
   };
 
   const handleWhatsAppChat = () => {
@@ -178,38 +235,21 @@ Thanks`;
     <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
       <motion.button
         disabled={!isActionsEnabled}
-        className={`w-full py-3 ${
+        className={`w-full py-3 font-medium rounded-md ${
           !isActionsEnabled
             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-            : "bg-gray-800 text-white"
-        } font-medium rounded-md`}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleBuyNow}
-      >
-        {ordersArePaused
-          ? "Orders Temporarily Paused"
-          : `Buy Now • ${convertCurrency(calculatePrice(), currency)}`}
-      </motion.button>
-
-      <motion.button
-        disabled={!isActionsEnabled}
-        className={`w-full py-3 mt-2 font-medium rounded-md border ${
-          !isActionsEnabled
-            ? "text-gray-400 border-gray-300 cursor-not-allowed"
-            : "text-gray-800 border-gray-800"
-        }`}
+            : "bg-gray-800 text-white hover:bg-gray-900"
+        } transition-colors duration-200`}
         whileTap={{ scale: 0.98 }}
         onClick={handleAddToCart}
       >
-        <span className="inline-flex items-center gap-2">
-          <img
-            src="/images/bag.png"
-            className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 cursor-pointer object-contain"
-            alt="Cart"
-          />
+        <span className="inline-flex items-center justify-center gap-2">
+          <ShoppingBag size={20}/>
           {ordersArePaused
             ? "Orders Temporarily Paused"
-            : `Add to Bag • ${convertCurrency(calculatePrice(), currency)}`}
+            : productInCart
+            ? "Go to Cart"
+            : "Add to Cart"}
         </span>
       </motion.button>
     </div>
