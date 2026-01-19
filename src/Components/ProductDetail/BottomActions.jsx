@@ -157,7 +157,7 @@ const BottomActions = ({
     // Schedule browser notification for abandoned cart (15 minutes)
     setTimeout(() => {
       scheduleAbandonedCartNotification();
-    }, 15 * 60 * 1000); // 15 minutes
+    }, 2 * 60 * 1000); // 15 minutes
   };
 
   const scheduleAbandonedCartNotification = () => {
