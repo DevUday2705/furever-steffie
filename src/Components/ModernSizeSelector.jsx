@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useOrderPause } from "../context/OrderPauseContext";
+import { useAppContext } from "../context/AppContext";
 
 // Size chart data based on the provided chart
 const SIZE_CHART = {
@@ -79,6 +80,7 @@ const SimpleSizeSelector = ({
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [activeTab, setActiveTab] = useState("chart");
   const { ordersArePaused } = useOrderPause();
+  const { checkAndShowNotificationRequest } = useAppContext();
 
   // Check if size is available in stock
   const isSizeAvailable = (size) => {
@@ -165,6 +167,10 @@ const SimpleSizeSelector = ({
       duration: 4000,
       position: 'top-center',
     });
+    
+    // Check if we should show notification permission request
+    checkAndShowNotificationRequest();
+    
     setShowSizeGuide(false); // Close modal
     setIsOpen(true);
   };

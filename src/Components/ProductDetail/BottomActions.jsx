@@ -28,7 +28,7 @@ const BottomActions = ({
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
-  const { cart } = useAppContext();
+  const { cart, checkAndShowNotificationRequest } = useAppContext();
 
   // Check if current product configuration is already in cart
   const isProductInCart = () => {
@@ -152,6 +152,10 @@ const BottomActions = ({
       duration: 4000,
       position: 'top-center',
     });
+    
+    // Check if we should show notification permission request
+    checkAndShowNotificationRequest();
+    
     // setIsOpen(true);
 
     // Schedule browser notification for abandoned cart (15 minutes)

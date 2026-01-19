@@ -62,6 +62,7 @@ import FemaleBandanas from "./Components/BandanaListing";
 import MaleBandanas from "./Components/MaleBandanas";
 import DailyTaskSheet from "./Components/TaskSheet";
 import PaymentFailed from "./Components/PaymentFailed";
+import NotificationPermissionDialog from "./Components/NotificationPermissionDialog";
 import EmailTest from "./Components/EmailTest";
 import WhatsAppTest from "./Components/WhatsAppTest";
 import SizeGuide from "./Components/SizeGuide";
@@ -228,6 +229,9 @@ const App = () => {
           }
         }}
       />
+
+      {/* Notification Permission Dialog */}
+      <NotificationPermissionDialog />
 
       <Toaster />
     </div>

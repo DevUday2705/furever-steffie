@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [gender, setGender] = useState("male");
+  const [showNotificationPermission, setShowNotificationPermission] = useState(false);
   const [selections, setSelections] = useState({
     gender: "",
     style: "",
@@ -43,6 +44,27 @@ export const AppProvider = ({ children }) => {
 
   const updateSelections = (key, value) => {
     setSelections((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Notification permission functions
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      setShowNotificationPermission(false);
+      
+      if (permission === 'granted') {
+        localStorage.setItem('notificationPermissionAsked', 'true');
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const checkAndShowNotificationRequest = () => {
+    const hasAsked = localStorage.getItem('notificationPermissionAsked');
+    if (!hasAsked && 'Notification' in window && Notification.permission === 'default') {
+      setShowNotificationPermission(true);
+    }
   };
 
   // n
@@ -108,6 +130,10 @@ export const AppProvider = ({ children }) => {
         updateQuantity,
         isOpen,
         setIsOpen,
+        showNotificationPermission,
+        setShowNotificationPermission,
+        requestNotificationPermission,
+        checkAndShowNotificationRequest,
       }}
     >
       {children}
