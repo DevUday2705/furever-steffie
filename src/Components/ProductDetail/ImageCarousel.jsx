@@ -20,7 +20,7 @@ const ImageCarousel = ({
   return (
     <>
       {/* Media Carousel with Back Button */}
-      <div className="overflow-hidden relative" ref={emblaRef}>
+      <div className="relative">
         {/* Back Icon */}
         <button
           onClick={handleGoBack}
@@ -28,27 +28,30 @@ const ImageCarousel = ({
         >
           <ChevronLeft size={18} className="text-gray-700" />
         </button>
-        <div className="flex">
-          {images.map((media, idx) => (
-            <div className="min-w-full relative pb-[133%]" key={idx}>
-              {isVideo(media) ? (
-                <video
-                  src={media}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="absolute w-full h-full object-cover object-[0%_25%]"
-                />
-              ) : (
-                <img
-                  src={media}
-                  alt={`Product Media ${idx + 1}`}
-                  className="absolute w-full h-full object-cover object-[0%_25%]"
-                />
-              )}
-            </div>
-          ))}
+        
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {images.map((media, idx) => (
+              <div className="min-w-full relative pb-[133%]" key={idx}>
+                {isVideo(media) ? (
+                  <video
+                    src={media}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute w-full h-full object-cover object-[0%_25%]"
+                  />
+                ) : (
+                  <img
+                    src={media}
+                    alt={`Product Media ${idx + 1}`}
+                    className="absolute w-full h-full object-cover object-[0%_25%]"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

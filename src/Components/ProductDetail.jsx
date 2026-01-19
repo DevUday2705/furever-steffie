@@ -72,6 +72,20 @@ const ProductDetail = () => {
     emblaApi.on("select", onSelect);
     return () => emblaApi.off("select", onSelect);
   }, [emblaApi, onSelect]);
+
+  // Reinitialize carousel when images change
+  useEffect(() => {
+    if (!emblaApi || images.length === 0) return;
+    
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(() => {
+      emblaApi.reInit();
+      setScrollSnaps(emblaApi.scrollSnapList());
+      setSelectedIndex(0);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [images, emblaApi]);
   useEffect(() => {
     const fetchProduct = async () => {
       try {
