@@ -242,6 +242,8 @@ Thanks`;
         className={`w-full py-3 font-medium rounded-md ${
           !isActionsEnabled
             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+            : productInCart
+            ? "bg-green-600 text-white hover:bg-green-700"
             : "bg-gray-800 text-white hover:bg-gray-900"
         } transition-colors duration-200`}
         whileTap={{ scale: 0.98 }}

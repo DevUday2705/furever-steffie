@@ -914,6 +914,7 @@ const AdminPage = () => {
             <div className="space-y-4">
               {filteredAndSortedOrders.map((order) => {
                 const hasRoyalSet = order.items?.some(item => item.isRoyalSet);
+                const isExpressDelivery = order.customer?.deliveryOption === "express";
                 
                 return (
                 <motion.div
@@ -924,6 +925,8 @@ const AdminPage = () => {
                   className={`border rounded-lg p-4 shadow-sm ${
                     hasRoyalSet
                       ? "bg-yellow-50 border-yellow-300"
+                      : isExpressDelivery
+                      ? "bg-red-50 border-red-300"
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
                       : "border-gray-200"
@@ -1434,7 +1437,13 @@ const AdminPage = () => {
                         </p>
                         <p>
                           <span className="font-bold">Delivery:</span>{" "}
-                          {order.customer?.deliveryOption}
+                          <span className={`font-bold ${
+                            order.customer?.deliveryOption === "express"
+                              ? "text-red-600"
+                              : "text-gray-700"
+                          }`}>
+                            {order.customer?.deliveryOption}
+                          </span>
                         </p>
                       </div>
                       <div className="pt-2 border-t">
