@@ -923,7 +923,9 @@ const AdminPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className={`border rounded-lg p-4 shadow-sm ${
-                    hasRoyalSet
+                    hasRoyalSet && isExpressDelivery
+                      ? "bg-purple-50 border-purple-300"
+                      : hasRoyalSet
                       ? "bg-yellow-50 border-yellow-300"
                       : isExpressDelivery
                       ? "bg-red-50 border-red-300"
