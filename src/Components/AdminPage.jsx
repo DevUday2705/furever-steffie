@@ -374,7 +374,6 @@ const AdminPage = () => {
             }
             .header-message {
               text-align: center;
-              font-weight: bold;
               font-size: 15px;
               margin-bottom: 12px;
               padding: 8px;
@@ -420,7 +419,7 @@ const AdminPage = () => {
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
                 
-                <div class="order-id">Order ID: ${order.id}</div>
+
               </div>
             `
               )
