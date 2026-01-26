@@ -419,7 +419,7 @@ const AdminPage = () => {
                 <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
-                ${order.customer?.specialInstructions ? `<div class="address-line" style="margin-top: 8px;"><span class="label">Instructions:</span>${order.customer.specialInstructions}</div>` : ""}
+                
                 <div class="order-id">Order ID: ${order.id}</div>
               </div>
             `
