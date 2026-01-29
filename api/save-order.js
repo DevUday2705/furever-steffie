@@ -56,6 +56,7 @@ export default async function handler(req, res) {
                 // Handle known collection mappings
                 const collectionMap = {
                     'kurta': 'kurtas',
+                    'pathani': 'pathanis',
                     'lehenga': 'lehengas',
                     'frock': 'frocks',
                     'bandana': 'bandanas',
@@ -78,7 +79,7 @@ export default async function handler(req, res) {
                     console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
 
                     // Try alternative collection names
-                    const alternativeCollections = ['kurtas', 'lehengas', 'frocks', 'bandanas', 'bowties'];
+                    const alternativeCollections = ['kurtas', 'pathanis', 'lehengas', 'frocks', 'bandanas', 'bowties'];
                     let found = false;
 
                     for (const altCollection of alternativeCollections) {

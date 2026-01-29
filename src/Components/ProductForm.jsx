@@ -86,6 +86,10 @@ const schemaConfigurations = {
     additionalFields: [],
     excludedFields: [],
   },
+  pathani: {
+    additionalFields: [],
+    excludedFields: [],
+  },
   frock: {
     additionalFields: ["colors"],
     excludedFields: [],

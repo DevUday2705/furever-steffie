@@ -21,6 +21,7 @@ const collections = [
   "tuts",
   "lehengas",
   "male-bandanas",
+  "pathanis",
 ];
 
 const AdminProducts = () => {

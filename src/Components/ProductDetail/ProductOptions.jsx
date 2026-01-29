@@ -83,11 +83,17 @@ const ProductOptions = ({
 
   // If user switches to a size where these options are not allowed, clear them
   useEffect(() => {
+    // Clear dhoti-related options if dhoti is not available or not available for selected size
     if (!isDhotiAvailable || !isDhotiAvailableForSize) {
       if (isRoyalSet) setIsRoyalSet(false);
       if (isFullSet) setIsFullSet(false);
       // reset selected dhoti since dhoti options should not be selectable
       if (selectedDhoti) setSelectedDhoti(null);
+    }
+    
+    // Clear dupatta option only if dhoti is not available at all (not size-dependent)
+    if (!isDhotiAvailable && isDupattaSet) {
+      setIsDupattaSet(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSize, isDhotiAvailable, isDhotiAvailableForSize]);
@@ -301,36 +307,23 @@ const ProductOptions = ({
                 } border text-gray-800`}
               >
                 Kurta + Dhoti
-                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
-                  <span className="ml-2 text-xs text-orange-600">
-                    {!isDhotiAvailable 
-                      ? "(Not Available)" 
-                      : `(Not for ${selectedSize})`}
-                  </span>
-                )}
               </button>
 
               {/* NEW: Kurta + Dupatta Option */}
               <button
-                onClick={() => isDhotiAvailable && isDhotiAvailableForSize && handleRegularOptionClick(false, true)}
-                disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
-                aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
+                onClick={() => isDhotiAvailable && handleRegularOptionClick(false, true)}
+                disabled={!isDhotiAvailable}
+                aria-disabled={!isDhotiAvailable}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
                   isDupattaSet && !isRoyalSet
                     ? "border-gray-800 bg-gray-100"
-                    : isDhotiAvailable && isDhotiAvailableForSize
+                    : isDhotiAvailable
                     ? "border-gray-200 bg-gray-50 hover:border-gray-300"
                     : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                 } border text-gray-800`}
               >
                 Kurta + Dupatta
-                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
-                  <span className="ml-2 text-xs text-orange-600">
-                    {!isDhotiAvailable 
-                      ? "(Not Available)" 
-                      : `(Not for ${selectedSize})`}
-                  </span>
-                )}
+               
               </button>
             </div>
 

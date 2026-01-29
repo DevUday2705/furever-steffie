@@ -6,7 +6,7 @@ import { db } from "../firebase";
 
 export const getTopProductsByGender = async (gender) => {
   const collectionMap = {
-    male: ['kurtas'],
+    male: ['kurtas', 'pathanis'],
     female: ['female-bandanas', 'frocks', 'tuts'],
   };
 
