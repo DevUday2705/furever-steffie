@@ -31,6 +31,7 @@ import ThankYouPage from "./Components/ThankYouPage";
 import BowTieCategories from "./Components/BowTieCategories";
 
 import KurtaListing from "./Components/KurtaListing";
+import PathaniListing from "./Components/PathaniListing";
 import TuxedoListing from "./Components/TuxedoListing";
 
 import LehengaListing from "./Components/LehengaListing";
@@ -152,8 +153,10 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/kurta" element={<KurtaListing />} />
+              <Route path="/pathani" element={<PathaniListing />} />
               <Route path="/frock" element={<FrockListing />} />
               <Route path="/tuxedo" element={<TuxedoListing />} />
+              <Route path="/pathani" element={<PathaniListing />} />
               <Route path="/female-bandanas" element={<FemaleBandanas />} />
               <Route path="/male-bandanas" element={<MaleBandanas />} />
               <Route path="/lehenga" element={<LehengaListing />} />

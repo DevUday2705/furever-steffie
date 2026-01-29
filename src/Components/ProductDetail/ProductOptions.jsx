@@ -131,7 +131,7 @@ const ProductOptions = ({
     const availableOptions = [];
 
     // Always available options
-    if (product.type == "kurta" && !isRoyalSet) {
+    if ((product.type == "kurta" || product.type == "pathani") && !isRoyalSet) {
       availableOptions.push(
         { id: "simple", label: "Simple", description: "Classic look" },
         {
@@ -211,7 +211,7 @@ const ProductOptions = ({
   // };
 
   const renderDhotiOptions = () => {
-    if (!isFullSet || product.type !== "kurta") return null;
+    if (!isFullSet || (product.type !== "kurta" && product.type !== "pathani")) return null;
     console.log(product.dhotis);
     return (
       <motion.div
@@ -262,7 +262,7 @@ const ProductOptions = ({
       />
 
       {/* STYLE OPTIONS */}
-      {["kurta", "lehnga"].includes(product.type) &&
+      {["kurta", "pathani", "lehnga"].includes(product.type) &&
         (isBeadedAvailable || isNonBeadedAvailable) && (
           <div>
             <h3 className="text-xs font-medium text-gray-900">Style</h3>
@@ -271,7 +271,7 @@ const ProductOptions = ({
         )}
 
       {/* PRODUCT TYPE OPTIONS */}
-      {product.type === "kurta" && product.options && (
+      {(product.type === "kurta" || product.type === "pathani") && product.options && (
         <div>
           <h3 className="text-xs font-medium text-gray-900">Product Type</h3>
           <div className="mt-1 space-y-2">

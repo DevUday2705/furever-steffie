@@ -16,6 +16,14 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1753112945/Rani_Pink_nqcsl7.webp  ",
     },
+     {
+      id: 5,
+      name: "Pathani",
+      link: "Pathani",
+      description: "Suit Up!",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1768739245/IMG_0079_sdnofh.webp",
+    },
     {
       id: 2,
       name: "TUXEDO",
@@ -32,14 +40,15 @@ const Categories = () => {
       image:
         "https://res.cloudinary.com/di6unrpjw/image/upload/v1755713280/IMG_9469_txpsl9.webp",
     },
-    {
-      id: 4,
-      name: "BOW TIE",
-      link: "Bow Tie",
-      description: "Suit Up!",
-      image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
-    },
+    // {
+    //   id: 4,
+    //   name: "BOW TIE",
+    //   link: "Bow Tie",
+    //   description: "Suit Up!",
+    //   image:
+    //     "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
+    // },
+       
   ];
 
   const femaleCategories = [

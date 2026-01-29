@@ -106,11 +106,11 @@ const ProductDetail = () => {
             foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
           setSelectedColor(defaultColor);
 
-          const isKurta = foundProduct.type === "kurta";
+          const isKurtaOrPathani = foundProduct.type === "kurta" || foundProduct.type === "pathani";
           const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
 
-          // 👇 Combine all beaded & non-beaded images if kurta
-          if (isKurta) {
+          // 👇 Combine all beaded & non-beaded images if kurta or pathani
+          if (isKurtaOrPathani) {
             const beadedImgs = foundProduct.options?.beaded?.images || [];
             const nonBeadedImgs = foundProduct.options?.nonBeaded?.images || [];
             const allImages = [...beadedImgs, ...nonBeadedImgs];
@@ -148,7 +148,7 @@ const ProductDetail = () => {
   }, [productId, idPart, typePart]);
 
   useEffect(() => {
-    if (!product || product.type === "kurta") return; // ⛔ Skip if kurta
+    if (!product || product.type === "kurta" || product.type === "pathani") return; // ⛔ Skip if kurta or pathani
 
     if (product.colors && selectedColor) {
       const colorData = product.colors.find((c) => c.id === selectedColor);
