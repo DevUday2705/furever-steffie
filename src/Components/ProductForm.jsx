@@ -52,6 +52,7 @@ const defaultSchema = {
   },
   sizes: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"],
   dhotis: [],
+  dhotiSizeAvailability: ["XS", "S", "M"], // Sizes for which dhoti is available
   pricing: {
     basePrice: 0,
     discountPercent: 0,
@@ -160,6 +161,8 @@ const ProductForm = () => {
 
   // State for selected dhoti IDs
   const [selectedDhotiIds, setSelectedDhotiIds] = useState([]);
+  // State for dhoti size availability
+  const [selectedDhotiSizes, setSelectedDhotiSizes] = useState(["XS", "S", "M"]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -311,6 +314,17 @@ const ProductForm = () => {
     });
   };
 
+  // Handle dhoti size availability selection
+  const toggleDhotiSizeSelection = (size) => {
+    setSelectedDhotiSizes((prev) => {
+      if (prev.includes(size)) {
+        return prev.filter((s) => s !== size);
+      } else {
+        return [...prev, size];
+      }
+    });
+  };
+
   // Update formData.dhotis based on selected dhoti IDs
   useEffect(() => {
     const selectedDhotis = predefinedDhotis.filter((dhoti) =>
@@ -318,6 +332,11 @@ const ProductForm = () => {
     );
     handleChange("dhotis", selectedDhotis);
   }, [selectedDhotiIds]);
+
+  // Update formData.dhotiSizeAvailability based on selected sizes
+  useEffect(() => {
+    handleChange("dhotiSizeAvailability", selectedDhotiSizes);
+  }, [selectedDhotiSizes]);
 
   const handleSubmit = async () => {
     try {
@@ -686,9 +705,39 @@ const ProductForm = () => {
           <div className="border p-4 rounded">
             <h2 className="font-semibold mb-2">Dhotis</h2>
             <p className="text-sm text-gray-600 mb-3">
-              Select the dhoti options available for this product:
+              Select the dhoti options and sizes available for this product:
             </p>
 
+            {/* Dhoti Size Availability */}
+            <div className="mb-4">
+              <h3 className="font-medium text-sm mb-2">Available Sizes for Dhoti:</h3>
+              <div className="flex flex-wrap gap-2">
+                {formData.sizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => toggleDhotiSizeSelection(size)}
+                    className={`
+                      px-3 py-1 rounded-md text-sm border-2 font-medium transition-all duration-200
+                      ${
+                        selectedDhotiSizes.includes(size)
+                          ? "bg-green-500 text-white border-green-500 shadow-md"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-green-300 hover:bg-green-50"
+                      }
+                    `}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              {selectedDhotiSizes.length > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Dhoti options will be available for: {selectedDhotiSizes.join(", ")}
+                </p>
+              )}
+            </div>
+
+            {/* Dhoti Options */}
             <div className="flex flex-wrap gap-3 mb-4">
               {predefinedDhotis.map((dhoti) => (
                 <button

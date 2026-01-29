@@ -51,9 +51,8 @@ const ProductOptions = ({
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
 
   const handleRoyalSetClick = () => {
-    // guard: only allow royal set for XS/S/M
-    const allowed = ["XS", "S", "M"].includes(selectedSize);
-    if (!allowed) {
+    // guard: only allow royal set if dhoti is available for selected size
+    if (!isDhotiAvailable || !isDhotiAvailableForSize) {
       setShowDhotiUnavailableModal(true);
       return;
     }
@@ -73,17 +72,25 @@ const ProductOptions = ({
 
   // Disable dhoti/royal options for sizes L and above
   const isSizeAllowedForDhotiRoyal = ["XS", "S", "M"].includes(selectedSize);
+  
+  // Check if dhoti options are available
+  const isDhotiAvailable = product?.dhotis && product.dhotis.length > 0;
+  
+  // Check if dhoti is available for the selected size
+  const isDhotiAvailableForSize = product?.dhotiSizeAvailability 
+    ? product.dhotiSizeAvailability.includes(selectedSize)
+    : isSizeAllowedForDhotiRoyal; // fallback to old logic if dhotiSizeAvailability not set
 
   // If user switches to a size where these options are not allowed, clear them
   useEffect(() => {
-    if (!isSizeAllowedForDhotiRoyal) {
+    if (!isDhotiAvailable || !isDhotiAvailableForSize) {
       if (isRoyalSet) setIsRoyalSet(false);
       if (isFullSet) setIsFullSet(false);
       // reset selected dhoti since dhoti options should not be selectable
       if (selectedDhoti) setSelectedDhoti(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSize]);
+  }, [selectedSize, isDhotiAvailable, isDhotiAvailableForSize]);
 
   useEffect(() => {
     const initialTimer = setTimeout(() => {
@@ -279,37 +286,51 @@ const ProductOptions = ({
               {/* Regular Kurta + Dhoti Option */}
               <button
                 onClick={() =>
-                  isSizeAllowedForDhotiRoyal &&
+                  isDhotiAvailable &&
+                  isDhotiAvailableForSize &&
                   handleRegularOptionClick(true, false)
                 }
-                disabled={!isSizeAllowedForDhotiRoyal}
-                aria-disabled={!isSizeAllowedForDhotiRoyal}
+                disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
+                aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
                   isFullSet && !isRoyalSet && !isDupattaSet
                     ? "border-gray-800 bg-gray-100"
-                    : isSizeAllowedForDhotiRoyal
+                    : isDhotiAvailable && isDhotiAvailableForSize
                     ? "border-gray-200 bg-gray-50 hover:border-gray-300"
                     : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                 } border text-gray-800`}
               >
                 Kurta + Dhoti
-                {!isSizeAllowedForDhotiRoyal && (
+                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
                   <span className="ml-2 text-xs text-orange-600">
-                    (XS/S/M only)
+                    {!isDhotiAvailable 
+                      ? "(Not Available)" 
+                      : `(Not for ${selectedSize})`}
                   </span>
                 )}
               </button>
 
               {/* NEW: Kurta + Dupatta Option */}
               <button
-                onClick={() => handleRegularOptionClick(false, true)}
+                onClick={() => isDhotiAvailable && isDhotiAvailableForSize && handleRegularOptionClick(false, true)}
+                disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
+                aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
                 className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
                   isDupattaSet && !isRoyalSet
                     ? "border-gray-800 bg-gray-100"
-                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                    : isDhotiAvailable && isDhotiAvailableForSize
+                    ? "border-gray-200 bg-gray-50 hover:border-gray-300"
+                    : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                 } border text-gray-800`}
               >
                 Kurta + Dupatta
+                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
+                  <span className="ml-2 text-xs text-orange-600">
+                    {!isDhotiAvailable 
+                      ? "(Not Available)" 
+                      : `(Not for ${selectedSize})`}
+                  </span>
+                )}
               </button>
             </div>
 
@@ -319,13 +340,13 @@ const ProductOptions = ({
                 <button
                   onClick={handleRoyalSetClick}
                   onMouseEnter={triggerShine}
-                  disabled={!isSizeAllowedForDhotiRoyal}
-                  aria-disabled={!isSizeAllowedForDhotiRoyal}
+                  disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
+                  aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
                     ${
                       isRoyalSet
                         ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
-                        : isSizeAllowedForDhotiRoyal
+                        : isDhotiAvailable && isDhotiAvailableForSize
                         ? "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
                         : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
                     }
@@ -338,9 +359,11 @@ const ProductOptions = ({
                     : "Click here for  Royal Set"}
                 </button>
 
-                {!isSizeAllowedForDhotiRoyal && (
+                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
                   <div className="text-xs text-orange-600 mt-2">
-                    Royal Set available only for sizes XS, S, M
+                    {!isDhotiAvailable 
+                      ? "Royal Set not available for this product"
+                      : `Royal Set not available for size ${selectedSize}`}
                   </div>
                 )}
 
