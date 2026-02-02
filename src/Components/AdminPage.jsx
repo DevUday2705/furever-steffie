@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
 import OrderResumeNotifications from "./OrderResumeNotifications";
 import CouponManager from "./CouponManager";
+import Analytics from "./Analytics";
 import { useOrderPause } from "../context/OrderPauseContext";
 
 const ADMIN_KEY = "What@123";
@@ -693,7 +694,7 @@ const AdminPage = () => {
           >
             📦 Orders Management
           </button>
-          <button
+          {/* <button
             onClick={() => setActiveTab("notifications")}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === "notifications"
@@ -712,6 +713,16 @@ const AdminPage = () => {
             }`}
           >
             🎫 Custom Coupons
+          </button> */}
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "analytics"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            📊 Analytics
           </button>
         </nav>
       </div>
@@ -1474,6 +1485,9 @@ const AdminPage = () => {
       
       {/* Coupons Tab */}
       {activeTab === "coupons" && <CouponManager />}
+      
+      {/* Analytics Tab */}
+      {activeTab === "analytics" && <Analytics />}
     </div>
   );
 };
