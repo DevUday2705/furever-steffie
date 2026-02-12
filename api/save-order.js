@@ -24,7 +24,7 @@ async function updateDhotiInventory(dhotiType, size, quantityToReduce, batch) {
         const inventoryRef = db.collection('dhotis').doc('inventory');
         const inventorySnap = await inventoryRef.get();
         
-        if (!inventorySnap.exists()) {
+        if (!inventorySnap.exists) {
             throw new Error('Dhoti inventory not found');
         }
         
