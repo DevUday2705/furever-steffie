@@ -48,6 +48,8 @@ import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
+import GlobalSettings from "./Components/GlobalSettings";
+import DhotiManagement from "./Components/DhotiManagement";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
 import OrderUtility from "./Components/OrderUtility";
 import OrderPauseModal from "./Components/OrderPauseModal";
@@ -191,13 +193,10 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/thank-you" element={<ThankYouPage />} />
               <Route path="/admin" element={<AdminHome />} />
-              <Route path="/inventory" element={<FabricManagementSystem />} />
-              <Route path="/stock" element={<StockManager />} />
-              <Route path="/track" element={<TrackOrder />} />
-              <Route path="/upload" element={<UploadKurtasPage />} />
-              <Route path="/search" element={<UniversalSearchBar />} />
               <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/admin/product" element={<AdminProducts />} />
+              <Route path="/admin/settings" element={<GlobalSettings />} />
+              <Route path="/admin/dhotis" element={<DhotiManagement />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/order-utility" element={<OrderUtility />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />

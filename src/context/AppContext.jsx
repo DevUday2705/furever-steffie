@@ -128,7 +128,11 @@ export const AppProvider = ({ children }) => {
         p.productId === item.productId &&
         p.isBeaded === item.isBeaded &&
         p.isFullSet === item.isFullSet &&
-        p.selectedSize === item.selectedSize
+        p.isRoyalSet === item.isRoyalSet &&
+        p.isDupattaSet === item.isDupattaSet &&
+        p.selectedSize === item.selectedSize &&
+        p.selectedDhoti === item.selectedDhoti &&
+        p.selectedColor === item.selectedColor
     );
 
     if (existingIndex !== -1) {

@@ -18,6 +18,40 @@ if (!getApps().length) {
     db = getFirestore();
 }
 
+// Helper function to update dhoti inventory
+async function updateDhotiInventory(dhotiType, size, quantityToReduce, batch) {
+    try {
+        const inventoryRef = db.collection('dhotis').doc('inventory');
+        const inventorySnap = await inventoryRef.get();
+        
+        if (!inventorySnap.exists()) {
+            throw new Error('Dhoti inventory not found');
+        }
+        
+        const currentInventory = inventorySnap.data();
+        const currentStock = currentInventory[dhotiType]?.inventory[size] || 0;
+        
+        if (currentStock < quantityToReduce) {
+            throw new Error(`Insufficient dhoti stock. Available: ${currentStock}, Requested: ${quantityToReduce} for ${dhotiType} size ${size}`);
+        }
+        
+        const newStock = currentStock - quantityToReduce;
+        
+        // Add dhoti inventory update to batch
+        batch.update(inventoryRef, {
+            [`${dhotiType}.inventory.${size}`]: newStock,
+            lastUpdated: new Date().toISOString(),
+            updatedBy: 'order-system'
+        });
+        
+        console.log(`📦 Added dhoti inventory update to batch: ${dhotiType} size ${size} - ${currentStock} -> ${newStock}`);
+        return true;
+    } catch (error) {
+        console.error('Error updating dhoti inventory:', error);
+        throw error;
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only POST method allowed" });
@@ -144,6 +178,26 @@ export default async function handler(req, res) {
                         newStock: currentStock - requestedQty,
                         productId: item.productId,
                         collectionName: collectionName
+                    });
+                }
+            }
+        }
+
+        // Process dhoti inventory for items with dhoti selections
+        console.log("🍀 Processing dhoti inventory updates...");
+        
+        for (const item of items) {
+            // Check if item has dhoti selected (isFullSet indicates Kurta + Dhoti, isRoyalSet includes dhoti)
+            if ((item.isFullSet || item.isRoyalSet) && item.selectedDhoti) {
+                const dhotiQuantity = item.quantity || 1;
+                console.log(`🍀 Item requires dhoti: ${item.name}, Dhoti: ${item.selectedDhoti}, Size: ${item.selectedSize}, Qty: ${dhotiQuantity}`);
+                
+                try {
+                    await updateDhotiInventory(item.selectedDhoti, item.selectedSize, dhotiQuantity, batch);
+                } catch (error) {
+                    console.error(`❌ Dhoti inventory error for ${item.selectedDhoti} size ${item.selectedSize}:`, error.message);
+                    return res.status(400).json({
+                        message: `Dhoti inventory error: ${error.message}`
                     });
                 }
             }

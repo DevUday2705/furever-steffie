@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { CheckCircle, ChevronRight, Crown, Gift, X, Clock } from "lucide-react";
+import { CheckCircle, ChevronRight, Crown, Gift, X, Clock, AlertCircle } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
 import { Link } from "react-router-dom";
+import { getAvailableDhtoisForSize, getGlobalSettings } from "../../utils/dhotiInventoryUtils";
 
 const confettiOptions = {
   loop: false,
@@ -38,8 +39,10 @@ const ProductOptions = ({
   const [showRoyalDescription, setShowRoyalDescription] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isShining, setIsShining] = useState(false);
-  const [showDhotiUnavailableModal, setShowDhotiUnavailableModal] =
-    useState(false);
+  const [showDhotiUnavailableModal, setShowDhotiUnavailableModal] = useState(false);
+  const [availableDhtois, setAvailableDhtois] = useState([]);
+  const [globalSettings, setGlobalSettings] = useState(null);
+  const [dhotiLoading, setDhotiLoading] = useState(false);
 
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
@@ -50,9 +53,77 @@ const ProductOptions = ({
   };
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
 
+  // Load global settings and available dhotis on component mount
+  useEffect(() => {
+    const loadGlobalSettings = async () => {
+      try {
+        const settings = await getGlobalSettings();
+        setGlobalSettings(settings);
+      } catch (error) {
+        console.error('Error loading global settings:', error);
+      }
+    };
+
+    loadGlobalSettings();
+  }, []);
+
+  // Load available dhotis when size changes
+  useEffect(() => {
+    const loadAvailableDhtois = async () => {
+      if (!selectedSize || !globalSettings) return;
+      
+      const dhotiManagementEnabled = globalSettings?.features?.dhotiManagementEnabled;
+      
+      if (dhotiManagementEnabled) {
+        // Use centralized dhoti inventory system
+        setDhotiLoading(true);
+        try {
+          const dhtois = await getAvailableDhtoisForSize(selectedSize);
+          setAvailableDhtois(dhtois);
+          
+          // If current selected dhoti is not available for this size, reset it
+          if (selectedDhoti && !dhtois.some(d => d.id === selectedDhoti)) {
+            setSelectedDhoti(null);
+          }
+          
+          // Auto-select first available dhoti if none selected
+          if (!selectedDhoti && dhtois.length > 0) {
+            setSelectedDhoti(dhtois[0].id);
+          }
+        } catch (error) {
+          console.error('Error loading available dhotis:', error);
+          setAvailableDhtois([]);
+        } finally {
+          setDhotiLoading(false);
+        }
+      } else {
+        // Fallback to product-specific dhotis
+        if (product?.dhotis && product.dhotis.length > 0) {
+          const productDhotis = product.dhotis.map(dhoti => ({
+            id: dhoti.name?.toLowerCase() || dhoti.id,
+            name: dhoti.name,
+            image: dhoti.image,
+            availableStock: 999 // Product-specific dhotis are always available
+          }));
+          setAvailableDhtois(productDhotis);
+          
+          // Auto-select first dhoti if none selected
+          if (!selectedDhoti && productDhotis.length > 0) {
+            setSelectedDhoti(productDhotis[0].id);
+          }
+        } else {
+          setAvailableDhtois([]);
+        }
+      }
+    };
+
+    loadAvailableDhtois();
+  }, [selectedSize, selectedDhoti, globalSettings, product]);
+
+
   const handleRoyalSetClick = () => {
-    // guard: only allow royal set if dhoti is available for selected size
-    if (!isDhotiAvailable || !isDhotiAvailableForSize) {
+    // Check if royal set is enabled globally and dhotis are available
+    if (!globalSettings?.features?.royalSetEnabled || availableDhtois.length === 0) {
       setShowDhotiUnavailableModal(true);
       return;
     }
@@ -67,36 +138,30 @@ const ProductOptions = ({
     setTimeout(() => {
       setShowConfetti(false);
     }, 3000);
-    // Hide description after 5 seconds
   };
 
-  // Disable dhoti/royal options for sizes L and above
-  const isSizeAllowedForDhotiRoyal = ["XS", "S", "M"].includes(selectedSize);
-  
-  // Check if dhoti options are available
-  const isDhotiAvailable = product?.dhotis && product.dhotis.length > 0;
-  
-  // Check if dhoti is available for the selected size
-  const isDhotiAvailableForSize = product?.dhotiSizeAvailability 
-    ? product.dhotiSizeAvailability.includes(selectedSize)
-    : isSizeAllowedForDhotiRoyal; // fallback to old logic if dhotiSizeAvailability not set
+  // Check if dhoti/royal options are enabled globally and available for selected size
+  const dhotiManagementEnabled = globalSettings?.features?.dhotiManagementEnabled;
+  const kurtaDhotiEnabled = globalSettings?.features?.kurtaDhotiEnabled && 
+    (dhotiManagementEnabled ? availableDhtois.length > 0 : product?.dhotis?.length > 0);
+  const kurtaDupattaEnabled = globalSettings?.features?.kurtaDupattaEnabled;
+  const royalSetEnabled = globalSettings?.features?.royalSetEnabled && 
+    (dhotiManagementEnabled ? availableDhtois.length > 0 : product?.dhotis?.length > 0);
 
-  // If user switches to a size where these options are not allowed, clear them
+  // If user switches to a size where dhotis are not available, clear dhoti-related selections
   useEffect(() => {
-    // Clear dhoti-related options if dhoti is not available or not available for selected size
-    if (!isDhotiAvailable || !isDhotiAvailableForSize) {
+    if (availableDhtois.length === 0) {
       if (isRoyalSet) setIsRoyalSet(false);
       if (isFullSet) setIsFullSet(false);
-      // reset selected dhoti since dhoti options should not be selectable
       if (selectedDhoti) setSelectedDhoti(null);
     }
     
-    // Clear dupatta option only if dhoti is not available at all (not size-dependent)
-    if (!isDhotiAvailable && isDupattaSet) {
+    // Clear dupatta set if dupatta is not enabled globally
+    if (!kurtaDupattaEnabled && isDupattaSet) {
       setIsDupattaSet(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSize, isDhotiAvailable, isDhotiAvailableForSize]);
+  }, [selectedSize, availableDhtois.length, kurtaDhotiEnabled, royalSetEnabled, kurtaDupattaEnabled]);
 
   useEffect(() => {
     const initialTimer = setTimeout(() => {
@@ -212,7 +277,41 @@ const ProductOptions = ({
 
   const renderDhotiOptions = () => {
     if (!isFullSet || (product.type !== "kurta" && product.type !== "pathani")) return null;
-    console.log(product.dhotis);
+    
+    if (dhotiLoading) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.3 }}
+          className="mt-6"
+        >
+          <h3 className="text-xs font-medium text-gray-900 mb-3">Loading Dhoti Options...</h3>
+          <div className="flex items-center justify-center p-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-800"></div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    if (availableDhtois.length === 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.3 }}
+          className="mt-6"
+        >
+          <h3 className="text-xs font-medium text-gray-900 mb-3">Dhoti Color</h3>
+          <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+            <AlertCircle className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-600">No dhotis available for size {selectedSize}</p>
+            <p className="text-xs text-gray-500 mt-1">Try selecting a different size</p>
+          </div>
+        </motion.div>
+      );
+    }
+    
     return (
       <motion.div
         initial={{ opacity: 0, height: 0 }}
@@ -220,16 +319,18 @@ const ProductOptions = ({
         transition={{ duration: 0.3 }}
         className="mt-6"
       >
-        <h3 className="text-xs font-medium text-gray-900 mb-3">Dhoti Color</h3>
+        <h3 className="text-xs font-medium text-gray-900 mb-3">
+          Dhoti Color ({availableDhtois.length} available)
+        </h3>
         <div className="grid grid-cols-3 gap-2">
-          {product.dhotis.map((dhoti) => (
+          {availableDhtois.map((dhoti) => (
             <motion.div
               key={dhoti.id}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedDhoti(dhoti.name)}
+              onClick={() => setSelectedDhoti(dhoti.id)}
               className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
-                selectedDhoti === dhoti.name
+                selectedDhoti === dhoti.id
                   ? "border-gray-800"
                   : "border-transparent"
               }`}
@@ -290,56 +391,54 @@ const ProductOptions = ({
               </button>
 
               {/* Regular Kurta + Dhoti Option */}
-              <button
-                onClick={() =>
-                  isDhotiAvailable &&
-                  isDhotiAvailableForSize &&
-                  handleRegularOptionClick(true, false)
-                }
-                disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
-                aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
-                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
-                  isFullSet && !isRoyalSet && !isDupattaSet
-                    ? "border-gray-800 bg-gray-100"
-                    : isDhotiAvailable && isDhotiAvailableForSize
-                    ? "border-gray-200 bg-gray-50 hover:border-gray-300"
-                    : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
-                } border text-gray-800`}
-              >
-                Kurta + Dhoti
-              </button>
+              {kurtaDhotiEnabled && (
+                <button
+                  onClick={() => handleRegularOptionClick(true, false)}
+                  disabled={availableDhtois.length === 0}
+                  aria-disabled={availableDhtois.length === 0}
+                  className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
+                    isFullSet && !isRoyalSet && !isDupattaSet
+                      ? "border-gray-800 bg-gray-100"
+                      : availableDhtois.length > 0
+                      ? "border-gray-200 bg-gray-50 hover:border-gray-300"
+                      : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
+                  } border text-gray-800`}
+                >
+                  Kurta + Dhoti
+                  {availableDhtois.length === 0 && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+              )}
 
               {/* NEW: Kurta + Dupatta Option */}
-              <button
-                onClick={() => isDhotiAvailable && handleRegularOptionClick(false, true)}
-                disabled={!isDhotiAvailable}
-                aria-disabled={!isDhotiAvailable}
-                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
-                  isDupattaSet && !isRoyalSet
-                    ? "border-gray-800 bg-gray-100"
-                    : isDhotiAvailable
-                    ? "border-gray-200 bg-gray-50 hover:border-gray-300"
-                    : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
-                } border text-gray-800`}
-              >
-                Kurta + Dupatta
-               
-              </button>
+              {kurtaDupattaEnabled && (
+                <button
+                  onClick={() => handleRegularOptionClick(false, true)}
+                  className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
+                    isDupattaSet && !isRoyalSet
+                      ? "border-gray-800 bg-gray-100"
+                      : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                  } border text-gray-800`}
+                >
+                  Kurta + Dupatta
+                </button>
+              )}
             </div>
 
             {/* Royal Set Option - Full width */}
-            {product.isRoyal && (
+            {product.isRoyal && royalSetEnabled && (
               <div className="relative w-full overflow-hidden rounded-md">
                 <button
                   onClick={handleRoyalSetClick}
                   onMouseEnter={triggerShine}
-                  disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
-                  aria-disabled={!isDhotiAvailable || !isDhotiAvailableForSize}
+                  disabled={availableDhtois.length === 0}
+                  aria-disabled={availableDhtois.length === 0}
                   className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
                     ${
                       isRoyalSet
                         ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
-                        : isDhotiAvailable && isDhotiAvailableForSize
+                        : availableDhtois.length > 0
                         ? "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
                         : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
                     }
@@ -352,11 +451,9 @@ const ProductOptions = ({
                     : "Click here for  Royal Set"}
                 </button>
 
-                {(!isDhotiAvailable || !isDhotiAvailableForSize) && (
+                {availableDhtois.length === 0 && (
                   <div className="text-xs text-orange-600 mt-2">
-                    {!isDhotiAvailable 
-                      ? "Royal Set not available for this product"
-                      : `Royal Set not available for size ${selectedSize}`}
+                    Royal Set not available for size {selectedSize}
                   </div>
                 )}
 

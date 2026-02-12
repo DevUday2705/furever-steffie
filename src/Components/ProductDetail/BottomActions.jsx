@@ -86,11 +86,11 @@ const BottomActions = ({
   };
 
   const handleBuyNow = () => {
-    // Find selected dhoti details if dhoti is selected
-    const selectedDhotiDetails =
-      selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
-        : null;
+    // For centralized dhoti system
+    const selectedDhotiDetails = selectedDhoti ? {
+      id: selectedDhoti,
+      name: selectedDhoti.charAt(0).toUpperCase() + selectedDhoti.slice(1),
+    } : null;
 
     const orderDetails = {
       productId: product.id,
@@ -102,7 +102,7 @@ const BottomActions = ({
       isFullSet,
       isDupattaSet, // NEW
       selectedDhoti,
-      selectedDhotiDetails, // Store full dhoti object with name and image
+      selectedDhotiDetails, // Store basic dhoti info
       selectedStyle, // NEW: Track tassels selection
       selectedSize,
       selectedColor,
@@ -120,11 +120,14 @@ const BottomActions = ({
       return;
     }
 
-    // Find selected dhoti details if dhoti is selected
-    const selectedDhotiDetails =
-      selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
-        : null;
+    // For centralized dhoti system, dhoti details are stored differently
+    // selectedDhoti now contains the dhoti ID (white, black, gold)
+    // We'll fetch the full details in the cart/checkout components
+    const selectedDhotiDetails = selectedDhoti ? {
+      id: selectedDhoti,
+      name: selectedDhoti.charAt(0).toUpperCase() + selectedDhoti.slice(1), // Capitalize first letter
+      // Image will be loaded from centralized system
+    } : null;
 
     const cartItem = {
       productId: product.id,
@@ -136,7 +139,7 @@ const BottomActions = ({
       isDupattaSet, // NEW
       isRoyalSet,
       selectedDhoti,
-      selectedDhotiDetails, // Store full dhoti object with name and image
+      selectedDhotiDetails, // Store basic dhoti info for display
       selectedStyle, // NEW: Track tassels selection
       selectedSize,
       selectedColor,

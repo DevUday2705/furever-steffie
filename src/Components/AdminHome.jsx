@@ -13,6 +13,16 @@ const tiles = [
     description: "View and manage customer orders efficiently",
     route: "/admin/orders",
   },
+  {
+    title: "Global Settings",
+    description: "Manage global features and dhoti inventory controls",
+    route: "/admin/settings",
+  },
+  {
+    title: "Dhoti Management",
+    description: "Manage centralized dhoti inventory and stock levels",
+    route: "/admin/dhotis",
+  },
 ];
 
 const AdminHome = () => {
