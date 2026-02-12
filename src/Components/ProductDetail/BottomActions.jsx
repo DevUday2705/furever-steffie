@@ -86,11 +86,11 @@ const BottomActions = ({
   };
 
   const handleBuyNow = () => {
-    // For centralized dhoti system
-    const selectedDhotiDetails = selectedDhoti ? {
-      id: selectedDhoti,
-      name: selectedDhoti.charAt(0).toUpperCase() + selectedDhoti.slice(1),
-    } : null;
+    // Find selected dhoti details if dhoti is selected
+    const selectedDhotiDetails =
+      selectedDhoti && product.dhotis
+        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
+        : null;
 
     const orderDetails = {
       productId: product.id,
@@ -120,14 +120,11 @@ const BottomActions = ({
       return;
     }
 
-    // For centralized dhoti system, dhoti details are stored differently
-    // selectedDhoti now contains the dhoti ID (white, black, gold)
-    // We'll fetch the full details in the cart/checkout components
-    const selectedDhotiDetails = selectedDhoti ? {
-      id: selectedDhoti,
-      name: selectedDhoti.charAt(0).toUpperCase() + selectedDhoti.slice(1), // Capitalize first letter
-      // Image will be loaded from centralized system
-    } : null;
+    // Find selected dhoti details if dhoti is selected
+    const selectedDhotiDetails =
+      selectedDhoti && product.dhotis
+        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
+        : null;
 
     const cartItem = {
       productId: product.id,
