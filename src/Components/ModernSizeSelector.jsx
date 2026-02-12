@@ -109,7 +109,7 @@ const SimpleSizeSelector = ({
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails =
       selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
+        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
         : null;
 
     const orderDetails = {
@@ -138,7 +138,7 @@ const SimpleSizeSelector = ({
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails =
       selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.name === selectedDhoti)
+        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
         : null;
 
     const cartItem = {

@@ -69,7 +69,7 @@ const AdminPage = () => {
       );
       if (product?.dhotis) {
         return product.dhotis.find(
-          (dhoti) => dhoti.name === item.selectedDhoti
+          (dhoti) => dhoti.id === item.selectedDhoti
         );
       }
     }
