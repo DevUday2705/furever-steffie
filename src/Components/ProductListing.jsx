@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { CurrencyContext } from "../context/currencyContext";
+import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const ProductListing = ({
   title,
@@ -309,8 +310,31 @@ const ProductListing = ({
   }, [searchParams]);
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800"></div>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header section */}
+        <div className="relative h-48 sm:h-64 bg-gradient-to-r from-gray-300 to-gray-400 animate-pulse">
+          <div className="absolute inset-0 bg-black/20"></div>
+        </div>
+        
+        {/* Filter section skeleton */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex gap-2 overflow-x-auto">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="h-8 w-20 bg-gray-200 rounded-full animate-pulse flex-shrink-0" />
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Products grid skeleton */}
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-2 gap-5">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
