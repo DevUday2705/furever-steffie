@@ -135,8 +135,8 @@ const BottomActions = ({
       isFullSet,
       isDupattaSet, // NEW
       isRoyalSet,
-      selectedDhoti,
-      selectedDhotiDetails, // Store basic dhoti info for display
+      selectedDhoti: (isFullSet || isRoyalSet) ? selectedDhoti : null, // Only include dhoti if full set or royal set
+      selectedDhotiDetails: (isFullSet || isRoyalSet) ? selectedDhotiDetails : null, // Only include dhoti details if relevant
       selectedStyle, // NEW: Track tassels selection
       selectedSize,
       selectedColor,

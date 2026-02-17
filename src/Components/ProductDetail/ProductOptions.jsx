@@ -86,8 +86,8 @@ const ProductOptions = ({
             setSelectedDhoti(null);
           }
           
-          // Auto-select first available dhoti if none selected
-          if (!selectedDhoti && dhtois.length > 0) {
+          // Auto-select first dhoti if none selected AND full set is enabled
+          if (!selectedDhoti && dhtois.length > 0 && isFullSet) {
             setSelectedDhoti(dhtois[0].id);
           }
         } catch (error) {
@@ -107,8 +107,8 @@ const ProductOptions = ({
           }));
           setAvailableDhtois(productDhotis);
           
-          // Auto-select first dhoti if none selected
-          if (!selectedDhoti && productDhotis.length > 0) {
+          // Auto-select first dhoti if none selected AND full set is enabled
+          if (!selectedDhoti && productDhotis.length > 0 && isFullSet) {
             setSelectedDhoti(productDhotis[0].id);
           }
         } else {
@@ -163,6 +163,13 @@ const ProductOptions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSize, availableDhtois.length, kurtaDhotiEnabled, royalSetEnabled, kurtaDupattaEnabled]);
 
+  // Clear dhoti selection when neither royal set nor full set is selected
+  useEffect(() => {
+    if (!isRoyalSet && !isFullSet && selectedDhoti) {
+      setSelectedDhoti(null);
+    }
+  }, [isRoyalSet, isFullSet, selectedDhoti, setSelectedDhoti]);
+
   useEffect(() => {
     const initialTimer = setTimeout(() => {
       triggerShine();
@@ -191,6 +198,11 @@ const ProductOptions = ({
     setIsFullSet(isFullSetOption);
     setIsDupattaSet(isDupattaOption);
     setShowRoyalDescription(false);
+    
+    // Clear dhoti selection if not selecting full set
+    if (!isFullSetOption && selectedDhoti) {
+      setSelectedDhoti(null);
+    }
   };
   const renderStyleOptions = () => {
     const availableOptions = [];

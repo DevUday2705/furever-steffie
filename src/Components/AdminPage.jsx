@@ -57,24 +57,104 @@ const AdminPage = () => {
   const [selectedOrders, setSelectedOrders] = useState(new Set());
 
   // Helper function to get dhoti details from product data
+  const normalizeCollectionName = (rawCategory) => {
+    if (!rawCategory) return null;
+
+    const cleaned = String(rawCategory).toLowerCase().trim();
+    const categoryMap = {
+      kurta: "kurtas",
+      kurtas: "kurtas",
+      pathani: "pathanis",
+      pathanis: "pathanis",
+      lehenga: "lehengas",
+      lehengas: "lehengas",
+      frock: "frocks",
+      frocks: "frocks",
+      bandana: "bandanas",
+      bandanas: "bandanas",
+      bowtie: "bowties",
+      bowties: "bowties",
+    };
+
+    return categoryMap[cleaned] || (cleaned.endsWith("s") ? cleaned : `${cleaned}s`);
+  };
+
+  const normalizeDhotiValue = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(/[-_]/g, " ")
+      .trim();
+
+  const formatDhotiName = (value) => {
+    const normalized = normalizeDhotiValue(value);
+    if (!normalized) return "Dhoti";
+    return normalized
+      .split(" ")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  };
+
   const getDhotiDetails = (item) => {
-    if (item.selectedDhotiDetails) {
+    if (!item?.selectedDhoti) {
+      return null;
+    }
+
+    if (
+      item.selectedDhotiDetails &&
+      (item.selectedDhotiDetails.name || item.selectedDhotiDetails.image)
+    ) {
       return item.selectedDhotiDetails;
     }
 
-    if (item.selectedDhoti && item.category) {
-      const productKey = `${item.category}s`; // e.g., "kurtas"
-      const product = productData[productKey]?.find(
-        (p) => p.id === item.productId
-      );
-      if (product?.dhotis) {
-        return product.dhotis.find(
-          (dhoti) => dhoti.id === item.selectedDhoti
+    const categoryCandidates = [
+      normalizeCollectionName(item.category),
+      normalizeCollectionName(item.subcategory),
+      normalizeCollectionName(item.type),
+    ].filter(Boolean);
+
+    const keysToSearch = [
+      ...categoryCandidates,
+      ...Object.keys(productData || {}),
+    ].filter((key, index, array) => array.indexOf(key) === index);
+
+    for (const key of keysToSearch) {
+      const products = productData[key];
+      if (!Array.isArray(products) || products.length === 0) {
+        continue;
+      }
+
+      const product =
+        products.find((p) => p.id === item.productId) ||
+        products.find(
+          (p) =>
+            String(p?.name || "").toLowerCase().trim() ===
+            String(item?.name || "").toLowerCase().trim()
         );
+
+      if (Array.isArray(product?.dhotis) && product.dhotis.length > 0) {
+        const selectedDhotiNormalized = normalizeDhotiValue(item.selectedDhoti);
+        const dhoti = product.dhotis.find(
+          (dhotiOption) =>
+            normalizeDhotiValue(dhotiOption?.id) === selectedDhotiNormalized ||
+            normalizeDhotiValue(dhotiOption?.name) === selectedDhotiNormalized
+        );
+
+        if (!dhoti) {
+          console.warn(
+            `Dhoti not found. Product ID: ${item.productId}, Selected Dhoti: ${item.selectedDhoti}, Available dhotis:`,
+            product.dhotis.map((d) => d.id || d.name)
+          );
+        } else {
+          return dhoti;
+        }
       }
     }
 
-    return null;
+    return {
+      id: item.selectedDhoti,
+      name: formatDhotiName(item.selectedDhoti),
+      image: item.selectedDhotiDetails?.image || null,
+    };
   };
 
   // Helper function to get readable style name
@@ -116,17 +196,25 @@ const AdminPage = () => {
 
   const fetchProductData = async () => {
     try {
-      // Fetch kurtas data for dhoti lookup
-      const kurtasSnapshot = await getDocs(collection(db, "kurtas"));
-      const kurtasData = kurtasSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      // Fetch all product categories that might have dhotis for dhoti lookup
+      const collections = ['kurtas', 'pathanis']; // Add other collections as needed
+      const productData = {};
 
-      setProductData((prev) => ({
-        ...prev,
-        kurtas: kurtasData,
-      }));
+      for (const collectionName of collections) {
+        try {
+          const snapshot = await getDocs(collection(db, collectionName));
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          productData[collectionName] = data;
+        } catch (error) {
+          console.error(`Error fetching ${collectionName} data:`, error);
+          // Continue with other collections even if one fails
+        }
+      }
+
+      setProductData(productData);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -386,11 +474,10 @@ const AdminPage = () => {
               margin-right: 5px;
             }
             .name {
-              font-size: 20px;
+              font-size: 18px;
               font-weight: bold;
-              margin-bottom: 12px;
-              border-bottom: 2px solid #333;
-              padding-bottom: 8px;
+              margin-top: 130px;
+           
             }
             .address-line {
               margin-bottom: 8px;
@@ -402,6 +489,19 @@ const AdminPage = () => {
               font-size: 11px;
               color: #666;
             }
+            .name-n-rectangle{
+            border-bottom: 2px solid #000;
+            margin-bottom: 10px;
+              display: flex;
+              align-items: end;
+              justify-content: space-between;
+            }
+            .rectangle {
+              width: 100px;
+              height: 30px;
+              margin-bottom: 5px;
+              border: 0.5px solid #000;
+            }
           </style>
         </head>
         <body>
@@ -410,8 +510,11 @@ const AdminPage = () => {
               .map(
                 (order) => `
               <div class="address-box">
-                <div class="header-message">Sorry human, this package is for the pet! Woof. 🐾</div>
-                <div class="name">${order.customer?.fullName || "N/A"}</div>
+                  <div class="name-n-rectangle">
+                  <div class="name">${order.customer?.fullName || "N/A"}</div>
+                  <div class="rectangle"></div>
+                  </div>
+
                 <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
                 ${order.customer?.alternateMobile ? `<div class="address-line"><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
                 <div class="address-line"><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
@@ -703,7 +806,7 @@ const AdminPage = () => {
             }`}
           >
             🔔 Resume Notifications
-          </button>
+          </button> */}
           <button
             onClick={() => setActiveTab("coupons")}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -713,7 +816,7 @@ const AdminPage = () => {
             }`}
           >
             🎫 Custom Coupons
-          </button> */}
+          </button>
           <button
             onClick={() => setActiveTab("analytics")}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -1128,7 +1231,7 @@ const AdminPage = () => {
                                   )}
 
                                   {/* Dhoti Image if selected */}
-                                  {dhotiBrother && (
+                                  {dhotiBrother?.image && (
                                     <div className="flex-shrink-0">
                                       <img
                                         src={dhotiBrother.image}
@@ -1201,7 +1304,7 @@ const AdminPage = () => {
                                         </>
                                       )}
                                     </p>
-                                    {(item.selectedDhoti || dhotiBrother) && (
+                                    {(item.selectedDhoti || dhotiBrother) && item.selectedDhoti && (
                                       <p className="text-sm">
                                         Dhoti:{" "}
                                         <span className="font-medium text-blue-600">
@@ -1215,6 +1318,11 @@ const AdminPage = () => {
                                               loaded)
                                             </span>
                                           )}
+                                        {item.selectedDhoti && item.category && !['kurta', 'pathani'].includes(item.category) && (
+                                          <span className="text-xs text-yellow-600 ml-2">
+                                            ⚠️ (unusual - {item.category} typically don't have dhotis)
+                                          </span>
+                                        )}
                                       </p>
                                     )}
                                     {item.selectedColor && (
