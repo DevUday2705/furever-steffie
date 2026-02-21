@@ -180,7 +180,7 @@ const BottomActions = ({
   };
 
   const handleWhatsAppChat = () => {
-    const businessWhatsAppNumber = "918821456667";
+    const businessWhatsAppNumber = "917042212942";
 
     const message = `Hi! I'm interested in the ${product.name} (ID: ${product.id}) in size ${selectedSize}. Could you help me with a custom size order?`;
 
