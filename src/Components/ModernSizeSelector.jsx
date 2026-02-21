@@ -236,7 +236,7 @@ const SimpleSizeSelector = ({
                 onClick={() => handleSizeSelect(size)}
                 disabled={!isAvailable && !allowCustomSizes}
                 className={`
-                  w-full h-full rounded-xs border-1 text-sm font-semibold transition-all flex flex-col px-3 py-3 relative
+                  w-full h-full rounded-xs border-1 text-sm font-semibold transition-all flex flex-col p-[0.1] relative
                   ${
                     isSelected
                       ? "border-gray-600 bg-gray-50 text-gray-600"
@@ -265,11 +265,7 @@ const SimpleSizeSelector = ({
                 )}
                 
                 {/* Out of stock indicator for non-custom sizes */}
-                {!isAvailable && !allowCustomSizes && (
-                  <span className="text-gray-400 font-thin text-xs">
-                    Out of stock
-                  </span>
-                )}
+               
               </button>
             </div>
           );
