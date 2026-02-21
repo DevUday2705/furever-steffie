@@ -25,6 +25,7 @@ const BottomActions = ({
   measurementsValid,
   requiresMeasurements,
   selectedColor,
+  allowCustomSizes = false, // NEW: for custom sizing
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
@@ -47,24 +48,18 @@ const BottomActions = ({
   };
 
   const productInCart = isProductInCart();
+  // Check if selected size is in stock
+  const isSizeInStock = () => {
+    if (!product?.sizeStock) return true;
+    return product.sizeStock[selectedSize] > 0;
+  };
 
-  // Check if selected size requires custom tailoring
-  const isCustomSize =
-    selectedSize &&
-    ["XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"].includes(
-      selectedSize.toUpperCase()
-    );
+  // Check if selected size is a custom size (out of stock but custom allowed)
+  const isCustomSize = selectedSize && !isSizeInStock() && allowCustomSizes;
 
   // Check if user has saved size (from localStorage)
   const hasSavedSize = !!localStorage.getItem("savedPetSize");
 
-  // Check if selected size is in stock
-  const isSizeInStock = () => {
-    if (["XS", "S", "M"].includes(selectedSize)) {
-      return product?.sizeStock?.[selectedSize] > 0;
-    }
-    return true; // L, XL, XXL+ are always available
-  };
 
   // Determine if actions should be enabled
   const shouldEnableActions = () => {
@@ -73,16 +68,16 @@ const BottomActions = ({
 
     if (!selectedSize) return false;
 
-    // Check stock for XS, S, M sizes
-    if (!isSizeInStock()) return false;
-
-    if (requiresMeasurements) {
-      // If measurements are required, check if user has saved size OR valid measurements
-      return hasSavedSize || measurementsValid;
+    // Enable if size is in stock OR if it's a custom size
+    if (isSizeInStock() || isCustomSize) {
+      if (requiresMeasurements) {
+        // If measurements are required, check if user has saved size OR valid measurements
+        return hasSavedSize || measurementsValid;
+      }
+      return true;
     }
 
-    // For products that don't require measurements, just check if size is selected
-    return true;
+    return false;
   };
 
   const handleBuyNow = () => {
@@ -185,14 +180,9 @@ const BottomActions = ({
   };
 
   const handleWhatsAppChat = () => {
-    const businessWhatsAppNumber = "+917042212942";
+    const businessWhatsAppNumber = "918821456667";
 
-    const message = `Hi, I need help with my dog's dress - 
-Name: ${product.name}
-Product ID: ${product.id}
-Selected Size: ${selectedSize}
-Can we talk?
-Thanks`;
+    const message = `Hi! I'm interested in the ${product.name} (ID: ${product.id}) in size ${selectedSize}. Could you help me with a custom size order?`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${businessWhatsAppNumber}?text=${encodedMessage}`;
@@ -242,17 +232,25 @@ Thanks`;
         className={`w-full py-3 font-medium rounded-md ${
           !isActionsEnabled
             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+            : isCustomSize
+            ? "bg-green-600 text-white hover:bg-green-700"
             : productInCart
             ? "bg-green-600 text-white hover:bg-green-700"
             : "bg-gray-800 text-white hover:bg-gray-900"
         } transition-colors duration-200`}
         whileTap={{ scale: 0.98 }}
-        onClick={handleAddToCart}
+        onClick={isCustomSize ? handleWhatsAppChat : handleAddToCart}
       >
         <span className="inline-flex items-center justify-center gap-2">
-          <ShoppingBag size={20}/>
+          {isCustomSize ? (
+            <MessageCircle size={20}/>
+          ) : (
+            <ShoppingBag size={20}/>
+          )}
           {ordersArePaused
             ? "Orders Temporarily Paused"
+            : isCustomSize
+            ? `Contact Us for Size ${selectedSize}`
             : productInCart
             ? "Go to Cart"
             : "Add to Cart"}

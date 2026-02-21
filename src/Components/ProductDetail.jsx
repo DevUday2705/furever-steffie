@@ -316,6 +316,8 @@ const ProductDetail = () => {
               navigate={navigate}
               addToCart={addToCart}
               setIsOpen={setIsOpen}
+              // Custom sizing prop
+              allowCustomSizes={product.allowCustomSizes || false}
             />
 
             {/* Trust Signals Section - now below sizing options */}
@@ -343,6 +345,7 @@ const ProductDetail = () => {
         navigate={navigate}
         addToCart={addToCart}
         setIsOpen={setIsOpen}
+        allowCustomSizes={product.allowCustomSizes || false} // NEW: Pass custom sizing flag
       />
     </div>
   );

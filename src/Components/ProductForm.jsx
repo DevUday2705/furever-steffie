@@ -34,6 +34,7 @@ const defaultSchema = {
   availableStock: 0,
   priorityScore: 0,
   contactForCustomColors: false,
+  allowCustomSizes: false,
   category: "royal",
   type: "kurta",
   isBeadedAvailable: false,
@@ -463,6 +464,17 @@ const ProductForm = () => {
               }
             />
             <span>Contact For Custom Colors</span>
+          </label>
+
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.allowCustomSizes}
+              onChange={(e) =>
+                handleChange("allowCustomSizes", e.target.checked)
+              }
+            />
+            <span>📏 Allow Custom Sizes (for out-of-stock sizes)</span>
           </label>
 
           <label className="flex items-center space-x-2">
