@@ -1016,7 +1016,7 @@ const CheckoutPage = () => {
                           ? "Full Set"
                           : item.isDupattaSet
                           ? "Kurta + Dupatta"
-                          : "Kurta Only"}{" "}
+                          : item.category}{" "}
                         • Size {item.selectedSize}
                       </div>
                       {item.quantity && (

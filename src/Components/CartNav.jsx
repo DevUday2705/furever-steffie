@@ -140,6 +140,7 @@ const CartNav = () => {
                           exit={{ opacity: 0, x: -50 }}
                           className="flex items-center space-x-4 border-b pb-4"
                         >
+                          {console.log(item)}
                           <img
                             src={item.image}
                             alt={item.name}
@@ -152,7 +153,7 @@ const CartNav = () => {
                             <p className="text-gray-600 text-xs">
                               Size: {item.selectedSize} •{" "}
                               {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                              {item.isFullSet ? "Full Set" : "Kurta"}
+                              {item.isFullSet ? "Full Set" : item.category}
                             </p>
                             <p className="text-gray-900 font-medium text-sm mt-1">
                               {convertCurrency(item.price, currency)}

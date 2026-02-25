@@ -8,7 +8,8 @@ import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const KurtaListing = () => {
   const { data: kurtas, isLoading } = useFirestoreCollection("kurtas");
-  if (isLoading) {
+  const { data: dhotis, isLoadingDhoti } = useFirestoreCollection("dhotiss");
+  if (isLoading || isLoadingDhoti) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header section */}
@@ -46,7 +47,7 @@ const KurtaListing = () => {
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="kurta"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1770984025/WhatsApp_Image_2026-02-13_at_3.34.10_PM_kyge7r.webp"
-      products={kurtas}
+      products={[...kurtas, ...dhotis]} // Combine kurtas and dhotis into one array
       bannerTitle="Elegant Kurtas for Every Pet Personality"
     />
   );

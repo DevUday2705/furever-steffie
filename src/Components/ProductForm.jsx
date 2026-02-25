@@ -113,6 +113,13 @@ const schemaConfigurations = {
       colors: [],
     },
   },
+  dhotis: {
+    additionalFields: ["colors"],
+    excludedFields: ["dhotis"],
+    fieldDefaults: {
+      colors: [],
+    },
+  },
 };
 
 // Default item structures for array fields
