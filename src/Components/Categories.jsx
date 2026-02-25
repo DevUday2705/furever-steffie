@@ -18,7 +18,7 @@ const Categories = () => {
     },
      {
       id: 5,
-      name: "Pathani",
+      name: "PATHANI",
       link: "Pathani",
       description: "Suit Up!",
       image:
