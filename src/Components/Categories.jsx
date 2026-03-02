@@ -107,7 +107,7 @@ const Categories = () => {
           ? type === "female" 
             ? "bg-[#E89DB9]  scale-105 shadow-lg"
             : "bg-black text-white border-black scale-105 shadow-lg"
-          : "bg-white text-black border-gray-300 hover:border-black hover:shadow-md"
+          : "bg-pink-100 border-2 border-pink-400 text-black  hover:border-black hover:shadow-md"
       }`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -148,8 +148,8 @@ const Categories = () => {
                     alt={category.name}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  <div className="absolute bottom-0 left-0 w-full h-2/4 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                  {/* <div className="absolute bottom-0 left-0 w-full h-1/4 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" /> */}
                 </div>
                 <motion.div
                   className="absolute bottom-0 left-0 right-0 p-3 text-white flex flex-col transform group-hover:translate-y-[-2px] transition-transform duration-300"
