@@ -66,7 +66,7 @@ const Categories = () => {
       link: "Tutu Dress",
       description: "Traditional Elegance",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/White_Whisper_with_Bow_dce8nr.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1772440735/Photoroom_20260302_004028_n5lw3g.jpg",
     },
       {
       id: 7,

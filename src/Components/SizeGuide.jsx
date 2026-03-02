@@ -26,10 +26,11 @@ const SizeGuide = () => {
   const handleWhatsAppClick = () => {
     const message = `Hi, I need help with taking measurements for my pet's clothing order${order ? ` (Order ID: ${order.id})` : ''}. Can you guide me through the process?`;
     window.open(
-      `https://wa.me/+918828145667?text=${encodeURIComponent(message)}`,
+      `https://wa.me/+917042212942?text=${encodeURIComponent(message)}`,
       "_blank"
     );
   };
+
 
   // Auto-fetch order if mobile number is provided in URL
   useEffect(() => {
