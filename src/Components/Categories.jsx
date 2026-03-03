@@ -108,8 +108,8 @@ const Categories = () => {
               ? "bg-[#E89DB9] scale-105 shadow-lg"
               : "bg-black text-white border-2 border-black scale-105 shadow-lg"
             : type === "female"
-              ? "bg-pink-100 border-2 border-pink-400 text-black hover:border-black hover:shadow-md"
-              : "bg-white border-2 border-black text-black hover:shadow-md"
+              ? "bg-pink-100 border-[0.5px] border-pink-400 text-black hover:border-black hover:shadow-md"
+              : "bg-white border-[0.5px] border-black text-black hover:shadow-md"
         }`}
     >
       {type.charAt(0).toUpperCase() + type.slice(1)}
