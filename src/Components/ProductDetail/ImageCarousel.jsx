@@ -46,7 +46,7 @@ const ImageCarousel = ({
                   <img
                     src={media}
                     alt={`Product Media ${idx + 1}`}
-                    className="absolute w-full h-full object-cover object-[0%_25%]"
+                    className="absolute w-full h-full object-cover "
                   />
                 )}
               </div>

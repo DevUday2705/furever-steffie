@@ -236,18 +236,17 @@ const SimpleSizeSelector = ({
                 onClick={() => handleSizeSelect(size)}
                 disabled={!isAvailable && !allowCustomSizes}
                 className={`
-                  w-full h-full rounded-xs border-1 text-sm font-semibold transition-all flex flex-col p-[0.1] relative
-                  ${
-                    isSelected
-                      ? "border-gray-600 bg-gray-50 text-gray-600"
-                      : isAvailable
-                      ? "border-gray-300 bg-white text-gray-900 hover:border-gray-400 hover:shadow-sm"
-                      : allowCustomSizes
-                      ? "border-green-200 bg-green-50 text-green-700 hover:border-green-300 hover:shadow-sm"
-                      : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                  }
-                  
-                `}
+  w-full h-full rounded-xs border text-sm font-semibold transition-all flex flex-col p-[0.1] relative
+  ${
+    isSelected
+      ? "border-gray-700 bg-gray-100 text-gray-800"
+      : isAvailable
+      ? "border-gray-400 bg-white text-gray-900 hover:border-gray-600 hover:shadow-sm"
+      : allowCustomSizes
+      ? "border-gray-300 bg-white text-gray-500 hover:border-gray-400"
+      : "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+  }
+`}
               >
                 {size}
 

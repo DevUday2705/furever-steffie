@@ -96,29 +96,30 @@ const Categories = () => {
       <div className="container mx-auto px-4">
         {/* Toggle Switch */}
 
-        <div className="flex mx-10 justify-center gap-4 mb-8">
-          {["male", "female"].map((type) => (
-            <button
-              key={type}
-              onClick={() => setGender(type)}
-              className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden
-      ${
-        gender === type
-          ? type === "female" 
-            ? "bg-[#E89DB9]  scale-105 shadow-lg"
-            : "bg-black text-white border-black scale-105 shadow-lg"
-          : "bg-pink-100 border-2 border-pink-400 text-black  hover:border-black hover:shadow-md"
-      }`}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+      <div className="flex mx-10 justify-center gap-4 mb-8">
+  {["male", "female"].map((type) => (
+    <button
+      key={type}
+      onClick={() => setGender(type)}
+      className={`flex-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden
+        ${
+          gender === type
+            ? type === "female"
+              ? "bg-[#E89DB9] scale-105 shadow-lg"
+              : "bg-black text-white border-2 border-black scale-105 shadow-lg"
+            : type === "female"
+              ? "bg-pink-100 border-2 border-pink-400 text-black hover:border-black hover:shadow-md"
+              : "bg-white border-2 border-black text-black hover:shadow-md"
+        }`}
+    >
+      {type.charAt(0).toUpperCase() + type.slice(1)}
 
-              {/* Shimmer effect for selected button */}
-              {gender === type && (
-                <div className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
-              )}
-            </button>
-          ))}
-        </div>
+      {gender === type && (
+        <div className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
+      )}
+    </button>
+  ))}
+</div>
 
         {/* Section Header */}
         <div className="mb-8">
@@ -148,7 +149,7 @@ const Categories = () => {
                     alt={category.name}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute bottom-0 left-0 w-full h-2/4 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                  <div className="absolute bottom-0 left-0 w-full h-2/4 bg-gradient-to-b from-transparent via-transparent to-black/40" />
                   {/* <div className="absolute bottom-0 left-0 w-full h-1/4 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" /> */}
                 </div>
                 <motion.div
