@@ -318,7 +318,7 @@ const CartNav = () => {
                       </button>
 
                       <p className="text-xs text-gray-500 text-center mt-3">
-                        🔒 Secure payment • 30-day returns • Free size exchange
+                        🔒 Secure payment •  Free size exchange
                       </p>
                     </div>
                   </>

@@ -1373,18 +1373,7 @@ const CheckoutPage = () => {
               </div>
 
               <div className="p-4">
-                <div className="bg-gray-50 p-3 rounded-md mb-3">
-                  <div className="flex items-start">
-                    <div className="mr-2 mt-0.5 text-gray-800">
-                      <AlertTriangle size={16} className="text-yellow-600" />
-                    </div>
-                    <div className="flex-1 text-xs text-gray-600">
-                      {formData.country === "india"
-                        ? "Our products are custom-stitched after your order. Standard delivery takes 5-7 days (2 days for stitching + 3-5 days for shipping)."
-                        : "Our products are custom-stitched after your order. International delivery takes 10-15 business days (2 days for stitching + 8-13 days for international shipping)."}
-                    </div>
-                  </div>
-                </div>
+                
 
                 <div className="space-y-3">
                   {formData.country === "india" ? (
