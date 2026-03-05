@@ -44,6 +44,8 @@ const SmartStockFilter = ({ filters, setFilters, onSizeGuideOpen }) => {
     { size: "L", chest: '22-24"', description: "Large" },
     { size: "XL", chest: '24-26"', description: "Extra Large" },
     { size: "2XL", chest: '26-28"', description: "2X Large" },
+    { size: "4XL", chest: '28-30"', description: "4X Large" },
+    { size: "6XL", chest: '30-32"', description: "6X Large" },
   ];
 
   // Handle style selection
@@ -204,7 +206,7 @@ const SmartStockFilter = ({ filters, setFilters, onSizeGuideOpen }) => {
               <div className="text-xs text-gray-600 mb-2 font-medium">
                 Pet Chest Measurements
               </div>
-              <div className="grid grid-cols-2 gap-1 text-xs">
+              <div className="grid grid-cols-4 gap-1 text-xs">
                 {sizeOptions.map((option) => (
                   <div key={option.size} className="flex justify-between">
                     <span className="font-medium">{option.size}:</span>
@@ -225,8 +227,8 @@ const SmartStockFilter = ({ filters, setFilters, onSizeGuideOpen }) => {
           )}
         </AnimatePresence>
 
-        {/* Size Grid */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* Size Grid - Updated to accommodate 8 sizes */}
+        <div className="grid grid-cols-4 gap-2">
           {sizeOptions.map((option) => {
             const isSelected = selectedSizes.includes(option.size);
 

@@ -41,7 +41,7 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
                     });
                 }
 
-                // Check size availability
+                // Check size availability - ensure selected sizes have actual stock
                 let sizeMatch = true;
                 if (sizes.length > 0) {
                     sizeMatch = sizes.some(size => {
@@ -62,10 +62,13 @@ export const useProductFilter = (products, filters, searchQuery = "") => {
         );
         console.log("After Price Cap Filter:", list);
         console.log("Filters max price", filters.maxPrice);
-        // ✅ 4. Sizes
+        // ✅ 4. Sizes - Check actual stock availability
         if (filters.sizes.length) {
             list = list.filter((p) =>
-                p.sizes.some((s) => filters.sizes.includes(s))
+                p.sizes.some((s) => {
+                    // Check if size is selected AND has actual stock
+                    return filters.sizes.includes(s) && (p.sizeStock?.[s] || 0) > 0;
+                })
             );
         }
 

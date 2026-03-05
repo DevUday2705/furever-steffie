@@ -56,7 +56,7 @@ const ProductListing = ({
     maxPrice: 5000,
     priceLimit: 5000,
     sizes: [],
-    sizeOptions: ["XS", "S", "M", "L", "XL", "XXL"],
+    sizeOptions: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"],
     styleBeaded: false,
     styleSimple: false,
     inStockOnly: false,
@@ -302,7 +302,7 @@ const ProductListing = ({
 
       // Keep static values intact
       priceLimit: 5000,
-      sizeOptions: ["XS", "S", "M", "L", "XL", "XXL"],
+      sizeOptions: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"],
       categoryOptions: ["all", "royal"],
     };
 

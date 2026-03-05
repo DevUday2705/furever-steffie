@@ -263,7 +263,7 @@ export default function FilterDrawer({
                 )}
 
                 {/* 6) Smart Stock Filter */}
-                {activeFilters.includes("availability") && (
+                {/* {activeFilters.includes("availability") && (
                   <SmartStockFilter
                     filters={filters}
                     setFilters={setFilters}
@@ -272,7 +272,7 @@ export default function FilterDrawer({
                       console.log("Open size guide modal");
                     }}
                   />
-                )}
+                )} */}
 
                 {/* 7) Custom Color */}
                 {activeFilters.includes("customColor") && (

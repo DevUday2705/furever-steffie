@@ -17,7 +17,7 @@ const HamburgerMenu = () => {
     },
     {
       title: "Female",
-      items: ["Frock", "Tutu Dress", "Female Bandanas", "Bow tie"],
+      items: ["Frock", "Tutu Dress", "Female Bandanas", "Bow tie", "Lehenga"],
     },
     {
       title: "Contact Us",
@@ -79,7 +79,7 @@ const HamburgerMenu = () => {
         navigate("/tuxedo");
         break;
       case "bandana":
-        navigate("/bandana");
+        navigate("/male-bandanas");
         break;
       case "bow-tie":
         navigate("/bow-tie");
@@ -90,6 +90,9 @@ const HamburgerMenu = () => {
         break;
       case "tutu-dress":
         navigate("/tutu-dress");
+        break;
+      case "lehenga":
+        navigate("/lehenga");
         break;
       case "female-bandanas":
         navigate("/female-bandanas");
