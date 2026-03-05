@@ -192,6 +192,7 @@ const App = () => {
               />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/thank-you" element={<ThankYouPage />} />
+              <Route path="/search" element={<UniversalSearchBar/>} />
               <Route path="/admin" element={<AdminHome />} />
               <Route path="/admin/orders" element={<AdminPage />} />
               <Route path="/admin/product" element={<AdminProducts />} />
