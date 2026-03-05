@@ -265,7 +265,7 @@ const CartNav = () => {
                       </div>
 
                       {/* Progress to free shipping */}
-                      {!isFreeShipping && (
+                      {/* {!isFreeShipping && (
                         <div className="mb-4">
                           <div className="flex justify-between text-sm mb-2">
                             <span className="text-gray-600">
@@ -273,7 +273,7 @@ const CartNav = () => {
                               {convertCurrency(
                                 1500 - calculateTotal(),
                                 currency
-                              )}{" "}
+                              )}
                               for free shipping all over India
                             </span>
                             <span className="text-gray-600">
@@ -292,7 +292,7 @@ const CartNav = () => {
                             ></div>
                           </div>
                         </div>
-                      )}
+                      )} */}
 
                       {isFreeShipping && (
                         <motion.div
