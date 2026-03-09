@@ -437,6 +437,11 @@ const AdminPage = () => {
               size: A4;
               margin: 10mm;
             }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
             body {
               font-family: Arial, sans-serif;
               font-size: 14px;
@@ -451,6 +456,29 @@ const AdminPage = () => {
               gap: 8mm;
               height: 277mm;
               width: 190mm;
+              position: relative;
+            }
+            .cutting-guide-horizontal {
+              position: absolute;
+              left: 0;
+              right: 0;
+              top: 50%;
+              height: 2px;
+              background-color: #ff6b35 !important;
+              z-index: 10;
+              transform: translateY(-1px);
+              border: none !important;
+            }
+            .cutting-guide-vertical {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              left: 50%;
+              width: 2px;
+              background-color: #ff6b35 !important;
+              z-index: 10;
+              transform: translateX(-1px);
+              border: none !important;
             }
             .address-box {
               border: 2px solid #333;
@@ -460,6 +488,17 @@ const AdminPage = () => {
               display: flex;
               flex-direction: column;
               height: 100%;
+              position: relative;
+            }
+            .address-box::before {
+              content: '';
+              position: absolute;
+              top: -5px;
+              left: -5px;
+              right: -5px;
+              bottom: -5px;
+              border: 1px dotted #999;
+              pointer-events: none;
             }
             .header-message {
               text-align: center;
@@ -506,6 +545,8 @@ const AdminPage = () => {
         </head>
         <body>
           <div class="grid-container">
+            <div class="cutting-guide-horizontal"></div>
+            <div class="cutting-guide-vertical"></div>
             ${selectedOrdersData
               .map(
                 (order) => `
