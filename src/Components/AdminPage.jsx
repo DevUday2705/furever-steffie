@@ -541,6 +541,26 @@ const AdminPage = () => {
               margin-bottom: 5px;
               border: 0.5px solid #000;
             }
+            .business-footer {
+              margin-top: auto;
+              text-align: center;
+              padding: 8px;
+              border-top: 1px solid #ddd;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+            }
+            .business-logo {
+              height: 25px;
+              width: auto;
+              max-width: 80px;
+            }
+            .business-number {
+              font-size: 11px;
+              color: #666;
+              font-weight: 500;
+            }
           </style>
         </head>
         <body>
@@ -564,6 +584,10 @@ const AdminPage = () => {
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
                 
+                <div class="business-footer">
+                  <img src="/images/logo.png" alt="Furever Steffie" class="business-logo" />
+                  <div class="business-number">+91 70422 12942</div>
+                </div>
 
               </div>
             `
