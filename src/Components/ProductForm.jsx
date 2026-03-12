@@ -50,8 +50,9 @@ const defaultSchema = {
     "2XL": 0,
     "4XL": 0,
     "6XL": 0,
+    "8XL": 0,
   },
-  sizes: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"],
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"],
   dhotis: [],
   dhotiSizeAvailability: ["XS", "S", "M"], // Sizes for which dhoti is available
   pricing: {
@@ -69,6 +70,7 @@ const defaultSchema = {
       "2XL": 0,
       "4XL": 0,
       "6XL": 0,
+      "8XL": 0,
     },
   },
   defaultOptions: {
@@ -216,7 +218,7 @@ const ProductForm = () => {
             const finalData = deepMerge(merged, data);
 
             // Ensure all size stock entries exist with default value 0
-            const allSizes = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"];
+            const allSizes = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"];
             if (!finalData.sizeStock) {
               finalData.sizeStock = {};
             }

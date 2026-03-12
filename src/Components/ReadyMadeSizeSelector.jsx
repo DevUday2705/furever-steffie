@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 const ReadyMadeSizeSelector = ({
   selectedSize,
   setSelectedSize,
-  sizes = ["S", "M", "L", "XL", "XXL"],
+  sizes = ["S", "M", "L", "XL", "XXL", "2XL", "4XL", "6XL", "8XL"],
   onClearSavedSize, // new prop
   product, // NEW: to check stock
 }) => {

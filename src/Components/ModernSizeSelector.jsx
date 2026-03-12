@@ -55,9 +55,15 @@ const SIZE_CHART = {
     length: "22-26",
     breed: "Extra large breeds",
   },
+  "8XL": {
+    neck: "26-29",
+    chest: "31-36",
+    length: "22-26",
+    breed: "Extra large breeds",
+  },
 };
 
-const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL"];
+const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"];
 
 const SimpleSizeSelector = ({
   selectedSize,
