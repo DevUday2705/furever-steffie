@@ -80,7 +80,7 @@ const PremiumSection = ({ products }) => {
         <div className="relative mb-2 text-center">
           <div className="flex items-center relative left-20 justify-center mb-1">
             <span className="relative text-[#cd9f4b] text-3xl font-mont uppercase tracking-wider font-black">
-              <span className="shine-text block">ROYAL</span>
+              <span className="shine-text block">Shaadi</span>
               <Crown className="absolute -left-[0.1rem] -top-4" size={20} />
             </span>
           </div>
