@@ -14,7 +14,7 @@ const Categories = () => {
       link: "kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1753112945/Rani_Pink_nqcsl7.webp  ",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773726481/IMG_2179_wmypnr.webp",
     },
      {
       id: 5,
@@ -74,7 +74,7 @@ const Categories = () => {
       link: "Frock",
       description: "Playful Frills",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1751108610/cherry_red_polka_dot_frock_d3cspz.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773161790/Photoroom_20260308_014815_dqreww.webp",
     },
     {
       id: 8,
