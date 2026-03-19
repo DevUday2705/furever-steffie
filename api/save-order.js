@@ -113,7 +113,7 @@ export default async function handler(req, res) {
                     console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
 
                     // Try alternative collection names
-                    const alternativeCollections = ['kurtas', 'pathanis', 'lehengas', 'frocks', 'bandanas', 'bowties'];
+                    const alternativeCollections = ['kurtas', 'pathanis', 'lehengas', 'frocks', 'bandanas', 'bowties', 'dhotiss'];
                     let found = false;
 
                     for (const altCollection of alternativeCollections) {
