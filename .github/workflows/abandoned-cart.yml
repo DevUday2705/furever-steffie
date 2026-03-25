@@ -1,0 +1,39 @@
+name: Abandoned Cart Recovery
+
+on:
+  schedule:
+    # Runs every 2 minutes for testing
+    - cron: '*/2 * * * *'
+  workflow_dispatch: # Allows manual trigger for testing
+
+jobs:
+  send-abandoned-cart-emails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Abandoned Cart Cron
+        run: |
+          echo "🚀 Triggering abandoned cart cron job..."
+          
+          response=$(curl -s -w "%{http_code}" \
+            -X GET "${{ secrets.SITE_URL }}/api/cron/abandoned-cart" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          
+          http_code=${response: -3}
+          response_body=${response%???}
+          
+          echo "📊 HTTP Status: $http_code"
+          echo "📝 Response: $response_body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Abandoned cart cron executed successfully"
+          else
+            echo "❌ Abandoned cart cron failed with status $http_code"
+            exit 1
+          fi
+      
+      - name: Log Execution Time
+        run: |
+          echo "⏰ Execution completed at: $(date -u)"
+          echo "🌍 Timezone: UTC"
