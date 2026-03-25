@@ -496,6 +496,36 @@ const CheckoutPage = () => {
         localStorage.setItem("order", JSON.stringify(orderDetails));
       }
 
+      // Track abandoned checkout for cart recovery
+      try {
+        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const trackingData = {
+          sessionId,
+          email: formData.email,
+          phone: formData.mobileNumber,
+          name: formData.fullName,
+          cart: isCartCheckout ? cart : [orderDetails],
+          cartTotal: calculateTotal(),
+          address: formData
+        };
+
+        // Call track-address API 
+        await fetch('/api/track-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(trackingData)
+        });
+
+        // Store sessionId for later use (to mark as converted if payment succeeds)
+        setAbandonedDocId(sessionId);
+        localStorage.setItem('abandonedSessionId', sessionId);
+
+        console.log('✅ Abandoned checkout tracked:', sessionId);
+      } catch (error) {
+        console.error('❌ Failed to track abandoned checkout:', error);
+        // Don't block checkout if tracking fails
+      }
+
       await handlePayment();
     }
   };
@@ -658,6 +688,23 @@ const CheckoutPage = () => {
           coupon: COLLABORATION_COUPON,
         });
 
+        // Mark abandoned checkout as converted for collaboration orders
+        try {
+          const sessionId = abandonedDocId || localStorage.getItem('abandonedSessionId');
+          if (sessionId) {
+            await fetch('/api/mark-converted', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sessionId })
+            });
+            console.log('✅ Abandoned checkout marked as converted (collaboration):', sessionId);
+            localStorage.removeItem('abandonedSessionId');
+          }
+        } catch (error) {
+          console.error('❌ Failed to mark abandoned checkout as converted (collaboration):', error);
+          // Don't fail the order if conversion tracking fails
+        }
+
         // Save the order directly without payment
         const saveRes = await fetch("/api/save-order", {
           method: "POST",
@@ -756,6 +803,23 @@ const CheckoutPage = () => {
 
             if (verifyData.success) {
               mixpanel.track("Payment Success");
+
+              // Mark abandoned checkout as converted
+              try {
+                const sessionId = abandonedDocId || localStorage.getItem('abandonedSessionId');
+                if (sessionId) {
+                  await fetch('/api/mark-converted', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId })
+                  });
+                  console.log('✅ Abandoned checkout marked as converted:', sessionId);
+                  localStorage.removeItem('abandonedSessionId');
+                }
+              } catch (error) {
+                console.error('❌ Failed to mark abandoned checkout as converted:', error);
+                // Don't fail the order if conversion tracking fails
+              }
 
               // Mark single-use coupon as used globally in Firestore
               if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {

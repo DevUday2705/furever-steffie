@@ -358,31 +358,7 @@ const ProductListing = ({
         setFilters={setFilters}
       />
 
-      {/* Top Bar */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-          >
-            <ChevronLeft size={18} />
-            <span className="ml-1 text-sm font-medium">Back</span>
-          </button>
-
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-medium transition-colors border border-gray-200 shadow-sm"
-          >
-            <Sliders size={16} />
-            <span>
-              Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-            </span>
-            <ArrowUpDown size={14} className="ml-1" />
-          </button>
-        </div>
-      </div>
-
-      {/* Banner */}
+      {/* Banner with Overlay Navigation and Content */}
       <div className="relative bg-white w-full h-[250px] md:h-[300px] overflow-hidden">
         {bannerImage && isVideo(bannerImage) ? (
           <video
@@ -391,34 +367,68 @@ const ProductListing = ({
             loop
             muted
             playsInline
-            className="w-full rounded-md h-full object-cover"
+            className="w-full h-full object-cover"
           />
         ) : (
           <img
             src={bannerImage}
             alt="Kurta Banner"
-            className="w-full rounded-md h-full object-cover"
+            className="w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-md flex items-end justify-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-white text-xl ml-5 mb-5  md:text-4xl font-bold tracking-wide drop-shadow-md"
-          >
-            {bannerTitle}
-          </motion.h2>
-        </div>
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/10"></div>
+        
+        {/* Top Navigation Bar - Overlaid on Banner */}
+        <div className="absolute top-0 left-0 right-0 z-20">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center text-white hover:text-white/80 transition-colors bg-black/20 backdrop-blur-sm px-3 py-2 rounded-lg"
+            >
+              <ChevronLeft size={18} />
+              <span className="ml-1 text-sm font-medium">Back</span>
+            </button>
 
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-5">
-          <h1 className="text-2xl font-bold text-gray-800 capitalize">
-            {title}
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+            >
+              <Sliders size={16} />
+              <span>
+                Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+              </span>
+              <ArrowUpDown size={14} className="ml-1" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Overlay - Title, Subtitle and Banner Title */}
+        <div className="absolute inset-0 flex flex-col justify-end items-start px-4 pb-6 z-10">
+          <div className="container mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-left"
+            >
+              <h1 className="text-3xl md:text-5xl font-bold text-white capitalize mb-2 drop-shadow-2xl">
+                {title}
+              </h1>
+              <p className="text-white/90 text-base md:text-lg drop-shadow-lg mb-4">
+                {subtitle}
+              </p>
+              {bannerTitle && (
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="text-white/80 text-lg md:text-xl font-medium tracking-wide drop-shadow-md"
+                >
+                  {bannerTitle}
+                </motion.h2>
+              )}
+            </motion.div>
+          </div>
         </div>
       </div>
 

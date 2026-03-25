@@ -48,7 +48,6 @@ const KurtaListing = () => {
       category="kurta"
       bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1770984025/WhatsApp_Image_2026-02-13_at_3.34.10_PM_kyge7r.webp"
       products={[...kurtas, ...dhotis]} // Combine kurtas and dhotis into one array
-      bannerTitle="Elegant Kurtas for Every Pet Personality"
     />
   );
 };
