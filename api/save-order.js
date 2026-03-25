@@ -317,9 +317,7 @@ export default async function handler(req, res) {
 
                 console.log("📱 Sending WhatsApp confirmation...");
 
-                // Import and call the WhatsApp handler directly
-                const { default: sendWhatsAppConfirmation } = await import('./send-whatsapp-confirmation.js');
-
+              
                 // Create a mock request object for the WhatsApp handler
                 const mockWhatsAppReq = {
                     method: 'POST',
@@ -419,8 +417,7 @@ export default async function handler(req, res) {
 
                     console.log("📱 Sending WhatsApp confirmation for fallback order...");
 
-                    // Import and call the WhatsApp handler directly
-                    const { default: sendWhatsAppConfirmation } = await import('./send-whatsapp-confirmation.js');
+                   
 
                     // Create a mock request object for the WhatsApp handler
                     const mockWhatsAppReq = {

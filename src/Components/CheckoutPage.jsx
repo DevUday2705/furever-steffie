@@ -885,31 +885,7 @@ const CheckoutPage = () => {
                       year: "numeric",
                     }
                   );
-                  console.log(saveData);
-
-                  // await fetch("/api/send-whatsapp-notification", {
-                  //   method: "POST",
-                  //   headers: { "Content-Type": "application/json" },
-                  //   body: JSON.stringify({
-                  //     customerName: formData.fullName,
-                  //     orderNumber: response.razorpay_order_id, // Use razorpay_order_id instead of saveData.orderNumber
-                  //     items: isCartCheckout
-                  //       ? cart.map((item) => ({
-                  //           name: item.name,
-                  //           quantity: item.quantity || 1,
-                  //         }))
-                  //       : [
-                  //           {
-                  //             name: orderDetails.name,
-                  //             quantity: 1,
-                  //           },
-                  //         ],
-                  //     totalAmount: data.amount / 100,
-                  //     estimatedDelivery: formattedDispatchDate,
-                  //     mobileNumber: formData.mobileNumber,
-                  //   }),
-                  // });
-                  // console.log("📱 WhatsApp notification sent");
+                 
                 } catch (whatsappError) {
                   console.error(
                     "❌ WhatsApp notification failed:",

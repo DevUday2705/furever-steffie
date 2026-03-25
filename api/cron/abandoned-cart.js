@@ -80,7 +80,9 @@ export default async function handler(req, res) {
             }
 
             // Check if enough time has elapsed
-            const createdAt = data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt;
+            const createdAt = typeof data.createdAt === 'string' ? 
+                new Date(data.createdAt).getTime() : 
+                (data.createdAt?.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime());
             const elapsed = now - createdAt;
 
             if (elapsed >= rule.delayMs) {

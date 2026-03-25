@@ -1,5 +1,5 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { getFirestore, serverTimestamp } from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 
 let db;
 
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
             },
             status: 'abandoned',
             emailStage: 0,
-            createdAt: serverTimestamp(),
+            createdAt: new Date().toISOString(),
             lastEmailedAt: null,
             convertedAt: null
         };

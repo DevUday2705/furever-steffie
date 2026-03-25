@@ -1,5 +1,5 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { getFirestore, serverTimestamp } from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 
 let db;
 
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         await abandonedCheckoutRef.update({
             status: 'converted',
             emailStage: -1,  // Never send emails after conversion
-            convertedAt: serverTimestamp()
+            convertedAt: new Date().toISOString()
         });
 
         console.log(`✅ Abandoned checkout marked as converted: ${sessionId}`);
