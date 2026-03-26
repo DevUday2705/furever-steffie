@@ -69,6 +69,7 @@ import EmailTest from "./Components/EmailTest";
 import WhatsAppTest from "./Components/WhatsAppTest";
 import SizeGuide from "./Components/SizeGuide";
 import PopupPoster from "./Components/PopupPoster";
+import AnniversaryApp from "./Components/AnniversaryApp";
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
@@ -204,6 +205,7 @@ const App = () => {
               <Route path="/test-email" element={<EmailTest />} />
               <Route path="/test-whatsapp" element={<WhatsAppTest />} />
               <Route path="/size-guide" element={<SizeGuide />} />
+              <Route path="/anniversary" element={<AnniversaryApp />} />
 
               <Route
                 path="/admin/edit/:category/:id"
