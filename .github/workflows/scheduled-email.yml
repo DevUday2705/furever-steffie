@@ -1,9 +1,9 @@
-name: Scheduled Test Email
+name: Scheduled Order Report
 
 on:
   schedule:
-    # Runs every 2 minutes
-    - cron: '*/2 * * * *'
+    # Runs every 5 minutes
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allows manual triggering
 
 env:
@@ -33,20 +33,20 @@ jobs:
           echo "🔍 Verifying nodemailer installation..."
           node -e "console.log('nodemailer version:', require('nodemailer/package.json').version)"
         
-      - name: Send test email
+      - name: Send order report email
         env:
           EMAIL_USER: fureversteffie@gmail.com
           EMAIL_PASS: ${{ secrets.EMAIL_APP_PASSWORD }}
         run: |
           echo "🚀 Starting email send process..."
-          node .github/scripts/send-test-email.js
+          node .github/scripts/send-order-report.js
           
-      - name: Email status
+      - name: Report status
         if: always()
         run: |
           if [ $? -eq 0 ]; then
-            echo "✅ Email sent successfully!"
+            echo "✅ Order report email sent successfully!"
           else
-            echo "❌ Email sending failed!"
+            echo "❌ Order report email sending failed!"
             exit 1
           fi
