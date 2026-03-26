@@ -1,0 +1,30 @@
+name: Scheduled Test Email
+
+on:
+  schedule:
+    # Runs every 2 minutes
+    - cron: '*/2 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Send test email
+        env:
+          EMAIL_USER: fureversteffie@gmail.com
+          EMAIL_PASS: ${{ secrets.EMAIL_APP_PASSWORD }}
+        run: node .github/scripts/send-test-email.js
