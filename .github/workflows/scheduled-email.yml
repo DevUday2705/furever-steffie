@@ -6,6 +6,9 @@ on:
     - cron: '*/2 * * * *'
   workflow_dispatch: # Allows manual triggering
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   send-email:
     runs-on: ubuntu-latest
@@ -17,14 +20,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+          
+      - name: Verify nodemailer installation
+        run: |
+          echo "🔍 Verifying nodemailer installation..."
+          node -e "console.log('nodemailer version:', require('nodemailer/package.json').version)"
         
       - name: Send test email
         env:
           EMAIL_USER: fureversteffie@gmail.com
           EMAIL_PASS: ${{ secrets.EMAIL_APP_PASSWORD }}
-        run: node .github/scripts/send-test-email.js
+        run: |
+          echo "🚀 Starting email send process..."
+          node .github/scripts/send-test-email.js
+          
+      - name: Email status
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Email sent successfully!"
+          else
+            echo "❌ Email sending failed!"
+            exit 1
+          fi

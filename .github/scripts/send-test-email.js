@@ -3,21 +3,41 @@ import nodemailer from 'nodemailer';
 async function sendTestEmail() {
   try {
     console.log('🚀 Starting test email send...');
+    console.log('🔍 Environment check:');
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    console.log('- EMAIL_USER available:', !!process.env.EMAIL_USER);
+    console.log('- EMAIL_PASS available:', !!process.env.EMAIL_PASS);
+    
+    // Use environment variables or fall back to hardcoded values
+    const emailUser = process.env.EMAIL_USER || 'fureversteffie@gmail.com';
+    const emailPass = process.env.EMAIL_PASS || 'htyq oijh ugoi echv';
+    
+    console.log('📧 Using email:', emailUser);
     
     // Create transporter using Gmail SMTP
     const transporter = nodemailer.createTransporter({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.EMAIL_USER || 'fureversteffie@gmail.com',
-        pass: process.env.EMAIL_PASS || 'htyq oijh ugoi echv',
+        user: emailUser,
+        pass: emailPass,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
+
+    // Verify connection
+    console.log('🔌 Verifying SMTP connection...');
+    await transporter.verify();
+    console.log('✅ SMTP connection verified');
 
     // Email options
     const mailOptions = {
       from: {
         name: 'Furever Steffie Auto Test',
-        address: process.env.EMAIL_USER || 'fureversteffie@gmail.com'
+        address: emailUser
       },
       to: 'devuday2705@gmail.com',
       subject: 'test',
@@ -31,7 +51,8 @@ async function sendTestEmail() {
             <p style="font-size: 14px; color: #6c757d; margin-bottom: 0;">
               <strong>Triggered at:</strong> ${new Date().toISOString()}<br>
               <strong>From:</strong> GitHub Actions Scheduled Workflow<br>
-              <strong>Repository:</strong> furever-steffie
+              <strong>Repository:</strong> furever-steffie<br>
+              <strong>Workflow:</strong> Scheduled Test Email
             </p>
           </div>
         </div>
@@ -39,6 +60,7 @@ async function sendTestEmail() {
     };
 
     console.log('📧 Sending email to:', mailOptions.to);
+    console.log('📄 Subject:', mailOptions.subject);
     
     // Send email
     const info = await transporter.sendMail(mailOptions);
@@ -46,6 +68,7 @@ async function sendTestEmail() {
     console.log('✅ Email sent successfully!');
     console.log('📍 Message ID:', info.messageId);
     console.log('📬 Response:', info.response);
+    console.log('🏁 Test email process completed successfully');
     
     return info;
     
@@ -56,9 +79,20 @@ async function sendTestEmail() {
     if (error.response) {
       console.error('📧 SMTP Response:', error.response);
     }
+    if (error.responseCode) {
+      console.error('🔢 Response Code:', error.responseCode);
+    }
     if (error.code) {
       console.error('🔧 Error Code:', error.code);
     }
+    if (error.command) {
+      console.error('⚡ Failed Command:', error.command);
+    }
+    
+    console.error('💥 Full error details:', {
+      message: error.message,
+      stack: error.stack
+    });
     
     throw error;
   }
@@ -67,7 +101,6 @@ async function sendTestEmail() {
 // Execute the function
 sendTestEmail()
   .then(() => {
-    console.log('🏁 Test email process completed successfully');
     process.exit(0);
   })
   .catch((error) => {
