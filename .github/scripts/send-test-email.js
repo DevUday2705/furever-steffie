@@ -15,7 +15,7 @@ async function sendTestEmail() {
     console.log('📧 Using email:', emailUser);
     
     // Create transporter using Gmail SMTP
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false, // true for 465, false for other ports
