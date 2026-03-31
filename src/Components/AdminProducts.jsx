@@ -197,6 +197,24 @@ const AdminProducts = () => {
     );
   };
 
+  // Helper function to calculate total items from sizeStock
+  const calculateTotalItems = (products) => {
+    return products.reduce((total, product) => {
+      const sizeStock = product.sizeStock || {};
+      const productTotal = Object.values(sizeStock).reduce(
+        (sum, stock) => sum + (stock || 0),
+        0
+      );
+      // If no sizeStock, fall back to availableStock
+      const fallbackStock = productTotal > 0 ? productTotal : (product.availableStock || 0);
+      return total + fallbackStock;
+    }, 0);
+  };
+
+  // Calculate total items for current filtered products
+  const totalItems = useMemo(() => calculateTotalItems(filteredProducts), [filteredProducts]);
+  const totalAllItems = useMemo(() => calculateTotalItems(products), [products]);
+
   // Apply filters and search to products
   useEffect(() => {
     let filtered = [...products];
@@ -381,16 +399,24 @@ const AdminProducts = () => {
                   {selectedCollection}
                 </h2>
                 <div className="text-sm text-gray-500 mt-1">
-                  Total: <span className="font-medium">{products.length}</span> products
-                  {searchQuery && (
-                    <span className="ml-2">
-                      • Showing: <span className="font-medium">{filteredProducts.length}</span> matches
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+                    <span>
+                      Total: <span className="font-medium">{products.length}</span> products
                     </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block"></span>
+                      Total Items: <span className="font-medium text-blue-600">{totalAllItems}</span> pieces
+                    </span>
+                  </div>
+                  {(searchQuery || activeFilters.length > 0) && (
+                    <div className="text-sm text-gray-500 mt-1">
+                      Showing: <span className="font-medium">{filteredProducts.length}</span> products • <span className="font-medium text-blue-600">{totalItems}</span> items
+                    </div>
                   )}
                 </div>
               </div>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                {filteredProducts.length} of {products.length} items
+                <span className="font-medium">{totalItems}</span> items total
               </div>
             </div>
 
