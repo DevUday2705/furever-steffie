@@ -452,9 +452,9 @@ const AdminProducts = () => {
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+                      className="absolute top-2 right-2 bg-red-300 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
                     >
-                      Delete
+                      🗑️
                     </button>
                   </div>
                 ))}
