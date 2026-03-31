@@ -12,6 +12,7 @@ import {
   FaGem,
   FaRupeeSign,
   FaFilter,
+  FaSearch,
 } from "react-icons/fa";
 const ADMIN_KEY = "What@270598";
 const collections = [
@@ -32,6 +33,7 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeFilters, setActiveFilters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [passkey, setPasskey] = useState("");
@@ -195,22 +197,32 @@ const AdminProducts = () => {
     );
   };
 
-  // Apply filters to products
+  // Apply filters and search to products
   useEffect(() => {
     let filtered = [...products];
 
+    // Apply search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((product) =>
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.id?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply quick filters
     if (activeFilters.length > 0) {
       const activeFilterObjects = quickFilters.filter((filter) =>
         activeFilters.includes(filter.id)
       );
 
-      filtered = products.filter((product) =>
+      filtered = filtered.filter((product) =>
         activeFilterObjects.some((filter) => filter.filterFn(product))
       );
     }
 
     setFilteredProducts(filtered);
-  }, [products, activeFilters, quickFilters]);
+  }, [products, activeFilters, searchQuery, quickFilters]);
 
   useEffect(() => {
     if (selectedCollection) {
@@ -364,11 +376,45 @@ const AdminProducts = () => {
         {selectedCollection && (
           <>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900 capitalize">
-                {selectedCollection}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 capitalize">
+                  {selectedCollection}
+                </h2>
+                <div className="text-sm text-gray-500 mt-1">
+                  Total: <span className="font-medium">{products.length}</span> products
+                  {searchQuery && (
+                    <span className="ml-2">
+                      • Showing: <span className="font-medium">{filteredProducts.length}</span> matches
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                 {filteredProducts.length} of {products.length} items
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search products by name, ID, or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <FaTimes className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -379,13 +425,25 @@ const AdminProducts = () => {
                 <span className="text-sm font-medium text-gray-700">
                   Quick Filters
                 </span>
-                {activeFilters.length > 0 && (
-                  <button
-                    onClick={() => setActiveFilters([])}
-                    className="text-xs text-red-600 hover:text-red-800 font-medium"
-                  >
-                    Clear All
-                  </button>
+                {(activeFilters.length > 0 || searchQuery) && (
+                  <div className="flex gap-2">
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Clear Search
+                      </button>
+                    )}
+                    {activeFilters.length > 0 && (
+                      <button
+                        onClick={() => setActiveFilters([])}
+                        className="text-xs text-red-600 hover:text-red-800 font-medium"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               <div
