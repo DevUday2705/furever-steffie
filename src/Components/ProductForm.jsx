@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { doc, setDoc, getDoc, collection, addDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Predefined dhoti options
@@ -41,6 +41,7 @@ const defaultSchema = {
   isNonBeadedAvailable: true,
   isRoyal: false, // Add this line
   isTrending: false, // Add trending status
+  tags: [], // Custom tags for filtering and organization
   sizeStock: {
     XS: 0,
     S: 0,
@@ -177,12 +178,32 @@ const ProductForm = () => {
   const [selectedDhotiIds, setSelectedDhotiIds] = useState([]);
   // State for dhoti size availability
   const [selectedDhotiSizes, setSelectedDhotiSizes] = useState(["XS", "S", "M"]);
+  
+  // State for tag input
+  const [newTag, setNewTag] = useState("");
+  const [availableTags, setAvailableTags] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      // Fetch available tags for suggestions
+      try {
+        const tagsQuery = query(collection(db, "tags"), orderBy("usage", "desc"));
+        const tagsSnapshot = await getDocs(tagsQuery);
+        const tagsList = tagsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name,
+          usage: doc.data().usage || 0
+        }));
+        setAvailableTags(tagsList);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+
       if (isEditMode) {
         try {
           const docRef = doc(db, `${category}s`, id);
@@ -351,6 +372,96 @@ const ProductForm = () => {
   useEffect(() => {
     handleChange("dhotiSizeAvailability", selectedDhotiSizes);
   }, [selectedDhotiSizes]);
+
+  // Tag management functions
+  const saveTagToCollection = async (tagName) => {
+    try {
+      // Check if tag already exists in collection
+      const existingTag = availableTags.find(tag => tag.name === tagName);
+      
+      if (existingTag) {
+        // Increment usage count
+        await setDoc(doc(db, "tags", existingTag.id), {
+          name: tagName,
+          usage: existingTag.usage + 1,
+          lastUsed: new Date()
+        });
+      } else {
+        // Create new tag document
+        const newTagDoc = {
+          name: tagName,
+          usage: 1,
+          createdAt: new Date(),
+          lastUsed: new Date()
+        };
+        await addDoc(collection(db, "tags"), newTagDoc);
+        
+        // Update local state
+        setAvailableTags(prev => [...prev, {
+          id: Date.now().toString(), // temporary ID
+          name: tagName,
+          usage: 1
+        }]);
+      }
+    } catch (error) {
+      console.error("Error saving tag to collection:", error);
+    }
+  };
+
+  const addTag = async () => {
+    const trimmedTag = newTag.trim().toLowerCase();
+    if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+      handleChange("tags", [...formData.tags, trimmedTag]);
+      await saveTagToCollection(trimmedTag);
+      setNewTag("");
+      setShowSuggestions(false);
+    }
+  };
+
+  const addSuggestedTag = async (tagName) => {
+    if (!formData.tags.includes(tagName)) {
+      handleChange("tags", [...formData.tags, tagName]);
+      await saveTagToCollection(tagName);
+      setNewTag("");
+      setShowSuggestions(false);
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    handleChange("tags", formData.tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredSuggestions.length > 0 && showSuggestions) {
+        addSuggestedTag(filteredSuggestions[0].name);
+      } else {
+        addTag();
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleTagInputChange = (e) => {
+    const value = e.target.value;
+    setNewTag(value);
+    
+    if (value.trim()) {
+      const filtered = availableTags
+        .filter(tag => 
+          tag.name.toLowerCase().includes(value.toLowerCase()) &&
+          !formData.tags.includes(tag.name)
+        )
+        .slice(0, 5); // Show max 5 suggestions
+      
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -535,6 +646,90 @@ const ProductForm = () => {
             onChange={(e) => handleChange("category", e.target.value)}
             className="w-full border px-4 py-2 rounded"
           />
+        </div>
+
+        {/* Tags Section */}
+        <div className="border p-4 rounded">
+          <h2 className="font-semibold mb-2">🏷️ Tags</h2>
+          <p className="text-sm text-gray-600 mb-3">
+            Add custom tags to help with filtering and organization. Tags are automatically converted to lowercase.
+          </p>
+          
+          {/* Display existing tags */}
+          {formData.tags.length > 0 && (
+            <div className="mb-3">
+              <div className="flex flex-wrap gap-2">
+                {formData.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="ml-2 text-blue-600 hover:text-blue-800 font-bold"
+                      title="Remove tag"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Add new tag */}
+          <div className="relative">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter a new tag (e.g., premium, wedding, festive)"
+                value={newTag}
+                onChange={handleTagInputChange}
+                onKeyPress={handleTagKeyPress}
+                onFocus={() => {
+                  if (newTag.trim() && filteredSuggestions.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onBlur={() => {
+                  // Small delay to allow clicking on suggestions
+                  setTimeout(() => setShowSuggestions(false), 150);
+                }}
+                className="flex-1 border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="button"
+                onClick={addTag}
+                disabled={!newTag.trim() || formData.tags.includes(newTag.trim().toLowerCase())}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Add Tag
+              </button>
+            </div>
+            
+            {/* Suggestions dropdown */}
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                {filteredSuggestions.map((tag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => addSuggestedTag(tag.name)}
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex justify-between items-center"
+                  >
+                    <span>{tag.name}</span>
+                    <span className="text-xs text-gray-500">used {tag.usage} times</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {newTag.trim() && formData.tags.includes(newTag.trim().toLowerCase()) && (
+            <p className="text-sm text-red-600 mt-1">This tag already exists</p>
+          )}
         </div>
 
         {/* Pricing Section */}
