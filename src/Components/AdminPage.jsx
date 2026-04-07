@@ -1212,6 +1212,7 @@ const AdminPage = () => {
               {filteredAndSortedOrders.map((order) => {
                 const hasRoyalSet = order.items?.some(item => item.isRoyalSet);
                 const isExpressDelivery = order.customer?.deliveryOption === "express";
+                const isForeignOrder = order.customer?.country && order.customer.country.toLowerCase() !== "india";
                 
                 return (
                 <motion.div
@@ -1226,6 +1227,8 @@ const AdminPage = () => {
                       ? "bg-yellow-50 border-yellow-300"
                       : isExpressDelivery
                       ? "bg-red-50 border-red-300"
+                      : isForeignOrder
+                      ? "bg-blue-50 border-blue-300"
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
                       : !order.shippingType
