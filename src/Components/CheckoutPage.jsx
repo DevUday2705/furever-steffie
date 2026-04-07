@@ -470,6 +470,8 @@ const CheckoutPage = () => {
       // Domestic delivery charges
       if (formData.deliveryOption === "express") {
         deliveryCharge = 399;
+      } else if (formData.deliveryOption === "air") {
+        deliveryCharge = 199;
       } else {
         deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0;
       }
@@ -1429,10 +1431,29 @@ const CheckoutPage = () => {
                         />
                         <div className="ml-3">
                           <span className="block text-sm font-medium text-gray-800">
-                            Standard Delivery
+                            Standard Shipping
                           </span>
                           <span className="block text-xs text-green-500">
                             5-7 days • ₹Free
+                          </span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          value="air"
+                          checked={formData.deliveryOption === "air"}
+                          onChange={handleChange}
+                          className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                        />
+                        <div className="ml-3">
+                          <span className="block text-sm font-medium text-gray-800">
+                            Air Shipping
+                          </span>
+                          <span className="block text-xs text-blue-500">
+                            3-4 days • ₹199
                           </span>
                         </div>
                       </label>
@@ -1448,10 +1469,10 @@ const CheckoutPage = () => {
                         />
                         <div className="ml-3">
                           <span className="block text-sm font-medium text-gray-800">
-                            Express Delivery
+                            Express Shipping
                           </span>
-                          <span className="block text-xs text-gray-500">
-                            Within 2 days • ₹399
+                          <span className="block text-xs text-red-500">
+                            1-2 days • ₹399
                           </span>
                         </div>
                       </label>

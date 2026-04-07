@@ -12,6 +12,8 @@ const OrderFilters = ({
   setMeasurementFilter,
   collaborationFilter,
   setCollaborationFilter,
+  shippingTypeFilter,
+  setShippingTypeFilter,
   onDateRangeChange,
 }) => {
   // Get current month start and today's date as defaults
@@ -92,7 +94,7 @@ const OrderFilters = ({
     <div className="space-y-3 mb-4 bg-gray-50 p-4 rounded-lg border">
       <h2 className="font-medium text-gray-700 mb-2">Filter Orders</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
         {/* Search by name or phone */}
         <div>
           <label className="block text-xs text-gray-500 mb-1">Search</label>
@@ -120,6 +122,24 @@ const OrderFilters = ({
             <option value="cutting">Cutting</option>
             <option value="ready-to-ship">Ready to Ship</option>
             <option value="shipped">Shipped</option>
+          </select>
+        </div>
+
+        {/* Shipping Type filter */}
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">
+            📦 Shipping Method
+          </label>
+          <select
+            value={shippingTypeFilter}
+            onChange={(e) => setShippingTypeFilter(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+          >
+            <option value="all">All Methods</option>
+            <option value="standard">📦 Standard</option>
+            <option value="air">✈️ Air</option>
+            <option value="express">🚀 Express</option>
+            <option value="not-set">⚠️ Not Set</option>
           </select>
         </div>
 

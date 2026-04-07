@@ -41,6 +41,7 @@ const AdminPage = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [measurementFilter, setMeasurementFilter] = useState("all");
   const [collaborationFilter, setCollaborationFilter] = useState("all");
+  const [shippingTypeFilter, setShippingTypeFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -300,6 +301,26 @@ const AdminPage = () => {
     }
   };
 
+  // Handle shipping type change
+  const handleShippingTypeChange = async (orderId, newShippingType) => {
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        shippingType: newShippingType,
+      });
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, shippingType: newShippingType } : order
+        )
+      );
+      toast.success("Shipping type updated successfully");
+    } catch (error) {
+      console.error("Error updating shipping type:", error);
+      toast.error("Failed to update shipping type. Please try again.");
+    }
+  };
+
   const handleDeleteOrder = async (orderId, customerName) => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete the order for ${customerName}? This action cannot be undone.`
@@ -515,7 +536,7 @@ const AdminPage = () => {
             .name {
               font-size: 18px;
               font-weight: bold;
-              margin-top: 130px;
+             
            
             }
             .address-line {
@@ -552,14 +573,53 @@ const AdminPage = () => {
               gap: 4px;
             }
             .business-logo {
-              height: 25px;
+              height: 55px;
               width: auto;
-              max-width: 80px;
+              max-width: 250px;
             }
             .business-number {
               font-size: 11px;
               color: #666;
               font-weight: 500;
+            }
+            .shipping-type {
+              text-align: center;
+              font-size: 24px;
+              font-weight: bold;
+              color: #000 !important;
+              background-color: #FFD700;
+              border: 4px solid #000;
+              padding: 15px 10px;
+              margin: 10px 0 15px 0;
+              text-transform: uppercase;
+              letter-spacing: 3px;
+              border-radius: 10px;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+            .shipping-type.standard {
+              background-color: #E3F2FD;
+              border-color: #1976D2;
+              color: #1976D2 !important;
+            }
+            .shipping-type.air {
+              background-color: #000;
+              border-color: #000;
+              color: #000 !important;
+            }
+            .shipping-type.express {
+              background-color: #FFEBEE;
+              border-color: #D32F2F;
+              color: #D32F2F !important;
+            }
+            .shipping-type.not-set {
+              background-color: #FFF3E0;
+              border-color: #FF9800;
+              color: #FF9800 !important;
+              animation: blink 1s infinite;
+            }
+            @keyframes blink {
+              0%, 50% { opacity: 1; }
+              51%, 100% { opacity: 0.6; }
             }
           </style>
         </head>
@@ -571,9 +631,18 @@ const AdminPage = () => {
               .map(
                 (order) => `
               <div class="address-box">
+                  ${order.shippingType ? `
+                  <div class="shipping-type ${order.shippingType}">
+                    📦 ${order.shippingType.toUpperCase()} 📦
+                  </div>
+                  ` : `
+                  <div class="shipping-type not-set">
+                    ⚠️ SHIPPING METHOD NOT SET ⚠️
+                  </div>
+                  `}
+                  
                   <div class="name-n-rectangle">
                   <div class="name">${order.customer?.fullName || "N/A"}</div>
-                  <div class="rectangle"></div>
                   </div>
 
                 <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
@@ -583,9 +652,13 @@ const AdminPage = () => {
                 <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
+                ${order.customer?.deliveryOption ? `
+                <div class="address-line" style="font-size: 10px; color: #666;"><span class="label">Customer requested:</span>${order.customer.deliveryOption} delivery</div>
+                ` : ""}
                 
                 <div class="business-footer">
                   <img src="/images/logo.png" alt="Furever Steffie" class="business-logo" />
+                  <div class="business-number">Mumbai, Maharashtra - 401101</div>
                   <div class="business-number">+91 70422 12942</div>
                 </div>
 
@@ -761,8 +834,19 @@ const AdminPage = () => {
         }
       }
 
+      // Shipping Type filter
+      let matchesShippingType = true;
+      if (shippingTypeFilter !== "all") {
+        if (shippingTypeFilter === "not-set") {
+          matchesShippingType = !order.shippingType;
+        } else {
+          matchesShippingType = order.shippingType === shippingTypeFilter;
+        }
+      }
+
       return (
-        matchesSearch && matchesStatus && matchesDate && matchesMeasurement && matchesCollaboration
+        matchesSearch && matchesStatus && matchesDate && matchesMeasurement && 
+        matchesCollaboration && matchesShippingType
       );
     })
     .sort((a, b) => {
@@ -818,6 +902,11 @@ const AdminPage = () => {
     ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
+    // Shipping type stats
+    standardShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "standard").length,
+    airShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "air").length,
+    expressShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "express").length,
+    noShippingType: filteredAndSortedOrders.filter((o) => !o.shippingType).length,
     totalAmount: filteredAndSortedOrders.reduce(
       (sum, order) => sum + (Number(order.amount) || 0),
       0
@@ -938,6 +1027,34 @@ const AdminPage = () => {
             </div>
           </div>
 
+          {/* Shipping Type Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">📦 Standard Shipping</p>
+              <p className="text-lg font-bold text-blue-600">
+                {orderStats.standardShipping}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">✈️ Air Shipping</p>
+              <p className="text-lg font-bold text-purple-600">
+                {orderStats.airShipping}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">🚀 Express Shipping</p>
+              <p className="text-lg font-bold text-red-600">
+                {orderStats.expressShipping}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-orange-200">
+              <p className="text-xs text-orange-600">⚠️ No Shipping Type</p>
+              <p className="text-lg font-bold text-orange-500">
+                {orderStats.noShippingType}
+              </p>
+            </div>
+          </div>
+
           {/* Order Pause Control */}
           <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex items-center justify-between">
@@ -991,6 +1108,8 @@ const AdminPage = () => {
             setMeasurementFilter={setMeasurementFilter}
             collaborationFilter={collaborationFilter}
             setCollaborationFilter={setCollaborationFilter}
+            shippingTypeFilter={shippingTypeFilter}
+            setShippingTypeFilter={setShippingTypeFilter}
             onDateRangeChange={handleDateRangeChange}
           />
 
@@ -1109,6 +1228,8 @@ const AdminPage = () => {
                       ? "bg-red-50 border-red-300"
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
+                      : !order.shippingType
+                      ? "border-l-4 border-l-orange-400 bg-orange-50/20"
                       : "border-gray-200"
                   } ${
                     selectedOrders.has(order.id)
@@ -1149,6 +1270,7 @@ const AdminPage = () => {
                             🤝 Collaboration
                           </span>
                         )}
+                      
                       </div>
                       <div className="text-sm font-medium text-gray-800 mb-1">
                         📞 {order.customer?.mobileNumber}
@@ -1255,6 +1377,54 @@ const AdminPage = () => {
                           <option value="shipped">shipped</option>
                         </select>
                       </div>
+                    </div>
+
+                    {/* Customer's Original Delivery Preference */}
+                    <div className="mt-3 text-xs">
+                      <label className="text-gray-500"> Customer Selected: </label>
+                      <span className="text-gray-700 font-medium">
+                        {order.customer?.deliveryOption ? 
+                          `${order.customer.deliveryOption.charAt(0).toUpperCase()}${order.customer.deliveryOption.slice(1)} Delivery` : 
+                          "Standard Delivery"}
+                      </span>
+                    </div>
+
+                    {/* Admin Shipping Type Selection */}
+                    <div className="mt-3 text-xs">
+                      <label className="text-gray-500 font-semibold"> 📦 Shipping Method: </label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className={`px-2 py-1 rounded-full text-white text-[10px] font-bold
+                      ${
+                        order.shippingType === "standard"
+                          ? "bg-blue-500"
+                          : order.shippingType === "air"
+                          ? "bg-purple-500"
+                          : order.shippingType === "express"
+                          ? "bg-red-500"
+                          : "bg-gray-400"
+                      }
+                    `}
+                        >
+                          {order.shippingType ? order.shippingType.toUpperCase() : "⚠️ NOT SET"}
+                        </span>
+
+                        <select
+                          value={order.shippingType || ""}
+                          onChange={(e) =>
+                            handleShippingTypeChange(order.id, e.target.value)
+                          }
+                          className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
+                        >
+                          <option value="">⚠️ Select Shipping Method</option>
+                          <option value="standard">📦 Standard Shipping</option>
+                          <option value="air">✈️ Air Shipping</option>
+                          <option value="express">🚀 Express Shipping</option>
+                        </select>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        💡 This is how YOU will ship the package (independent of customer's choice)
+                      </p>
                     </div>
                   </div>
 
