@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 import FilterDrawer from "./FilterDrawer";
 import NotifyMeModal from "./NotifyMeModal";
-import SizeStockSlider from "./SizeStockSlider";
 import { useProductFilter } from "../hooks/useProductFilter";
 import {
   ChevronLeft,
@@ -19,10 +18,6 @@ import {
   Flame,
   CrownIcon,
   Star,
-  Check,
-  Gem,
-  DollarSign,
-  Percent,
   Bell,
 } from "lucide-react";
 import PropTypes from "prop-types";
@@ -44,13 +39,11 @@ const ProductListing = ({
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [quickFilters, setQuickFilters] = useState([]);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
   const [notifyMeModal, setNotifyMeModal] = useState({
     isOpen: false,
     product: null,
   });
-  const [sizeStockSlider, setSizeStockSlider] = useState(false);
-  const [selectedSizes, setSelectedSizes] = useState([]);
   const [filters, setFilters] = useState({
     sortBy: "",
     maxPrice: 5000,
@@ -136,126 +129,37 @@ const ProductListing = ({
     return videoExtensions.some(ext => urlPath.includes(ext));
   };
 
-  // Define quick filters with classy gray theme
-  const quickFilterOptions = useMemo(
-    () => [
-      {
-        id: "in-stock",
-        label: "In Stock",
-        icon: Check,
-        isSpecial: true, // This will open the size slider
-        filterFn: (product) => {
-          // If no sizes selected, show all products with any stock
-          if (selectedSizes.length === 0) {
-            const sizeStock = product.sizeStock || {};
-            return Object.values(sizeStock).some((stock) => (stock || 0) > 0);
-          }
-          // If sizes selected, show products with those specific sizes in stock
-          return selectedSizes.some(
-            (size) => (product.sizeStock?.[size] || 0) > 0
-          );
-        },
-      },
-      {
-        id: "royal",
-        label: "Royal",
-        icon: CrownIcon,
-        filterFn: (product) => product.isRoyal === true,
-      },
-      {
-        id: "trending",
-        label: "Trending",
-        icon: Flame,
-        filterFn: (product) => product.isTrending === true,
-      },
-      {
-        id: "top-rated",
-        label: "Top Rated",
-        icon: Star,
-        filterFn: (product) => (product.priorityScore || 0) >= 80,
-      },
-      {
-        id: "beaded",
-        label: "Beaded",
-        icon: Gem,
-        filterFn: (product) => product.isBeadedAvailable === true,
-      },
-      {
-        id: "budget",
-        label: "< ₹1000",
-        icon: DollarSign,
-        filterFn: (product) => (product.pricing?.basePrice || 0) < 1000,
-      },
-      {
-        id: "discount",
-        label: "40%+ Off",
-        icon: Percent,
-        filterFn: (product) => (product.pricing?.discountPercent || 0) >= 40,
-      },
-    ],
-    [selectedSizes]
-  );
 
-  // Quick filter toggle handler
-  const toggleQuickFilter = (filterId) => {
-    // Handle special "in-stock" filter
-    if (filterId === "in-stock") {
-      setSizeStockSlider(true);
-      return;
-    }
-
-    setQuickFilters((prev) =>
-      prev.includes(filterId)
-        ? prev.filter((id) => id !== filterId)
-        : [...prev, filterId]
-    );
-  };
-
-  // Size toggle handler for the slider
-  const handleSizeToggle = (size) => {
-    setSelectedSizes((prev) => {
-      const newSizes = prev.includes(size)
-        ? prev.filter((s) => s !== size)
-        : [...prev, size];
-
-      // Auto-activate in-stock filter when sizes are selected
-      if (newSizes.length > 0 && !quickFilters.includes("in-stock")) {
-        setQuickFilters((current) => [...current, "in-stock"]);
-      } else if (newSizes.length === 0 && quickFilters.includes("in-stock")) {
-        setQuickFilters((current) => current.filter((id) => id !== "in-stock"));
-      }
-
-      return newSizes;
-    });
-  };
 
   const baseList = useMemo(() => [...products], [products]);
 
-  // Apply regular filters first
+  // Apply regular filters
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
   
-  // Filter out products with no stock for any size
-  const stockFiltered = useMemo(() => {
+  // Apply category filter based on tags
+  const categoryFiltered = useMemo(() => {
+    if (selectedCategoryFilter === "all") {
+      return regularFiltered;
+    }
+    
     return regularFiltered.filter((product) => {
+      if (selectedCategoryFilter === "royal") {
+        return product.isRoyal === true;
+      }
+      
+      // For other categories, check if the product has the tag
+      const tags = product.tags || [];
+      return tags.some(tag => tag.toLowerCase().includes(selectedCategoryFilter.toLowerCase()));
+    });
+  }, [regularFiltered, selectedCategoryFilter]);
+  
+  // Filter out products with no stock for any size
+  const filtered = useMemo(() => {
+    return categoryFiltered.filter((product) => {
       const stockStatus = getProductStockStatus(product);
       return stockStatus.hasAnyStock; // Only show products that have stock for at least one size
     });
-  }, [regularFiltered]);
-
-  // Then apply quick filters
-  const filtered = useMemo(() => {
-    if (quickFilters.length === 0) {
-      return stockFiltered;
-    }
-
-    const activeQuickFilters = quickFilterOptions.filter((filter) =>
-      quickFilters.includes(filter.id)
-    );
-
-    return stockFiltered.filter((product) =>
-      activeQuickFilters.every((filter) => filter.filterFn(product))
-    );
-  }, [stockFiltered, quickFilters, quickFilterOptions]);
+  }, [categoryFiltered]);
   const activeFilterCount = useMemo(() => {
     return Object.entries(filters).reduce((count, [key, value]) => {
       const ignoredKeys = [
@@ -432,90 +336,84 @@ const ProductListing = ({
         </div>
       </div>
 
-      {/* Quick Filters */}
+      {/* Category Filters */}
       <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 py-3">
-          {/* Show selected sizes info */}
-          {selectedSizes.length > 0 && (
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs text-gray-500">Filtering by sizes:</span>
-              <div className="flex gap-1">
-                {selectedSizes.map((size) => (
-                  <span
-                    key={size}
-                    className="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-medium"
-                  >
-                    {size}
-                  </span>
-                ))}
-              </div>
-              <button
-                onClick={() => {
-                  setSelectedSizes([]);
-                  setQuickFilters((prev) =>
-                    prev.filter((id) => id !== "in-stock")
-                  );
-                }}
-                className="text-xs text-rose-600 hover:text-rose-700 font-medium ml-2"
-              >
-                Clear sizes
-              </button>
-            </div>
-          )}
-
-          <div
-            className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        <div className="container mx-auto px-4 py-4">
+          <div 
+            className="flex gap-3 overflow-x-auto pb-2" 
+            style={{ 
+              scrollbarWidth: "none", 
+              msOverflowStyle: "none",
+              WebkitScrollbar: { display: "none" }
+            }}
           >
-            {/* Regular Quick Filters */}
-            {quickFilterOptions.map((filter) => {
-              const Icon = filter.icon;
-              const isActive = quickFilters.includes(filter.id);
-              const isInStockWithSizes =
-                filter.id === "in-stock" && selectedSizes.length > 0;
-
-              return (
-                <button
-                  key={filter.id}
-                  onClick={() => toggleQuickFilter(filter.id)}
-                  className={`
-                    flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-200 
-                    whitespace-nowrap text-sm font-medium min-w-max
-                    ${
-                      isActive
-                        ? isInStockWithSizes
-                          ? "bg-rose-500 text-white border-rose-500 shadow-sm"
-                          : "bg-gray-800 text-white border-gray-800 shadow-sm"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
-                    }
-                  `}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {filter.label}
-                  {isInStockWithSizes && (
-                    <span className="bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full font-medium ml-1">
-                      {selectedSizes.length}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-
-            {/* Clear Button */}
-            {quickFilters.length > 0 && (
+            {[
+              { 
+                id: "all", 
+                label: "All", 
+                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp"
+              },
+              { 
+                id: "royal", 
+                label: "Royal", 
+                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1760562224/Diwali_6_begntv.jpg"
+              },
+              { 
+                id: "sherwani", 
+                label: "Sherwani", 
+                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924369/Photoroom_20260121_152801_nswyri.webp"
+              },
+              { 
+                id: "kurta", 
+                label: "Kurta", 
+                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924368/Photoroom_20260121_152835_igaa0h.webp"
+              },
+              { 
+                id: "dhoti", 
+                label: "Dhoti", 
+                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp"
+              }
+            ].map((categoryOption) => (
               <button
-                onClick={() => {
-                  setQuickFilters([]);
-                  setSelectedSizes([]);
-                }}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap"
+                key={categoryOption.id}
+                onClick={() => setSelectedCategoryFilter(categoryOption.id)}
+                className={`
+                  relative flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200
+                  ${selectedCategoryFilter === categoryOption.id 
+                    ? "border-gray-800 shadow-lg scale-105" 
+                    : "border-gray-200 hover:border-gray-300 hover:scale-105"
+                  }
+                `}
               >
-                Clear
+                <img
+                  src={categoryOption.image}
+                  alt={categoryOption.label}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className={`
+                    text-xs font-semibold text-white text-center px-2 py-1 rounded-full backdrop-blur-sm
+                    ${selectedCategoryFilter === categoryOption.id 
+                      ? "bg-white/30 border border-white/40" 
+                      : "bg-black/30"
+                    }
+                  `}>
+                    {categoryOption.label}
+                  </span>
+                </div>
+                {selectedCategoryFilter === categoryOption.id && (
+                  <div className="absolute top-1 right-1">
+                    <div className="w-3 h-3 bg-gray-800 rounded-full border-2 border-white"></div>
+                  </div>
+                )}
               </button>
-            )}
+            ))}
           </div>
         </div>
       </div>
+
+
 
       {/* Product Grid */}
       <div className="container mx-auto px-4 py-6">
@@ -750,19 +648,6 @@ const ProductListing = ({
         isOpen={notifyMeModal.isOpen}
         onClose={() => setNotifyMeModal({ isOpen: false, product: null })}
         product={notifyMeModal.product}
-      />
-
-      {/* Size Stock Slider */}
-      <SizeStockSlider
-        isOpen={sizeStockSlider}
-        onClose={() => setSizeStockSlider(false)}
-        products={regularFiltered}
-        selectedSizes={selectedSizes}
-        onSizeToggle={handleSizeToggle}
-        onClearSizes={() => {
-          setSelectedSizes([]);
-          setQuickFilters((prev) => prev.filter((id) => id !== "in-stock"));
-        }}
       />
     </div>
   );
