@@ -336,82 +336,77 @@ const ProductListing = ({
         </div>
       </div>
 
-      {/* Category Filters */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 py-4">
-          <div 
-            className="flex gap-3 overflow-x-auto pb-2" 
-            style={{ 
-              scrollbarWidth: "none", 
-              msOverflowStyle: "none",
-              WebkitScrollbar: { display: "none" }
-            }}
-          >
-            {[
-              { 
-                id: "all", 
-                label: "All", 
-                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp"
-              },
-              { 
-                id: "royal", 
-                label: "Royal", 
-                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1760562224/Diwali_6_begntv.jpg"
-              },
-              { 
-                id: "sherwani", 
-                label: "Sherwani", 
-                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924369/Photoroom_20260121_152801_nswyri.webp"
-              },
-              { 
-                id: "kurta", 
-                label: "Kurta", 
-                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924368/Photoroom_20260121_152835_igaa0h.webp"
-              },
-              { 
-                id: "dhoti", 
-                label: "Dhoti", 
-                image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp"
-              }
-            ].map((categoryOption) => (
-              <button
-                key={categoryOption.id}
-                onClick={() => setSelectedCategoryFilter(categoryOption.id)}
-                className={`
-                  relative flex-shrink-0 w-20 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200
-                  ${selectedCategoryFilter === categoryOption.id 
-                    ? "border-gray-800 shadow-lg scale-105" 
-                    : "border-gray-200 hover:border-gray-300 hover:scale-105"
-                  }
-                `}
-              >
-                <img
-                  src={categoryOption.image}
-                  alt={categoryOption.label}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
+      {/* Category Filters - Only for Kurta */}
+      {category === "kurta" && (
+        <div className="bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4 py-4">
+            <div 
+              className="flex gap-4 overflow-x-auto pb-2 pt-2 pl-2" 
+              style={{ 
+                scrollbarWidth: "none", 
+                msOverflowStyle: "none",
+                WebkitScrollbar: { display: "none" }
+              }}
+            >
+              {[
+                { 
+                  id: "all", 
+                  label: "All", 
+                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp"
+                },
+                { 
+                  id: "royal", 
+                  label: "Royal", 
+                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1760562224/Diwali_6_begntv.jpg"
+                },
+                { 
+                  id: "sherwani", 
+                  label: "Sherwani", 
+                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924369/Photoroom_20260121_152801_nswyri.webp"
+                },
+                { 
+                  id: "kurta", 
+                  label: "Kurta", 
+                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924368/Photoroom_20260121_152835_igaa0h.webp"
+                },
+                { 
+                  id: "dhoti", 
+                  label: "Dhoti", 
+                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp"
+                }
+              ].map((categoryOption) => (
+                <div key={categoryOption.id} className="flex flex-col items-center flex-shrink-0">
+                  <button
+                    onClick={() => setSelectedCategoryFilter(categoryOption.id)}
+                    className={`
+                      relative w-24 h-28 rounded-2xl overflow-hidden border transition-all duration-200 mb-2
+                      ${selectedCategoryFilter === categoryOption.id 
+                        ? "border-gray-800 shadow-xl scale-105" 
+                        : "border-gray-300 hover:border-gray-400 hover:scale-105 shadow-md"
+                      }
+                    `}
+                  >
+                    <img
+                      src={categoryOption.image}
+                      alt={categoryOption.label}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
                   <span className={`
-                    text-xs font-semibold text-white text-center px-2 py-1 rounded-full backdrop-blur-sm
+                    text-sm font-medium text-center
                     ${selectedCategoryFilter === categoryOption.id 
-                      ? "bg-white/30 border border-white/40" 
-                      : "bg-black/30"
+                      ? "text-gray-800 font-semibold" 
+                      : "text-gray-600"
                     }
                   `}>
                     {categoryOption.label}
                   </span>
                 </div>
-                {selectedCategoryFilter === categoryOption.id && (
-                  <div className="absolute top-1 right-1">
-                    <div className="w-3 h-3 bg-gray-800 rounded-full border-2 border-white"></div>
-                  </div>
-                )}
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
 
 
