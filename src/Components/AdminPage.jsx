@@ -906,7 +906,7 @@ const AdminPage = () => {
     standardShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "standard").length,
     airShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "air").length,
     expressShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "express").length,
-    noShippingType: filteredAndSortedOrders.filter((o) => !o.shippingType).length,
+    internationalOrders: filteredAndSortedOrders.filter((o) => o.customer?.country && o.customer.country.toLowerCase() !== "india").length,
     totalAmount: filteredAndSortedOrders.reduce(
       (sum, order) => sum + (Number(order.amount) || 0),
       0
@@ -1047,10 +1047,10 @@ const AdminPage = () => {
                 {orderStats.expressShipping}
               </p>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-orange-200">
-              <p className="text-xs text-orange-600">⚠️ No Shipping Type</p>
-              <p className="text-lg font-bold text-orange-500">
-                {orderStats.noShippingType}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-blue-200">
+              <p className="text-xs text-blue-600">🌍 International Orders</p>
+              <p className="text-lg font-bold text-blue-500">
+                {orderStats.internationalOrders}
               </p>
             </div>
           </div>
