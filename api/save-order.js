@@ -94,7 +94,8 @@ export default async function handler(req, res) {
                     'lehenga': 'lehengas',
                     'frock': 'frocks',
                     'bandana': 'bandanas',
-                    'bowtie': 'bowties'
+                    'bowtie': 'bowties',
+                    'dhotis': 'dhotiss'
                 };
 
                 // Use mapped name or add 's' if needed
