@@ -57,6 +57,11 @@ const AdminPage = () => {
   // Selected orders for printing
   const [selectedOrders, setSelectedOrders] = useState(new Set());
 
+  // Revenue visibility states for security
+  const [revenueVisible, setRevenueVisible] = useState(false);
+  const [revenuePassword, setRevenuePassword] = useState("");
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+
   // Helper function to get dhoti details from product data
   const normalizeCollectionName = (rawCategory) => {
     if (!rawCategory) return null;
@@ -174,6 +179,33 @@ const AdminPage = () => {
       setIsAuthorized(true);
     } else {
       alert("Wrong admin key!");
+    }
+  };
+
+  // Revenue visibility handlers
+  const handleRevenuePasswordSubmit = () => {
+    if (revenuePassword === ADMIN_KEY) {
+      setRevenueVisible(true);
+      setShowPasswordPrompt(false);
+      setRevenuePassword("");
+      toast.success("Revenue data unlocked");
+    } else {
+      toast.error("Incorrect password");
+      setRevenuePassword("");
+    }
+  };
+
+  const toggleRevenueVisibility = () => {
+    if (revenueVisible) {
+      setRevenueVisible(false);
+    } else {
+      setShowPasswordPrompt(true);
+    }
+  };
+
+  const handlePasswordKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleRevenuePasswordSubmit();
     }
   };
 
@@ -1141,6 +1173,21 @@ const AdminPage = () => {
           {/* Revenue Summary */}
           {filteredAndSortedOrders.length > 0 && (
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold text-gray-700">Revenue Summary</h3>
+                <button
+                  onClick={toggleRevenueVisibility}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                  title={revenueVisible ? "Hide revenue data" : "Show revenue data"}
+                >
+                  {revenueVisible ? (
+                    <>🙈 Hide</>
+                  ) : (
+                    <>👁️ Show</>
+                  )}
+                </button>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Total Orders</p>
@@ -1151,22 +1198,28 @@ const AdminPage = () => {
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Total Revenue</p>
                   <p className="text-2xl font-bold text-green-600">
-                    ₹
-                    {filteredAndSortedOrders
-                      .reduce((sum, order) => sum + (order.amount || 0), 0)
-                      .toLocaleString()}
+                    {revenueVisible ? (
+                      `₹${filteredAndSortedOrders
+                        .reduce((sum, order) => sum + (order.amount || 0), 0)
+                        .toLocaleString()}`
+                    ) : (
+                      "₹ ••••••••"
+                    )}
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-gray-600">Average Order Value</p>
                   <p className="text-2xl font-bold text-purple-600">
-                    ₹
-                    {Math.round(
-                      filteredAndSortedOrders.reduce(
-                        (sum, order) => sum + (order.amount || 0),
-                        0
-                      ) / filteredAndSortedOrders.length
-                    ).toLocaleString()}
+                    {revenueVisible ? (
+                      `₹${Math.round(
+                        filteredAndSortedOrders.reduce(
+                          (sum, order) => sum + (order.amount || 0),
+                          0
+                        ) / filteredAndSortedOrders.length
+                      ).toLocaleString()}`
+                    ) : (
+                      "₹ ••••••••"
+                    )}
                   </p>
                 </div>
               </div>
@@ -1834,6 +1887,46 @@ const AdminPage = () => {
       
       {/* Analytics Tab */}
       {activeTab === "analytics" && <Analytics />}
+
+      {/* Password Prompt Modal */}
+      {showPasswordPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96 max-w-[90%]">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              Enter Password to View Revenue Data
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This information is sensitive and requires password verification.
+            </p>
+            <input
+              type="password"
+              value={revenuePassword}
+              onChange={(e) => setRevenuePassword(e.target.value)}
+              onKeyPress={handlePasswordKeyPress}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter admin password"
+              autoFocus
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowPasswordPrompt(false);
+                  setRevenuePassword("");
+                }}
+                className="px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRevenuePasswordSubmit}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Unlock
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
