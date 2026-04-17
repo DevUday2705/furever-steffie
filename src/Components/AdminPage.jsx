@@ -589,8 +589,9 @@ const AdminPage = () => {
               justify-content: space-between;
             }
             .rectangle {
-              width: 100px;
-              height: 30px;
+              width: 130px;
+              height: 50px;
+              margin-left: auto;
               margin-bottom: 5px;
               border: 0.5px solid #000;
             }
@@ -663,20 +664,11 @@ const AdminPage = () => {
               .map(
                 (order) => `
               <div class="address-box">
-                  ${order.shippingType ? `
-                  <div class="shipping-type ${order.shippingType}">
-                    📦 ${order.shippingType.toUpperCase()} 📦
-                  </div>
-                  ` : `
-                  <div class="shipping-type not-set">
-                    ⚠️ SHIPPING METHOD NOT SET ⚠️
-                  </div>
-                  `}
-                  
+              <div class="rectangle"></div>
+                
                   <div class="name-n-rectangle">
                   <div class="name">${order.customer?.fullName || "N/A"}</div>
                   </div>
-
                 <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
                 ${order.customer?.alternateMobile ? `<div class="address-line"><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
                 <div class="address-line"><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
