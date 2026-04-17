@@ -583,7 +583,7 @@ const AdminPage = () => {
             }
             .name-n-rectangle{
             border-bottom: 2px solid #000;
-                margin-top: 38px;
+                margin-top: 50px;
             margin-bottom: 10px;
               display: flex;
               align-items: end;
@@ -607,7 +607,7 @@ const AdminPage = () => {
               gap: 4px;
             }
             .business-logo {
-              height: 55px;
+              height: 35px;
               width: auto;
               max-width: 250px;
             }
