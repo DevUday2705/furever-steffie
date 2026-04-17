@@ -583,6 +583,7 @@ const AdminPage = () => {
             }
             .name-n-rectangle{
             border-bottom: 2px solid #000;
+                margin-top: 38px;
             margin-bottom: 10px;
               display: flex;
               align-items: end;
