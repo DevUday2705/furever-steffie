@@ -11,9 +11,9 @@ const MobileHeroCarousel = () => {
   const maleSlides = [
     {
       id: 1,
-      type: "video",
-      video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165575/V3_egjbpb.mp4",
+      type: "image",
+      image:
+        "https://instagram.fbom35-1.fna.fbcdn.net/v/t51.82787-15/670428249_17989983359973912_4476767728819433307_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ig_cache_key=Mzg4MDg1NTAyNTUwNjA3NDEyNw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjExMjB4MTQwMC5zZHIuQzMifQ%3D%3D&_nc_ohc=j7sVRwKE-GwQ7kNvwH-So6G&_nc_oc=Adpp8H8B82C0byqe4tmMWbh-F_ii5g-OuTSZm1RIitoNj3jr_MlhEPv4cbIY0qUPuW8&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.fbom35-1.fna&_nc_gid=gtPztcdXjJIIEOC0A9LIvQ&_nc_ss=7a22e&oh=00_Af0lnzQ8eGk_R1XAym_A8PrxSI7i92_eUJgB5AFNn_7udw&oe=69F3B7E7",
       title: "Timeless Attire",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
@@ -21,9 +21,9 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 2,
-      type: "video",
-      video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V2_c9vqud.mp4",
+      type: "image",
+      image:
+        "https://instagram.fbom35-1.fna.fbcdn.net/v/t51.82787-15/673089238_17989915484973912_146467703098228208_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ig_cache_key=Mzg4MDQyMTEzMDQyNzkwMTY0Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjEwNTR4MTMxOC5zZHIuQzMifQ%3D%3D&_nc_ohc=UyWEKOAHd6AQ7kNvwHEEjcG&_nc_oc=AdqS6W5GH7HoVos8h9jo6SVe4_JABn9Goi6swctXzQeKE_DksUuQvru9RAb3tdT7hes&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.fbom35-1.fna&_nc_gid=zSqPeit6RVDzYDTuXeuAoA&_nc_ss=7a22e&oh=00_Af0i0hjNV2rnCBO2eP1Oj2F_HWFCRuYWlgIQAmfokVc4CQ&oe=69F3A0C0ww",
       title: "Tradition Tailored",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
@@ -31,14 +31,34 @@ const MobileHeroCarousel = () => {
     },
     {
       id: 3,
-      type: "video",
-      video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
-      title: "Modern Heritage",
-      subtitle: "Explore our latest arrivals",
-      cta: "Shop Now",
+      type: "image",
+      image:
+        "https://instagram.fbom35-1.fna.fbcdn.net/v/t51.82787-15/639480411_17981733482973912_1471645646592745706_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ig_cache_key=MzgzODE4MjAwNzAyNTY0ODE0Ng%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjExMzd4MTM2OS5zZHIuQzMifQ%3D%3D&_nc_ohc=s62-mwVnf3UQ7kNvwEDRmQf&_nc_oc=AdqaEvA7YPoK2sFqdYvVA-9v_MyrQHl2JfeQgNFxucJ8TDF8icBrDoRyp3EbSSeeSmo&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.fbom35-1.fna&_nc_gid=QR2MT1YGaqqHQDbpxtrTJQ&_nc_ss=7a22e&oh=00_Af2oQH-2KZJ8n7ElDyH35AQx-7bkgEzvWOEYM4f2u-Q_Eg&oe=69F39748",
+      title: "Tradition Tailored",
+      subtitle: "Timeless wardrobe staples",
+      cta: "View Collection",
       link: "kurta?sort=popularity",
     },
+    {
+      id: 3,
+      type: "image",
+      image:
+        "https://instagram.fbom35-1.fna.fbcdn.net/v/t51.82787-15/641466517_17982184364973912_2812290557106329100_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ig_cache_key=Mzg0MDk5MTgxOTM5MjM1MDAyNg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjUxMng2MzYuc2RyLkMzIn0%3D&_nc_ohc=Tj317jB2SK0Q7kNvwGK8JHB&_nc_oc=AdopuNlKn7X3cNrZT-HMDC6BX12RochGD_z6krrep4ZVT_6QBM0yBx-4p6XAknusMn0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.fbom35-1.fna&_nc_gid=se9P2kN0iNnWLercVriI7w&_nc_ss=7a22e&oh=00_Af2zeIdAofSojumOPitMT9djDYn0qw5Au2GMlqYYHaTbNg&oe=69F393BD",
+      title: "Tradition Tailored",
+      subtitle: "Timeless wardrobe staples",
+      cta: "View Collection",
+      link: "kurta?sort=popularity",
+    },
+    // {
+    //   id: 4,
+    //   type: "video",
+    //   video:
+    //     "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
+    //   title: "Modern Heritage",
+    //   subtitle: "Explore our latest arrivals",
+    //   cta: "Shop Now",
+    //   link: "kurta?sort=popularity",
+    // },
   ];
 
   const femaleSlides = [
@@ -148,7 +168,7 @@ const MobileHeroCarousel = () => {
 
   return (
     <section className="w-full bg-transparent rounded-md">
-      <div className="relative w-full h-[65vh] overflow-hidden" ref={emblaRef}>
+      <div className="relative w-full h-[50vh] overflow-hidden" ref={emblaRef}>
         <div className="flex h-full touch-pan-y">
           {slides.map((slide, index) => (
             <div
@@ -183,7 +203,7 @@ const MobileHeroCarousel = () => {
                   <img
                     src={slide.image}
                     alt={slide.title}
-                    className="w-full h-full object-cover object-[25%_75%] rounded-md"
+                    className="w-full h-full object-cover object-[25%_15%] rounded-md"
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-md" />
