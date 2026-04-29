@@ -37,7 +37,7 @@ const Home = () => {
   console.log(products);
   return (
     <div>
-      <MobileHeroCarousel />
+      <MobileHeroCaorousel />
       <Categories />
       <PremiumSection products={products} loading={isLoading} />
 

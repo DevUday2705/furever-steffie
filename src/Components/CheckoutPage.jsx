@@ -62,6 +62,8 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState("");
+  const [customCouponData, setCustomCouponData] = useState(null);
+  const [customCouponId, setCustomCouponId] = useState(null);
 
   const availableCoupons = {
     FUREVER5: 5,
@@ -165,34 +167,14 @@ const CheckoutPage = () => {
     const code = couponCode.trim().toUpperCase();
 
     // Clear any existing custom coupon data
-    window.customCouponData = null;
-    window.customCouponId = null;
+    setCustomCouponData(null);
+    setCustomCouponId(null);
 
     if (code === SINGLE_USE_COUPON) {
-      // Check Firestore if this global single-use coupon is still available
-      try {
-        const couponRef = doc(db, "singleUseCoupons", code);
-        const couponSnap = await getDoc(couponRef);
-
-        if (couponSnap.exists() && couponSnap.data().used) {
-          setDiscount(0);
-          setCouponError(
-            "This coupon has already been used and is no longer available."
-          );
-          toast.error("❌ Coupon already used");
-          return;
-        }
-
-        // Coupon is available - apply flat ₹750 discount
-        setDiscount(0); // Set to 0 for percentage discount as we'll handle flat discount separately
-        setCouponError("");
-        toast.success("🎉 Coupon applied: ₹750 off");
-      } catch (error) {
-        console.error("Error checking coupon:", error);
-        setCouponError("Error validating coupon. Please try again.");
-        toast.error("❌ Error validating coupon");
-        return;
-      }
+      // Apply flat ₹750 discount without checking usage status
+      setDiscount(0); // Set to 0 for percentage discount as we'll handle flat discount separately
+      setCouponError("");
+      toast.success("🎉 Coupon applied: ₹750 off");
     } else if (CUSTOMER_VALIDATION_COUPONS[code]) {
       // Handle customer validation coupons (₹100 flat discount)
       const requiredCustomerType = CUSTOMER_VALIDATION_COUPONS[code];
@@ -311,13 +293,7 @@ const CheckoutPage = () => {
           const couponDoc = querySnapshot.docs[0];
           const couponData = couponDoc.data();
           
-          // Check if coupon is already used
-          if (couponData.isUsed) {
-            setDiscount(0);
-            setCouponError("This coupon has already been used.");
-            toast.error("❌ Coupon already used");
-            return;
-          }
+          // Removed check for coupon usage - allow reuse of coupons
           
           // Check if coupon is expired
           const expiryDate = new Date(couponData.expiryDate);
@@ -348,8 +324,8 @@ const CheckoutPage = () => {
           setCouponError("");
           
           // Store the custom coupon data for later use in calculateTotal
-          window.customCouponData = couponData;
-          window.customCouponId = couponDoc.id;
+          setCustomCouponData(couponData);
+          setCustomCouponId(couponDoc.id);
           
         } else {
           setDiscount(0);
@@ -421,9 +397,9 @@ const CheckoutPage = () => {
     } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
       // Customer validation coupons for flat ₹100 discount
       discountAmount = 100;
-    } else if (window.customCouponData) {
+    } else if (customCouponData) {
       // Custom coupon discount
-      discountAmount = window.customCouponData.discountAmount;
+      discountAmount = customCouponData.discountAmount;
     } else if (couponCode.trim().toUpperCase() === NAVRATRI_COUPON) {
       // GARBA5 - 5% discount only on Navratri items
       let navratriSubtotal = 0;
@@ -730,7 +706,7 @@ const CheckoutPage = () => {
             coupon: couponCode,
             dispatchDate: calculateDispatchDate(),
             isCollaboration: true, // Add collaboration flag
-            customCouponId: window.customCouponId || null, // Pass custom coupon ID
+            customCouponId: customCouponId || null, // Pass custom coupon ID
           }),
         });
 
@@ -865,7 +841,7 @@ const CheckoutPage = () => {
                   amount: data.amount / 100,
                   coupon: couponCode,
                   dispatchDate: calculateDispatchDate(), // Add dispatch date (3 days from today)
-                  customCouponId: window.customCouponId || null, // Pass custom coupon ID
+                  customCouponId: customCouponId || null, // Pass custom coupon ID
                 }),
               });
 
@@ -1611,7 +1587,7 @@ const CheckoutPage = () => {
                 {(discount > 0 ||
                   couponCode.trim().toUpperCase() === SINGLE_USE_COUPON ||
                   CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()] ||
-                  window.customCouponData) && (
+                  customCouponData) && (
                   <div className="flex justify-between text-green-600">
                     <span>Coupon Discount:</span>
                     <span>
@@ -1624,9 +1600,9 @@ const CheckoutPage = () => {
                         } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
                           // Customer validation coupons - ₹100 flat discount
                           return convertCurrency(100, currency);
-                        } else if (window.customCouponData) {
+                        } else if (customCouponData) {
                           // Custom coupon discount
-                          return convertCurrency(window.customCouponData.discountAmount, currency);
+                          return convertCurrency(customCouponData.discountAmount, currency);
                         } else {
                           // Percentage discount
                           let subtotal = isCartCheckout
