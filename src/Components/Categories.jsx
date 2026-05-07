@@ -74,7 +74,7 @@ const Categories = () => {
       link: "Frock",
       description: "Playful Frills",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773161790/Photoroom_20260308_014815_dqreww.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773775880/Photoroom_20260317_014033_yxvgv3.jpg",
     },
     {
       id: 8,
