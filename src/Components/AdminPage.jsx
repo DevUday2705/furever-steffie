@@ -676,6 +676,7 @@ const AdminPage = () => {
                 ${order.customer?.addressLine2 ? `<div class="address-line" style="margin-left: 60px;">${order.customer.addressLine2}</div>` : ""}
                 <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
+                <div class="address-line"><span class="label">Country:</span>${order.customer?.country || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
                 ${order.customer?.deliveryOption ? `
                 <div class="address-line" style="font-size: 10px; color: #666;"><span class="label">Customer requested:</span>${order.customer.deliveryOption} delivery</div>
