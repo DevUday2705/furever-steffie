@@ -30,7 +30,7 @@ const Categories = () => {
       link: "tuxedo",
       description: "Classic Fits",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1752523140/Luxury_black_Blazer_Sets_for_Pets_w0jku9.webp",
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1778151677/IMG_3843_dqyl4d.webp",
     },
     {
       id: 3,
