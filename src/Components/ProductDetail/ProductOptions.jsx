@@ -471,7 +471,7 @@ const ProductOptions = ({
 
                   {isRoyalSet
                     ? "Royal Set Selected ✓"
-                    : "Click here for  Royal Set"}
+                    : "Click here for  Full Set"}
                 </button>
 
                 {availableDhtois.length === 0 && (
