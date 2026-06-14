@@ -338,7 +338,7 @@ export default async function handler(req, res) {
                     })
                 };
 
-                await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
+                // await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
             } catch (whatsappError) {
                 console.error("❌ WhatsApp service error:", whatsappError);
                 // Don't fail the order if WhatsApp fails
