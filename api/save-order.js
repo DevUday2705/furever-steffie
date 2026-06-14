@@ -22,7 +22,7 @@ if (!getApps().length) {
 async function updateDhotiInventory(dhotiType, size, quantityToReduce, batch) {
     try {
         const inventoryRef = db.collection('dhotis').doc('inventory');
-        const inventorySnap = await inventoryRef.get();
+        const inventorySnap = await getDocWithTimeout(inventoryRef, 5000);
         
         if (!inventorySnap.exists) {
             throw new Error('Dhoti inventory not found');
@@ -50,6 +50,14 @@ async function updateDhotiInventory(dhotiType, size, quantityToReduce, batch) {
         console.error('Error updating dhoti inventory:', error);
         throw error;
     }
+}
+
+// Helper to fetch a document with a timeout to avoid long blocking calls
+function getDocWithTimeout(docRef, ms = 5000) {
+    return Promise.race([
+        docRef.get(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore read timeout')), ms))
+    ]);
 }
 
 export default async function handler(req, res) {
@@ -108,7 +116,7 @@ export default async function handler(req, res) {
                 console.log(`📁 Using collection: ${collectionName}, Product ID: ${item.productId}`);
 
                 const productRef = db.collection(collectionName).doc(item.productId);
-                const productDoc = await productRef.get();
+                const productDoc = await getDocWithTimeout(productRef, 5000);
 
                 if (!productDoc.exists) {
                     console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
@@ -120,7 +128,7 @@ export default async function handler(req, res) {
                     for (const altCollection of alternativeCollections) {
                         try {
                             const altRef = db.collection(altCollection).doc(item.productId);
-                            const altDoc = await altRef.get();
+                            const altDoc = await getDocWithTimeout(altRef, 5000);
 
                             if (altDoc.exists) {
                                 console.log(`✅ Found product in alternative collection: ${altCollection}`);
