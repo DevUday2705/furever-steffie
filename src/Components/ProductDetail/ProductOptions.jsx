@@ -207,20 +207,18 @@ const ProductOptions = ({
   const renderStyleOptions = () => {
     const availableOptions = [];
 
-    // Always available options
+    // Always available options (respect product-level disables)
     if ((product.type == "kurta" || product.type == "pathani") && !isRoyalSet) {
-      availableOptions.push(
-        { id: "simple", label: "Simple", description: "Classic look" },
-        {
-          id: "tassels",
-          label: "Tassels",
-          description: "With decorative tassels",
-        }
-      );
+      if (!product.disableSimpleOption) {
+        availableOptions.push({ id: "simple", label: "Simple", description: "Classic look" });
+      }
+      if (!product.disableTasselsOption) {
+        availableOptions.push({ id: "tassels", label: "Tassels", description: "With decorative tassels" });
+      }
     }
 
-    // Add beaded options only if beaded is available
-    if (product.isBeadedAvailable) {
+    // Add beaded options only if beaded is available and not disabled for this product
+    if (product.isBeadedAvailable && !product.disableBeadedOption) {
       availableOptions.push(
         {
           id: "beaded",
@@ -238,20 +236,35 @@ const ProductOptions = ({
     return (
       <div className="mt-1">
         <div className="grid grid-cols-2 gap-2">
-          {availableOptions.map((option) => (
-            <button
-              key={option.id}
-              onClick={() => setSelectedStyle(option.id)}
-              className={`py-2 px-3 rounded-md text-sm border transition-all ${
-                selectedStyle === option.id
-                  ? "border-gray-800 bg-gray-100 text-gray-800 shadow-sm"
-                  : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              <div className="font-medium">{option.label}</div>
-            
-            </button>
-          ))}
+                {availableOptions.map((option) => {
+                  const disableSimple = !!product.disableSimpleOption;
+                  const disableBeaded = !!product.disableBeadedOption;
+                  const disableTassels = !!product.disableTasselsOption;
+
+                  let isDisabled = false;
+                  if (option.id === "simple") isDisabled = disableSimple;
+                  else if (option.id === "tassels") isDisabled = disableTassels;
+                  else if (option.id.startsWith("beaded")) {
+                    // beaded options disabled if beaded disabled OR if they include tassels and tassels disabled
+                    isDisabled = disableBeaded || (option.id.includes("tassels") && disableTassels);
+                  }
+
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => !isDisabled && setSelectedStyle(option.id)}
+                      disabled={isDisabled}
+                      title={isDisabled ? "Option disabled for this product" : ""}
+                      className={`py-2 px-3 rounded-md text-sm border transition-all ${
+                        selectedStyle === option.id
+                          ? "border-gray-800 bg-gray-100 text-gray-800 shadow-sm"
+                          : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"
+                      } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <div className="font-medium">{option.label}</div>
+                    </button>
+                  );
+                })}
         </div>
       </div>
     );

@@ -39,6 +39,9 @@ const defaultSchema = {
   type: "kurta",
   isBeadedAvailable: false,
   isNonBeadedAvailable: true,
+  disableSimpleOption: false,
+  disableBeadedOption: false,
+  disableTasselsOption: false,
   isRoyal: false, // Add this line
   isTrending: false, // Add trending status
   tags: [], // Custom tags for filtering and organization
@@ -618,6 +621,43 @@ const ProductForm = () => {
             />
             <span>Non-Beaded Option Available</span>
           </label>
+          {/* Disable specific style options for this product */}
+          {category === "kurta" && (
+            <>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.disableSimpleOption}
+                  onChange={(e) =>
+                    handleChange("disableSimpleOption", e.target.checked)
+                  }
+                />
+                <span>Disable Simple Option</span>
+              </label>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.disableBeadedOption}
+                  onChange={(e) =>
+                    handleChange("disableBeadedOption", e.target.checked)
+                  }
+                />
+                <span>Disable Beaded Option</span>
+              </label>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.disableTasselsOption}
+                  onChange={(e) =>
+                    handleChange("disableTasselsOption", e.target.checked)
+                  }
+                />
+                <span>Disable Tassels Option</span>
+              </label>
+            </>
+          )}
         </div>
         {category === "kurta" && (
           <label className="flex items-center space-x-2">
