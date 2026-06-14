@@ -82,126 +82,103 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        // Check and update stock for XS, S, M sizes
+        // Check and update stock for XS, S, M sizes (parallelized reads)
         const batch = db.batch();
         const stockUpdates = [];
-
         console.log("📦 Processing items for stock check:", JSON.stringify(items, null, 2));
 
-        for (const item of items) {
-            console.log(`🔍 Checking item: ${item.name}, Size: ${item.selectedSize}, Category: ${item.category || item.subcategory || item.type}`);
+        const itemsToCheck = items.filter(i => ['XS', 'S', 'M'].includes(i.selectedSize));
+        const readTimeoutMs = 8000;
+        let readTimeoutOccurred = false;
 
-            if (['XS', 'S', 'M'].includes(item.selectedSize)) {
-                // Try different collection name patterns
-                let collectionName = item.category || item.subcategory || item.type;
+        // Fire all primary collection reads in parallel
+        const readPromises = itemsToCheck.map(item => {
+            let collectionName = item.category || item.subcategory || item.type;
+            const collectionMap = {
+                'kurta': 'kurtas',
+                'pathani': 'pathanis',
+                'lehenga': 'lehengas',
+                'frock': 'frocks',
+                'bandana': 'bandanas',
+                'bowtie': 'bowties',
+                'dhotis': 'dhotiss'
+            };
+            if (collectionMap[collectionName]) {
+                collectionName = collectionMap[collectionName];
+            } else if (collectionName && !collectionName.endsWith('s')) {
+                collectionName += 's';
+            }
 
-                // Handle known collection mappings
-                const collectionMap = {
-                    'kurta': 'kurtas',
-                    'pathani': 'pathanis',
-                    'lehenga': 'lehengas',
-                    'frock': 'frocks',
-                    'bandana': 'bandanas',
-                    'bowtie': 'bowties',
-                    'dhotis': 'dhotiss'
-                };
+            const productRef = db.collection(collectionName).doc(item.productId);
+            return getDocWithTimeout(productRef, readTimeoutMs)
+                .then(doc => ({ item, doc, productRef, collectionName }))
+                .catch(err => ({ item, error: err, productRef, collectionName }));
+        });
 
-                // Use mapped name or add 's' if needed
-                if (collectionMap[collectionName]) {
-                    collectionName = collectionMap[collectionName];
-                } else if (collectionName && !collectionName.endsWith('s')) {
-                    collectionName += 's';
+        const readResults = await Promise.all(readPromises);
+
+        for (const result of readResults) {
+            const item = result.item;
+            if (result.error) {
+                console.error(`❌ Read error for product ${item.productId}:`, result.error.message);
+                // If a read timed out, set flag and break to fallback save without stock updates
+                if (result.error.message && result.error.message.toLowerCase().includes('timeout')) {
+                    readTimeoutOccurred = true;
+                    break;
                 }
+                // For other errors, respond with 500
+                return res.status(500).json({ success: false, message: `Error reading product ${item.productId}`, error: result.error.message });
+            }
 
-                console.log(`📁 Using collection: ${collectionName}, Product ID: ${item.productId}`);
+            const productDoc = result.doc;
+            const productRef = result.productRef;
+            const collectionName = result.collectionName;
 
-                const productRef = db.collection(collectionName).doc(item.productId);
-                let productDoc;
-                try {
-                    productDoc = await getDocWithTimeout(productRef, 5000);
-                } catch (err) {
-                    console.error(`❌ Error reading product ${item.productId} from ${collectionName}:`, err.message);
-                    return res.status(500).json({ success: false, message: `Error reading product ${item.productId}`, error: err.message });
-                }
-
-                if (!productDoc || !productDoc.exists) {
-                    console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
-
-                    // Try alternative collection names
-                    const alternativeCollections = ['kurtas', 'pathanis', 'lehengas', 'frocks', 'bandanas', 'bowties', 'dhotiss'];
-                    let found = false;
-
-                    for (const altCollection of alternativeCollections) {
-                        try {
-                            const altRef = db.collection(altCollection).doc(item.productId);
-                            let altDoc;
-                            try {
-                                altDoc = await getDocWithTimeout(altRef, 5000);
-                            } catch (err) {
-                                console.log(`Failed to read product ${item.productId} from ${altCollection}:`, err.message);
-                                continue;
+            if (!productDoc || !productDoc.exists) {
+                console.error(`❌ Product not found in primary collection: ${item.productId} (${collectionName})`);
+                // Try alternative collections sequentially
+                const alternativeCollections = ['kurtas', 'pathanis', 'lehengas', 'frocks', 'bandanas', 'bowties', 'dhotiss'];
+                let found = false;
+                for (const altCollection of alternativeCollections) {
+                    try {
+                        const altRef = db.collection(altCollection).doc(item.productId);
+                        const altDoc = await getDocWithTimeout(altRef, readTimeoutMs);
+                        if (altDoc && altDoc.exists) {
+                            const product = altDoc.data();
+                            const currentStock = product.sizeStock?.[item.selectedSize] || 0;
+                            const requestedQty = item.quantity || 1;
+                            if (currentStock < requestedQty) {
+                                return res.status(400).json({ message: `Insufficient stock for size ${item.selectedSize}. Available: ${currentStock}, Requested: ${requestedQty}` });
                             }
-
-                            if (altDoc.exists) {
-                                console.log(`✅ Found product in alternative collection: ${altCollection}`);
-                                const product = altDoc.data();
-                                const currentStock = product.sizeStock?.[item.selectedSize] || 0;
-                                const requestedQty = item.quantity || 1;
-
-                                console.log(`📋 Stock check - Size: ${item.selectedSize}, Current: ${currentStock}, Requested: ${requestedQty}`);
-
-                                if (currentStock < requestedQty) {
-                                    return res.status(400).json({
-                                        message: `Insufficient stock for size ${item.selectedSize}. Available: ${currentStock}, Requested: ${requestedQty}`
-                                    });
-                                }
-
-                                stockUpdates.push({
-                                    ref: altRef,
-                                    size: item.selectedSize,
-                                    newStock: currentStock - requestedQty,
-                                    productId: item.productId,
-                                    collectionName: altCollection
-                                });
-
-                                found = true;
-                                break;
-                            }
-                        } catch (err) {
-                            console.log(`Failed to check collection ${altCollection}:`, err.message);
+                            stockUpdates.push({ ref: altRef, size: item.selectedSize, newStock: currentStock - requestedQty, productId: item.productId, collectionName: altCollection });
+                            found = true;
+                            break;
+                        }
+                    } catch (err) {
+                        console.log(`Failed to read ${item.productId} from ${altCollection}:`, err.message);
+                        if (err.message && err.message.toLowerCase().includes('timeout')) {
+                            readTimeoutOccurred = true;
+                            break;
                         }
                     }
-
-                    if (!found) {
-                        return res.status(400).json({
-                            message: `Product ${item.productId} not found in any collection`
-                        });
-                    }
-                } else {
-                    const product = productDoc.data();
-                    console.log(`📊 Product data:`, JSON.stringify(product.sizeStock, null, 2));
-
-                    const currentStock = product.sizeStock?.[item.selectedSize] || 0;
-                    const requestedQty = item.quantity || 1;
-
-                    console.log(`📋 Stock check - Size: ${item.selectedSize}, Current: ${currentStock}, Requested: ${requestedQty}`);
-
-                    if (currentStock < requestedQty) {
-                        return res.status(400).json({
-                            message: `Insufficient stock for size ${item.selectedSize}. Available: ${currentStock}, Requested: ${requestedQty}`
-                        });
-                    }
-
-                    // Prepare stock update
-                    stockUpdates.push({
-                        ref: productRef,
-                        size: item.selectedSize,
-                        newStock: currentStock - requestedQty,
-                        productId: item.productId,
-                        collectionName: collectionName
-                    });
                 }
+                if (readTimeoutOccurred) break;
+                if (!found) {
+                    return res.status(400).json({ message: `Product ${item.productId} not found in any collection` });
+                }
+            } else {
+                const product = productDoc.data();
+                const currentStock = product.sizeStock?.[item.selectedSize] || 0;
+                const requestedQty = item.quantity || 1;
+                if (currentStock < requestedQty) {
+                    return res.status(400).json({ message: `Insufficient stock for size ${item.selectedSize}. Available: ${currentStock}, Requested: ${requestedQty}` });
+                }
+                stockUpdates.push({ ref: productRef, size: item.selectedSize, newStock: currentStock - requestedQty, productId: item.productId, collectionName });
             }
+        }
+
+        if (readTimeoutOccurred) {
+            console.warn('⚠️ One or more Firestore reads timed out; will save order without stock updates after creating order');
         }
 
         // Process dhoti inventory for items with dhoti selections
@@ -260,6 +237,26 @@ export default async function handler(req, res) {
         }
 
         console.log(`🚀 Committing batch with ${stockUpdates.length} stock updates...`);
+
+        if (readTimeoutOccurred) {
+            console.warn('⚠️ Read timeout detected earlier — saving order without stock updates');
+            try {
+                const fallbackOrderRef = await db.collection('orders').add(orderData);
+                try {
+                    const { default: sendOrderConfirmation } = await import('./send-order-confirmation.js');
+                    const mockReq = { method: 'POST', body: { orderId: fallbackOrderRef.id, orderNumber, razorpay_order_id, razorpay_payment_id, customer, items, amount } };
+                    const mockRes = { status: (code) => ({ json: (data) => data }) };
+                    await sendOrderConfirmation(mockReq, mockRes);
+                } catch (emailError) {
+                    console.error('❌ Email service error on fallback order:', emailError);
+                }
+
+                return res.status(200).json({ success: true, orderId: fallbackOrderRef.id, orderNumber, warning: 'Order saved but stock may not be updated due to Firestore read timeout', stockUpdated: [] });
+            } catch (fallbackSaveError) {
+                console.error('❌ Failed to save fallback order after read timeout:', fallbackSaveError);
+                return res.status(500).json({ success: false, message: 'Failed to save order after Firestore read timeout', error: fallbackSaveError.message });
+            }
+        }
 
         try {
             // Commit all changes atomically
