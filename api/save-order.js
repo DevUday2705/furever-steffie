@@ -116,9 +116,15 @@ export default async function handler(req, res) {
                 console.log(`📁 Using collection: ${collectionName}, Product ID: ${item.productId}`);
 
                 const productRef = db.collection(collectionName).doc(item.productId);
-                const productDoc = await getDocWithTimeout(productRef, 5000);
+                let productDoc;
+                try {
+                    productDoc = await getDocWithTimeout(productRef, 5000);
+                } catch (err) {
+                    console.error(`❌ Error reading product ${item.productId} from ${collectionName}:`, err.message);
+                    return res.status(500).json({ success: false, message: `Error reading product ${item.productId}`, error: err.message });
+                }
 
-                if (!productDoc.exists) {
+                if (!productDoc || !productDoc.exists) {
                     console.error(`❌ Product not found: ${item.productId} in collection ${collectionName}`);
 
                     // Try alternative collection names
@@ -128,7 +134,13 @@ export default async function handler(req, res) {
                     for (const altCollection of alternativeCollections) {
                         try {
                             const altRef = db.collection(altCollection).doc(item.productId);
-                            const altDoc = await getDocWithTimeout(altRef, 5000);
+                            let altDoc;
+                            try {
+                                altDoc = await getDocWithTimeout(altRef, 5000);
+                            } catch (err) {
+                                console.log(`Failed to read product ${item.productId} from ${altCollection}:`, err.message);
+                                continue;
+                            }
 
                             if (altDoc.exists) {
                                 console.log(`✅ Found product in alternative collection: ${altCollection}`);
@@ -470,6 +482,7 @@ export default async function handler(req, res) {
         return res.status(500).json({
             success: false,
             message: "Server error while saving order",
+            error: error.message
         });
     }
 }
