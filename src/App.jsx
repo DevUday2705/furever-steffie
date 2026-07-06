@@ -206,6 +206,7 @@ const App = () => {
               <Route path="/test-whatsapp" element={<WhatsAppTest />} />
               <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="/anniversary" element={<AnniversaryApp />} />
+              <Route path="/fabric-management" element={<FabricManagementSystem />} />
 
               <Route
                 path="/admin/edit/:category/:id"
