@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
@@ -26,13 +26,7 @@ export default async function handler(req, res) {
         }
 
         // Create transporter
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'fureversteffie@gmail.com',
-                pass: 'htyq oijh ugoi echv' // App password
-            }
-        });
+        const transporter = createEmailTransport();
 
         // Generate items list HTML (if any)
         const itemsListHtml = items.map(item => `
@@ -105,7 +99,7 @@ export default async function handler(req, res) {
         const mailOptions = {
             from: {
                 name: 'Furever Steffie',
-                address: process.env.EMAIL_USER
+                address: getEmailFromAddress()
             },
             to: customerEmail,
             subject: `🚚 Your Order #${orderId} has been dispatched | Tracking: ${trackingId}`,

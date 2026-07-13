@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
@@ -23,13 +23,7 @@ export default async function handler(req, res) {
         }
 
         // Create transporter
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'fureversteffie@gmail.com',
-                pass: 'htyq oijh ugoi echv' // App password
-            }
-        });
+        const transporter = createEmailTransport();
 
         const emailHtml = `
         <!DOCTYPE html>
@@ -174,7 +168,7 @@ export default async function handler(req, res) {
         const mailOptions = {
             from: {
                 name: 'Furever Steffie',
-                address: process.env.EMAIL_USER
+                address: getEmailFromAddress()
             },
             to: email,
             subject: `🎉 Great News! ${product.name} (Size ${size}) is Back in Stock!`,

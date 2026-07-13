@@ -1,15 +1,7 @@
-import nodemailer from 'nodemailer';
+import { createEmailTransport, getEmailFromAddress } from '../api/utils/emailTransport.js';
 
 // Create transporter using Gmail SMTP (same as existing email infrastructure)
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'fureversteffie@gmail.com',
-      pass: 'htyq oijh ugoi echv', // App password
-    },
-  });
-};
+const createTransporter = () => createEmailTransport();
 
 const SUBJECTS = {
   1: "You left something behind 🐾",
@@ -27,7 +19,7 @@ export const sendAbandonedEmail = async (customer, stage) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: '"Furever Steffie" <fureversteffie@gmail.com>',
+      from: `"Furever Steffie" <${getEmailFromAddress()}>`,
       to: customer.email,
       subject: SUBJECTS[stage],
       html

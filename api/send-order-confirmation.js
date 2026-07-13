@@ -1,15 +1,7 @@
-import nodemailer from 'nodemailer';
+import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
 // Create transporter using Gmail SMTP
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'fureversteffie@gmail.com',
-      pass: 'htyq oijh ugoi echv', // App password
-    },
-  });
-};
+const createTransporter = () => createEmailTransport();
 
 // Generate order details HTML
 const generateOrderDetailsHTML = (orderData) => {
@@ -193,7 +185,7 @@ export default async function handler(req, res) {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: '"Furever Steffie" <fureversteffie@gmail.com>',
+      from: `"Furever Steffie" <${getEmailFromAddress()}>`,
       to: customer.email, // Use the email from the form
       subject: `🎉 Order Confirmed - ${orderId} | Furever Steffie`,
       html: generateOrderDetailsHTML(orderData),

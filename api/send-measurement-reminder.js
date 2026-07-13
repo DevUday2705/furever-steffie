@@ -1,15 +1,7 @@
-import nodemailer from 'nodemailer';
+import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
 // Create transporter using Gmail SMTP
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'fureversteffie@gmail.com',
-            pass: 'htyq oijh ugoi echv', // App password
-        },
-    });
-};
+const createTransporter = () => createEmailTransport();
 
 // Generate measurement reminder email HTML
 const generateMeasurementReminderHTML = (orderData) => {
@@ -162,7 +154,7 @@ export default async function handler(req, res) {
         const mailOptions = {
             from: {
                 name: 'Furever Steffie',
-                address: 'fureversteffie@gmail.com'
+                address: getEmailFromAddress()
             },
             to: customer.email,
             subject: `📏 Measurement Reminder - Order #${orderNumber} | Furever Steffie`,
