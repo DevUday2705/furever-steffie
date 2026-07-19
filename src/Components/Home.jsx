@@ -1,4 +1,4 @@
-import MobileHeroCarousel from "./MobileHeroCarousel";
+
 import Categories from "./Categories";
 import WatchAndBuy from "./WatchAndBuy";
 import PremiumSection from "./PremiumSection";
@@ -10,9 +10,7 @@ import { db } from "../firebase";
 import TrendingProducts from "./TrendingProducts";
 import { useAppContext } from "../context/AppContext";
 import { getTopProductsByGender } from "../constants/constant";
-import ModernReviewsSection from "./ModernReviewsSection";
-import ComingSoonSection from "./ComingSoonSection";
-
+import MobileHeroCaorousel from "./MobileHeroCarousel";
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const phoneNumber = "917042212942"; // change to your WhatsApp business number (with country code)
@@ -37,7 +35,7 @@ const Home = () => {
   console.log(products);
   return (
     <div>
-      <MobileHeroCarousel />
+      <MobileHeroCaorousel />
       <Categories />
       <PremiumSection products={products} loading={isLoading} />
 
