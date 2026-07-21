@@ -659,8 +659,7 @@ const AdminPage = () => {
         </head>
         <body>
           <div class="grid-container">
-            <div class="cutting-guide-horizontal"></div>
-            <div class="cutting-guide-vertical"></div>
+ 
             ${selectedOrdersData
               .map(
                 (order) => `
