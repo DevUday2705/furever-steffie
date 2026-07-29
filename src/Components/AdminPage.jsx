@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
+import * as XLSX from "xlsx";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
@@ -938,6 +939,79 @@ const AdminPage = () => {
     ),
   };
 
+  const exportOrdersToExcel = () => {
+    if (!filteredAndSortedOrders.length) {
+      toast.error("No orders to export");
+      return;
+    }
+
+    const rows = filteredAndSortedOrders.map((order) => {
+      const itemSummary = (order.items || [])
+        .map((item, index) => {
+          const dhotiDetail = getDhotiDetails(item);
+          const measurements = item.measurements || {};
+          const measurementText = [
+            measurements.neck ? `Neck: ${measurements.neck}` : null,
+            measurements.chest ? `Chest: ${measurements.chest}` : null,
+            measurements.back ? `Back: ${measurements.back}` : null,
+          ]
+            .filter(Boolean)
+            .join(" | ");
+
+          return [
+            `${index + 1}. ${item.name || item.productName || "Unnamed item"}`,
+            `Category: ${item.category || ""}`,
+            `Subcategory: ${item.subcategory || ""}`,
+            `Qty: ${item.quantity || item.qty || 1}`,
+            `Price: ${item.price || item.amount || ""}`,
+            `Dhoti: ${dhotiDetail?.name || item.selectedDhoti || ""}`,
+            `Style: ${item.selectedStyle || ""}`,
+            `Royal Set: ${item.isRoyalSet ? "Yes" : "No"}`,
+            `Measurements: ${measurementText || "Not provided"}`,
+          ].join(" | ");
+        })
+        .join(" || ");
+
+      return {
+        "Order ID": order.id || "",
+        "Customer Name": order.customer?.fullName || "",
+        "Email": order.customer?.email || "",
+        "Phone": order.customer?.mobileNumber || "",
+        "WhatsApp": order.customer?.alternateMobile || "",
+        "Address Line 1": order.customer?.addressLine1 || "",
+        "Address Line 2": order.customer?.addressLine2 || "",
+        "City": order.customer?.city || "",
+        "State": order.customer?.state || "",
+        "Country": order.customer?.country || "",
+        "Pincode": order.customer?.pincode || "",
+        "Delivery Option": order.customer?.deliveryOption || "",
+        "Special Instructions": order.customer?.specialInstructions || "",
+        "Payment Status": order.paymentStatus || "",
+        "Order Status": order.orderStatus || "",
+        "Shipping Type": order.shippingType || "",
+        "Collaboration": order.isCollaboration ? "Yes" : "No",
+        "Pinned": order.pinned ? "Yes" : "No",
+        "Created At": order.createdAt || "",
+        "Dispatch Date": order.dispatchDate || "",
+        "Tracking ID": order.tracking_id || "",
+        "Total Bill": order.amount || 0,
+        "Items Selected": itemSummary,
+        "Reminder Count": order.reminderCount || 0,
+        "Last Reminder Sent": order.lastReminderSent || "",
+        "Razorpay Order ID": order.razorpay_order_id || "",
+        "Razorpay Payment ID": order.razorpay_payment_id || "",
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    const fileName = `furever-steffie-orders-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    toast.success("Excel export downloaded");
+  };
+
   if (!isAuthorized) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
@@ -1139,29 +1213,45 @@ const AdminPage = () => {
           />
 
           {/* Print Selection Controls */}
-          {selectedOrders.size > 0 && (
-            <div className="mb-4 p-2 bg-blue-50 border border-blue-300 rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <div className="mb-4 p-2 bg-blue-50 border border-blue-300 rounded-lg flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              {selectedOrders.size > 0 ? (
+                <>
+                  <span className="text-blue-800 text-sm font-medium">
+                    {selectedOrders.size} selected
+                  </span>
+                  <button
+                    onClick={handleClearSelection}
+                    className="p-1.5 text-lg rounded transition-colors"
+                    title="Clear Selection"
+                  >
+                    ✕
+                  </button>
+                </>
+              ) : (
                 <span className="text-blue-800 text-sm font-medium">
-                  {selectedOrders.size} selected
+                  Export the current filtered orders for analysis
                 </span>
-                <button
-                  onClick={handleClearSelection}
-                  className="p-1.5 text-lg rounded  transition-colors"
-                  title="Clear Selection"
-                >
-                  ✕
-                </button>
-              </div>
-              <button
-                onClick={handlePrintAddresses}
-                className="p-1.5 text-lg bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                title="Print Addresses"
-              >
-                🖨️
-              </button>
+              )}
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportOrdersToExcel}
+                className="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              >
+                ⬇️ Download Excel
+              </button>
+              {selectedOrders.size > 0 && (
+                <button
+                  onClick={handlePrintAddresses}
+                  className="p-1.5 text-lg bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  title="Print Addresses"
+                >
+                  🖨️
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* Revenue Summary */}
           {filteredAndSortedOrders.length > 0 && (
