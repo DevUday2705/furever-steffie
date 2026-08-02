@@ -2,8 +2,17 @@ import { useEffect, useState, useMemo } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { Gift, X, Clock, AlertCircle } from "lucide-react";
+import {
+  Gift,
+  X,
+  Clock,
+  AlertCircle,
+  Shirt,
+  Sparkles,
+  Gem,
+} from "lucide-react";
 import Lottie from "react-lottie";
+import { Badge, Button } from "../ui";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
 import { getAvailableDhtoisForSize, getGlobalSettings } from "../../utils/dhotiInventoryUtils";
@@ -221,20 +230,6 @@ const ProductOptions = ({
     }
   };
 
-  const getStylePreviewImage = (styleId) => {
-    const fallbackImages = [product?.mainImage, product?.image, product?.images?.[0]];
-
-    if (styleId === "simple") {
-      return product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
-    }
-
-    if (styleId.startsWith("beaded")) {
-      return product?.options?.beaded?.images?.[0] || product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
-    }
-
-    return product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
-  };
-
   const getStylePriceDelta = (styleId) => {
     switch (styleId) {
       case "simple":
@@ -298,10 +293,20 @@ const ProductOptions = ({
     // Always available options (respect product-level disables)
     if ((product.type == "kurta" || product.type == "pathani") && !isRoyalSet) {
       if (!product.disableSimpleOption) {
-        availableOptions.push({ id: "simple", label: "Simple", description: "Classic look" });
+        availableOptions.push({
+          id: "simple",
+          label: "Simple Kurta",
+          description: "Classic look",
+          icon: Shirt,
+        });
       }
       if (!product.disableTasselsOption) {
-        availableOptions.push({ id: "tassels", label: "Tassels", description: "With decorative tassels" });
+        availableOptions.push({
+          id: "tassels",
+          label: "With Tassels",
+          description: "Decorative finish",
+          icon: Sparkles,
+        });
       }
     }
 
@@ -310,20 +315,22 @@ const ProductOptions = ({
       availableOptions.push(
         {
           id: "beaded",
-          label: "Beaded Luxe",
+          label: "With Beads",
           description: "Premium beaded design",
+          icon: Gem,
         },
         {
           id: "beaded-tassels",
-          label: "Beaded + Tassels",
+          label: "Beads + Tassels",
           description: "Ultimate luxury combo",
+          icon: "beaded-tassels",
         }
       );
     }
 
     return (
       <div className="mt-2">
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="grid grid-cols-2 gap-3">
           {availableOptions.map((option) => {
             const disableSimple = !!product.disableSimpleOption;
             const disableBeaded = !!product.disableBeadedOption;
@@ -337,7 +344,7 @@ const ProductOptions = ({
             }
 
             const isSelected = selectedStyle === option.id;
-            const previewImage = getStylePreviewImage(option.id);
+            const Icon = option.icon;
 
             return (
               <button
@@ -345,23 +352,33 @@ const ProductOptions = ({
                 onClick={() => !isDisabled && handleStyleOptionClick(option.id)}
                 disabled={isDisabled}
                 title={isDisabled ? "Option disabled for this product" : ""}
-                className={`min-w-[108px] flex-1 rounded-xl border p-2 text-left transition-all ${
+                className={`rounded-xl border p-3 text-left transition-all ${
                   isSelected
                     ? "border-[#1D9E75] bg-emerald-50 shadow-sm"
                     : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                 } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <div className="mb-2 h-16 overflow-hidden rounded-lg bg-gray-50">
-                  {previewImage ? (
-                    <img src={previewImage} alt={option.label} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[10px] text-gray-400">
-                      Preview
-                    </div>
-                  )}
+                <div className="mb-3 flex items-center justify-between">
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                      isSelected ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {option.id === "beaded-tassels" ? (
+                      <div className="relative flex h-5 w-5 items-center justify-center">
+                        <Gem className="h-4 w-4" />
+                        <Sparkles className="absolute -right-1 -top-1 h-3 w-3" />
+                      </div>
+                    ) : (
+                      <Icon className="h-5 w-5" />
+                    )}
+                  </div>
+                  <span className="text-[11px] font-medium text-gray-500">
+                    {getStylePriceDelta(option.id)}
+                  </span>
                 </div>
-                <div className="text-[11px] font-semibold text-gray-800">{option.label}</div>
-                <div className="text-[11px] text-gray-500">{getStylePriceDelta(option.id)}</div>
+                <div className="text-sm font-semibold text-gray-800">{option.label}</div>
+                <div className="mt-1 text-[11px] text-gray-500">{option.description}</div>
               </button>
             );
           })}
@@ -479,7 +496,37 @@ const ProductOptions = ({
 
   return (
     <div className="px-4 pb-4 space-y-4">
-      
+      {/* Size availability banner — shown before options so users know upfront */}
+      {sizeAvailability.hasManagedInventory && sizeAvailability.inStockSizes.length > 0 && (
+        <div className="rounded-xl border border-brand-200 bg-brand-50 p-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-1.5 items-center">
+              <span className="text-xs font-medium text-brand-700">Available sizes:</span>
+              {sizeAvailability.inStockSizes.map((size) => (
+                <Badge
+                  key={size}
+                  variant={sizeAvailability.lowStockSizes.includes(size) ? "warning" : "brand"}
+                  size="sm"
+                >
+                  {size}{sizeAvailability.lowStockSizes.includes(size) ? " ⚡" : ""}
+                </Badge>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleJumpToSizeSelection}
+              className="text-[11px] font-medium text-brand-600 underline underline-offset-2 whitespace-nowrap"
+            >
+              Size chart ↓
+            </button>
+          </div>
+          {sizeAvailability.lowStockSizes.length > 0 && (
+            <p className="mt-1.5 text-[11px] text-warning-600">
+              ⚡ Low stock on {sizeAvailability.lowStockSizes.join(", ")} — order soon
+            </p>
+          )}
+        </div>
+      )}
 
       <ColorSelector
         colors={product.colors}
@@ -561,9 +608,9 @@ const ProductOptions = ({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       {option.showBadge && (
-                        <div className="mb-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                        <Badge variant="brand" size="sm" className="mb-2">
                           Most popular
-                        </div>
+                        </Badge>
                       )}
                       <div className="text-sm font-semibold text-gray-900">{option.title}</div>
                       <div className="mt-1 text-xs text-gray-500">{option.description}</div>
@@ -678,12 +725,14 @@ const ProductOptions = ({
                   </div>
                 </div>
 
-                <button
+                <Button
                   onClick={() => setShowDhotiUnavailableModal(false)}
-                  className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors font-medium"
+                  fullWidth
+                  size="lg"
+                  variant="secondary"
                 >
                   Got it, Thanks!
-                </button>
+                </Button>
               </div>
             </motion.div>
           </motion.div>

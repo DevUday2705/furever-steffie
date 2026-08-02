@@ -10,6 +10,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { ChevronLeft, AlertTriangle } from "lucide-react";
+import { Button, Input } from "./ui";
 import { db } from "../firebase";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
@@ -627,12 +628,7 @@ const CheckoutPage = () => {
           <p className="text-gray-600 mb-4">
             Please add items to cart or buy a product first.
           </p>
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 bg-gray-800 text-white rounded-md"
-          >
-            Return to Home
-          </button>
+          <Button onClick={() => navigate("/")}>Return to Home</Button>
         </div>
       </div>
     );
@@ -1126,102 +1122,59 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="p-4 space-y-4">
-                  <div>
-                    <label
-                      htmlFor="fullName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Full Name*
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className={`w-full p-2 border ${
-                        errors.fullName ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      placeholder="Enter your full name"
-                      autoComplete="name"
-                    />
-                    {errors.fullName && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.fullName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Email Address*
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={`w-full p-2 border ${
-                        errors.email ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      placeholder="Enter your email address"
-                      autoComplete="email"
-                    />
-                    {errors.email && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                    )}
-                    <p className="mt-1 text-xs text-gray-500">
-                      We&apos;ll send order updates and follow-up information here.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="mobileNumber"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Mobile Number*
-                    </label>
-                    <input
-                      type="tel"
-                      id="mobileNumber"
-                      name="mobileNumber"
-                      value={formData.mobileNumber}
-                      onChange={handleChange}
-                      maxLength={formData.country === "india" ? 10 : 20}
-                      className={`w-full p-2 border ${
-                        errors.mobileNumber ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      placeholder={
-                        formData.country === "india"
-                          ? "10-digit mobile number"
-                          : "Mobile number with country code"
-                      }
-                      autoComplete="tel"
-                    />
-                    {errors.mobileNumber && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.mobileNumber}
-                      </p>
-                    )}
-                    <p className="mt-1 text-xs text-gray-500">
-                      Required for delivery coordination and urgent updates.
-                    </p>
-                  </div>
+                  <Input
+                    label="Full Name"
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    autoComplete="name"
+                    required
+                    error={formSubmitted ? errors.fullName : undefined}
+                  />
+                  <Input
+                    label="Email Address"
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    autoComplete="email"
+                    required
+                    error={formSubmitted ? errors.email : undefined}
+                    hint="We'll send order updates and follow-up information here."
+                  />
+                  <Input
+                    label="Mobile Number"
+                    id="mobileNumber"
+                    name="mobileNumber"
+                    type="tel"
+                    value={formData.mobileNumber}
+                    onChange={handleChange}
+                    maxLength={formData.country === "india" ? 10 : 20}
+                    placeholder={
+                      formData.country === "india"
+                        ? "10-digit mobile number"
+                        : "Mobile number with country code"
+                    }
+                    autoComplete="tel"
+                    required
+                    error={formSubmitted ? errors.mobileNumber : undefined}
+                    hint="Required for delivery coordination and urgent updates."
+                  />
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
+                fullWidth
+                size="lg"
                 onClick={handleNextCheckoutStep}
-                className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
               >
                 Continue to shipping
-              </button>
+              </Button>
             </>
           )}
 
@@ -1235,164 +1188,104 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="p-4 space-y-4">
-                  <div>
-                    <label
-                      htmlFor="addressLine1"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Address Line 1*
-                    </label>
-                    <input
-                      type="text"
-                      id="addressLine1"
-                      name="addressLine1"
-                      value={formData.addressLine1}
-                      onChange={handleChange}
-                      className={`w-full p-2 border ${
-                        errors.addressLine1 ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      placeholder="House/Flat number, Building name"
-                      autoComplete="address-line1"
-                    />
-                    {errors.addressLine1 && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.addressLine1}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="addressLine2"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Address Line 2
-                    </label>
-                    <input
-                      type="text"
-                      id="addressLine2"
-                      name="addressLine2"
-                      value={formData.addressLine2}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                      placeholder="Street name, Area (Optional)"
-                      autoComplete="address-line2"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="country"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Country*
-                    </label>
-                    <select
-                      id="country"
-                      name="country"
-                      value={formData.country}
-                      onChange={handleChange}
-                      className={`w-full p-2 border ${
-                        errors.country ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      autoComplete="country-name"
-                    >
-                      <option value="india">🇮🇳 India</option>
-                      <option value="singapore">🇸🇬 Singapore</option>
-                      <option value="malaysia">🇲🇾 Malaysia</option>
-                      <option value="usa">🇺🇸 United States</option>
-                      <option value="uk">🇬🇧 United Kingdom</option>
-                      <option value="canada">🇨🇦 Canada</option>
-                      <option value="australia">🇦🇺 Australia</option>
-                      <option value="newzealand">🇳🇿 New Zealand</option>
-                      <option value="dubai">🇦🇪 UAE (Dubai)</option>
-                      <option value="germany">🇩🇪 Germany</option>
-                      <option value="france">🇫🇷 France</option>
-                      <option value="netherlands">🇳🇱 Netherlands</option>
-                      <option value="japan">🇯🇵 Japan</option>
-                      <option value="southkorea">🇰🇷 South Korea</option>
-                      <option value="hongkong">🇭🇰 Hong Kong</option>
-                      <option value="thailand">🇹🇭 Thailand</option>
-                    </select>
-                    {errors.country && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.country}
-                      </p>
-                    )}
-                  </div>
+                  <Input
+                    label="Address Line 1"
+                    id="addressLine1"
+                    name="addressLine1"
+                    value={formData.addressLine1}
+                    onChange={handleChange}
+                    placeholder="House/Flat number, Building name"
+                    autoComplete="address-line1"
+                    required
+                    error={formSubmitted ? errors.addressLine1 : undefined}
+                  />
+                  <Input
+                    label="Address Line 2"
+                    id="addressLine2"
+                    name="addressLine2"
+                    value={formData.addressLine2}
+                    onChange={handleChange}
+                    placeholder="Street name, Area (Optional)"
+                    autoComplete="address-line2"
+                  />
+                  <Input
+                    as="select"
+                    label="Country"
+                    id="country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    autoComplete="country-name"
+                    required
+                    error={formSubmitted ? errors.country : undefined}
+                  >
+                    <option value="india">🇮🇳 India</option>
+                    <option value="singapore">🇸🇬 Singapore</option>
+                    <option value="malaysia">🇲🇾 Malaysia</option>
+                    <option value="usa">🇺🇸 United States</option>
+                    <option value="uk">🇬🇧 United Kingdom</option>
+                    <option value="canada">🇨🇦 Canada</option>
+                    <option value="australia">🇦🇺 Australia</option>
+                    <option value="newzealand">🇳🇿 New Zealand</option>
+                    <option value="dubai">🇦🇪 UAE (Dubai)</option>
+                    <option value="germany">🇩🇪 Germany</option>
+                    <option value="france">🇫🇷 France</option>
+                    <option value="netherlands">🇳🇱 Netherlands</option>
+                    <option value="japan">🇯🇵 Japan</option>
+                    <option value="southkorea">🇰🇷 South Korea</option>
+                    <option value="hongkong">🇭🇰 Hong Kong</option>
+                    <option value="thailand">🇹🇭 Thailand</option>
+                  </Input>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        htmlFor="city"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        City*
-                      </label>
-                      <input
-                        type="text"
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className={`w-full p-2 border ${
-                          errors.city ? "border-red-500" : "border-gray-300"
-                        } rounded-md text-sm`}
-                        placeholder="City"
-                        autoComplete="address-level2"
-                      />
-                      {errors.city && formSubmitted && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors.city}
-                        </p>
-                      )}
-                    </div>
-
+                    <Input
+                      label="City"
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      placeholder="City"
+                      autoComplete="address-level2"
+                      required
+                      error={formSubmitted ? errors.city : undefined}
+                    />
                     <div>
                       <label
                         htmlFor="state"
-                        className="block text-sm font-medium text-gray-700 mb-1"
+                        className="mb-1.5 block text-sm font-medium text-gray-700"
                       >
                         {formData.country === "india"
-                          ? "State*"
+                          ? "State"
                           : "State/Province"}
+                        {formData.country === "india" && (
+                          <span className="ml-0.5 text-danger-500">*</span>
+                        )}
                       </label>
                       {formData.country === "india" ? (
-                        <select
+                        <Input
+                          as="select"
                           id="state"
                           name="state"
                           value={formData.state}
                           onChange={handleChange}
-                          className={`w-full p-2 border ${
-                            errors.state ? "border-red-500" : "border-gray-300"
-                          } rounded-md text-sm`}
                           autoComplete="address-level1"
+                          error={formSubmitted ? errors.state : undefined}
                         >
                           <option value="">Select State</option>
-                          <option value="Andaman and Nicobar Islands">
-                            Andaman and Nicobar Islands
-                          </option>
+                          <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
                           <option value="Andhra Pradesh">Andhra Pradesh</option>
-                          <option value="Arunachal Pradesh">
-                            Arunachal Pradesh
-                          </option>
+                          <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                           <option value="Assam">Assam</option>
                           <option value="Bihar">Bihar</option>
                           <option value="Chandigarh">Chandigarh</option>
                           <option value="Chhattisgarh">Chhattisgarh</option>
-                          <option value="Dadra and Nagar Haveli and Daman and Diu">
-                            Dadra and Nagar Haveli and Daman and Diu
-                          </option>
+                          <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
                           <option value="Delhi">Delhi</option>
                           <option value="Goa">Goa</option>
                           <option value="Gujarat">Gujarat</option>
                           <option value="Haryana">Haryana</option>
-                          <option value="Himachal Pradesh">
-                            Himachal Pradesh
-                          </option>
-                          <option value="Jammu and Kashmir">
-                            Jammu and Kashmir
-                          </option>
+                          <option value="Himachal Pradesh">Himachal Pradesh</option>
+                          <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                           <option value="Jharkhand">Jharkhand</option>
                           <option value="Karnataka">Karnataka</option>
                           <option value="Kerala">Kerala</option>
@@ -1415,61 +1308,36 @@ const CheckoutPage = () => {
                           <option value="Uttar Pradesh">Uttar Pradesh</option>
                           <option value="Uttarakhand">Uttarakhand</option>
                           <option value="West Bengal">West Bengal</option>
-                        </select>
+                        </Input>
                       ) : (
-                        <input
-                          type="text"
+                        <Input
                           id="state"
                           name="state"
                           value={formData.state}
                           onChange={handleChange}
-                          className={`w-full p-2 border ${
-                            errors.state ? "border-red-500" : "border-gray-300"
-                          } rounded-md text-sm`}
                           placeholder="Enter state/province"
                           autoComplete="address-level1"
                         />
                       )}
-                      {formData.country === "india" &&
-                        errors.state &&
-                        formSubmitted && (
-                          <p className="mt-1 text-xs text-red-500">
-                            {errors.state}
-                          </p>
-                        )}
                     </div>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="pincode"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {formData.country === "india" ? "PIN Code*" : "Postal Code"}
-                    </label>
-                    <input
-                      type="text"
-                      id="pincode"
-                      name="pincode"
-                      value={formData.pincode}
-                      onChange={handleChange}
-                      maxLength={formData.country === "india" ? 6 : 20}
-                      className={`w-full p-2 border ${
-                        errors.pincode ? "border-red-500" : "border-gray-300"
-                      } rounded-md text-sm`}
-                      placeholder={
-                        formData.country === "india"
-                          ? "6-digit PIN code"
-                          : "Enter postal code"
-                      }
-                      autoComplete="postal-code"
-                    />
-                    {errors.pincode && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.pincode}
-                      </p>
-                    )}
-                  </div>
+                  <Input
+                    label={formData.country === "india" ? "PIN Code" : "Postal Code"}
+                    id="pincode"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    maxLength={formData.country === "india" ? 6 : 20}
+                    placeholder={
+                      formData.country === "india"
+                        ? "6-digit PIN code"
+                        : "Enter postal code"
+                    }
+                    autoComplete="postal-code"
+                    required={formData.country === "india"}
+                    error={formSubmitted ? errors.pincode : undefined}
+                  />
                 </div>
               </div>
 
@@ -1574,33 +1442,36 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="p-4">
-                  <textarea
+                  <Input
+                    as="textarea"
                     id="specialInstructions"
                     name="specialInstructions"
                     value={formData.specialInstructions}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
                     placeholder="Any special instructions for delivery (Optional)"
-                  ></textarea>
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  fullWidth
+                  size="lg"
                   onClick={handlePreviousCheckoutStep}
-                  className="w-full py-3 bg-white border border-gray-300 text-gray-800 font-medium rounded-md"
                 >
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  fullWidth
+                  size="lg"
                   onClick={handleNextCheckoutStep}
-                  className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
                 >
                   Review order
-                </button>
+                </Button>
               </div>
             </>
           )}
@@ -1663,25 +1534,26 @@ const CheckoutPage = () => {
                     Have a Coupon?
                   </h3>
                 </div>
-                <div className="p-4 flex space-x-2">
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Enter coupon code"
-                    className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
-                  />
-                  <button
+                <div className="p-4 flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      id="couponCode"
+                      name="couponCode"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Enter coupon code"
+                      error={couponError || undefined}
+                    />
+                  </div>
+                  <Button
                     type="button"
+                    variant="secondary"
                     onClick={applyCoupon}
-                    className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md"
+                    className="self-start mt-0"
                   >
                     Apply
-                  </button>
+                  </Button>
                 </div>
-                {couponError && (
-                  <p className="px-4 pb-3 text-xs text-red-500">{couponError}</p>
-                )}
               </div>
 
               <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
@@ -1772,19 +1644,18 @@ const CheckoutPage = () => {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  fullWidth
+                  size="lg"
                   onClick={handlePreviousCheckoutStep}
-                  className="w-full py-3 bg-white border border-gray-300 text-gray-800 font-medium rounded-md"
                 >
                   Back
-                </button>
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
-                >
+                </Button>
+                <Button type="submit" fullWidth size="lg">
                   Place Order
-                </button>
+                </Button>
               </div>
             </>
           )}

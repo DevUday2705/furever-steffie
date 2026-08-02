@@ -1,11 +1,10 @@
-import { useContext } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { MessageCircle, ShoppingBag } from "lucide-react";
-import { CurrencyContext } from "../../context/currencyContext";
 import { useOrderPause } from "../../context/OrderPauseContext";
 import { useAppContext } from "../../context/AppContext";
 import mixpanel from "../../hooks/mixpanel";
+import { Button } from "../ui";
 
 const BottomActions = ({
   product,
@@ -27,7 +26,6 @@ const BottomActions = ({
   selectedColor,
   allowCustomSizes = false, // NEW: for custom sizing
 }) => {
-  const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
   const { cart, checkAndShowNotificationRequest } = useAppContext();
 
@@ -258,25 +256,18 @@ const BottomActions = ({
         <p className="text-[11px] text-gray-500">{getSelectionSummary()}</p>
         <p className="text-sm font-semibold text-gray-900">₹{calculatePrice()}</p>
       </div>
-      <motion.button
-        disabled={!isActionsEnabled}
-        className={`w-full py-3 font-medium rounded-md ${
-          !isActionsEnabled
-            ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-            : isCustomSize
-            ? "bg-green-600 text-white hover:bg-green-700"
-            : productInCart
-            ? "bg-green-600 text-white hover:bg-green-700"
-            : "bg-gray-800 text-white hover:bg-gray-900"
-        } transition-colors duration-200`}
-        whileTap={{ scale: 0.98 }}
-        onClick={isCustomSize ? handleWhatsAppChat : handleAddToCart}
-      >
-        <span className="inline-flex items-center justify-center gap-2">
+      <motion.div whileTap={isActionsEnabled ? { scale: 0.98 } : undefined}>
+        <Button
+          disabled={!isActionsEnabled}
+          fullWidth
+          size="lg"
+          variant={productInCart || isCustomSize ? "brand" : "primary"}
+          onClick={isCustomSize ? handleWhatsAppChat : handleAddToCart}
+        >
           {isCustomSize ? (
-            <MessageCircle size={20}/>
+            <MessageCircle size={20} />
           ) : (
-            <ShoppingBag size={20}/>
+            <ShoppingBag size={20} />
           )}
           {ordersArePaused
             ? "Orders Temporarily Paused"
@@ -285,8 +276,8 @@ const BottomActions = ({
             : productInCart
             ? "Go to Cart"
             : "Add to Cart"}
-        </span>
-      </motion.button>
+        </Button>
+      </motion.div>
     </div>
   );
 };

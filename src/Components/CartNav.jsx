@@ -7,6 +7,7 @@ import { CurrencyContext } from "../context/currencyContext";
 import { getTopProductsByGender } from "../constants/constant";
 import { Sparkles, ArrowRight, Heart } from "lucide-react";
 import mixpanel from "../hooks/mixpanel";
+import { Button, Badge } from "./ui";
 const CartNav = () => {
   const { cart, updateQuantity, removeFromCart, isOpen, setIsOpen, gender } =
     useAppContext();
@@ -242,9 +243,9 @@ const CartNav = () => {
                                     )}
                                   </p>
                                   {product.pricing?.discountPercent > 0 && (
-                                    <span className="inline-block bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full mt-1">
+                                                    <Badge variant="success" className="mt-1">
                                       {product.pricing.discountPercent}% off
-                                    </span>
+                                                    </Badge>
                                   )}
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
@@ -309,13 +310,15 @@ const CartNav = () => {
                         </motion.div>
                       )}
 
-                      <button
+                      <Button
                         onClick={handleCheckout}
-                        className="w-full bg-black text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 group"
+                        fullWidth
+                        size="lg"
+                        className="group"
                       >
                         Secure Checkout
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </button>
+                      </Button>
 
                       <p className="text-xs text-gray-500 text-center mt-3">
                         🔒 Secure payment •  Free size exchange
