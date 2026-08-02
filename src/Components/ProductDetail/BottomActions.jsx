@@ -192,6 +192,21 @@ const BottomActions = ({
 
   const isActionsEnabled = shouldEnableActions();
 
+  const getSelectionSummary = () => {
+    const tierLabel = isRoyalSet ? "Royal Set" : isFullSet ? (isDupattaSet ? "Kurta + Dupatta" : "Kurta + Dhoti") : isDupattaSet ? "Kurta + Dupatta" : "Kurta only";
+    const styleLabel = selectedStyle === "simple"
+      ? "Simple"
+      : selectedStyle === "tassels"
+      ? "Tassels"
+      : selectedStyle === "beaded"
+      ? "Beaded"
+      : selectedStyle === "beaded-tassels"
+      ? "Beaded + Tassels"
+      : "Simple";
+
+    return `${tierLabel} · ${styleLabel}`;
+  };
+
   // If custom size is selected, show WhatsApp button
   // if (isCustomSize) {
   //   return (
@@ -226,7 +241,11 @@ const BottomActions = ({
 
   // Regular flow for standard sizes
   return (
-    <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+    <div className="max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+      <div className="mb-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+        <p className="text-[11px] text-gray-500">{getSelectionSummary()}</p>
+        <p className="text-sm font-semibold text-gray-900">₹{calculatePrice()}</p>
+      </div>
       <motion.button
         disabled={!isActionsEnabled}
         className={`w-full py-3 font-medium rounded-md ${
