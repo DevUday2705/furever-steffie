@@ -129,13 +129,16 @@ const App = () => {
             {/* Left: Hamburger & Search */}
             <div className="flex items-center gap-1 min-w-[100px] justify-start">
               <HamburgerMenu />
-              <Search
-                className="cursor-pointer"
+              <button
+                type="button"
                 onClick={() => {
                   navigate("/search");
                 }}
-                size={20}
-              />
+                aria-label="Open search"
+                className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+              >
+                <Search size={20} aria-hidden="true" />
+              </button>
             </div>
 
             {/* Center: Logo */}
@@ -192,6 +195,7 @@ const App = () => {
                 element={<CancellationsRefundsPage />}
               />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/track" element={<TrackOrder />} />
               <Route path="/thank-you" element={<ThankYouPage />} />
               <Route path="/search" element={<UniversalSearchBar/>} />
               <Route path="/admin" element={<AdminHome />} />

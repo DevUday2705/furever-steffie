@@ -1,5 +1,6 @@
 // MobileFooter.jsx
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const footerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -7,6 +8,9 @@ const footerVariants = {
 };
 
 const Footer2 = () => {
+  const linkClassName =
+    "text-gray-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-sm";
+
   return (
     <motion.footer
       className="bg-gray-900 rounded-t-md text-white px-4 py-8 text-sm"
@@ -18,29 +22,29 @@ const Footer2 = () => {
         <h3 className="text-lg font-semibold mb-2">Need Help?</h3>
         <ul className="space-y-1">
           <li>
-            <a href="/contact" className="text-gray-300 hover:text-white">
+            <Link to="/contact" className={linkClassName}>
               Contact Us
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/policy" className="text-gray-300 hover:text-white">
+            <Link to="/policy" className={linkClassName}>
               Policy
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/terms" className="text-gray-300 hover:text-white">
+            <Link to="/terms" className={linkClassName}>
               Terms
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/privacy" className="text-gray-300 hover:text-white">
+            <Link to="/privacy" className={linkClassName}>
               Privacy
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/cancellations" className="text-gray-300 hover:text-white">
+            <Link to="/cancellations" className={linkClassName}>
               Cancellations
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
@@ -49,29 +53,29 @@ const Footer2 = () => {
         <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
         <ul className="space-y-1">
           <li>
-            <a href="/track" className="text-gray-300 hover:text-white">
+            <Link to="/track" className={linkClassName}>
               Track My Order
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/kurtas" className="text-gray-300 hover:text-white">
+            <Link to="/kurta" className={linkClassName}>
               Kurtas
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/frocks" className="text-gray-300 hover:text-white">
+            <Link to="/frock" className={linkClassName}>
               Frocks
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/bowtie" className="text-gray-300 hover:text-white">
+            <Link to="/bow-tie" className={linkClassName}>
               Bowtie
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/about" className="text-gray-300 hover:text-white">
+            <Link to="/about-us" className={linkClassName}>
               About Us
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

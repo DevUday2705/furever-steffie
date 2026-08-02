@@ -35,6 +35,24 @@ const CartNav = () => {
     }
   }, [isOpen, cart.length, fetchRecommendations]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, setIsOpen]);
+
   const calculateTotal = () =>
     cart
       .reduce((total, item) => total + item.price * item.quantity, 0)
@@ -55,12 +73,21 @@ const CartNav = () => {
   return (
     <div className="relative">
       <div className="relative">
-        <img
+        <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
-          src="/images/bag.png"
-          className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 cursor-pointer object-contain"
-          alt="Cart"
-        />
+          aria-label={isOpen ? "Close cart" : "Open cart"}
+          aria-expanded={isOpen}
+          aria-controls="cart-drawer"
+          className="rounded-full p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+        >
+          <img
+            src="/images/bag.png"
+            className="h-6 w-6 min-w-[1.5rem] min-h-[1.5rem] flex-shrink-0 object-contain"
+            alt=""
+            aria-hidden="true"
+          />
+        </button>
 
         {totalCartItems > 0 && (
           <div className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md">
@@ -87,19 +114,28 @@ const CartNav = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween" }}
+              id="cart-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cart-drawer-title"
               className="fixed top-0 right-0 w-full h-full bg-white shadow-xl z-50 overflow-y-auto"
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Your Cart</h2>
+                  <h2 id="cart-drawer-title" className="text-2xl font-bold">
+                    Your Cart
+                  </h2>
                   <button
+                    type="button"
                     onClick={() => setIsOpen(false)}
-                    className="hover:bg-gray-100 rounded-full p-2 transition-colors"
+                    aria-label="Close cart drawer"
+                    className="hover:bg-gray-100 rounded-full p-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                   >
                     <img
                       src="/images/close.png"
                       className="w-6 h-6"
-                      alt="Close"
+                      alt=""
+                      aria-hidden="true"
                     />
                   </button>
                 </div>
@@ -119,15 +155,15 @@ const CartNav = () => {
                     <p className="text-gray-500 mb-6">
                       Add some adorable outfits for your pet
                     </p>
-                    <button
+                    <Button
+                      type="button"
                       onClick={() => {
                         setIsOpen(false);
                         navigate("/");
                       }}
-                      className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       Start Shopping
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <>
@@ -141,7 +177,6 @@ const CartNav = () => {
                           exit={{ opacity: 0, x: -50 }}
                           className="flex items-center space-x-4 border-b pb-4"
                         >
-                          {console.log(item)}
                           <img
                             src={item.image}
                             alt={item.name}
@@ -161,6 +196,7 @@ const CartNav = () => {
                             </p>
                             <div className="flex items-center space-x-3 mt-2">
                               <button
+                                type="button"
                                 onClick={() =>
                                   updateQuantity(
                                     item.productId,
@@ -168,7 +204,8 @@ const CartNav = () => {
                                     Math.max(1, item.quantity - 1)
                                   )
                                 }
-                                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors"
+                                aria-label={`Decrease quantity of ${item.name}`}
+                                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                               >
                                 -
                               </button>
@@ -176,6 +213,7 @@ const CartNav = () => {
                                 {item.quantity}
                               </span>
                               <button
+                                type="button"
                                 onClick={() =>
                                   updateQuantity(
                                     item.productId,
@@ -183,20 +221,24 @@ const CartNav = () => {
                                     item.quantity + 1
                                   )
                                 }
-                                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors"
+                                aria-label={`Increase quantity of ${item.name}`}
+                                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                               >
                                 +
                               </button>
                             </div>
                           </div>
                           <button
+                            type="button"
                             onClick={() => removeFromCart(item.productId, item)}
-                            className="text-red-500 hover:bg-red-50 rounded-full p-2 transition-colors"
+                            aria-label={`Remove ${item.name} from cart`}
+                            className="text-red-500 hover:bg-red-50 rounded-full p-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                           >
                             <img
                               src="/images/trash.png"
                               className="w-5 h-5"
-                              alt="Remove"
+                              alt=""
+                              aria-hidden="true"
                             />
                           </button>
                         </motion.div>
