@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useOrderPause } from "../context/OrderPauseContext";
 import { useAppContext } from "../context/AppContext";
+import mixpanel from "../hooks/mixpanel";
 
 // Size chart data based on the provided chart
 const SIZE_CHART = {
@@ -86,6 +87,13 @@ const SimpleSizeSelector = ({
   allowCustomSizes = false,
 }) => {
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [notifySize, setNotifySize] = useState(null);
+  const [notifyNumber, setNotifyNumber] = useState(
+    typeof window !== "undefined"
+      ? localStorage.getItem("userPhone") || localStorage.getItem("savedPhone") || ""
+      : ""
+  );
   const [activeTab, setActiveTab] = useState("chart");
   const { ordersArePaused } = useOrderPause();
   const { checkAndShowNotificationRequest } = useAppContext();
@@ -98,9 +106,6 @@ const SimpleSizeSelector = ({
   // Check if selected size is a custom size (out of stock but custom allowed)
   const isCustomSize = selectedSize && !isSizeAvailable(selectedSize) && allowCustomSizes;
   
-  console.log('Debug:', { selectedSize, isAvailable: isSizeAvailable(selectedSize), allowCustomSizes, isCustomSize });
-
-
   // Get stock count for a size
   const getStockCount = (size) => {
     return product?.sizeStock?.[size] || 0;
@@ -115,37 +120,37 @@ const SimpleSizeSelector = ({
     // Allow selection if size is available OR if custom sizes are allowed
     if (isSizeAvailable(size) || allowCustomSizes) {
       setSelectedSize(size);
+      return;
     }
+
+    setNotifySize(size);
+    setNotifyNumber(
+      typeof window !== "undefined"
+        ? localStorage.getItem("userPhone") || localStorage.getItem("savedPhone") || ""
+        : ""
+    );
+    setShowNotifyModal(true);
   };
 
-  // Action button functions (copied from BottomActions)
-  const handleBuyNow = () => {
-    // Find selected dhoti details if dhoti is selected
-    const selectedDhotiDetails =
-      selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
-        : null;
+  const handleNotifySubmit = () => {
+    if (!notifyNumber.trim()) {
+      toast.error("Please enter your WhatsApp number");
+      return;
+    }
 
-    const orderDetails = {
-      productId: product.id,
-      name: product.name,
-      category: product.category || product.type,
-      subcategory: product.subcategory,
-      isBeaded,
-      isRoyalSet,
-      isFullSet,
-      isDupattaSet,
-      selectedDhoti,
-      selectedDhotiDetails,
+    // TODO: wire this UI to the existing waitlist/notify endpoint if one is available.
+    console.log("Out-of-stock waitlist request", {
+      productId: product?.id,
+      size: notifySize,
+      phoneNumber: notifyNumber,
       selectedStyle,
-      selectedSize,
       selectedColor,
-      price: calculatePrice(),
-      image: images[0],
-      measurements: null, // For simplified sizing, we don't need measurements
-    };
-    setShowSizeGuide(false); // Close modal
-    navigate("/checkout", { state: { orderDetails, sizeConfirmed: true } });
+      selectedSize,
+    });
+
+    toast.success(`Thanks! We’ll notify you when ${notifySize} is back.`);
+    setShowNotifyModal(false);
+    setNotifySize(null);
   };
 
   const handleAddToCart = () => {
@@ -177,6 +182,18 @@ const SimpleSizeSelector = ({
     };
 
     addToCart(cartItem);
+    mixpanel.track("Added To Cart", {
+      productId: cartItem.productId,
+      name: cartItem.name,
+      category: cartItem.category || cartItem.subcategory,
+      selectedStyle: cartItem.selectedStyle || "simple",
+      selectedSize: cartItem.selectedSize,
+      isRoyalSet: Boolean(cartItem.isRoyalSet),
+      isFullSet: Boolean(cartItem.isFullSet),
+      isDupattaSet: Boolean(cartItem.isDupattaSet),
+      quantityAdded: cartItem.quantity || 1,
+      itemPrice: cartItem.price || 0,
+    });
     toast.success("🐕 Product has been added to cart! Your furry friend's style is secured.", {
       duration: 4000,
       position: 'top-center',
@@ -218,7 +235,7 @@ const SimpleSizeSelector = ({
       {/* Size Selection Header - Modern Style */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
-          SELECT SIZE
+          Step 3 • Select Size
         </h3>
         <button
           className="text-sm text-pink-600 hover:text-pink-700 font-medium transition-colors"
@@ -240,7 +257,6 @@ const SimpleSizeSelector = ({
             <div key={size} className="flex flex-col items-center">
               <button
                 onClick={() => handleSizeSelect(size)}
-                disabled={!isAvailable && !allowCustomSizes}
                 className={`
   w-full h-full rounded-xs border text-sm font-semibold transition-all flex flex-col p-[0.1] relative
   ${
@@ -334,6 +350,47 @@ const SimpleSizeSelector = ({
           <div className="text-sm text-gray-700 bg-white/60 rounded-lg p-2">
             <span className="font-medium">Recommended for:</span>{" "}
             {selectedSizeData.breed}
+          </div>
+        </div>
+      )}
+
+      {showNotifyModal && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-black/45 p-4 sm:items-center">
+          <div className="w-full rounded-2xl bg-white p-5 shadow-xl sm:max-w-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h4 className="text-base font-semibold text-gray-900">
+                  Get notified when {notifySize} is back
+                </h4>
+                <p className="mt-1 text-sm text-gray-500">
+                  We’ll send you a WhatsApp update as soon as it becomes available.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowNotifyModal(false)}
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100"
+              >
+                ✕
+              </button>
+            </div>
+
+            <label className="mt-4 block text-sm font-medium text-gray-700">
+              WhatsApp number
+            </label>
+            <input
+              type="tel"
+              value={notifyNumber}
+              onChange={(e) => setNotifyNumber(e.target.value)}
+              placeholder="Enter your number"
+              className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#1D9E75]"
+            />
+
+            <button
+              onClick={handleNotifySubmit}
+              className="mt-4 w-full rounded-lg bg-[#1D9E75] px-4 py-3 text-sm font-semibold text-white"
+            >
+              Notify me
+            </button>
           </div>
         </div>
       )}

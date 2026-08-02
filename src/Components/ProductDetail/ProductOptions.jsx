@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import ColorSelector from "../ColorSelector";
-import { CheckCircle, ChevronRight, Crown, Gift, X, Clock, AlertCircle } from "lucide-react";
+import { Gift, X, Clock, AlertCircle } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
-import { Link } from "react-router-dom";
 import { getAvailableDhtoisForSize, getGlobalSettings } from "../../utils/dhotiInventoryUtils";
 
 const confettiOptions = {
@@ -17,6 +16,7 @@ const confettiOptions = {
     preserveAspectRatio: "xMidYMid slice",
   },
 };
+const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"];
 
 const ProductOptions = ({
   product,
@@ -38,7 +38,6 @@ const ProductOptions = ({
 }) => {
   const [showRoyalDescription, setShowRoyalDescription] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [isShining, setIsShining] = useState(false);
   const [showDhotiUnavailableModal, setShowDhotiUnavailableModal] = useState(false);
   const [availableDhtois, setAvailableDhtois] = useState([]);
   const [globalSettings, setGlobalSettings] = useState(null);
@@ -48,10 +47,47 @@ const ProductOptions = ({
     setSelectedColor(colorId);
   };
 
-  const handleDhotiUnavailableClick = () => {
-    setShowDhotiUnavailableModal(true);
-  };
   const { isBeadedAvailable, isNonBeadedAvailable } = product;
+
+  const sizeAvailability = useMemo(() => {
+    if (!product?.sizeStock) {
+      return {
+        hasManagedInventory: false,
+        inStockSizes: [],
+        lowStockSizes: [],
+        outOfStockSizes: [],
+      };
+    }
+
+    const inStockSizes = [];
+    const lowStockSizes = [];
+    const outOfStockSizes = [];
+
+    SIZE_ORDER.forEach((size) => {
+      const stock = product.sizeStock[size] || 0;
+      if (stock > 0) {
+        inStockSizes.push(size);
+        if (stock <= 5) {
+          lowStockSizes.push(size);
+        }
+      } else {
+        outOfStockSizes.push(size);
+      }
+    });
+
+    return {
+      hasManagedInventory: true,
+      inStockSizes,
+      lowStockSizes,
+      outOfStockSizes,
+    };
+  }, [product]);
+
+  const handleJumpToSizeSelection = () => {
+    document
+      .getElementById("size-selection-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Load global settings and available dhotis on component mount
   useEffect(() => {
@@ -170,26 +206,6 @@ const ProductOptions = ({
     }
   }, [isRoyalSet, isFullSet, selectedDhoti, setSelectedDhoti]);
 
-  useEffect(() => {
-    const initialTimer = setTimeout(() => {
-      triggerShine();
-    }, 1000);
-
-    const intervalId = setInterval(() => {
-      triggerShine();
-    }, 5000);
-
-    return () => {
-      clearTimeout(initialTimer);
-      clearInterval(intervalId);
-    };
-  }, []);
-
-  const triggerShine = () => {
-    setIsShining(true);
-    setTimeout(() => setIsShining(false), 2500);
-  };
-
   const handleRegularOptionClick = (
     isFullSetOption,
     isDupattaOption = false
@@ -204,6 +220,78 @@ const ProductOptions = ({
       setSelectedDhoti(null);
     }
   };
+
+  const getStylePreviewImage = (styleId) => {
+    const fallbackImages = [product?.mainImage, product?.image, product?.images?.[0]];
+
+    if (styleId === "simple") {
+      return product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
+    }
+
+    if (styleId.startsWith("beaded")) {
+      return product?.options?.beaded?.images?.[0] || product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
+    }
+
+    return product?.options?.nonBeaded?.images?.[0] || fallbackImages.find(Boolean) || "";
+  };
+
+  const getStylePriceDelta = (styleId) => {
+    switch (styleId) {
+      case "simple":
+        return "Included";
+      case "tassels":
+        return `+₹${product?.pricing?.tasselsAdditional || 150}`;
+      case "beaded":
+        return `+₹${product?.pricing?.beadedAdditional || 250}`;
+      case "beaded-tassels":
+        return `+₹${(product?.pricing?.beadedAdditional || 250) + (product?.pricing?.tasselsAdditional || 150)}`;
+      default:
+        return "Included";
+    }
+  };
+
+  const handleStyleOptionClick = (optionId) => {
+    setSelectedStyle(optionId);
+    if (optionId === "simple") {
+      setIsBeaded(false);
+    } else {
+      setIsBeaded(true);
+    }
+  };
+
+  const getTierPrice = (tierKey) => {
+    if (!product) return 0;
+
+    let price = product.pricing.basePrice;
+
+    if (tierKey === "royal") {
+      price += (product.pricing.fullSetAdditional || 0) + 300;
+    } else if (tierKey === "kurta-dhoti") {
+      price += product.pricing.fullSetAdditional || 0;
+    } else if (tierKey === "kurta-dupatta") {
+      price += 200;
+    }
+
+    switch (selectedStyle) {
+      case "beaded":
+        price += product.pricing.beadedAdditional || 0;
+        break;
+      case "beaded-tassels":
+        price += (product.pricing.beadedAdditional || 0) + (product.pricing.tasselsAdditional || 0);
+        break;
+      case "tassels":
+        price += product.pricing.tasselsAdditional || 0;
+        break;
+      default:
+        break;
+    }
+
+    const mappedSize = { Small: "S", Medium: "M", Large: "L", XL: "XL", XXL: "XXL" }[selectedSize] || selectedSize;
+    price += product.pricing.sizeIncrements?.[mappedSize] ?? 0;
+
+    return price;
+  };
+
   const renderStyleOptions = () => {
     const availableOptions = [];
 
@@ -234,37 +322,49 @@ const ProductOptions = ({
     }
 
     return (
-      <div className="mt-1">
-        <div className="grid grid-cols-2 gap-2">
-                {availableOptions.map((option) => {
-                  const disableSimple = !!product.disableSimpleOption;
-                  const disableBeaded = !!product.disableBeadedOption;
-                  const disableTassels = !!product.disableTasselsOption;
+      <div className="mt-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {availableOptions.map((option) => {
+            const disableSimple = !!product.disableSimpleOption;
+            const disableBeaded = !!product.disableBeadedOption;
+            const disableTassels = !!product.disableTasselsOption;
 
-                  let isDisabled = false;
-                  if (option.id === "simple") isDisabled = disableSimple;
-                  else if (option.id === "tassels") isDisabled = disableTassels;
-                  else if (option.id.startsWith("beaded")) {
-                    // beaded options disabled if beaded disabled OR if they include tassels and tassels disabled
-                    isDisabled = disableBeaded || (option.id.includes("tassels") && disableTassels);
-                  }
+            let isDisabled = false;
+            if (option.id === "simple") isDisabled = disableSimple;
+            else if (option.id === "tassels") isDisabled = disableTassels;
+            else if (option.id.startsWith("beaded")) {
+              isDisabled = disableBeaded || (option.id.includes("tassels") && disableTassels);
+            }
 
-                  return (
-                    <button
-                      key={option.id}
-                      onClick={() => !isDisabled && setSelectedStyle(option.id)}
-                      disabled={isDisabled}
-                      title={isDisabled ? "Option disabled for this product" : ""}
-                      className={`py-2 px-3 rounded-md text-sm border transition-all ${
-                        selectedStyle === option.id
-                          ? "border-gray-800 bg-gray-100 text-gray-800 shadow-sm"
-                          : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300"
-                      } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                    >
-                      <div className="font-medium">{option.label}</div>
-                    </button>
-                  );
-                })}
+            const isSelected = selectedStyle === option.id;
+            const previewImage = getStylePreviewImage(option.id);
+
+            return (
+              <button
+                key={option.id}
+                onClick={() => !isDisabled && handleStyleOptionClick(option.id)}
+                disabled={isDisabled}
+                title={isDisabled ? "Option disabled for this product" : ""}
+                className={`min-w-[108px] flex-1 rounded-xl border p-2 text-left transition-all ${
+                  isSelected
+                    ? "border-[#1D9E75] bg-emerald-50 shadow-sm"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                <div className="mb-2 h-16 overflow-hidden rounded-lg bg-gray-50">
+                  {previewImage ? (
+                    <img src={previewImage} alt={option.label} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-[10px] text-gray-400">
+                      Preview
+                    </div>
+                  )}
+                </div>
+                <div className="text-[11px] font-semibold text-gray-800">{option.label}</div>
+                <div className="text-[11px] text-gray-500">{getStylePriceDelta(option.id)}</div>
+              </button>
+            );
+          })}
         </div>
       </div>
     );
@@ -379,6 +479,8 @@ const ProductOptions = ({
 
   return (
     <div className="px-4 pb-4 space-y-4">
+      
+
       <ColorSelector
         colors={product.colors}
         selectedColor={selectedColor}
@@ -389,7 +491,7 @@ const ProductOptions = ({
       {["kurta", "pathani", "lehnga"].includes(product.type) &&
         (isBeadedAvailable || isNonBeadedAvailable) && (
           <div>
-            <h3 className="text-xs font-medium text-gray-900">Style</h3>
+            <h3 className="text-xs font-medium text-gray-900">Step 1 • Style</h3>
             {renderStyleOptions()}
           </div>
         )}
@@ -397,122 +499,119 @@ const ProductOptions = ({
       {/* PRODUCT TYPE OPTIONS */}
       {(product.type === "kurta" || product.type === "pathani") && product.options && (
         <div>
-          <h3 className="text-xs font-medium text-gray-900">Product Type</h3>
-          <div className="mt-1 space-y-2">
-            {/* Regular options in a row */}
-            <div className="flex flex-wrap gap-2">
-              {/* Regular Kurta Option */}
-              <button
-                onClick={() => handleRegularOptionClick(false, false)}
-                className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
-                  !isFullSet && !isRoyalSet && !isDupattaSet
-                    ? "border-gray-800 bg-gray-100"
-                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
-                } border text-gray-800`}
-              >
-                Kurta
-              </button>
+          <h3 className="text-xs font-medium text-gray-900">Step 2 • Product Type</h3>
+          <div className="mt-2 space-y-2">
+            {[
+              {
+                key: "kurta",
+                title: "Kurta only",
+                description: "Classic kurta with no extras",
+                price: getTierPrice("kurta"),
+                isSelected: !isFullSet && !isRoyalSet && !isDupattaSet && !showRoyalDescription,
+                onClick: () => handleRegularOptionClick(false, false),
+                showBadge: false,
+              },
+              {
+                key: "kurta-dhoti",
+                title: "Kurta + Dhoti",
+                description: "A polished kurta-and-dhoti pairing",
+                price: getTierPrice("kurta-dhoti"),
+                isSelected: isFullSet && !isRoyalSet && !isDupattaSet,
+                onClick: () => handleRegularOptionClick(true, false),
+                showBadge: false,
+              },
+              {
+                key: "royal",
+                title: "Royal Set",
+                description: "Kurta + Dhoti + Dupatta with premium styling",
+                price: getTierPrice("royal"),
+                isSelected: isRoyalSet,
+                onClick: handleRoyalSetClick,
+                showBadge: true,
+              },
+              {
+                key: "kurta-dupatta",
+                title: "Kurta + Dupatta",
+                description: "A graceful kurta-and-dupatta pairing",
+                price: getTierPrice("kurta-dupatta"),
+                isSelected: isDupattaSet && !isRoyalSet,
+                onClick: () => handleRegularOptionClick(false, true),
+                showBadge: false,
+              },
+            ].map((option) => {
+              const isDisabled = option.key === "kurta-dhoti" && !kurtaDhotiEnabled;
+              const isRoyalDisabled = option.key === "royal" && (!royalSetEnabled || availableDhtois.length === 0);
+              const isSelected = option.isSelected;
+              const originalPartsTotal = option.key === "royal" ? getTierPrice("kurta") + 700 + 699 : null;
+              const savings = option.key === "royal" ? Math.max(0, originalPartsTotal - option.price) : null;
 
-              {/* Regular Kurta + Dhoti Option */}
-              {kurtaDhotiEnabled && (
+              return (
                 <button
-                  onClick={() => handleRegularOptionClick(true, false)}
-                  disabled={availableDhtois.length === 0}
-                  aria-disabled={availableDhtois.length === 0}
-                  className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 relative ${
-                    isFullSet && !isRoyalSet && !isDupattaSet
-                      ? "border-gray-800 bg-gray-100"
-                      : availableDhtois.length > 0
-                      ? "border-gray-200 bg-gray-50 hover:border-gray-300"
-                      : "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
-                  } border text-gray-800`}
+                  key={option.key}
+                  onClick={() => {
+                    if (isDisabled || isRoyalDisabled) return;
+                    option.onClick();
+                  }}
+                  className={`w-full rounded-xl border px-3 py-3 text-left transition-all ${
+                    isSelected
+                      ? "border-[#1D9E75] bg-emerald-50 shadow-sm"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  } ${isDisabled || isRoyalDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  Kurta + Dhoti
-                  {availableDhtois.length === 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                  )}
-                </button>
-              )}
-
-              {/* NEW: Kurta + Dupatta Option */}
-              {kurtaDupattaEnabled && (
-                <button
-                  onClick={() => handleRegularOptionClick(false, true)}
-                  className={`py-1.5 flex-1 rounded-md text-sm transition-all duration-200 ${
-                    isDupattaSet && !isRoyalSet
-                      ? "border-gray-800 bg-gray-100"
-                      : "border-gray-200 bg-gray-50 hover:border-gray-300"
-                  } border text-gray-800`}
-                >
-                  Kurta + Dupatta
-                </button>
-              )}
-            </div>
-
-            {/* Royal Set Option - Full width */}
-            {product.isRoyal && royalSetEnabled && (
-              <div className="relative w-full overflow-hidden rounded-md">
-                <button
-                  onClick={handleRoyalSetClick}
-                  onMouseEnter={triggerShine}
-                  disabled={availableDhtois.length === 0}
-                  aria-disabled={availableDhtois.length === 0}
-                  className={`w-full inline-flex items-center justify-center px-6 py-1.5 font-medium rounded-md transition-all duration-300 shadow-md border border-gray-300 border-opacity-30 relative
-                    ${
-                      isRoyalSet
-                        ? "bg-gradient-to-r from-[#c9a94e] to-[#b5892e] text-white border-2  shadow-xl "
-                        : availableDhtois.length > 0
-                        ? "bg-gradient-to-r from-gray-600 to-gray-400 text-white border-2 border-gray-300  hover:shadow-xl"
-                        : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-                    }
-                  `}
-                >
-                  <Crown className="w-5 h-5 mr-2 opacity-60" />
-
-                  {isRoyalSet
-                    ? "Royal Set Selected ✓"
-                    : "Click here for  Full Set"}
-                </button>
-
-                {availableDhtois.length === 0 && (
-                  <div className="text-xs text-orange-600 mt-2">
-                    Royal Set not available for size {selectedSize}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      {option.showBadge && (
+                        <div className="mb-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                          Most popular
+                        </div>
+                      )}
+                      <div className="text-sm font-semibold text-gray-900">{option.title}</div>
+                      <div className="mt-1 text-xs text-gray-500">{option.description}</div>
+                      {option.key === "royal" && (
+                        <div className="mt-2 text-[11px] font-medium text-[#1D9E75]">
+                          Premium bundle pricing
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      {option.key === "royal" && (
+                        <div className="text-[11px] text-gray-400 line-through">₹{originalPartsTotal}</div>
+                      )}
+                      <div className="text-sm font-semibold text-gray-900">₹{option.price}</div>
+                      {option.key === "royal" && (
+                        <div className="mt-1 text-[11px] font-medium text-emerald-600">Save ₹{savings}</div>
+                      )}
+                    </div>
                   </div>
-                )}
-
-                <motion.div
-                  className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-gray-200/80 to-transparent opacity-50"
-                  initial={{ x: "-100%", skewX: -30 }}
-                  animate={isShining ? { x: "300%" } : { x: "-100%" }}
-                  transition={{
-                    duration: 3,
-                    ease: "easeInOut",
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Confetti Animation Overlay */}
-            {showConfetti && (
-              <div className="fixed inset-0 pointer-events-none z-50">
-                <Lottie
-                  options={confettiOptions}
-                  height="100vh"
-                  width="100vw"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    filter: "grayscale(0.7) brightness(0.95)",
-                  }}
-                />
-              </div>
-            )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Royal Set Description */}
+          {availableDhtois.length === 0 && product.isRoyal && royalSetEnabled && (
+            <div className="mt-2 text-xs text-orange-600">
+              Royal Set not available for size {selectedSize}
+            </div>
+          )}
+
+          {showConfetti && (
+            <div className="fixed inset-0 pointer-events-none z-50">
+              <Lottie
+                options={confettiOptions}
+                height="100vh"
+                width="100vw"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  filter: "grayscale(0.7) brightness(0.95)",
+                }}
+              />
+            </div>
+          )}
+
           {showRoyalDescription && isRoyalSet && (
             <div className="mt-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg animate-fadeIn">
               <div className="flex items-start gap-2">

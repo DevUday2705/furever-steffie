@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { MessageCircle, ShoppingBag } from "lucide-react";
 import { CurrencyContext } from "../../context/currencyContext";
-import { convertCurrency } from "../../constants/currency";
 import { useOrderPause } from "../../context/OrderPauseContext";
 import { useAppContext } from "../../context/AppContext";
+import mixpanel from "../../hooks/mixpanel";
 
 const BottomActions = ({
   product,
@@ -143,6 +143,18 @@ const BottomActions = ({
     };
 
     addToCart(cartItem);
+    mixpanel.track("Added To Cart", {
+      productId: cartItem.productId,
+      name: cartItem.name,
+      category: cartItem.category || cartItem.subcategory,
+      selectedStyle: cartItem.selectedStyle || "simple",
+      selectedSize: cartItem.selectedSize,
+      isRoyalSet: Boolean(cartItem.isRoyalSet),
+      isFullSet: Boolean(cartItem.isFullSet),
+      isDupattaSet: Boolean(cartItem.isDupattaSet),
+      quantityAdded: cartItem.quantity || 1,
+      itemPrice: cartItem.price || 0,
+    });
     toast.success("🐕 Product has been added to cart! Your furry friend's style is secured.", {
       duration: 4000,
       position: 'top-center',
@@ -192,6 +204,21 @@ const BottomActions = ({
 
   const isActionsEnabled = shouldEnableActions();
 
+  const getSelectionSummary = () => {
+    const tierLabel = isRoyalSet ? "Royal Set" : isFullSet ? (isDupattaSet ? "Kurta + Dupatta" : "Kurta + Dhoti") : isDupattaSet ? "Kurta + Dupatta" : "Kurta only";
+    const styleLabel = selectedStyle === "simple"
+      ? "Simple"
+      : selectedStyle === "tassels"
+      ? "Tassels"
+      : selectedStyle === "beaded"
+      ? "Beaded"
+      : selectedStyle === "beaded-tassels"
+      ? "Beaded + Tassels"
+      : "Simple";
+
+    return `${tierLabel} · ${styleLabel}`;
+  };
+
   // If custom size is selected, show WhatsApp button
   // if (isCustomSize) {
   //   return (
@@ -226,7 +253,11 @@ const BottomActions = ({
 
   // Regular flow for standard sizes
   return (
-    <div className=" max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+    <div className="max-w-md mx-auto left-0 right-0 bg-white shadow-top p-3 z-20">
+      <div className="mb-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+        <p className="text-[11px] text-gray-500">{getSelectionSummary()}</p>
+        <p className="text-sm font-semibold text-gray-900">₹{calculatePrice()}</p>
+      </div>
       <motion.button
         disabled={!isActionsEnabled}
         className={`w-full py-3 font-medium rounded-md ${

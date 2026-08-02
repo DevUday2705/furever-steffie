@@ -1,20 +1,19 @@
-import React, { useContext, useState, useEffect, useCallback } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useAppContext } from "../context/AppContext";
 import { convertCurrency } from "../constants/currency";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { CurrencyContext } from "../context/currencyContext";
 import { getTopProductsByGender } from "../constants/constant";
-import { Sparkles, ArrowRight, Heart, Gift } from "lucide-react";
+import { Sparkles, ArrowRight, Heart } from "lucide-react";
+import mixpanel from "../hooks/mixpanel";
 const CartNav = () => {
   const { cart, updateQuantity, removeFromCart, isOpen, setIsOpen, gender } =
     useAppContext();
   const navigate = useNavigate();
   const [recommendedProducts, setRecommendedProducts] = useState([]);
-  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   const fetchRecommendations = useCallback(async () => {
-    setLoadingRecommendations(true);
     try {
       const products = await getTopProductsByGender(gender);
       // Filter out products already in cart
@@ -25,8 +24,6 @@ const CartNav = () => {
       setRecommendedProducts(filtered);
     } catch (error) {
       console.error("Failed to fetch recommendations:", error);
-    } finally {
-      setLoadingRecommendations(false);
     }
   }, [gender, cart]);
 
@@ -43,13 +40,16 @@ const CartNav = () => {
       .toFixed(2);
 
   const isFreeShipping = calculateTotal() > 1499;
+  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
 
   const handleCheckout = () => {
+    mixpanel.track("Checkout Started From Cart", {
+      itemCount: totalCartItems,
+      cartTotal: Number(calculateTotal()),
+    });
     setIsOpen(false);
     navigate("/checkout");
   };
-
-  const totalCartItems = cart.reduce((total, item) => total + item.quantity, 0);
   const { currency } = useContext(CurrencyContext);
   return (
     <div className="relative">

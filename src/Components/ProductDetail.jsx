@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import { useAppContext } from "../context/AppContext";
@@ -11,11 +11,13 @@ import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import mixpanel from "../hooks/mixpanel";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsOpen } = useAppContext();
   const [idPart, typePart] = productId.split("+");
+  const trackedProductIdRef = useRef(null);
 
   // Function to check if the file is a video
   const isVideo = (url) => {
@@ -37,6 +39,101 @@ const ProductDetail = () => {
     // Otherwise return all images
     return imageArray;
   };
+
+  const pickVariantImages = (source, keys = []) => {
+    if (!source) return [];
+
+    for (const key of keys) {
+      const candidates = [
+        source?.options?.[key]?.images,
+        source?.[key]?.images,
+        source?.[`${key}Images`],
+        source?.imagesByStyle?.[key],
+        source?.setImages?.[key],
+        source?.variantImages?.[key],
+      ];
+
+      for (const candidate of candidates) {
+        if (Array.isArray(candidate) && candidate.length > 0) {
+          return candidate;
+        }
+      }
+    }
+
+    return [];
+  };
+
+  const resolveGalleryImages = (
+    currentProduct,
+    {
+      colorId,
+      style,
+      beaded,
+      dupattaSelected,
+      royalSelected,
+    }
+  ) => {
+    if (!currentProduct) return [];
+
+    const colorData = currentProduct.colors?.find((c) => c.id === colorId);
+    const source = colorData || currentProduct;
+
+    const nonBeadedImages = pickVariantImages(source, ["nonBeaded", "simple"]);
+    const beadedImages = pickVariantImages(source, ["beaded"]);
+    const tasselImages = pickVariantImages(source, ["tassels", "tassel", "withTassels"]);
+    const beadedTasselImages = pickVariantImages(source, [
+      "beadedTassels",
+      "beaded-tassels",
+      "beaded_tassels",
+    ]);
+    const dupattaSetImages = pickVariantImages(source, [
+      "dupatta",
+      "kurtaDupatta",
+      "dupattaSet",
+    ]);
+    const royalSetImages = pickVariantImages(source, ["royal", "royalSet", "fullSet"]);
+
+    if (royalSelected && royalSetImages.length > 0) {
+      return royalSetImages;
+    }
+
+    if (dupattaSelected && dupattaSetImages.length > 0) {
+      return dupattaSetImages;
+    }
+
+    const styleKey = style || (beaded ? "beaded" : "simple");
+
+    if (styleKey === "tassels") {
+      return tasselImages.length > 0
+        ? tasselImages
+        : nonBeadedImages.length > 0
+        ? nonBeadedImages
+        : beadedImages;
+    }
+
+    if (styleKey === "beaded") {
+      return beadedImages.length > 0
+        ? beadedImages
+        : nonBeadedImages;
+    }
+
+    if (styleKey === "beaded-tassels") {
+      return beadedTasselImages.length > 0
+        ? beadedTasselImages
+        : beadedImages.length > 0
+        ? beadedImages
+        : tasselImages.length > 0
+        ? tasselImages
+        : nonBeadedImages;
+    }
+
+    return nonBeadedImages.length > 0
+      ? nonBeadedImages
+      : beadedImages.length > 0
+      ? beadedImages
+      : [currentProduct.mainImage].filter(Boolean);
+  };
+
   const [selectedColor, setSelectedColor] = useState(null);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,41 +195,26 @@ const ProductDetail = () => {
 
         if (foundProduct) {
           setProduct(foundProduct);
-          setIsBeaded(foundProduct.defaultOptions?.isBeaded ?? true);
-          setIsFullSet(foundProduct.defaultOptions?.isFullSet ?? false);
+
+          const isKurtaOrPathani =
+            foundProduct.type === "kurta" || foundProduct.type === "pathani";
+          const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
+          const defaultStyle =
+            foundProduct.defaultOptions?.selectedStyle ||
+            (defaultIsBeaded ? "beaded" : "simple");
+
+          setIsBeaded(defaultStyle.includes("beaded") || defaultIsBeaded);
+          setSelectedStyle(defaultStyle);
+          setIsFullSet(
+            foundProduct.defaultOptions?.isFullSet ?? isKurtaOrPathani
+          );
+          setIsRoyalSet(foundProduct.defaultOptions?.isRoyalSet ?? false);
+          setIsDupattaSet(foundProduct.defaultOptions?.isDupattaSet ?? false);
           setSelectedSize(foundProduct.defaultOptions?.size ?? "S");
 
           const defaultColor =
             foundProduct.defaultOptions?.color || foundProduct.colors?.[0]?.id;
           setSelectedColor(defaultColor);
-
-          const isKurtaOrPathani = foundProduct.type === "kurta" || foundProduct.type === "pathani";
-          const defaultIsBeaded = foundProduct.defaultOptions?.isBeaded ?? true;
-
-          // 👇 Combine all beaded & non-beaded images if kurta or pathani
-          if (isKurtaOrPathani) {
-            const beadedImgs = foundProduct.options?.beaded?.images || [];
-            const nonBeadedImgs = foundProduct.options?.nonBeaded?.images || [];
-            const allImages = [...beadedImgs, ...nonBeadedImgs];
-            setImages(filterImagesForGallery(allImages));
-          } else if (foundProduct.colors?.length > 0) {
-            const colorData = foundProduct.colors.find(
-              (c) => c.id === defaultColor
-            );
-            if (colorData?.options) {
-              const selectedImages = defaultIsBeaded
-                ? colorData.options.beaded?.images ?? []
-                : colorData.options.nonBeaded?.images ?? [];
-              setImages(filterImagesForGallery(selectedImages));
-            }
-          } else if (foundProduct.options) {
-            const selectedImages = defaultIsBeaded
-              ? foundProduct.options.beaded?.images ?? []
-              : foundProduct.options.nonBeaded?.images ?? [];
-            setImages(filterImagesForGallery(selectedImages));
-          } else {
-            setImages(filterImagesForGallery([foundProduct.mainImage]));
-          }
         } else {
           setProduct(null);
         }
@@ -148,28 +230,46 @@ const ProductDetail = () => {
   }, [productId, idPart, typePart]);
 
   useEffect(() => {
-    if (!product || product.type === "kurta" || product.type === "pathani") return; // ⛔ Skip if kurta or pathani
+    if (!product) return;
 
-    if (product.colors && selectedColor) {
-      const colorData = product.colors.find((c) => c.id === selectedColor);
-      if (colorData?.options) {
-        const selectedImages = isBeaded
-          ? colorData.options.beaded?.images ?? []
-          : colorData.options.nonBeaded?.images ?? [];
-        setImages(filterImagesForGallery(selectedImages));
-        return;
-      }
+    const resolvedImages = resolveGalleryImages(product, {
+      colorId: selectedColor,
+      style: selectedStyle,
+      beaded: isBeaded,
+      dupattaSelected: isDupattaSet,
+      royalSelected: isRoyalSet,
+    });
+
+    setImages(filterImagesForGallery(resolvedImages));
+  }, [
+    isBeaded,
+    isDupattaSet,
+    isRoyalSet,
+    product,
+    selectedColor,
+    selectedStyle,
+  ]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.scrollTo(0);
+  }, [selectedStyle, isDupattaSet, isRoyalSet, selectedColor, emblaApi]);
+
+  useEffect(() => {
+    if (!product || trackedProductIdRef.current === product.id) {
+      return;
     }
 
-    if (product.options) {
-      const selectedImages = isBeaded
-        ? product.options.beaded?.images ?? []
-        : product.options.nonBeaded?.images ?? [];
-      setImages(filterImagesForGallery(selectedImages));
-    } else {
-      setImages(filterImagesForGallery([product.mainImage]));
-    }
-  }, [isBeaded, product, selectedColor]);
+    mixpanel.track("Product Viewed", {
+      productId: product.id,
+      name: product.name,
+      type: product.type,
+      category: product.category || product.type,
+      basePrice: product.pricing?.basePrice || 0,
+      isRoyal: Boolean(product.isRoyal),
+    });
+    trackedProductIdRef.current = product.id;
+  }, [product]);
 
   const sizeCodeMap = {
     Small: "S",
@@ -230,9 +330,6 @@ const ProductDetail = () => {
 
     return price;
   };
-  console.log(selectedStyle);
-  const handleGoBack = () => navigate(-1);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -262,7 +359,6 @@ const ProductDetail = () => {
     );
   }
 
-  console.log(product);
   return (
     <div className="bg-gray-50 min-h-screen pb-4">
       <div className="container mx-auto px-3 pt-2 pb-4">
@@ -299,26 +395,28 @@ const ProductDetail = () => {
             />
 
             {/* Simple Size Selector - replaces smart sizing logic */}
-            <SimpleSizeSelector
-              selectedSize={selectedSize}
-              setSelectedSize={setSelectedSize}
-              product={product}
-              // Action button props
-              images={images}
-              isBeaded={isBeaded}
-              isFullSet={isFullSet}
-              isDupattaSet={isDupattaSet}
-              isRoyalSet={isRoyalSet}
-              selectedDhoti={selectedDhoti}
-              selectedStyle={selectedStyle}
-              selectedColor={selectedColor}
-              calculatePrice={calculatePrice}
-              navigate={navigate}
-              addToCart={addToCart}
-              setIsOpen={setIsOpen}
-              // Custom sizing prop
-              allowCustomSizes={product.allowCustomSizes || false}
-            />
+            <div id="size-selection-section">
+              <SimpleSizeSelector
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+                product={product}
+                // Action button props
+                images={images}
+                isBeaded={isBeaded}
+                isFullSet={isFullSet}
+                isDupattaSet={isDupattaSet}
+                isRoyalSet={isRoyalSet}
+                selectedDhoti={selectedDhoti}
+                selectedStyle={selectedStyle}
+                selectedColor={selectedColor}
+                calculatePrice={calculatePrice}
+                navigate={navigate}
+                addToCart={addToCart}
+                setIsOpen={setIsOpen}
+                // Custom sizing prop
+                allowCustomSizes={product.allowCustomSizes || false}
+              />
+            </div>
 
             {/* Trust Signals Section - now below sizing options */}
             <TrustSignals />

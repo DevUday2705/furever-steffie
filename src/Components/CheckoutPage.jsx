@@ -1,12 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
-  addDoc,
   collection,
   doc,
-  updateDoc,
-  getDoc,
   setDoc,
   query,
   where,
@@ -20,6 +17,7 @@ import { validateForm } from "../constants/constant";
 import { convertCurrency } from "../constants/currency";
 import { CurrencyContext } from "../context/currencyContext";
 import mixpanel from "../hooks/mixpanel";
+import { calculateCheckoutPricing } from "../utils/checkoutPricing";
 
 // Utility function to calculate dispatch date (3 days from today)
 const calculateDispatchDate = () => {
@@ -29,6 +27,29 @@ const calculateDispatchDate = () => {
   return dispatchDate.toISOString();
 };
 
+const CHECKOUT_STEPS = [
+  {
+    id: "contact",
+    title: "Contact details",
+    description: "So we can confirm and update the order.",
+  },
+  {
+    id: "address",
+    title: "Shipping & delivery",
+    description: "Where the order should go and how fast.",
+  },
+  {
+    id: "review",
+    title: "Review & payment",
+    description: "Check totals, apply coupons, and place the order.",
+  },
+];
+
+const STEP_FIELDS = {
+  0: ["fullName", "email", "mobileNumber"],
+  1: ["addressLine1", "city", "state", "pincode", "country"],
+};
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,6 +57,7 @@ const CheckoutPage = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
+  const [currentCheckoutStep, setCurrentCheckoutStep] = useState(0);
 
   const isCartCheckout = !orderDetails;
   // Form state
@@ -57,7 +79,6 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
   // Order complete state
-  const [orderCompleted, setOrderCompleted] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -376,85 +397,165 @@ const CheckoutPage = () => {
     }
   };
 
-  // Calculate total price including delivery
-  const calculateTotal = () => {
-    let subtotal = 0;
+  const pricing = useMemo(
+    () =>
+      calculateCheckoutPricing({
+        isCartCheckout,
+        cart,
+        orderDetails,
+        couponCode,
+        discountPercent: discount,
+        customCouponData,
+        formData,
+        internationalDelivery,
+        currencyRates,
+        singleUseCoupon: SINGLE_USE_COUPON,
+        navratriCoupon: NAVRATRI_COUPON,
+        customerValidationCoupons: CUSTOMER_VALIDATION_COUPONS,
+      }),
+    [
+      isCartCheckout,
+      cart,
+      orderDetails,
+      couponCode,
+      discount,
+      customCouponData,
+      formData,
+      internationalDelivery,
+      currencyRates,
+      CUSTOMER_VALIDATION_COUPONS,
+    ]
+  );
 
-    if (isCartCheckout) {
-      subtotal = cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
-    } else {
-      subtotal = orderDetails.price;
-    }
+  const checkoutItemCount = pricing.items.reduce(
+    (total, item) => total + (item.quantity || 1),
+    0
+  );
 
-    let discountAmount = 0;
+  const validateCheckoutStep = (stepIndex) => {
+    const stepErrors = {};
 
-    // Check if it's the special single-use coupon for flat ₹750 discount
-    if (couponCode.trim().toUpperCase() === SINGLE_USE_COUPON) {
-      discountAmount = 750;
-    } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
-      // Customer validation coupons for flat ₹100 discount
-      discountAmount = 100;
-    } else if (customCouponData) {
-      // Custom coupon discount
-      discountAmount = customCouponData.discountAmount;
-    } else if (couponCode.trim().toUpperCase() === NAVRATRI_COUPON) {
-      // GARBA5 - 5% discount only on Navratri items
-      let navratriSubtotal = 0;
+    if (stepIndex === 0) {
+      if (!formData.fullName.trim()) {
+        stepErrors.fullName = "Full name is required";
+      }
 
-      if (isCartCheckout) {
-        // Calculate subtotal only for Navratri items in cart
-        navratriSubtotal = cart.reduce((total, item) => {
-          if (item.name && item.name.toUpperCase().includes("NAVRATRI")) {
-            return total + item.price * item.quantity;
-          }
-          return total;
-        }, 0);
+      if (!formData.email.trim()) {
+        stepErrors.email = "Email is required";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        stepErrors.email = "Enter a valid email address";
+      }
+
+      if (!formData.mobileNumber.trim()) {
+        stepErrors.mobileNumber = "Mobile number is required";
       } else {
-        // Single item checkout - check if it's a Navratri item
-        if (
-          orderDetails.name &&
-          orderDetails.name.toUpperCase().includes("NAVRATRI")
-        ) {
-          navratriSubtotal = orderDetails.price;
+        const cleanNumber = formData.mobileNumber.replace(/[\s\-()+ ]/g, "");
+        if (formData.country === "india") {
+          if (!/^\d{10}$/.test(cleanNumber)) {
+            stepErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+          }
+        } else if (!/^\d{7,15}$/.test(cleanNumber)) {
+          stepErrors.mobileNumber = "Enter a valid mobile number (7-15 digits)";
         }
       }
-
-      // Apply 5% discount only on Navratri items
-      discountAmount = (navratriSubtotal * 5) / 100;
-    } else {
-      // Regular percentage discount
-      discountAmount = (subtotal * discount) / 100;
     }
 
-    const totalAfterDiscount = subtotal - discountAmount;
-
-    let deliveryCharge = 0;
-
-    // Handle international delivery
-    if (formData.country !== "india") {
-      const deliveryInfo = internationalDelivery[formData.country];
-      if (deliveryInfo) {
-        // Convert delivery charge from original currency to INR for consistent calculation
-        const chargeInINR =
-          deliveryInfo.charge / currencyRates[deliveryInfo.currency];
-        deliveryCharge = Math.round(chargeInINR);
+    if (stepIndex === 1) {
+      if (!formData.addressLine1.trim()) {
+        stepErrors.addressLine1 = "Address is required";
       }
-    } else {
-      // Domestic delivery charges
-      if (formData.deliveryOption === "express") {
-        deliveryCharge = 399;
-      } else if (formData.deliveryOption === "air") {
-        deliveryCharge = 199;
-      } else {
-        deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0;
+
+      if (!formData.city.trim()) {
+        stepErrors.city = "City is required";
+      }
+
+      if (!formData.country.trim()) {
+        stepErrors.country = "Country is required";
+      }
+
+      if (formData.country === "india" && !formData.state.trim()) {
+        stepErrors.state = "State is required";
+      }
+
+      if (formData.country === "india") {
+        if (!formData.pincode.trim()) {
+          stepErrors.pincode = "PIN code is required";
+        } else if (!/^\d{6}$/.test(formData.pincode)) {
+          stepErrors.pincode = "Enter a valid 6-digit PIN code";
+        }
+      } else if (
+        formData.pincode.trim() &&
+        formData.pincode.trim().length < 3
+      ) {
+        stepErrors.pincode = "Enter a valid postal code";
       }
     }
 
-    return Math.round(totalAfterDiscount + deliveryCharge);
+    setErrors((previousErrors) => {
+      const nextErrors = { ...previousErrors };
+      (STEP_FIELDS[stepIndex] || []).forEach((field) => {
+        delete nextErrors[field];
+      });
+
+      return { ...nextErrors, ...stepErrors };
+    });
+
+    return Object.keys(stepErrors).length === 0;
   };
+
+  const handleNextCheckoutStep = () => {
+    setFormSubmitted(true);
+
+    if (!validateCheckoutStep(currentCheckoutStep)) {
+      return;
+    }
+
+    const step = CHECKOUT_STEPS[currentCheckoutStep];
+    mixpanel.track("Checkout Step Completed", {
+      step: step.id,
+      total: pricing.total,
+      isCartCheckout,
+      itemCount: checkoutItemCount,
+    });
+
+    setCurrentCheckoutStep((previousStep) =>
+      Math.min(previousStep + 1, CHECKOUT_STEPS.length - 1)
+    );
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePreviousCheckoutStep = () => {
+    setCurrentCheckoutStep((previousStep) => Math.max(previousStep - 1, 0));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (pricing.items.length === 0) {
+      return;
+    }
+
+    mixpanel.track("Checkout Started", {
+      total: pricing.total,
+      isCartCheckout,
+      itemCount: checkoutItemCount,
+      country: formData.country,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (pricing.items.length === 0) {
+      return;
+    }
+
+    const step = CHECKOUT_STEPS[currentCheckoutStep];
+    mixpanel.track("Checkout Step Viewed", {
+      step: step.id,
+      total: pricing.total,
+      isCartCheckout,
+      itemCount: checkoutItemCount,
+    });
+  }, [currentCheckoutStep, pricing.items.length, pricing.total, isCartCheckout, checkoutItemCount]);
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -483,7 +584,7 @@ const CheckoutPage = () => {
           phone: formData.mobileNumber,
           name: formData.fullName,
           cart: isCartCheckout ? cart : [orderDetails],
-          cartTotal: calculateTotal(),
+          cartTotal: pricing.total,
           address: formData
         };
 
@@ -516,7 +617,7 @@ const CheckoutPage = () => {
   // Download receipt as image
 
   // If no order details, redirect back
-  if (!orderDetails && cart.length === 0 && !orderCompleted) {
+  if (!orderDetails && cart.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-4">
@@ -538,10 +639,10 @@ const CheckoutPage = () => {
   }
 
   const handlePayment = async () => {
-    const totalAmount = calculateTotal(); // Always in INR for Razorpay
+    const totalAmount = pricing.total; // Always in INR for Razorpay
 
     // For international customers, redirect to bank transfer page
-    if (formData.country !== "india") {
+    if (pricing.isInternational) {
       const currentCurrency = countryToCurrency[formData.country];
       const displayAmount = convertCurrency(totalAmount, currentCurrency);
 
@@ -558,34 +659,6 @@ const CheckoutPage = () => {
       };
       const currencySymbol =
         currencySymbols[currentCurrency] || currentCurrency;
-
-      // Calculate subtotal, discount, and shipping charges
-      let subtotal = 0;
-      if (isCartCheckout) {
-        subtotal = cart.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
-      } else {
-        subtotal = orderDetails.price;
-      }
-
-      // Calculate discount amount
-      let discountAmount = 0;
-      if (couponCode.trim().toUpperCase() === "SINGLE750") {
-        discountAmount = 750;
-      } else if (discount > 0) {
-        discountAmount = (subtotal * discount) / 100;
-      }
-
-      // Calculate shipping charge for international delivery
-      let shippingCharge = 0;
-      const deliveryInfo = internationalDelivery[formData.country];
-      if (deliveryInfo) {
-        const chargeInINR =
-          deliveryInfo.charge / currencyRates[deliveryInfo.currency];
-        shippingCharge = Math.round(chargeInINR);
-      }
 
       // Prepare order summary for international payment page
       const orderSummary = {
@@ -619,16 +692,19 @@ const CheckoutPage = () => {
               },
             ],
         subtotal: Number(
-          convertCurrency(subtotal, currentCurrency).replace(/[^\d.-]/g, "")
+          convertCurrency(pricing.subtotal, currentCurrency).replace(
+            /[^\d.-]/g,
+            ""
+          )
         ),
         discount: Number(
-          convertCurrency(discountAmount, currentCurrency).replace(
+          convertCurrency(pricing.discountAmount, currentCurrency).replace(
             /[^\d.-]/g,
             ""
           )
         ),
         shipping: Number(
-          convertCurrency(shippingCharge, currentCurrency).replace(
+          convertCurrency(pricing.deliveryCharge, currentCurrency).replace(
             /[^\d.-]/g,
             ""
           )
@@ -702,7 +778,7 @@ const CheckoutPage = () => {
                     measurements: orderDetails.measurements || {},
                   },
                 ],
-            amount: calculateTotal(),
+            amount: pricing.total,
             coupon: couponCode,
             dispatchDate: calculateDispatchDate(),
             isCollaboration: true, // Add collaboration flag
@@ -714,7 +790,7 @@ const CheckoutPage = () => {
           throw new Error(`Failed to save collaboration order: ${saveRes.status}`);
         }
 
-        const saveData = await saveRes.json();
+        await saveRes.json();
         
         setLoadingPayment(false);
         
@@ -737,7 +813,7 @@ const CheckoutPage = () => {
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: calculateTotal() }),
+        body: JSON.stringify({ amount: pricing.total }),
       });
 
       if (!res.ok) {
@@ -755,7 +831,7 @@ const CheckoutPage = () => {
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         // amount: data.amount,
-        amount: calculateTotal() * 100, // Convert to paise
+        amount: pricing.total * 100, // Convert to paise
         currency: data.currency,
         name: "Furever Steffie",
         description: "Order Payment",
@@ -853,16 +929,7 @@ const CheckoutPage = () => {
               } else {
                 // Order saved successfully, send WhatsApp notification
                 try {
-                  const saveData = await saveRes.json();
-                  const dispatchDate = new Date(calculateDispatchDate());
-                  const formattedDispatchDate = dispatchDate.toLocaleDateString(
-                    "en-IN",
-                    {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    }
-                  );
+                  await saveRes.json();
                  
                 } catch (whatsappError) {
                   console.error(
@@ -1002,398 +1069,418 @@ const CheckoutPage = () => {
       </div>
 
       <div className="container max-w-md mx-auto pt-4 pb-16">
-        {!orderCompleted ? (
-          <form onSubmit={handleSubmit}>
-            {/* Order Summary */}
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Order Summary
-                </h3>
-              </div>
-
-              <div className="p-4 space-y-4">
-                {(isCartCheckout ? cart : [orderDetails]).map((item, idx) => (
-                  <div key={idx} className="flex">
-                    <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.image}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="ml-3 flex-1">
-                      <div className="text-xs text-gray-600">
-                        {item.subcategory}
-                      </div>
-                      <h4 className="text-sm font-semibold text-gray-800">
-                        {item.name}
-                      </h4>
-                      <div className="text-xs text-gray-600 mt-0.5">
-                        {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                        {item.isFullSet
-                          ? "Full Set"
-                          : item.isDupattaSet
-                          ? "Kurta + Dupatta"
-                          : item.category}{" "}
-                        • Size {item.selectedSize}
-                      </div>
-                      {item.quantity && (
-                        <div className="text-xs text-gray-500 mt-0.5">
-                          Qty: {item.quantity}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm font-semibold text-gray-800 ml-2">
-                      {convertCurrency(
-                        item.price * (item.quantity || 1),
-                        currency
-                      )}
-                    </div>
+        <form onSubmit={handleSubmit}>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Checkout progress
+                  </p>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {CHECKOUT_STEPS[currentCheckoutStep].title}
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {CHECKOUT_STEPS[currentCheckoutStep].description}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-gray-500">
+                    {checkoutItemCount} item{checkoutItemCount !== 1 ? "s" : ""}
                   </div>
-                ))}
+                  <div className="text-base font-semibold text-gray-900">
+                    {convertCurrency(pricing.total, currency)}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Shipping Information */}
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Shipping Information
-                </h3>
-              </div>
+            <div className="grid grid-cols-3 gap-2 p-4">
+              {CHECKOUT_STEPS.map((step, index) => (
+                <div
+                  key={step.id}
+                  className={`rounded-lg border px-3 py-2 text-center ${
+                    index === currentCheckoutStep
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : index < currentCheckoutStep
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-gray-200 bg-gray-50 text-gray-500"
+                  }`}
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-wide">
+                    Step {index + 1}
+                  </div>
+                  <div className="mt-1 text-xs font-medium">{step.title}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              <div className="p-4 space-y-4">
-                <div>
-                  <label
-                    htmlFor="fullName"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Full Name*
-                  </label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className={`w-full p-2 border ${
-                      errors.fullName ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder="Enter your full name"
-                  />
-                  {errors.fullName && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.fullName}
-                    </p>
-                  )}
+          {currentCheckoutStep === 0 && (
+            <>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Contact Information
+                  </h3>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Email Address*
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full p-2 border ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder="Enter your email address"
-                  />
-                  {errors.email && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    💡 We recommend providing a valid email as we&apos;ll share
-                    order updates and further steps through email communication.
-                  </p>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="addressLine1"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Address Line 1*
-                  </label>
-                  <input
-                    type="text"
-                    id="addressLine1"
-                    name="addressLine1"
-                    value={formData.addressLine1}
-                    onChange={handleChange}
-                    className={`w-full p-2 border ${
-                      errors.addressLine1 ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder="House/Flat number, Building name"
-                  />
-                  {errors.addressLine1 && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.addressLine1}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="addressLine2"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Address Line 2
-                  </label>
-                  <input
-                    type="text"
-                    id="addressLine2"
-                    name="addressLine2"
-                    value={formData.addressLine2}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                    placeholder="Street name, Area (Optional)"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="country"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Country*
-                  </label>
-                  <select
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    className={`w-full p-2 border ${
-                      errors.country ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                  >
-                    <option value="india">🇮🇳 India</option>
-                    <option value="singapore">🇸🇬 Singapore</option>
-                    <option value="malaysia">🇲🇾 Malaysia</option>
-                    <option value="usa">🇺🇸 United States</option>
-                    <option value="uk">🇬🇧 United Kingdom</option>
-                    <option value="canada">🇨🇦 Canada</option>
-                    <option value="australia">🇦🇺 Australia</option>
-                    <option value="newzealand">🇳🇿 New Zealand</option>
-                    <option value="dubai">🇦🇪 UAE (Dubai)</option>
-                    <option value="germany">🇩🇪 Germany</option>
-                    <option value="france">🇫🇷 France</option>
-                    <option value="netherlands">�� Netherlands</option>
-                    <option value="japan">🇯🇵 Japan</option>
-                    <option value="southkorea">🇰🇷 South Korea</option>
-                    <option value="hongkong">�� Hong Kong</option>
-                    <option value="thailand">🇹🇭 Thailand</option>
-                  </select>
-                  {errors.country && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.country}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 space-y-4">
                   <div>
                     <label
-                      htmlFor="city"
+                      htmlFor="fullName"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      City*
+                      Full Name*
                     </label>
                     <input
                       type="text"
-                      id="city"
-                      name="city"
-                      value={formData.city}
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
                       onChange={handleChange}
                       className={`w-full p-2 border ${
-                        errors.city ? "border-red-500" : "border-gray-300"
+                        errors.fullName ? "border-red-500" : "border-gray-300"
                       } rounded-md text-sm`}
-                      placeholder="City"
+                      placeholder="Enter your full name"
+                      autoComplete="name"
                     />
-                    {errors.city && formSubmitted && (
-                      <p className="mt-1 text-xs text-red-500">{errors.city}</p>
+                    {errors.fullName && formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.fullName}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <label
-                      htmlFor="state"
+                      htmlFor="email"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      {formData.country === "india"
-                        ? "State*"
-                        : "State/Province"}
+                      Email Address*
                     </label>
-                    {formData.country === "india" ? (
-                      <select
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        className={`w-full p-2 border ${
-                          errors.state ? "border-red-500" : "border-gray-300"
-                        } rounded-md text-sm`}
-                      >
-                        <option value="">Select State</option>
-                        {/* Indian States */}
-                        <option value="Andaman and Nicobar Islands">
-                          Andaman and Nicobar Islands
-                        </option>
-                        <option value="Andhra Pradesh">Andhra Pradesh</option>
-                        <option value="Arunachal Pradesh">
-                          Arunachal Pradesh
-                        </option>
-                        <option value="Assam">Assam</option>
-                        <option value="Bihar">Bihar</option>
-                        <option value="Chandigarh">Chandigarh</option>
-                        <option value="Chhattisgarh">Chhattisgarh</option>
-                        <option value="Dadra and Nagar Haveli and Daman and Diu">
-                          Dadra and Nagar Haveli and Daman and Diu
-                        </option>
-                        <option value="Delhi">Delhi</option>
-                        <option value="Goa">Goa</option>
-                        <option value="Gujarat">Gujarat</option>
-                        <option value="Haryana">Haryana</option>
-                        <option value="Himachal Pradesh">
-                          Himachal Pradesh
-                        </option>
-                        <option value="Jammu and Kashmir">
-                          Jammu and Kashmir
-                        </option>
-                        <option value="Jharkhand">Jharkhand</option>
-                        <option value="Karnataka">Karnataka</option>
-                        <option value="Kerala">Kerala</option>
-                        <option value="Ladakh">Ladakh</option>
-                        <option value="Lakshadweep">Lakshadweep</option>
-                        <option value="Madhya Pradesh">Madhya Pradesh</option>
-                        <option value="Maharashtra">Maharashtra</option>
-                        <option value="Manipur">Manipur</option>
-                        <option value="Meghalaya">Meghalaya</option>
-                        <option value="Mizoram">Mizoram</option>
-                        <option value="Nagaland">Nagaland</option>
-                        <option value="Odisha">Odisha</option>
-                        <option value="Puducherry">Puducherry</option>
-                        <option value="Punjab">Punjab</option>
-                        <option value="Rajasthan">Rajasthan</option>
-                        <option value="Sikkim">Sikkim</option>
-                        <option value="Tamil Nadu">Tamil Nadu</option>
-                        <option value="Telangana">Telangana</option>
-                        <option value="Tripura">Tripura</option>
-                        <option value="Uttar Pradesh">Uttar Pradesh</option>
-                        <option value="Uttarakhand">Uttarakhand</option>
-                        <option value="West Bengal">West Bengal</option>
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        className={`w-full p-2 border ${
-                          errors.state ? "border-red-500" : "border-gray-300"
-                        } rounded-md text-sm`}
-                        placeholder="Enter state/province"
-                      />
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full p-2 border ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      } rounded-md text-sm`}
+                      placeholder="Enter your email address"
+                      autoComplete="email"
+                    />
+                    {errors.email && formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
                     )}
-                    {formData.country === "india" &&
-                      errors.state &&
-                      formSubmitted && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors.state}
-                        </p>
-                      )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      We&apos;ll send order updates and follow-up information here.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="mobileNumber"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Mobile Number*
+                    </label>
+                    <input
+                      type="tel"
+                      id="mobileNumber"
+                      name="mobileNumber"
+                      value={formData.mobileNumber}
+                      onChange={handleChange}
+                      maxLength={formData.country === "india" ? 10 : 20}
+                      className={`w-full p-2 border ${
+                        errors.mobileNumber ? "border-red-500" : "border-gray-300"
+                      } rounded-md text-sm`}
+                      placeholder={
+                        formData.country === "india"
+                          ? "10-digit mobile number"
+                          : "Mobile number with country code"
+                      }
+                      autoComplete="tel"
+                    />
+                    {errors.mobileNumber && formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.mobileNumber}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Required for delivery coordination and urgent updates.
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="pincode"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {formData.country === "india" ? "PIN Code*" : "Postal Code"}
-                  </label>
-                  <input
-                    type="text"
-                    id="pincode"
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    maxLength={formData.country === "india" ? 6 : 20}
-                    className={`w-full p-2 border ${
-                      errors.pincode ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder={
-                      formData.country === "india"
-                        ? "6-digit PIN code"
-                        : "Enter postal code"
-                    }
-                  />
-                  {formData.country === "india" &&
-                    errors.pincode &&
-                    formSubmitted && (
+              <button
+                type="button"
+                onClick={handleNextCheckoutStep}
+                className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
+              >
+                Continue to shipping
+              </button>
+            </>
+          )}
+
+          {currentCheckoutStep === 1 && (
+            <>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Shipping Address
+                  </h3>
+                </div>
+
+                <div className="p-4 space-y-4">
+                  <div>
+                    <label
+                      htmlFor="addressLine1"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Address Line 1*
+                    </label>
+                    <input
+                      type="text"
+                      id="addressLine1"
+                      name="addressLine1"
+                      value={formData.addressLine1}
+                      onChange={handleChange}
+                      className={`w-full p-2 border ${
+                        errors.addressLine1 ? "border-red-500" : "border-gray-300"
+                      } rounded-md text-sm`}
+                      placeholder="House/Flat number, Building name"
+                      autoComplete="address-line1"
+                    />
+                    {errors.addressLine1 && formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.addressLine1}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="addressLine2"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Address Line 2
+                    </label>
+                    <input
+                      type="text"
+                      id="addressLine2"
+                      name="addressLine2"
+                      value={formData.addressLine2}
+                      onChange={handleChange}
+                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                      placeholder="Street name, Area (Optional)"
+                      autoComplete="address-line2"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="country"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Country*
+                    </label>
+                    <select
+                      id="country"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleChange}
+                      className={`w-full p-2 border ${
+                        errors.country ? "border-red-500" : "border-gray-300"
+                      } rounded-md text-sm`}
+                      autoComplete="country-name"
+                    >
+                      <option value="india">🇮🇳 India</option>
+                      <option value="singapore">🇸🇬 Singapore</option>
+                      <option value="malaysia">🇲🇾 Malaysia</option>
+                      <option value="usa">🇺🇸 United States</option>
+                      <option value="uk">🇬🇧 United Kingdom</option>
+                      <option value="canada">🇨🇦 Canada</option>
+                      <option value="australia">🇦🇺 Australia</option>
+                      <option value="newzealand">🇳🇿 New Zealand</option>
+                      <option value="dubai">🇦🇪 UAE (Dubai)</option>
+                      <option value="germany">🇩🇪 Germany</option>
+                      <option value="france">🇫🇷 France</option>
+                      <option value="netherlands">🇳🇱 Netherlands</option>
+                      <option value="japan">🇯🇵 Japan</option>
+                      <option value="southkorea">🇰🇷 South Korea</option>
+                      <option value="hongkong">🇭🇰 Hong Kong</option>
+                      <option value="thailand">🇹🇭 Thailand</option>
+                    </select>
+                    {errors.country && formSubmitted && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.country}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="city"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        City*
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className={`w-full p-2 border ${
+                          errors.city ? "border-red-500" : "border-gray-300"
+                        } rounded-md text-sm`}
+                        placeholder="City"
+                        autoComplete="address-level2"
+                      />
+                      {errors.city && formSubmitted && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.city}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="state"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        {formData.country === "india"
+                          ? "State*"
+                          : "State/Province"}
+                      </label>
+                      {formData.country === "india" ? (
+                        <select
+                          id="state"
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className={`w-full p-2 border ${
+                            errors.state ? "border-red-500" : "border-gray-300"
+                          } rounded-md text-sm`}
+                          autoComplete="address-level1"
+                        >
+                          <option value="">Select State</option>
+                          <option value="Andaman and Nicobar Islands">
+                            Andaman and Nicobar Islands
+                          </option>
+                          <option value="Andhra Pradesh">Andhra Pradesh</option>
+                          <option value="Arunachal Pradesh">
+                            Arunachal Pradesh
+                          </option>
+                          <option value="Assam">Assam</option>
+                          <option value="Bihar">Bihar</option>
+                          <option value="Chandigarh">Chandigarh</option>
+                          <option value="Chhattisgarh">Chhattisgarh</option>
+                          <option value="Dadra and Nagar Haveli and Daman and Diu">
+                            Dadra and Nagar Haveli and Daman and Diu
+                          </option>
+                          <option value="Delhi">Delhi</option>
+                          <option value="Goa">Goa</option>
+                          <option value="Gujarat">Gujarat</option>
+                          <option value="Haryana">Haryana</option>
+                          <option value="Himachal Pradesh">
+                            Himachal Pradesh
+                          </option>
+                          <option value="Jammu and Kashmir">
+                            Jammu and Kashmir
+                          </option>
+                          <option value="Jharkhand">Jharkhand</option>
+                          <option value="Karnataka">Karnataka</option>
+                          <option value="Kerala">Kerala</option>
+                          <option value="Ladakh">Ladakh</option>
+                          <option value="Lakshadweep">Lakshadweep</option>
+                          <option value="Madhya Pradesh">Madhya Pradesh</option>
+                          <option value="Maharashtra">Maharashtra</option>
+                          <option value="Manipur">Manipur</option>
+                          <option value="Meghalaya">Meghalaya</option>
+                          <option value="Mizoram">Mizoram</option>
+                          <option value="Nagaland">Nagaland</option>
+                          <option value="Odisha">Odisha</option>
+                          <option value="Puducherry">Puducherry</option>
+                          <option value="Punjab">Punjab</option>
+                          <option value="Rajasthan">Rajasthan</option>
+                          <option value="Sikkim">Sikkim</option>
+                          <option value="Tamil Nadu">Tamil Nadu</option>
+                          <option value="Telangana">Telangana</option>
+                          <option value="Tripura">Tripura</option>
+                          <option value="Uttar Pradesh">Uttar Pradesh</option>
+                          <option value="Uttarakhand">Uttarakhand</option>
+                          <option value="West Bengal">West Bengal</option>
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          id="state"
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className={`w-full p-2 border ${
+                            errors.state ? "border-red-500" : "border-gray-300"
+                          } rounded-md text-sm`}
+                          placeholder="Enter state/province"
+                          autoComplete="address-level1"
+                        />
+                      )}
+                      {formData.country === "india" &&
+                        errors.state &&
+                        formSubmitted && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {errors.state}
+                          </p>
+                        )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="pincode"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      {formData.country === "india" ? "PIN Code*" : "Postal Code"}
+                    </label>
+                    <input
+                      type="text"
+                      id="pincode"
+                      name="pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      maxLength={formData.country === "india" ? 6 : 20}
+                      className={`w-full p-2 border ${
+                        errors.pincode ? "border-red-500" : "border-gray-300"
+                      } rounded-md text-sm`}
+                      placeholder={
+                        formData.country === "india"
+                          ? "6-digit PIN code"
+                          : "Enter postal code"
+                      }
+                      autoComplete="postal-code"
+                    />
+                    {errors.pincode && formSubmitted && (
                       <p className="mt-1 text-xs text-red-500">
                         {errors.pincode}
                       </p>
                     )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="mobileNumber"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Mobile Number*
-                  </label>
-                  <input
-                    type="tel"
-                    id="mobileNumber"
-                    name="mobileNumber"
-                    value={formData.mobileNumber}
-                    onChange={handleChange}
-                    maxLength={formData.country === "india" ? 10 : 20}
-                    className={`w-full p-2 border ${
-                      errors.mobileNumber ? "border-red-500" : "border-gray-300"
-                    } rounded-md text-sm`}
-                    placeholder={
-                      formData.country === "india"
-                        ? "10-digit mobile number"
-                        : "Mobile number with country code"
-                    }
-                  />
-                  {errors.mobileNumber && formSubmitted && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.mobileNumber}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    Required for order updates and delivery coordination.
-                    {formData.country !== "india" &&
-                      " Include country code (e.g., +1234567890)"}
-                  </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Delivery Options */}
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Delivery Options
-                </h3>
-              </div>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Delivery Options
+                  </h3>
+                </div>
 
-              <div className="p-4">
-                
-
-                <div className="space-y-3">
+                <div className="p-4 space-y-3">
                   {formData.country === "india" ? (
                     <>
                       <label className="flex items-center p-3 border border-gray-200 rounded-md">
@@ -1410,7 +1497,7 @@ const CheckoutPage = () => {
                             Standard Shipping
                           </span>
                           <span className="block text-xs text-green-500">
-                            5-7 days • ₹Free
+                            5-7 days • Free
                           </span>
                         </div>
                       </label>
@@ -1471,188 +1558,237 @@ const CheckoutPage = () => {
                           10-15 business days •{" "}
                           {internationalDelivery[formData.country]?.currency ||
                             "TBD"}{" "}
-                          {internationalDelivery[formData.country]?.charge ||
-                            "0"}
+                          {internationalDelivery[formData.country]?.charge || "0"}
                         </span>
                       </div>
                     </label>
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* Special Instructions */}
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Special Instructions
-                </h3>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Special Instructions
+                  </h3>
+                </div>
+
+                <div className="p-4">
+                  <textarea
+                    id="specialInstructions"
+                    name="specialInstructions"
+                    value={formData.specialInstructions}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    placeholder="Any special instructions for delivery (Optional)"
+                  ></textarea>
+                </div>
               </div>
 
-              <div className="p-4">
-                <textarea
-                  id="specialInstructions"
-                  name="specialInstructions"
-                  value={formData.specialInstructions}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="Any special instructions for delivery (Optional)"
-                ></textarea>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Have a Coupon?
-                </h3>
-              </div>
-              <div className="p-4 flex space-x-2">
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  placeholder="Enter coupon code"
-                  className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
-                />
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={applyCoupon}
-                  className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md"
+                  onClick={handlePreviousCheckoutStep}
+                  className="w-full py-3 bg-white border border-gray-300 text-gray-800 font-medium rounded-md"
                 >
-                  Apply
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextCheckoutStep}
+                  className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
+                >
+                  Review order
                 </button>
               </div>
-              {couponError && (
-                <p className="px-4 pb-3 text-xs text-red-500">{couponError}</p>
-              )}
-            </div>
-            {/* Order Total */}
-            <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="text-md font-semibold text-gray-800">
-                  Order Total
-                </h3>
+            </>
+          )}
+
+          {currentCheckoutStep === 2 && (
+            <>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Order Summary
+                  </h3>
+                </div>
+
+                <div className="p-4 space-y-4">
+                  {pricing.items.map((item, idx) => (
+                    <div key={idx} className="flex">
+                      <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="ml-3 flex-1">
+                        <div className="text-xs text-gray-600">
+                          {item.subcategory}
+                        </div>
+                        <h4 className="text-sm font-semibold text-gray-800">
+                          {item.name}
+                        </h4>
+                        <div className="text-xs text-gray-600 mt-0.5">
+                          {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
+                          {item.isFullSet
+                            ? "Full Set"
+                            : item.isDupattaSet
+                            ? "Kurta + Dupatta"
+                            : item.category}{" "}
+                          • Size {item.selectedSize}
+                        </div>
+                        {item.quantity && (
+                          <div className="text-xs text-gray-500 mt-0.5">
+                            Qty: {item.quantity}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm font-semibold text-gray-800 ml-2">
+                        {convertCurrency(
+                          item.price * (item.quantity || 1),
+                          currency
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Product Price:</span>
-                  <span className="text-gray-800">
-                    {convertCurrency(
-                      (isCartCheckout
-                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                        : orderDetails.price
-                      ).toFixed(2),
-                      currency
-                    )}
-                  </span>
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Have a Coupon?
+                  </h3>
+                </div>
+                <div className="p-4 flex space-x-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    className="px-4 py-2 bg-gray-800 text-white text-sm rounded-md"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {couponError && (
+                  <p className="px-4 pb-3 text-xs text-red-500">{couponError}</p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Order Total
+                  </h3>
                 </div>
 
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Delivery:</span>
-                  <span className="text-gray-800">
-                    {(() => {
-                      if (formData.country !== "india") {
-                        // International delivery - convert to current currency
-                        const country = internationalDelivery[formData.country];
-                        if (country) {
-                          // Convert the charge from INR to display currency
-                          const chargeInINR =
-                            country.charge /
-                            (currencyRates[country.currency] || 1);
-                          return convertCurrency(chargeInINR, currency);
-                        }
-                        return "International";
-                      }
-
-                      // Domestic delivery
-                      const productPrice = isCartCheckout
-                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                        : orderDetails.price;
-
-                      const discountAmount = (productPrice * discount) / 100;
-                      const totalAfterDiscount = productPrice - discountAmount;
-
-                      if (formData.deliveryOption === "express") {
-                        return convertCurrency(399, currency);
-                      }
-                      if (totalAfterDiscount > 1499) {
-                        return "Free";
-                      }
-                      return "Free";
-                    })()}
-                  </span>
-                </div>
-                {(discount > 0 ||
-                  couponCode.trim().toUpperCase() === SINGLE_USE_COUPON ||
-                  CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()] ||
-                  customCouponData) && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Coupon Discount:</span>
-                    <span>
-                      {(() => {
-                        if (
-                          couponCode.trim().toUpperCase() === SINGLE_USE_COUPON
-                        ) {
-                          // Flat ₹750 discount
-                          return convertCurrency(750, currency);
-                        } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
-                          // Customer validation coupons - ₹100 flat discount
-                          return convertCurrency(100, currency);
-                        } else if (customCouponData) {
-                          // Custom coupon discount
-                          return convertCurrency(customCouponData.discountAmount, currency);
-                        } else {
-                          // Percentage discount
-                          let subtotal = isCartCheckout
-                            ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                            : orderDetails.price;
-                          return convertCurrency(
-                            ((subtotal * discount) / 100).toFixed(2),
-                            currency
-                          );
-                        }
-                      })()}
+                <div className="p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Product Price:</span>
+                    <span className="text-gray-800">
+                      {convertCurrency(pricing.subtotal.toFixed(2), currency)}
                     </span>
                   </div>
-                )}
-                <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
-                  <span className="text-gray-800">Total:</span>
-                  <span className="text-gray-800">
-                    {convertCurrency(calculateTotal(), currency)}
-                  </span>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Delivery:</span>
+                    <span className="text-gray-800">
+                      {pricing.deliveryCharge > 0
+                        ? convertCurrency(pricing.deliveryCharge, currency)
+                        : "Free"}
+                    </span>
+                  </div>
+
+                  {(discount > 0 ||
+                    couponCode.trim().toUpperCase() === SINGLE_USE_COUPON ||
+                    CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()] ||
+                    customCouponData) && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Coupon Discount:</span>
+                      <span>
+                        {(() => {
+                          if (
+                            couponCode.trim().toUpperCase() === SINGLE_USE_COUPON
+                          ) {
+                            return convertCurrency(750, currency);
+                          }
+
+                          if (
+                            CUSTOMER_VALIDATION_COUPONS[
+                              couponCode.trim().toUpperCase()
+                            ]
+                          ) {
+                            return convertCurrency(100, currency);
+                          }
+
+                          if (customCouponData) {
+                            return convertCurrency(
+                              customCouponData.discountAmount,
+                              currency
+                            );
+                          }
+
+                          return convertCurrency(
+                            pricing.discountAmount.toFixed(2),
+                            currency
+                          );
+                        })()}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
+                    <span className="text-gray-800">Total:</span>
+                    <span className="text-gray-800">
+                      {convertCurrency(pricing.total, currency)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* International Payment Note */}
-            {formData.country !== "india" && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
-                <div className="flex items-start">
-                  <div className="mr-2 mt-0.5">
-                    <AlertTriangle size={16} className="text-blue-600" />
-                  </div>
-                  <div className="flex-1 text-sm text-blue-700">
-                    <strong>International Payment:</strong> Payment will be
-                    processed in Indian Rupees (INR) through our secure payment
-                    gateway. The exact amount charged may vary slightly due to
-                    exchange rate fluctuations and bank conversion fees.
+              {formData.country !== "india" && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
+                  <div className="flex items-start">
+                    <div className="mr-2 mt-0.5">
+                      <AlertTriangle size={16} className="text-blue-600" />
+                    </div>
+                    <div className="flex-1 text-sm text-blue-700">
+                      <strong>International Payment:</strong> Payment will be
+                      processed in Indian Rupees (INR) through our secure
+                      payment gateway. The exact amount charged may vary slightly
+                      due to exchange rate fluctuations and bank conversion fees.
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <button
-              type="submit"
-              className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
-            >
-              Place Order
-            </button>
-          </form>
-        ) : (
-          <h1>We collect payment here!!</h1>
-        )}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handlePreviousCheckoutStep}
+                  className="w-full py-3 bg-white border border-gray-300 text-gray-800 font-medium rounded-md"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
+                >
+                  Place Order
+                </button>
+              </div>
+            </>
+          )}
+        </form>
       </div>
     </div>
   );

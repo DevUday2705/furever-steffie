@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
+import { isSameCartItem } from "../utils/cartItem";
 
 // Create Context
 export const AppContext = createContext();
@@ -123,16 +124,8 @@ export const AppProvider = ({ children }) => {
 
   // n
   const addToCart = (item) => {
-    const existingIndex = cart.findIndex(
-      (p) =>
-        p.productId === item.productId &&
-        p.isBeaded === item.isBeaded &&
-        p.isFullSet === item.isFullSet &&
-        p.isRoyalSet === item.isRoyalSet &&
-        p.isDupattaSet === item.isDupattaSet &&
-        p.selectedSize === item.selectedSize &&
-        p.selectedDhoti === item.selectedDhoti &&
-        p.selectedColor === item.selectedColor
+    const existingIndex = cart.findIndex((cartItem) =>
+      isSameCartItem(cartItem, item)
     );
 
     if (existingIndex !== -1) {
@@ -150,12 +143,7 @@ export const AppProvider = ({ children }) => {
     setCart((prev) =>
       prev.filter(
         (item) =>
-          !(
-            item.productId === productId &&
-            item.isBeaded === config.isBeaded &&
-            item.isFullSet === config.isFullSet &&
-            item.selectedSize === config.selectedSize
-          )
+          !(item.productId === productId && isSameCartItem(item, config))
       )
     );
   };
@@ -164,10 +152,7 @@ export const AppProvider = ({ children }) => {
   const updateQuantity = (productId, config = {}, quantity) => {
     setCart((prev) =>
       prev.map((item) =>
-        item.productId === productId &&
-        item.isBeaded === config.isBeaded &&
-        item.isFullSet === config.isFullSet &&
-        item.selectedSize === config.selectedSize
+        item.productId === productId && isSameCartItem(item, config)
           ? { ...item, quantity }
           : item
       )
