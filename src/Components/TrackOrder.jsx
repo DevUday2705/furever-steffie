@@ -168,6 +168,8 @@ const TrackOrder = () => {
         return "text-blue-600 bg-blue-100";
       case "cutting":
         return "text-purple-600 bg-purple-100";
+      case "shipped-but-tracking-not-received":
+        return "text-amber-600 bg-amber-100";
       case "shipped":
         return "text-green-600 bg-green-100";
       case "cancelled":
@@ -243,6 +245,8 @@ const TrackOrder = () => {
                       ? "bg-yellow-500"
                       : order.orderStatus === "cutting"
                       ? "bg-indigo-500"
+                      : order.orderStatus === "shipped-but-tracking-not-received"
+                      ? "bg-amber-500"
                       : order.orderStatus === "shipped"
                       ? "bg-green-600"
                       : "bg-gray-300"
@@ -253,6 +257,17 @@ const TrackOrder = () => {
               </div>
 
               <OrderProgressBar status={order.orderStatus} />
+
+              {/* Shipped but tracking ID not yet received from courier */}
+              {order.orderStatus === "shipped-but-tracking-not-received" && (
+                <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-700">
+                    Your order has been shipped. Tracking details will be
+                    updated here shortly once received from our courier
+                    partner.
+                  </p>
+                </div>
+              )}
 
               {/* Shipping Information - Only show if order is shipped */}
               {order.orderStatus === "shipped" && (

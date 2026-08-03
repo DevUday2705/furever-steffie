@@ -11,7 +11,7 @@ import CouponManager from "./CouponManager";
 import Analytics from "./Analytics";
 import { useOrderPause } from "../context/OrderPauseContext";
 
-const ADMIN_KEY = "What@123";
+const ADMIN_KEY = "Steffie@123";
 
 const AdminPage = () => {
   const [passkey, setPasskey] = useState("");
@@ -926,6 +926,9 @@ const AdminPage = () => {
     readyToShip: filteredAndSortedOrders.filter(
       (o) => o.orderStatus === "ready-to-ship"
     ).length,
+    shippedTrackingPending: filteredAndSortedOrders.filter(
+      (o) => o.orderStatus === "shipped-but-tracking-not-received"
+    ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
     // Shipping type stats
@@ -1491,6 +1494,8 @@ const AdminPage = () => {
                           ? "bg-orange-500"
                           : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
+                          : order.orderStatus === "shipped-but-tracking-not-received"
+                          ? "bg-amber-500"
                           : order.orderStatus === "shipped"
                           ? "bg-green-600"
                           : "bg-gray-300"
@@ -1513,6 +1518,9 @@ const AdminPage = () => {
                           </option>
                           <option value="cutting">Cutting</option>
                           <option value="ready-to-ship">Ready to Ship</option>
+                          <option value="shipped-but-tracking-not-received">
+                            Shipped But Tracking Not Received
+                          </option>
                           <option value="shipped">shipped</option>
                         </select>
                       </div>

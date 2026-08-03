@@ -121,6 +121,9 @@ const OrderFilters = ({
             <option value="pending">Pending</option>
             <option value="cutting">Cutting</option>
             <option value="ready-to-ship">Ready to Ship</option>
+            <option value="shipped-but-tracking-not-received">
+              Shipped But Tracking Not Received
+            </option>
             <option value="shipped">Shipped</option>
           </select>
         </div>
