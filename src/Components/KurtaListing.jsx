@@ -43,10 +43,9 @@ const KurtaListing = () => {
 
   return (
     <ProductListing
-      title="All Kurtas"
-      subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
+     
       category="kurta"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1770984025/WhatsApp_Image_2026-02-13_at_3.34.10_PM_kyge7r.webp"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/video/upload/v1785869299/Whatsapp_Video_2026-08-04_At_10.58.44_Pm_1_ftofp9.mp4"
       products={[...kurtas, ...dhotis]} // Combine kurtas and dhotis into one array
     />
   );

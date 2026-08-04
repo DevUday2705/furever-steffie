@@ -30,8 +30,7 @@ import { CurrencyContext } from "../context/currencyContext";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 
 const ProductListing = ({
-  title,
-  subtitle,
+
   category,
   bannerImage,
   bannerTitle,
@@ -359,7 +358,7 @@ const ProductListing = ({
       />
 
       {/* Banner with Overlay Navigation and Content */}
-      <div className="relative bg-white w-full h-[250px] md:h-[300px] overflow-hidden">
+      <div className="relative bg-white w-full h-[250px] md:h-[300px] overflow-hidden rounded-b-2xl">
         {bannerImage && isVideo(bannerImage) ? (
           <video
             src={bannerImage}
@@ -376,7 +375,6 @@ const ProductListing = ({
             className="w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/10"></div>
         
         {/* Top Navigation Bar - Overlaid on Banner */}
         <div className="absolute top-0 left-0 right-0 z-20">
@@ -399,35 +397,6 @@ const ProductListing = ({
               </span>
               <ArrowUpDown size={14} className="ml-1" />
             </button>
-          </div>
-        </div>
-
-        {/* Content Overlay - Title, Subtitle and Banner Title */}
-        <div className="absolute inset-0 flex flex-col justify-end items-start px-4 pb-6 z-10">
-          <div className="container mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-left"
-            >
-              <h1 className="text-3xl md:text-5xl font-bold text-white capitalize mb-2 drop-shadow-2xl">
-                {title}
-              </h1>
-              <p className="text-white/90 text-base md:text-lg drop-shadow-lg mb-4">
-                {subtitle}
-              </p>
-              {bannerTitle && (
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="text-white/80 text-lg md:text-xl font-medium tracking-wide drop-shadow-md"
-                >
-                  {bannerTitle}
-                </motion.h2>
-              )}
-            </motion.div>
           </div>
         </div>
       </div>
