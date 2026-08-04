@@ -45,7 +45,7 @@ const KurtaListing = () => {
     <ProductListing
      
       category="kurta"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/video/upload/v1785869299/Whatsapp_Video_2026-08-04_At_10.58.44_Pm_1_ftofp9.mp4"
+      bannerImage="https://res.cloudinary.com/di6unrpjw/video/upload/v1785873386/Whatsapp_Video_2026-08-05_At_1.19.35_Am_tunfr3.mp4"
       products={[...kurtas, ...dhotis]} // Combine kurtas and dhotis into one array
     />
   );
