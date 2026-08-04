@@ -927,7 +927,7 @@ const AdminPage = () => {
       (o) => o.orderStatus === "ready-to-ship"
     ).length,
     shippedTrackingPending: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "shipped-but-tracking-not-received"
+      (o) => o.orderStatus === "tracking-pending"
     ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
@@ -1494,7 +1494,7 @@ const AdminPage = () => {
                           ? "bg-orange-500"
                           : order.orderStatus === "ready-to-ship"
                           ? "bg-indigo-500"
-                          : order.orderStatus === "shipped-but-tracking-not-received"
+                          : order.orderStatus === "tracking-pending"
                           ? "bg-amber-500"
                           : order.orderStatus === "shipped"
                           ? "bg-green-600"
@@ -1518,8 +1518,8 @@ const AdminPage = () => {
                           </option>
                           <option value="cutting">Cutting</option>
                           <option value="ready-to-ship">Ready to Ship</option>
-                          <option value="shipped-but-tracking-not-received">
-                            Shipped But Tracking Not Received
+                          <option value="tracking-pending">
+                            Tracking Pending
                           </option>
                           <option value="shipped">shipped</option>
                         </select>

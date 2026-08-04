@@ -12,7 +12,7 @@ const OrderProgressBar = ({ status }) => {
 
   const getStepIndex = (currentStatus) => {
     // Order has physically shipped even if tracking hasn't been received yet
-    if (currentStatus === "shipped-but-tracking-not-received") {
+    if (currentStatus === "tracking-pending") {
       return steps.findIndex((step) => step.key === "shipped");
     }
     return steps.findIndex((step) => step.key === currentStatus);
