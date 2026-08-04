@@ -384,7 +384,6 @@ const ProductListing = ({
               className="inline-flex items-center text-white hover:text-white/80 transition-colors bg-black/20 backdrop-blur-sm px-3 py-2 rounded-lg"
             >
               <ChevronLeft size={18} />
-              <span className="ml-1 text-sm font-medium">Back</span>
             </button>
 
             <button
@@ -392,10 +391,7 @@ const ProductListing = ({
               className="flex items-center space-x-2 px-4 py-2 bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
             >
               <Sliders size={16} />
-              <span>
-                Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-              </span>
-              <ArrowUpDown size={14} className="ml-1" />
+             
             </button>
           </div>
         </div>
