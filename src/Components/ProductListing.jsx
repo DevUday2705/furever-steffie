@@ -34,6 +34,7 @@ const ProductListing = ({
   category,
   bannerImage,
   bannerTitle,
+  bannerSubtitle,
   products,
 }) => {
   const [searchParams] = useSearchParams();
@@ -375,7 +376,27 @@ const ProductListing = ({
             className="w-full h-full object-cover"
           />
         )}
-        
+
+        {/* Subtle dark overlay so white text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10" />
+
+        {(bannerTitle || bannerSubtitle) && (
+          <div className="absolute bottom-4 left-0 right-0 z-20 px-4 sm:px-6">
+            <div className="container mx-auto">
+              {bannerTitle && (
+                <h1 className="text-white text-2xl sm:text-3xl font-semibold drop-shadow-sm">
+                  {bannerTitle}
+                </h1>
+              )}
+              {bannerSubtitle && (
+                <p className="text-white/90 text-sm sm:text-base mt-1 drop-shadow-sm">
+                  {bannerSubtitle}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Top Navigation Bar - Overlaid on Banner */}
         <div className="absolute top-0 left-0 right-0 z-20">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -739,6 +760,7 @@ ProductListing.propTypes = {
   category: PropTypes.string.isRequired,
   bannerImage: PropTypes.string,
   bannerTitle: PropTypes.string,
+  bannerSubtitle: PropTypes.string,
   products: PropTypes.array.isRequired,
 };
 
