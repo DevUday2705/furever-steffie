@@ -1,6 +1,6 @@
 import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
-// Create transporter using Gmail SMTP
+// Create transporter using Resend
 const createTransporter = () => createEmailTransport();
 
 // Generate measurement reminder email HTML

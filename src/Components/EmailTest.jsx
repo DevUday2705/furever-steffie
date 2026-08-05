@@ -217,7 +217,7 @@ The email service works in production but has limitations in local development.`
         </p>
         <ul style={{ margin: 0, paddingLeft: "20px" }}>
           <li>✅ Email service code is implemented</li>
-          <li>✅ Gmail SMTP configured</li>
+          <li>✅ Resend configured</li>
           <li>✅ Order integration complete</li>
           <li>⚠️ Local testing has limitations</li>
         </ul>

@@ -28,15 +28,16 @@ jobs:
           echo "📦 Installing dependencies..."
           npm ci --prefer-offline 
           
-      - name: Verify nodemailer installation
+      - name: Verify Resend installation
         run: |
-          echo "🔍 Verifying nodemailer installation..."
-          node -e "console.log('nodemailer version:', require('nodemailer/package.json').version)"
+          echo "🔍 Verifying resend installation..."
+          node -e "console.log('resend version:', require('resend/package.json').version)"
         
       - name: Send order report email
         env:
-          EMAIL_USER: fureversteffie@gmail.com
-          EMAIL_PASS: ${{ secrets.EMAIL_APP_PASSWORD }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          ORDER_REPORT_TO_EMAIL: ${{ secrets.ORDER_REPORT_TO_EMAIL }}
         run: |
           echo "🚀 Starting email send process..."
           node .github/scripts/send-order-report.js

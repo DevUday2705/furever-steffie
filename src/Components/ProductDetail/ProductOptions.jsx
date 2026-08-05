@@ -497,36 +497,7 @@ const ProductOptions = ({
   return (
     <div className="px-4 pb-4 space-y-4">
       {/* Size availability banner — shown before options so users know upfront */}
-      {sizeAvailability.hasManagedInventory && sizeAvailability.inStockSizes.length > 0 && (
-        <div className="rounded-xl border border-brand-200 bg-brand-50 p-3">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-wrap gap-1.5 items-center">
-              <span className="text-xs font-medium text-brand-700">Available sizes:</span>
-              {sizeAvailability.inStockSizes.map((size) => (
-                <Badge
-                  key={size}
-                  variant={sizeAvailability.lowStockSizes.includes(size) ? "warning" : "brand"}
-                  size="sm"
-                >
-                  {size}{sizeAvailability.lowStockSizes.includes(size) ? " ⚡" : ""}
-                </Badge>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={handleJumpToSizeSelection}
-              className="text-[11px] font-medium text-brand-600 underline underline-offset-2 whitespace-nowrap"
-            >
-              Size chart ↓
-            </button>
-          </div>
-          {sizeAvailability.lowStockSizes.length > 0 && (
-            <p className="mt-1.5 text-[11px] text-warning-600">
-              ⚡ Low stock on {sizeAvailability.lowStockSizes.join(", ")} — order soon
-            </p>
-          )}
-        </div>
-      )}
+      
 
       <ColorSelector
         colors={product.colors}

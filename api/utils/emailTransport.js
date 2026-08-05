@@ -1,13 +1,13 @@
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const envPath = resolve(currentDir, '../../.env');
 
 const loadEnvFile = () => {
-  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  if (process.env.RESEND_API_KEY) {
     return;
   }
 
@@ -38,27 +38,74 @@ const loadEnvFile = () => {
 
 loadEnvFile();
 
-export const getEmailCredentials = () => {
-  const user = process.env.EMAIL_USER || process.env.SMTP_USER;
-  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+export const getResendApiKey = () => {
+  const key = process.env.RESEND_API_KEY;
 
-  if (!user || !pass) {
-    throw new Error('Email credentials are not configured. Set EMAIL_USER and EMAIL_PASS (or SMTP_USER/SMTP_PASS).');
+  if (!key) {
+    throw new Error('Resend API key is not configured. Set RESEND_API_KEY.');
   }
 
-  return { user, pass };
+  return key;
 };
 
-export const getEmailFromAddress = () => getEmailCredentials().user;
+export const getEmailFromAddress = () => {
+  const fromAddress = process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || process.env.EMAIL_USER;
+
+  if (!fromAddress) {
+    throw new Error('Sender address is not configured. Set RESEND_FROM_EMAIL (or EMAIL_FROM).');
+  }
+
+  return fromAddress;
+};
+
+const getAddressValue = (addressInput) => {
+  if (!addressInput) return undefined;
+  if (typeof addressInput === 'string') return addressInput;
+  if (typeof addressInput === 'object' && addressInput.address) {
+    return addressInput.name ? `${addressInput.name} <${addressInput.address}>` : addressInput.address;
+  }
+  return undefined;
+};
+
+const toAddressArray = (addressInput) => {
+  if (!addressInput) return [];
+  const values = Array.isArray(addressInput) ? addressInput : [addressInput];
+  return values.map(getAddressValue).filter(Boolean);
+};
 
 export const createEmailTransport = () => {
-  const { user, pass } = getEmailCredentials();
+  const resend = new Resend(getResendApiKey());
 
-  return nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE || process.env.SMTP_SERVICE || 'gmail',
-    auth: {
-      user,
-      pass,
+  return {
+    async sendMail(mailOptions) {
+      const from = getAddressValue(mailOptions?.from) || getEmailFromAddress();
+      const to = toAddressArray(mailOptions?.to);
+
+      if (to.length === 0) {
+        throw new Error('Recipient address is missing in mail options.');
+      }
+
+      const payload = {
+        from,
+        to,
+        subject: mailOptions?.subject,
+        html: mailOptions?.html,
+        text: mailOptions?.text,
+        cc: toAddressArray(mailOptions?.cc),
+        bcc: toAddressArray(mailOptions?.bcc),
+        replyTo: getAddressValue(mailOptions?.replyTo),
+      };
+
+      const { data, error } = await resend.emails.send(payload);
+
+      if (error) {
+        throw new Error(error.message || 'Resend failed to send email.');
+      }
+
+      return {
+        messageId: data?.id,
+        data,
+      };
     },
-  });
+  };
 };

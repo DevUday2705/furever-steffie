@@ -1,6 +1,6 @@
 import { createEmailTransport, getEmailFromAddress } from '../api/utils/emailTransport.js';
 
-// Create transporter using Gmail SMTP (same as existing email infrastructure)
+// Create transporter using Resend (same as existing email infrastructure)
 const createTransporter = () => createEmailTransport();
 
 const SUBJECTS = {

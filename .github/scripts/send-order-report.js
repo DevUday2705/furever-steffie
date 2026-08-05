@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
@@ -118,37 +118,30 @@ async function sendOrderReportEmail() {
     console.log('🚀 Starting order report email send...');
     console.log('🔍 Environment check:');
     console.log('- NODE_ENV:', process.env.NODE_ENV);
-    console.log('- EMAIL_USER available:', !!process.env.EMAIL_USER);
-    console.log('- EMAIL_PASS available:', !!process.env.EMAIL_PASS);
+    console.log('- RESEND_API_KEY available:', !!process.env.RESEND_API_KEY);
+    console.log('- RESEND_FROM_EMAIL available:', !!process.env.RESEND_FROM_EMAIL);
+    console.log('- ORDER_REPORT_TO_EMAIL available:', !!process.env.ORDER_REPORT_TO_EMAIL);
     console.log('🔥 Using Firebase client SDK (no service account needed)');
     
     // Fetch orders data
     const orders = await fetchLastOrders();
     
-    // Use environment variables or fall back to hardcoded values
-    const emailUser = process.env.EMAIL_USER || 'fureversteffie@gmail.com';
-    const emailPass = process.env.EMAIL_PASS || 'htyq oijh ugoi echv';
-    
-    console.log('📧 Using email:', emailUser);
-    
-    // Create transporter using Gmail SMTP
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const fromEmail = process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM;
+    const reportToEmail = process.env.ORDER_REPORT_TO_EMAIL || 'devuday2705@gmail.com';
 
-    // Verify connection
-    console.log('🔌 Verifying SMTP connection...');
-    await transporter.verify();
-    console.log('✅ SMTP connection verified');
+    if (!resendApiKey) {
+      throw new Error('Missing RESEND_API_KEY environment variable');
+    }
+
+    if (!fromEmail) {
+      throw new Error('Missing RESEND_FROM_EMAIL (or EMAIL_FROM) environment variable');
+    }
+
+    const resend = new Resend(resendApiKey);
+
+    console.log('📧 Using sender:', fromEmail);
+    console.log('📩 Sending report to:', reportToEmail);
 
     const ordersHTML = generateOrdersHTML(orders);
     const totalAmount = orders.reduce((sum, order) => sum + (order.amount || 0), 0);
@@ -157,9 +150,9 @@ async function sendOrderReportEmail() {
     const mailOptions = {
       from: {
         name: 'Furever Steffie Order Report',
-        address: emailUser
+        address: fromEmail
       },
-      to: 'devuday2705@gmail.com',
+      to: reportToEmail,
       subject: `📊 Order Report - ${orders.length} Recent Orders (₹${totalAmount.toLocaleString()})`,
       text: 'Hi this is triggered Email with order data',
       html: `
@@ -201,32 +194,27 @@ async function sendOrderReportEmail() {
     console.log('📄 Subject:', mailOptions.subject);
     console.log('📊 Orders included:', orders.length);
     
-    // Send email
-    const info = await transporter.sendMail(mailOptions);
+    const { data, error } = await resend.emails.send({
+      from: `${mailOptions.from.name} <${mailOptions.from.address}>`,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      text: mailOptions.text,
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Resend failed to send order report email');
+    }
     
     console.log('✅ Email sent successfully!');
-    console.log('📍 Message ID:', info.messageId);
-    console.log('📬 Response:', info.response);
+    console.log('📍 Message ID:', data?.id);
+    console.log('📬 Response:', data);
     console.log('🏁 Order report email process completed successfully');
     
-    return info;
+    return data;
     
   } catch (error) {
     console.error('❌ Error sending email:', error);
-    
-    // Log more detailed error information
-    if (error.response) {
-      console.error('📧 SMTP Response:', error.response);
-    }
-    if (error.responseCode) {
-      console.error('🔢 Response Code:', error.responseCode);
-    }
-    if (error.code) {
-      console.error('🔧 Error Code:', error.code);
-    }
-    if (error.command) {
-      console.error('⚡ Failed Command:', error.command);
-    }
     
     console.error('💥 Full error details:', {
       message: error.message,
