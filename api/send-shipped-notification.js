@@ -1,5 +1,12 @@
 import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
 
+// courier -> { label, trackingUrl }
+const COURIER_INFO = {
+    mahavir: { label: 'Shree Mahavir Courier', trackingUrl: 'https://shreemahavircourier.com/' },
+    delhivery: { label: 'Delhivery', trackingUrl: 'https://www.delhivery.com/' },
+    shree_maruti: { label: 'Shree Maruti Courier', trackingUrl: 'https://shreemaruti.com/track-shipment/' },
+};
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only POST method allowed" });
@@ -14,6 +21,7 @@ export default async function handler(req, res) {
             expectedDelivery,
             customerCity,
             courierPartner,
+            shippingType,
             items = []
         } = req.body;
 
@@ -24,6 +32,8 @@ export default async function handler(req, res) {
                 message: "Missing required fields for shipped notification"
             });
         }
+
+        const courier = COURIER_INFO[courierPartner] || { label: 'our courier partner', trackingUrl: '' };
 
         // Create transporter
         const transporter = createEmailTransport();
@@ -39,7 +49,7 @@ export default async function handler(req, res) {
             </div>
         `).join('');
 
-        // Simple, clear shipped email mentioning Shree Maruti and tracking link
+        // Shipped email mentioning the correct courier partner, tracking link & delivery estimate
         const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -65,17 +75,23 @@ export default async function handler(req, res) {
                 <div class="content">
                     <p>Hi <strong>${customerName}</strong>,</p>
 
-                    <p>Good news — your order <strong>#${orderId}</strong> has been dispatched via <strong>Shree Maruti Courier Service</strong>. The tracking reference for your shipment is:</p>
+                    <p>Good news — your order <strong>#${orderId}</strong> has been dispatched via <strong>${courier.label}</strong>. The tracking reference for your shipment is:</p>
 
                     <p style="font-family: monospace; font-weight: 700; font-size: 16px;">${trackingId}</p>
 
-                    <p>You can track your package directly on Shree Maruti's tracking page:</p>
+                    ${expectedDelivery ? `<p>Expected delivery: <strong>${expectedDelivery}</strong></p>` : ''}
+
+                    <p style="font-size: 13px; color: #666;">This is what we expect: you can track it live on this link and may reach out to the courier service directly if any concern.</p>
+
+                    ${courier.trackingUrl ? `
+                    <p>You can track your package directly on ${courier.label}'s tracking page:</p>
 
                     <p style="text-align:center; margin: 16px 0;">
-                        <a class="btn" href="https://shreemaruti.com/track-shipment/" target="_blank" rel="noopener">Track Your Shipment</a>
+                        <a class="btn" href="${courier.trackingUrl}" target="_blank" rel="noopener">Track Your Shipment</a>
                     </p>
 
                     <p>If the tracking page asks for your reference, please enter the tracking reference shown above.</p>
+                    ` : ''}
 
                     ${items.length > 0 ? `
                     <div class="items">

@@ -9,6 +9,7 @@ import OrderFilters from "./OrderFilters"; // Import the new component
 import OrderResumeNotifications from "./OrderResumeNotifications";
 import CouponManager from "./CouponManager";
 import Analytics from "./Analytics";
+import ShippedDetailsModal from "./ShippedDetailsModal";
 import { useOrderPause } from "../context/OrderPauseContext";
 
 const ADMIN_KEY = "Steffie@123";
@@ -21,6 +22,7 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
   const { ordersArePaused, setOrdersArePaused } = useOrderPause();
+  const [shippedModalOrderId, setShippedModalOrderId] = useState(null);
 
   // Tab state for admin navigation
   const [activeTab, setActiveTab] = useState("orders");
@@ -257,63 +259,9 @@ const AdminPage = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       if (newStatus === "shipped") {
-        const trackingID = prompt(
-          "Enter tracking ID before marking as shipped:"
-        );
-        if (!trackingID) {
-          toast.error("Tracking ID is required to mark as shipped.");
-          return;
-        }
-
-        const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, {
-          orderStatus: "shipped",
-          tracking_id: trackingID,
-        });
-
-        setOrders((prev) =>
-          prev.map((order) =>
-            order.id === orderId
-              ? { ...order, orderStatus: "shipped", tracking_id: trackingID }
-              : order
-          )
-        );
-        toast.success("Tracking ID saved & status updated");
-
-        // Send shipped notification email to customer
-        try {
-          const order = orders.find((o) => o.id === orderId) || {};
-
-          const resp = await fetch("/api/send-shipped-notification", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              customerName: order.customer?.fullName || "",
-              customerEmail: order.customer?.email || order.customer?.mobileNumber || "",
-              orderId: orderId,
-              trackingId: trackingID,
-              expectedDelivery: order.dispatchDate || "",
-              customerCity: order.customer?.city || "",
-              courierPartner: order.courierPartner || "",
-              items: order.items || [],
-            }),
-          });
-
-          if (resp.ok) {
-            toast.success("Shipment email sent to customer");
-          } else {
-            const err = await resp.json().catch(() => null);
-            console.error("Failed to send shipped email:", err);
-            toast.error("Failed to send shipped email to customer");
-          }
-        } catch (emailErr) {
-          console.error("Error sending shipped email:", emailErr);
-          toast.error("Error sending shipped email");
-        }
-
-        fetchOrders();
+        // Ask admin for shipping type, courier partner & tracking number via modal
+        setShippedModalOrderId(orderId);
+        return;
       } else {
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, {
@@ -331,6 +279,79 @@ const AdminPage = () => {
     } catch (err) {
       console.error("Error updating status:", err);
       alert("Failed to update status. Try again.");
+    }
+  };
+
+  // Called when admin confirms shipment details in the ShippedDetailsModal
+  const handleConfirmShipment = async ({ shippingType, courierPartner, trackingId, expectedDelivery }) => {
+    const orderId = shippedModalOrderId;
+    if (!orderId) return;
+
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, {
+        orderStatus: "shipped",
+        tracking_id: trackingId,
+        shippingType,
+        courierPartner,
+        expectedDelivery,
+      });
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                orderStatus: "shipped",
+                tracking_id: trackingId,
+                shippingType,
+                courierPartner,
+                expectedDelivery,
+              }
+            : order
+        )
+      );
+      toast.success("Tracking details saved & status updated");
+      setShippedModalOrderId(null);
+
+      // Send shipped notification email to customer
+      try {
+        const order = orders.find((o) => o.id === orderId) || {};
+
+        const resp = await fetch("/api/send-shipped-notification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerName: order.customer?.fullName || "",
+            customerEmail: order.customer?.email || order.customer?.mobileNumber || "",
+            orderId: orderId,
+            trackingId,
+            expectedDelivery,
+            customerCity: order.customer?.city || "",
+            courierPartner,
+            shippingType,
+            items: order.items || [],
+          }),
+        });
+
+        if (resp.ok) {
+          toast.success("Shipment email sent to customer");
+        } else {
+          const err = await resp.json().catch(() => null);
+          console.error("Failed to send shipped email:", err);
+          toast.error("Failed to send shipped email to customer");
+        }
+      } catch (emailErr) {
+        console.error("Error sending shipped email:", emailErr);
+        toast.error("Error sending shipped email");
+      }
+
+      fetchOrders();
+    } catch (err) {
+      console.error("Error updating status:", err);
+      toast.error("Failed to update status. Try again.");
     }
   };
 
@@ -2018,6 +2039,15 @@ const AdminPage = () => {
           </div>
         </div>
       )}
+
+      <ShippedDetailsModal
+        isOpen={!!shippedModalOrderId}
+        defaultShippingType={
+          orders.find((o) => o.id === shippedModalOrderId)?.shippingType
+        }
+        onCancel={() => setShippedModalOrderId(null)}
+        onConfirm={handleConfirmShipment}
+      />
     </div>
   );
 };
