@@ -31,13 +31,15 @@ const ProductListing = ({
   bannerImage,
   bannerTitle,
   products,
+  subcategories = [],
+  loading,
 }) => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("search")?.toLowerCase() || "";
 
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
+  const [internalLoading, setInternalLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
   const [notifyMeModal, setNotifyMeModal] = useState({
@@ -129,6 +131,45 @@ const ProductListing = ({
     return videoExtensions.some(ext => urlPath.includes(ext));
   };
 
+  const defaultKurtaSubcategories = [
+    {
+      id: "all",
+      label: "All",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
+    },
+    {
+      id: "royal",
+      label: "Royal",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1760562224/Diwali_6_begntv.jpg",
+    },
+    {
+      id: "sherwani",
+      label: "Sherwani",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924369/Photoroom_20260121_152801_nswyri.webp",
+    },
+    {
+      id: "kurta",
+      label: "Kurta",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924368/Photoroom_20260121_152835_igaa0h.webp",
+    },
+    {
+      id: "dhoti",
+      label: "Dhoti",
+      image:
+        "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp",
+    },
+  ];
+
+  const activeSubcategories = subcategories.length
+    ? subcategories
+    : category === "kurta"
+      ? defaultKurtaSubcategories
+      : [];
+
 
 
   const baseList = useMemo(() => [...products], [products]);
@@ -136,22 +177,28 @@ const ProductListing = ({
   // Apply regular filters
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
   
-  // Apply category filter based on tags
+  // Apply category filter based on tags or explicit subcategory matchers
   const categoryFiltered = useMemo(() => {
-    if (selectedCategoryFilter === "all") {
+    if (selectedCategoryFilter === "all" || activeSubcategories.length === 0) {
       return regularFiltered;
     }
-    
+
+    const activeOption = activeSubcategories.find(
+      (option) => option.id === selectedCategoryFilter
+    );
+
+    if (activeOption?.filterFn) {
+      return regularFiltered.filter((product) => activeOption.filterFn(product));
+    }
+
     return regularFiltered.filter((product) => {
-      if (selectedCategoryFilter === "royal") {
-        return product.isRoyal === true;
-      }
-      
       // For other categories, check if the product has the tag
       const tags = product.tags || [];
-      return tags.some(tag => tag.toLowerCase().includes(selectedCategoryFilter.toLowerCase()));
+      return tags.some((tag) =>
+        tag.toLowerCase().includes(selectedCategoryFilter.toLowerCase())
+      );
     });
-  }, [regularFiltered, selectedCategoryFilter]);
+  }, [activeSubcategories, regularFiltered, selectedCategoryFilter]);
   
   // Filter out products with no stock for any size
   const filtered = useMemo(() => {
@@ -179,8 +226,12 @@ const ProductListing = ({
   }, [filters]);
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 500);
-  }, []);
+    if (loading === undefined) {
+      setTimeout(() => setInternalLoading(false), 500);
+    }
+  }, [loading]);
+
+  const isLoading = loading ?? internalLoading;
   useEffect(() => {
     const getBoolean = (val) => val === "1";
     const getArray = (val) => (val ? val.split(",") : []);
@@ -336,55 +387,27 @@ const ProductListing = ({
         </div>
       </div>
 
-      {/* Category Filters - Only for Kurta */}
-      {category === "kurta" && (
+      {/* Category Filters */}
+      {activeSubcategories.length > 0 && (
         <div className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-4 py-4">
-            <div 
-              className="flex gap-4 overflow-x-auto pb-2 pt-2 pl-2" 
-              style={{ 
-                scrollbarWidth: "none", 
-                msOverflowStyle: "none",
-                WebkitScrollbar: { display: "none" }
-              }}
-            >
-              {[
-                { 
-                  id: "all", 
-                  label: "All", 
-                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp"
-                },
-                { 
-                  id: "royal", 
-                  label: "Royal", 
-                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1760562224/Diwali_6_begntv.jpg"
-                },
-                { 
-                  id: "sherwani", 
-                  label: "Sherwani", 
-                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924369/Photoroom_20260121_152801_nswyri.webp"
-                },
-                { 
-                  id: "kurta", 
-                  label: "Kurta", 
-                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1770924368/Photoroom_20260121_152835_igaa0h.webp"
-                },
-                { 
-                  id: "dhoti", 
-                  label: "Dhoti", 
-                  image: "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp"
-                }
-              ].map((categoryOption) => (
-                <div key={categoryOption.id} className="flex flex-col items-center flex-shrink-0">
+            <div className="hide-scrollbar flex gap-4 overflow-x-auto pb-2 pt-2 pl-2">
+              {activeSubcategories.map((categoryOption) => (
+                <div key={categoryOption.id} className="flex flex-col items-center shrink-0">
                   <button
-                    onClick={() => setSelectedCategoryFilter(categoryOption.id)}
+                    onClick={() => {
+                      if (categoryOption.disabled) return;
+                      setSelectedCategoryFilter(categoryOption.id);
+                    }}
                     className={`
                       relative w-24 h-28 rounded-2xl overflow-hidden border transition-all duration-200 mb-2
                       ${selectedCategoryFilter === categoryOption.id 
                         ? "border-gray-800 shadow-xl scale-105" 
                         : "border-gray-300 hover:border-gray-400 hover:scale-105 shadow-md"
                       }
+                      ${categoryOption.disabled ? "opacity-60 cursor-not-allowed hover:scale-100" : ""}
                     `}
+                    disabled={categoryOption.disabled}
                   >
                     <img
                       src={categoryOption.image}
@@ -655,6 +678,8 @@ ProductListing.propTypes = {
   bannerImage: PropTypes.string,
   bannerTitle: PropTypes.string,
   products: PropTypes.array.isRequired,
+  subcategories: PropTypes.array,
+  loading: PropTypes.bool,
 };
 
 export default ProductListing;

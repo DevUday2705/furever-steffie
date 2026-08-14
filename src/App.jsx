@@ -33,6 +33,10 @@ import BowTieCategories from "./Components/BowTieCategories";
 import KurtaListing from "./Components/KurtaListing";
 import PathaniListing from "./Components/PathaniListing";
 import TuxedoListing from "./Components/TuxedoListing";
+import TraditionalListing from "./Components/TraditionalListing";
+import FormalListing from "./Components/FormalListing";
+import CasualListing from "./Components/CasualListing";
+import RoyalListing from "./Components/RoyalListing";
 
 import LehengaListing from "./Components/LehengaListing";
 import FrockListing from "./Components/FrockListing";
@@ -75,7 +79,7 @@ const App = () => {
   const { ordersArePaused } = useOrderPause();
   const navigate = useNavigate();
   const location = useLocation();
-  const ready = true; // Set to false to show coming soon for non-admin pages
+  const ready = true; // Set to false to show the maintenance poster for non-admin pages
 
   // Initialize Firebase order pause settings on app start
   useEffect(() => {
@@ -157,8 +161,12 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/kurta" element={<KurtaListing />} />
               <Route path="/pathani" element={<PathaniListing />} />
+              <Route path="/traditional" element={<TraditionalListing />} />
+              <Route path="/formal" element={<FormalListing />} />
+              <Route path="/casual" element={<CasualListing />} />
               <Route path="/frock" element={<FrockListing />} />
               <Route path="/tuxedo" element={<TuxedoListing />} />
+              <Route path="/royal" element={<RoyalListing />} />
               <Route path="/pathani" element={<PathaniListing />} />
               <Route path="/female-bandanas" element={<FemaleBandanas />} />
               <Route path="/male-bandanas" element={<MaleBandanas />} />

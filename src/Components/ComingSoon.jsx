@@ -1,94 +1,58 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Mail, ArrowRight } from "lucide-react";
 
 const ComingSoonPage = () => {
-  const [email, setEmail] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubmitted(true);
-      setTimeout(() => setIsSubmitted(false), 3000);
-      setEmail("");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-stone-100 flex items-center justify-center p-4">
       <motion.div
-        className="max-w-md w-full text-center"
+        className="max-w-md w-full text-center bg-white/90 rounded-3xl shadow-[0_20px_60px_rgba(15,23,42,0.12)] border border-stone-200 p-6 sm:p-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Logo */}
         <motion.div
-          className="mb-8"
+          className="mb-6 flex justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <img src="/images/logo.png" />
+          <img src="/images/logo.png" alt="Logo" className="h-14 object-contain" />
         </motion.div>
 
-        {/* Heading */}
+        <motion.div
+          className="inline-flex items-center rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-800"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          Website Maintenance
+        </motion.div>
+
         <motion.h1
-          className="text-4xl font-bold text-slate-900 mb-4"
+          className="text-3xl sm:text-4xl font-bold text-slate-900 mt-5 mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          Coming Soon
+          We’re currently under maintenance
         </motion.h1>
 
-        {/* Description */}
         <motion.p
-          className="text-slate-700 mb-8 text-lg leading-relaxed"
+          className="text-slate-700 text-base sm:text-lg leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          We're working on something amazing. Get notified when we launch.
+          We’re making a few improvements to serve you better. We should be live again by tomorrow, and we appreciate your patience while we wrap things up.
         </motion.p>
 
-        {/* Email form */}
         <motion.div
+          className="mt-8 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              <motion.button
-                type="submit"
-                className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Mail className="w-4 h-4" />
-                Notify Me
-                <ArrowRight className="w-4 h-4" />
-              </motion.button>
-            </form>
-          ) : (
-            <motion.div
-              className="text-green-400 font-medium"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              Thanks! We'll keep you updated.
-            </motion.div>
-          )}
+          Please check back soon — we’ll be back online tomorrow.
         </motion.div>
       </motion.div>
     </div>

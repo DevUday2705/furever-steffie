@@ -26,6 +26,10 @@ export default function FilterDrawer({
     bow: ["sort", "price", "size", "availability"],
     lehnga: ["sort", "price", "size", "style", "availability"],
     tuxedo: ["sort", "price", "size", "style", "availability"],
+    traditional: ["sort", "price", "size", "availability"],
+    formal: ["sort", "price", "size", "availability"],
+    casual: ["sort", "price", "size", "availability"],
+    royal: ["sort", "price", "size", "availability"],
     frock: ["sort", "price", "size"],
   };
 
