@@ -86,15 +86,22 @@ const CheckoutPage = () => {
   // Special Navratri coupon - 5% discount on Navratri outfits only
   const NAVRATRI_COUPON = "GARBA5";
 
+  // Razorpay payment processing fee charged on international payments
+  const INTERNATIONAL_PROCESSING_FEE = 0.04; // 4%
+
+  // Orders of 3 or more outfits ship at a 30% higher rate
+  const BULK_OUTFIT_THRESHOLD = 3;
+  const BULK_SHIPPING_SURCHARGE = 0.3; // +30%
+
   // International delivery charges
   const internationalDelivery = {
-    singapore: { charge: 21, currency: "SGD", symbol: "$" },
-    malaysia: { charge: 39, currency: "MYR", symbol: "RM" },
-    usa: { charge: 31, currency: "USD", symbol: "$" },
-    uk: { charge: 13, currency: "GBP", symbol: "£" },
-    newzealand: { charge: 40, currency: "NZD", symbol: "$" },
-    canada: { charge: 49, currency: "CAD", symbol: "$" },
-    dubai: { charge: 32, currency: "AED", symbol: "AED" },
+    singapore: { charge: 25, currency: "SGD", symbol: "$" },
+    malaysia: { charge: 80, currency: "MYR", symbol: "RM" },
+    usa: { charge: 35, currency: "USD", symbol: "$" },
+    uk: { charge: 17, currency: "GBP", symbol: "£" },
+    newzealand: { charge: 45, currency: "NZD", symbol: "$" },
+    canada: { charge: 55, currency: "CAD", symbol: "$" },
+    dubai: { charge: 40, currency: "AED", symbol: "AED" },
   };
 
   // Currency rates for conversion calculations
@@ -376,8 +383,16 @@ const CheckoutPage = () => {
     }
   };
 
-  // Calculate total price including delivery
-  const calculateTotal = () => {
+  // Total number of outfits being ordered (used for the bulk shipping surcharge)
+  const getOutfitCount = () => {
+    if (isCartCheckout) {
+      return cart.reduce((count, item) => count + (item.quantity || 1), 0);
+    }
+    return orderDetails?.quantity || 1;
+  };
+
+  // Full price breakdown - single source of truth for the summary and for payment
+  const getOrderBreakdown = () => {
     let subtotal = 0;
 
     if (isCartCheckout) {
@@ -431,10 +446,11 @@ const CheckoutPage = () => {
 
     const totalAfterDiscount = subtotal - discountAmount;
 
+    const isInternational = formData.country !== "india";
     let deliveryCharge = 0;
 
     // Handle international delivery
-    if (formData.country !== "india") {
+    if (isInternational) {
       const deliveryInfo = internationalDelivery[formData.country];
       if (deliveryInfo) {
         // Convert delivery charge from original currency to INR for consistent calculation
@@ -453,8 +469,35 @@ const CheckoutPage = () => {
       }
     }
 
-    return Math.round(totalAfterDiscount + deliveryCharge);
+    // Bulk shipping surcharge: 3 or more outfits ship at +30%
+    const isBulkShipping = getOutfitCount() >= BULK_OUTFIT_THRESHOLD;
+    if (isInternational && isBulkShipping) {
+      deliveryCharge = Math.round(
+        deliveryCharge * (1 + BULK_SHIPPING_SURCHARGE)
+      );
+    }
+
+    // Razorpay processing fee on international payments
+    const processingFee = isInternational
+      ? Math.round(
+          (totalAfterDiscount + deliveryCharge) * INTERNATIONAL_PROCESSING_FEE
+        )
+      : 0;
+
+    return {
+      subtotal,
+      discountAmount,
+      totalAfterDiscount,
+      deliveryCharge,
+      processingFee,
+      isInternational,
+      isBulkShipping,
+      total: Math.round(totalAfterDiscount + deliveryCharge + processingFee),
+    };
   };
+
+  // Calculate total price including delivery
+  const calculateTotal = () => getOrderBreakdown().total;
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -539,116 +582,6 @@ const CheckoutPage = () => {
 
   const handlePayment = async () => {
     const totalAmount = calculateTotal(); // Always in INR for Razorpay
-
-    // For international customers, redirect to bank transfer page
-    if (formData.country !== "india") {
-      const currentCurrency = countryToCurrency[formData.country];
-      const displayAmount = convertCurrency(totalAmount, currentCurrency);
-
-      // Extract currency symbol from currency.js
-      const currencySymbols = {
-        INR: "₹",
-        SGD: "S$",
-        MYR: "RM",
-        USD: "$",
-        GBP: "£",
-        NZD: "NZ$",
-        CAD: "C$",
-        AED: "د.إ",
-      };
-      const currencySymbol =
-        currencySymbols[currentCurrency] || currentCurrency;
-
-      // Calculate subtotal, discount, and shipping charges
-      let subtotal = 0;
-      if (isCartCheckout) {
-        subtotal = cart.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
-      } else {
-        subtotal = orderDetails.price;
-      }
-
-      // Calculate discount amount
-      let discountAmount = 0;
-      if (couponCode.trim().toUpperCase() === "SINGLE750") {
-        discountAmount = 750;
-      } else if (discount > 0) {
-        discountAmount = (subtotal * discount) / 100;
-      }
-
-      // Calculate shipping charge for international delivery
-      let shippingCharge = 0;
-      const deliveryInfo = internationalDelivery[formData.country];
-      if (deliveryInfo) {
-        const chargeInINR =
-          deliveryInfo.charge / currencyRates[deliveryInfo.currency];
-        shippingCharge = Math.round(chargeInINR);
-      }
-
-      // Prepare order summary for international payment page
-      const orderSummary = {
-        items: isCartCheckout
-          ? [
-              ...cart.map((item) => ({
-                name: item.name,
-                price: Number(
-                  convertCurrency(item.price, currentCurrency).replace(
-                    /[^\d.-]/g,
-                    ""
-                  )
-                ),
-                selectedSize: item.selectedSize,
-                quantity: item.quantity || 1,
-                isRoyalSet: item.isRoyalSet,
-              })),
-            ]
-          : [
-              {
-                name: orderDetails.name,
-                price: Number(
-                  convertCurrency(orderDetails.price, currentCurrency).replace(
-                    /[^\d.-]/g,
-                    ""
-                  )
-                ),
-                selectedSize: orderDetails.selectedSize,
-                quantity: 1,
-                isRoyalSet: orderDetails.isRoyalSet,
-              },
-            ],
-        subtotal: Number(
-          convertCurrency(subtotal, currentCurrency).replace(/[^\d.-]/g, "")
-        ),
-        discount: Number(
-          convertCurrency(discountAmount, currentCurrency).replace(
-            /[^\d.-]/g,
-            ""
-          )
-        ),
-        shipping: Number(
-          convertCurrency(shippingCharge, currentCurrency).replace(
-            /[^\d.-]/g,
-            ""
-          )
-        ),
-      };
-
-      const finalAmount = Number(displayAmount.replace(/[^\d.-]/g, ""));
-
-      // Navigate to international payment page with order data
-      navigate("/international-payment", {
-        state: {
-          orderSummary,
-          customerDetails: formData,
-          finalAmount: finalAmount.toFixed(2),
-          currency: currentCurrency,
-          currencySymbol: currencySymbol,
-        },
-      });
-      return;
-    }
 
     // Check if collaboration coupon is applied - bypass payment
     if (couponCode.trim().toUpperCase() === COLLABORATION_COUPON) {
@@ -978,6 +911,8 @@ const CheckoutPage = () => {
       });
     }
   };
+
+  const breakdown = getOrderBreakdown();
 
   return loadingPayment ? (
     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
@@ -1410,7 +1345,7 @@ const CheckoutPage = () => {
                             Standard Shipping
                           </span>
                           <span className="block text-xs text-green-500">
-                            5-7 days • ₹Free
+                            7-10 working days • ₹Free
                           </span>
                         </div>
                       </label>
@@ -1429,7 +1364,7 @@ const CheckoutPage = () => {
                             Air Shipping
                           </span>
                           <span className="block text-xs text-blue-500">
-                            3-4 days • ₹199
+                            5-6 working days • ₹149
                           </span>
                         </div>
                       </label>
@@ -1448,7 +1383,7 @@ const CheckoutPage = () => {
                             Express Shipping
                           </span>
                           <span className="block text-xs text-red-500">
-                            1-2 days • ₹399
+                            3-4 working days • ₹299
                           </span>
                         </div>
                       </label>
@@ -1471,8 +1406,14 @@ const CheckoutPage = () => {
                           10-15 business days •{" "}
                           {internationalDelivery[formData.country]?.currency ||
                             "TBD"}{" "}
-                          {internationalDelivery[formData.country]?.charge ||
-                            "0"}
+                          {(() => {
+                            const charge =
+                              internationalDelivery[formData.country]?.charge;
+                            if (!charge) return "0";
+                            return getOutfitCount() >= BULK_OUTFIT_THRESHOLD
+                              ? Math.round(charge * (1 + BULK_SHIPPING_SURCHARGE))
+                              : charge;
+                          })()}
                         </span>
                       </div>
                     </label>
@@ -1550,40 +1491,34 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Delivery:</span>
+                  <span className="text-gray-600">
+                    Delivery:
+                    {breakdown.isBulkShipping &&
+                      breakdown.deliveryCharge > 0 && (
+                        <span className="block text-xs text-gray-500">
+                          Includes 30% surcharge for {getOutfitCount()} outfits
+                        </span>
+                      )}
+                  </span>
                   <span className="text-gray-800">
-                    {(() => {
-                      if (formData.country !== "india") {
-                        // International delivery - convert to current currency
-                        const country = internationalDelivery[formData.country];
-                        if (country) {
-                          // Convert the charge from INR to display currency
-                          const chargeInINR =
-                            country.charge /
-                            (currencyRates[country.currency] || 1);
-                          return convertCurrency(chargeInINR, currency);
-                        }
-                        return "International";
-                      }
-
-                      // Domestic delivery
-                      const productPrice = isCartCheckout
-                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                        : orderDetails.price;
-
-                      const discountAmount = (productPrice * discount) / 100;
-                      const totalAfterDiscount = productPrice - discountAmount;
-
-                      if (formData.deliveryOption === "express") {
-                        return convertCurrency(399, currency);
-                      }
-                      if (totalAfterDiscount > 1499) {
-                        return "Free";
-                      }
-                      return "Free";
-                    })()}
+                    {breakdown.deliveryCharge > 0
+                      ? convertCurrency(breakdown.deliveryCharge, currency)
+                      : breakdown.isInternational
+                      ? "International"
+                      : "Free"}
                   </span>
                 </div>
+
+                {breakdown.processingFee > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      Payment Processing Fee (4%):
+                    </span>
+                    <span className="text-gray-800">
+                      {convertCurrency(breakdown.processingFee, currency)}
+                    </span>
+                  </div>
+                )}
                 {(discount > 0 ||
                   couponCode.trim().toUpperCase() === SINGLE_USE_COUPON ||
                   CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()] ||
@@ -1620,7 +1555,7 @@ const CheckoutPage = () => {
                 <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
                   <span className="text-gray-800">Total:</span>
                   <span className="text-gray-800">
-                    {convertCurrency(calculateTotal(), currency)}
+                    {convertCurrency(breakdown.total, currency)}
                   </span>
                 </div>
               </div>
@@ -1636,7 +1571,8 @@ const CheckoutPage = () => {
                   <div className="flex-1 text-sm text-blue-700">
                     <strong>International Payment:</strong> Payment will be
                     processed in Indian Rupees (INR) through our secure payment
-                    gateway. The exact amount charged may vary slightly due to
+                    gateway. A 4% payment processing fee is included in the
+                    total. The exact amount charged may vary slightly due to
                     exchange rate fluctuations and bank conversion fees.
                   </div>
                 </div>

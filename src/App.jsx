@@ -75,7 +75,7 @@ const App = () => {
   const { ordersArePaused } = useOrderPause();
   const navigate = useNavigate();
   const location = useLocation();
-  const ready = false; // Set to false to show coming soon for non-admin pages
+  const ready = true; // Set to false to show coming soon for non-admin pages
 
   // Initialize Firebase order pause settings on app start
   useEffect(() => {

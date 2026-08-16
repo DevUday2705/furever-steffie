@@ -197,6 +197,14 @@ const AdminProducts = () => {
     );
   };
 
+  // Sizes that are down to their last piece
+  const getLastPieceSizes = (product) => {
+    const sizeStock = product.sizeStock || {};
+    return Object.entries(sizeStock)
+      .filter(([, stock]) => Number(stock) === 1)
+      .map(([size]) => size);
+  };
+
   // Helper function to calculate total items from sizeStock
   const calculateTotalItems = (products) => {
     return products.reduce((total, product) => {
@@ -526,6 +534,19 @@ const AdminProducts = () => {
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                        {getLastPieceSizes(item).length > 0 && (
+                          <div
+                            title={`Only 1 left in size: ${getLastPieceSizes(
+                              item
+                            ).join(", ")}`}
+                            className="absolute top-2 left-2 flex items-center gap-1 bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow"
+                          >
+                            <FaExclamationTriangle className="w-2.5 h-2.5" />
+                            <span>
+                              1 left: {getLastPieceSizes(item).join(", ")}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="p-4">
                         <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">

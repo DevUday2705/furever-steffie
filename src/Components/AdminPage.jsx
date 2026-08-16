@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
-import * as XLSX from "xlsx";
+
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
