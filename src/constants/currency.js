@@ -1,13 +1,12 @@
-
 const currencyRates = {
     INR: 1,
-    SGD: 0.016,
-    MYR: 0.056,
-    USD: 0.012,
-    GBP: 0.0094,
-    NZD: 0.019,
-    CAD: 0.016,
-    AED: 0.044, // Added Dubai Dirham
+    SGD: 0.0134016,
+    MYR: 0.0428069,
+    USD: 0.0104773,
+    GBP: 0.00774269,
+    NZD: 0.0177833,
+    CAD: 0.0145379,
+    AED: 0.0384779,
 };
 
 const currencySymbols = {
@@ -18,9 +17,8 @@ const currencySymbols = {
     GBP: "£",
     NZD: "NZ$",
     CAD: "C$",
-    AED: "د.إ", // Added Dubai Dirham symbol
+    AED: "د.إ",
 };
-
 export const convertCurrency = (value, targetCurrency = "INR", round = true) => {
     const rate = currencyRates[targetCurrency] || 1;
     const symbol = currencySymbols[targetCurrency] || "";
