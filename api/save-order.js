@@ -1,5 +1,6 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { sendOrderConfirmationWhatsApp } from "./utils/whatsappNotify.js";
 let db;
 
 // Initialize Firestore only once
@@ -251,6 +252,15 @@ export default async function handler(req, res) {
                     console.error('❌ Email service error on fallback order:', emailError);
                 }
 
+                if (orderData.paymentStatus === 'paid') {
+                    await sendOrderConfirmationWhatsApp({
+                        phone: customer.mobileNumber,
+                        customerName: customer.fullName,
+                        orderNumber,
+                        amount,
+                    });
+                }
+
                 return res.status(200).json({ success: true, orderId: fallbackOrderRef.id, orderNumber, warning: 'Order saved but stock may not be updated due to Firestore read timeout', stockUpdated: [] });
             } catch (fallbackSaveError) {
                 console.error('❌ Failed to save fallback order after read timeout:', fallbackSaveError);
@@ -322,43 +332,19 @@ export default async function handler(req, res) {
                 // Don't fail the order if email fails
             }
 
-            // Send WhatsApp confirmation
-            try {
-                const whatsappPayload = {
-                    customerName: customer.fullName,
-                    customerPhone: customer.mobileNumber,
-                    orderId: razorpay_order_id,
-                    items: items,
-                    totalAmount: amount,
-                    orderDate: new Date().toISOString()
-                };
-
-                console.log("📱 Sending WhatsApp confirmation...");
-
-              
-                // Create a mock request object for the WhatsApp handler
-                const mockWhatsAppReq = {
-                    method: 'POST',
-                    body: whatsappPayload
-                };
-
-                const mockWhatsAppRes = {
-                    status: (code) => ({
-                        json: (data) => {
-                            if (code === 200) {
-                                console.log("✅ WhatsApp confirmation sent successfully");
-                            } else {
-                                console.warn("⚠️ Failed to send WhatsApp confirmation, but order was saved");
-                            }
-                            return data;
-                        }
-                    })
-                };
-
-                // await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
-            } catch (whatsappError) {
-                console.error("❌ WhatsApp service error:", whatsappError);
-                // Don't fail the order if WhatsApp fails
+            // Send WhatsApp order confirmation (business-initiated template message)
+            if (orderData.paymentStatus === 'paid') {
+                try {
+                    await sendOrderConfirmationWhatsApp({
+                        phone: customer.mobileNumber,
+                        customerName: customer.fullName,
+                        orderNumber,
+                        amount,
+                    });
+                } catch (whatsappError) {
+                    console.error("❌ WhatsApp service error:", whatsappError);
+                    // Don't fail the order if WhatsApp fails
+                }
             }
 
             return res.status(200).json({
@@ -422,44 +408,19 @@ export default async function handler(req, res) {
                     // Don't fail the order if email fails
                 }
 
-                // Send WhatsApp confirmation for fallback order
-                try {
-                    const whatsappPayload = {
-                        customerName: customer.fullName,
-                        customerPhone: customer.mobileNumber,
-                        orderId: razorpay_order_id,
-                        items: items,
-                        totalAmount: amount,
-                        orderDate: new Date().toISOString()
-                    };
-
-                    console.log("📱 Sending WhatsApp confirmation for fallback order...");
-
-                   
-
-                    // Create a mock request object for the WhatsApp handler
-                    const mockWhatsAppReq = {
-                        method: 'POST',
-                        body: whatsappPayload
-                    };
-
-                    const mockWhatsAppRes = {
-                        status: (code) => ({
-                            json: (data) => {
-                                if (code === 200) {
-                                    console.log("✅ WhatsApp confirmation sent successfully");
-                                } else {
-                                    console.warn("⚠️ Failed to send WhatsApp confirmation, but order was saved");
-                                }
-                                return data;
-                            }
-                        })
-                    };
-
-                    await sendWhatsAppConfirmation(mockWhatsAppReq, mockWhatsAppRes);
-                } catch (whatsappError) {
-                    console.error("❌ WhatsApp service error:", whatsappError);
-                    // Don't fail the order if WhatsApp fails
+                // Send WhatsApp order confirmation for fallback order
+                if (orderData.paymentStatus === 'paid') {
+                    try {
+                        await sendOrderConfirmationWhatsApp({
+                            phone: customer.mobileNumber,
+                            customerName: customer.fullName,
+                            orderNumber,
+                            amount,
+                        });
+                    } catch (whatsappError) {
+                        console.error("❌ WhatsApp service error:", whatsappError);
+                        // Don't fail the order if WhatsApp fails
+                    }
                 }
 
                 return res.status(200).json({

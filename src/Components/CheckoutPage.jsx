@@ -783,28 +783,9 @@ const CheckoutPage = () => {
                   "Failed to save order, but payment was successful"
                 );
                 // Still redirect to success page since payment went through
-              } else {
-                // Order saved successfully, send WhatsApp notification
-                try {
-                  const saveData = await saveRes.json();
-                  const dispatchDate = new Date(calculateDispatchDate());
-                  const formattedDispatchDate = dispatchDate.toLocaleDateString(
-                    "en-IN",
-                    {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    }
-                  );
-                 
-                } catch (whatsappError) {
-                  console.error(
-                    "❌ WhatsApp notification failed:",
-                    whatsappError
-                  );
-                  // Don't fail the order if WhatsApp fails
-                }
               }
+              // WhatsApp order confirmation is triggered server-side from
+              // /api/save-order once the order is persisted.
 
               setLoadingPayment(false);
               navigate({
