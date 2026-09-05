@@ -1296,15 +1296,25 @@ const CheckoutPage = () => {
                     {formData.country !== "india" &&
                       " Include country code (e.g., +1234567890)"}
                   </p>
-                  <label className="flex items-start gap-2 mt-3 cursor-pointer">
+                  <label
+                    className={`flex items-start gap-2.5 mt-3 p-2.5 rounded-md border cursor-pointer transition-colors ${
+                      whatsappOptIn
+                        ? "bg-green-50 border-green-200"
+                        : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
                     <input
                       type="checkbox"
                       checked={whatsappOptIn}
                       onChange={(e) => setWhatsappOptIn(e.target.checked)}
-                      className="mt-0.5"
+                      className="mt-0.5 w-4 h-4 accent-green-600"
                     />
-                    <span className="text-xs text-gray-600">
-                      Message me on WhatsApp if I don't finish this order. You can stop these anytime.
+                    <span className="text-xs text-gray-700 leading-snug">
+                      <span className="font-medium text-gray-800">
+                        🐾 Yes, remind me on WhatsApp if I don&apos;t finish checking out
+                      </span>
+                      <br />
+                      Handy if you get pulled away mid-order — one tap to pick up where you left off. Stop anytime, no spam.
                     </span>
                   </label>
                 </div>

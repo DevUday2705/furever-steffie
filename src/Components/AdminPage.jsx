@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import OrderFilters from "./OrderFilters"; // Import the new component
 import OrderResumeNotifications from "./OrderResumeNotifications";
 import CouponManager from "./CouponManager";
+import AbandonedCartsManager from "./AbandonedCartsManager";
 import Analytics from "./Analytics";
 import ShippedDetailsModal from "./ShippedDetailsModal";
 import { useOrderPause } from "../context/OrderPauseContext";
@@ -1085,6 +1086,16 @@ const AdminPage = () => {
             🔔 Resume Notifications
           </button> */}
           <button
+            onClick={() => setActiveTab("abandoned-carts")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "abandoned-carts"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            🛒 Abandoned Carts
+          </button>
+          <button
             onClick={() => setActiveTab("coupons")}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === "coupons"
@@ -1993,7 +2004,10 @@ const AdminPage = () => {
 
       {/* Notifications Tab */}
       {activeTab === "notifications" && <OrderResumeNotifications />}
-      
+
+      {/* Abandoned Carts Tab */}
+      {activeTab === "abandoned-carts" && <AbandonedCartsManager />}
+
       {/* Coupons Tab */}
       {activeTab === "coupons" && <CouponManager />}
       
