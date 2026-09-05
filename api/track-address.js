@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { sessionId, email, phone, name, cart, cartTotal, address } = req.body;
+        const { sessionId, email, phone, name, cart, cartTotal, address, marketingOptIn } = req.body;
 
         if (!sessionId || !email) {
             return res.status(400).json({ error: 'Missing required fields: sessionId and email' });
@@ -61,9 +61,14 @@ export default async function handler(req, res) {
                 country: address?.country || 'india'
             },
             status: 'abandoned',
-            emailStage: 0,
+            // Only true if the customer explicitly checked the WhatsApp
+            // reminders box at checkout - the recovery job in whatsapp-agent
+            // only ever reads carts where this is strictly `true`, so a
+            // missing/false value here means "never message this cart."
+            marketingOptIn: marketingOptIn === true,
+            whatsappStage: 0,
             createdAt: new Date().toISOString(),
-            lastEmailedAt: null,
+            lastNudgedAt: null,
             convertedAt: null
         };
 

@@ -36,6 +36,7 @@ const CheckoutPage = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
+  const [whatsappOptIn, setWhatsappOptIn] = useState(false);
 
   const isCartCheckout = !orderDetails;
   // Form state
@@ -527,7 +528,8 @@ const CheckoutPage = () => {
           name: formData.fullName,
           cart: isCartCheckout ? cart : [orderDetails],
           cartTotal: calculateTotal(),
-          address: formData
+          address: formData,
+          marketingOptIn: whatsappOptIn
         };
 
         // Call track-address API 
@@ -1294,6 +1296,17 @@ const CheckoutPage = () => {
                     {formData.country !== "india" &&
                       " Include country code (e.g., +1234567890)"}
                   </p>
+                  <label className="flex items-start gap-2 mt-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={whatsappOptIn}
+                      onChange={(e) => setWhatsappOptIn(e.target.checked)}
+                      className="mt-0.5"
+                    />
+                    <span className="text-xs text-gray-600">
+                      Message me on WhatsApp if I don't finish this order. You can stop these anytime.
+                    </span>
+                  </label>
                 </div>
               </div>
             </div>

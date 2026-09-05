@@ -41,10 +41,12 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: 'Abandoned checkout not found' });
         }
 
-        // Mark as converted
+        // Mark as converted. The recovery job only ever queries
+        // status == 'abandoned', so flipping this alone is enough to stop
+        // future nudges - it also double-checks against real orders on
+        // every run, so a missed call here isn't a silent failure mode.
         await abandonedCheckoutRef.update({
             status: 'converted',
-            emailStage: -1,  // Never send emails after conversion
             convertedAt: new Date().toISOString()
         });
 
