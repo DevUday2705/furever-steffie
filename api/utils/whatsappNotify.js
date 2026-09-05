@@ -2,7 +2,7 @@ const NOTIFY_TIMEOUT_MS = 8000;
 
 // Triggers the business-initiated WhatsApp order confirmation by calling the
 // separate whatsapp-agent project's notify endpoint. That project owns the
-// Meta WhatsApp credentials and the approved message template - this repo
+// Meta WhatsApp cre dentials and the approved message template - this repo
 // only needs the shared secret to authenticate the call. Business-initiated
 // messages require an approved template (not a free-form message) since the
 // customer has no open 24-hour session at order time.
