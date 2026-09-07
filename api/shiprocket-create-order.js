@@ -1,0 +1,187 @@
+import { initializeApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { getShiprocketToken, SHIPROCKET_BASE_URL } from "./utils/shiprocketAuth.js";
+
+if (!getApps().length) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    initializeApp({
+        credential: cert({
+            ...serviceAccount,
+            private_key: serviceAccount.private_key.replace(/\\n/g, "\n"),
+        }),
+    });
+}
+const db = getFirestore();
+
+const DEFAULT_ITEM_WEIGHT_KG = 0.2; // ~150-200g per outfit, averaged
+// Default package dimensions (cm) for a folded kurta in a poly bag (8in x 10in x 0.5in), rounded up slightly
+const DEFAULT_DIMENSIONS_CM = { length: 21, breadth: 26, height: 2 };
+
+async function shiprocketFetch(path, token, options = {}) {
+    const resp = await fetch(`${SHIPROCKET_BASE_URL}${path}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+        },
+    });
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+        const err = new Error(json?.message || `Shiprocket request failed: ${resp.status}`);
+        err.status = resp.status;
+        err.body = json;
+        throw err;
+    }
+    return json;
+}
+
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ message: "Only POST method allowed" });
+    }
+
+    try {
+        const { orderId, courierId } = req.body;
+        if (!orderId) {
+            return res.status(400).json({ message: "orderId is required" });
+        }
+
+        const pickupLocation = process.env.SHIPROCKET_PICKUP_LOCATION_NAME;
+        if (!pickupLocation) {
+            return res.status(500).json({ message: "SHIPROCKET_PICKUP_LOCATION_NAME is not configured" });
+        }
+
+        const orderRef = db.collection("orders").doc(orderId);
+        const orderSnap = await orderRef.get();
+        if (!orderSnap.exists) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        const order = orderSnap.data();
+        const customer = order.customer || {};
+
+        const totalWeight = (order.items || []).reduce(
+            (sum, item) => sum + (item.weightKg || DEFAULT_ITEM_WEIGHT_KG) * (item.quantity || 1),
+            0
+        ) || DEFAULT_ITEM_WEIGHT_KG;
+
+        const token = await getShiprocketToken(db);
+
+        // 1. Create the shipment order in Shiprocket
+        const createPayload = {
+            order_id: order.orderNumber,
+            order_date: (order.createdAt || new Date().toISOString()).slice(0, 19).replace("T", " "),
+            pickup_location: pickupLocation,
+            billing_customer_name: customer.fullName || "Customer",
+            billing_last_name: "",
+            billing_address: customer.addressLine1 || "",
+            billing_address_2: customer.addressLine2 || "",
+            billing_city: customer.city || "",
+            billing_pincode: customer.pincode || "",
+            billing_state: customer.state || "",
+            billing_country: "India",
+            billing_email: customer.email || "",
+            billing_phone: customer.mobileNumber || "",
+            shipping_is_billing: true,
+            order_items: (order.items || []).map((item) => ({
+                name: item.name || "Kurta",
+                sku: item.productId || item.name || "SKU",
+                units: item.quantity || 1,
+                selling_price: item.price || 0,
+            })),
+            payment_method: "Prepaid",
+            sub_total: order.amount || 0,
+            length: DEFAULT_DIMENSIONS_CM.length,
+            breadth: DEFAULT_DIMENSIONS_CM.breadth,
+            height: DEFAULT_DIMENSIONS_CM.height,
+            weight: Number(totalWeight.toFixed(2)),
+        };
+
+        const createResult = await shiprocketFetch("/orders/create/adhoc", token, {
+            method: "POST",
+            body: JSON.stringify(createPayload),
+        });
+
+        const shipmentId = createResult.shipment_id;
+        const shiprocketOrderId = createResult.order_id;
+        if (!shipmentId) {
+            console.error("Shiprocket order create returned no shipment_id:", createResult);
+            return res.status(502).json({ message: "Shiprocket did not return a shipment_id", details: createResult });
+        }
+
+        // 2. Assign AWB - pass courier_id if admin picked one, otherwise Shiprocket auto-assigns the recommended courier
+        const awbPayload = courierId ? { shipment_id: shipmentId, courier_id: courierId } : { shipment_id: shipmentId };
+        const awbResult = await shiprocketFetch("/courier/assign/awb", token, {
+            method: "POST",
+            body: JSON.stringify(awbPayload),
+        });
+
+        const awbData = awbResult?.response?.data;
+        const awbCode = awbData?.awb_code;
+        const courierName = awbData?.courier_name;
+
+        if (!awbCode) {
+            console.error("Shiprocket AWB assignment returned no awb_code:", awbResult);
+            return res.status(502).json({ message: "Shiprocket did not return an AWB code", details: awbResult });
+        }
+
+        // 3. Schedule pickup (best-effort - don't fail the whole flow if this errors)
+        try {
+            await shiprocketFetch("/courier/generate/pickup", token, {
+                method: "POST",
+                body: JSON.stringify({ shipment_id: [shipmentId] }),
+            });
+        } catch (pickupError) {
+            console.error("⚠️ Shiprocket pickup scheduling failed (continuing):", pickupError.body || pickupError.message);
+        }
+
+        // 4. Update the order in Firestore
+        const updateData = {
+            orderStatus: "shipped",
+            tracking_id: awbCode,
+            courierPartner: courierName,
+            shiprocketOrderId,
+            shiprocketShipmentId: shipmentId,
+        };
+        await orderRef.update(updateData);
+
+        // 5. Send shipped notification email (reuse existing handler)
+        try {
+            const { default: sendShippedNotification } = await import("./send-shipped-notification.js");
+            const mockReq = {
+                method: "POST",
+                body: {
+                    customerName: customer.fullName || "",
+                    customerEmail: customer.email || customer.mobileNumber || "",
+                    orderId,
+                    trackingId: awbCode,
+                    expectedDelivery: "",
+                    customerCity: customer.city || "",
+                    courierPartner: courierName,
+                    shippingType: "standard",
+                    items: order.items || [],
+                    trackingUrl: `https://shiprocket.co/tracking/${awbCode}`,
+                },
+            };
+            const mockRes = { status: (code) => ({ json: (data) => data }) };
+            await sendShippedNotification(mockReq, mockRes);
+        } catch (emailError) {
+            console.error("❌ Failed to send shipped notification email:", emailError);
+        }
+
+        return res.status(200).json({
+            success: true,
+            trackingId: awbCode,
+            courierName,
+            shiprocketOrderId,
+            shipmentId,
+        });
+    } catch (error) {
+        console.error("❌ shiprocket-create-order error:", error.body || error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: "Failed to create Shiprocket shipment",
+            error: error.body || error.message,
+        });
+    }
+}

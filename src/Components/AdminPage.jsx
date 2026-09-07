@@ -356,6 +356,48 @@ const AdminPage = () => {
     }
   };
 
+  // Called when admin picks a courier and confirms shipping via the Shiprocket API
+  const handleShiprocketShip = async (courierId) => {
+    const orderId = shippedModalOrderId;
+    if (!orderId) return;
+
+    try {
+      const resp = await fetch("/api/shiprocket-create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, courierId }),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok || !data.success) {
+        console.error("Shiprocket shipment creation failed:", data);
+        toast.error(data.message || "Failed to create Shiprocket shipment");
+        return;
+      }
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                orderStatus: "shipped",
+                tracking_id: data.trackingId,
+                courierPartner: data.courierName,
+              }
+            : order
+        )
+      );
+
+      toast.success(`Shipped via ${data.courierName} — tracking ${data.trackingId}. Customer notified.`);
+      setShippedModalOrderId(null);
+      fetchOrders();
+    } catch (err) {
+      console.error("Error creating Shiprocket shipment:", err);
+      toast.error("Failed to create Shiprocket shipment. Try again.");
+    }
+  };
+
   // Handle shipping type change
   const handleShippingTypeChange = async (orderId, newShippingType) => {
     try {
@@ -2056,11 +2098,13 @@ const AdminPage = () => {
 
       <ShippedDetailsModal
         isOpen={!!shippedModalOrderId}
+        order={orders.find((o) => o.id === shippedModalOrderId)}
         defaultShippingType={
           orders.find((o) => o.id === shippedModalOrderId)?.shippingType
         }
         onCancel={() => setShippedModalOrderId(null)}
         onConfirm={handleConfirmShipment}
+        onShiprocketConfirm={handleShiprocketShip}
       />
     </div>
   );

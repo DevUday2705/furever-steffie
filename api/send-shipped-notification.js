@@ -22,7 +22,8 @@ export default async function handler(req, res) {
             customerCity,
             courierPartner,
             shippingType,
-            items = []
+            items = [],
+            trackingUrl, // optional override, e.g. Shiprocket's universal tracking link
         } = req.body;
 
         // Require only the essential fields for a shipped notification
@@ -33,7 +34,9 @@ export default async function handler(req, res) {
             });
         }
 
-        const courier = COURIER_INFO[courierPartner] || { label: 'our courier partner', trackingUrl: '' };
+        const courier = trackingUrl
+            ? { label: courierPartner || 'our courier partner', trackingUrl }
+            : COURIER_INFO[courierPartner] || { label: courierPartner || 'our courier partner', trackingUrl: '' };
 
         // Create transporter
         const transporter = createEmailTransport();
