@@ -1,6 +1,7 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getShiprocketToken, SHIPROCKET_BASE_URL } from "../lib/shiprocketAuth.js";
+import { sendShippedNotificationWhatsApp } from "../lib/whatsappNotify.js";
 
 if (!getApps().length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -215,6 +216,18 @@ async function handleCreateOrder(req, res) {
             await sendShippedNotification(mockReq, mockRes);
         } catch (emailError) {
             console.error("❌ Failed to send shipped notification email:", emailError);
+        }
+
+        try {
+            await sendShippedNotificationWhatsApp({
+                phone: customer.mobileNumber,
+                customerName: customer.fullName || "",
+                orderNumber: order.orderNumber,
+                courierName,
+                trackingId: awbCode,
+            });
+        } catch (whatsappError) {
+            console.error("❌ Failed to send shipped notification WhatsApp:", whatsappError);
         }
 
         return res.status(200).json({
