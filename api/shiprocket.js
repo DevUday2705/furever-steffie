@@ -84,6 +84,7 @@ async function handleServiceability(req, res) {
                 courierName: c.courier_name,
                 etaDays: c.etd || c.estimated_delivery_days || null,
                 price: Math.round(c.rate || 0),
+                rating: c.rating || null,
             }))
             .sort((a, b) => a.price - b.price);
 

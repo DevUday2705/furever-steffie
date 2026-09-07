@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Truck, Loader2 } from "lucide-react";
+import { X, Truck, Loader2, Star } from "lucide-react";
 import {
   COURIER_OPTIONS,
   SHIPPING_TYPE_OPTIONS,
@@ -79,34 +79,34 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-lg shadow-xl w-full max-w-md p-6"
+          className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6 max-h-[92vh] overflow-y-auto"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <Truck size={20} className="text-green-600" /> Shipment Details
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <Truck size={20} className="text-green-600 shrink-0" /> Shipment Details
             </h3>
-            <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+            <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 shrink-0">
               <X size={20} />
             </button>
           </div>
 
-          <div className="flex gap-2 mb-4 text-sm">
+          <div className="flex gap-2 mb-4 text-xs sm:text-sm">
             <button
               type="button"
               onClick={() => setMode("shiprocket")}
-              className={`px-3 py-1.5 rounded ${mode === "shiprocket" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"}`}
+              className={`px-2.5 sm:px-3 py-1.5 rounded flex-1 sm:flex-none ${mode === "shiprocket" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"}`}
             >
               Ship via Shiprocket
             </button>
             <button
               type="button"
               onClick={() => setMode("manual")}
-              className={`px-3 py-1.5 rounded ${mode === "manual" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"}`}
+              className={`px-2.5 sm:px-3 py-1.5 rounded flex-1 sm:flex-none ${mode === "manual" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"}`}
             >
               Manual entry
             </button>
@@ -131,35 +131,47 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
               )}
 
               {!loadingOptions && courierOptions.length > 0 && (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="space-y-2 max-h-[45vh] sm:max-h-64 overflow-y-auto -mx-1 px-1">
                   {courierOptions.map((opt, idx) => (
                     <label
                       key={opt.courierId}
-                      className={`flex items-center justify-between border rounded px-3 py-2 text-sm cursor-pointer ${
+                      className={`flex items-start gap-2 border rounded px-3 py-2.5 text-sm cursor-pointer ${
                         selectedCourierId === opt.courierId ? "border-green-600 bg-green-50" : "border-gray-200"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="courierOption"
-                          checked={selectedCourierId === opt.courierId}
-                          onChange={() => setSelectedCourierId(opt.courierId)}
-                        />
-                        {opt.courierName}
-                        {idx === 0 && (
-                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">Cheapest</span>
-                        )}
-                      </span>
-                      <span className="text-gray-500">
-                        ₹{opt.price}{opt.etaDays ? ` · ${opt.etaDays}d` : ""}
-                      </span>
+                      <input
+                        type="radio"
+                        name="courierOption"
+                        checked={selectedCourierId === opt.courierId}
+                        onChange={() => setSelectedCourierId(opt.courierId)}
+                        className="mt-1 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-medium text-gray-800 truncate">{opt.courierName}</span>
+                          {idx === 0 && (
+                            <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded shrink-0">
+                              Cheapest
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-gray-500">
+                          <span className="font-semibold text-gray-700 text-sm">₹{opt.price}</span>
+                          {opt.etaDays && <span>ETA: {opt.etaDays}</span>}
+                          {opt.rating && (
+                            <span className="flex items-center gap-0.5">
+                              <Star size={12} className="fill-amber-400 text-amber-400" />
+                              {Number(opt.rating).toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </label>
                   ))}
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={onCancel}
@@ -171,7 +183,7 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
                   type="button"
                   disabled={!selectedCourierId || shipping}
                   onClick={handleShiprocketShip}
-                  className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {shipping && <Loader2 size={14} className="animate-spin" />}
                   Create Shipment & Notify Customer
@@ -236,7 +248,7 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={onCancel}
