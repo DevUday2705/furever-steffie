@@ -1,4 +1,4 @@
-import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
+import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => createEmailTransport();

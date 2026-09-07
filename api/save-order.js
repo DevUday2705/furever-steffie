@@ -1,6 +1,6 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { sendOrderConfirmationWhatsApp } from "./utils/whatsappNotify.js";
+import { sendOrderConfirmationWhatsApp } from "../lib/whatsappNotify.js";
 let db;
 
 // Initialize Firestore only once

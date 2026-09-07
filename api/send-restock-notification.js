@@ -1,4 +1,4 @@
-import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
+import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {

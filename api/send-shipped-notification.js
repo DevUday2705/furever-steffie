@@ -1,4 +1,4 @@
-import { createEmailTransport, getEmailFromAddress } from './utils/emailTransport.js';
+import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
 
 // courier -> { label, trackingUrl }
 const COURIER_INFO = {
