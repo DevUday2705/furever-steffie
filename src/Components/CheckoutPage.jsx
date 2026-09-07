@@ -29,6 +29,13 @@ const calculateDispatchDate = () => {
   return dispatchDate.toISOString();
 };
 
+// COD requires a non-refundable advance (filters low-intent orders, covers
+// forward+return shipping risk if the customer declines at the door).
+const COD_ADVANCE_PERCENT = 10;
+const MIN_COD_ADVANCE = 49;
+const calculateCodAdvance = (totalAmount) =>
+  Math.max(MIN_COD_ADVANCE, Math.round((totalAmount * COD_ADVANCE_PERCENT) / 100));
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +44,7 @@ const CheckoutPage = () => {
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("online"); // "online" | "cod"
 
   const isCartCheckout = !orderDetails;
   // Form state
@@ -584,6 +592,14 @@ const CheckoutPage = () => {
 
   const handlePayment = async () => {
     const totalAmount = calculateTotal(); // Always in INR for Razorpay
+    const isCod = paymentMethod === "cod" && formData.country === "india";
+    const codAdvanceAmount = isCod ? calculateCodAdvance(totalAmount) : 0;
+    // What actually gets charged via Razorpay right now - full amount for
+    // online payment, just the non-refundable advance for COD.
+    const chargeAmount = isCod ? codAdvanceAmount : totalAmount;
+    const orderItems = isCartCheckout
+      ? cart.map((item) => ({ ...item, measurements: item.measurements || {} }))
+      : [{ ...orderDetails, measurements: orderDetails.measurements || {} }];
 
     // Check if collaboration coupon is applied - bypass payment
     if (couponCode.trim().toUpperCase() === COLLABORATION_COUPON) {
@@ -626,17 +642,7 @@ const CheckoutPage = () => {
             razorpay_order_id: mockOrderId,
             razorpay_payment_id: mockPaymentId,
             customer: formData,
-            items: isCartCheckout
-              ? cart.map((item) => ({
-                  ...item,
-                  measurements: item.measurements || {},
-                }))
-              : [
-                  {
-                    ...orderDetails,
-                    measurements: orderDetails.measurements || {},
-                  },
-                ],
+            items: orderItems,
             amount: calculateTotal(),
             coupon: couponCode,
             dispatchDate: calculateDispatchDate(),
@@ -672,7 +678,18 @@ const CheckoutPage = () => {
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: calculateTotal() }),
+        body: JSON.stringify({
+          amount: chargeAmount,
+          items: orderItems,
+          fullAmount: totalAmount,
+          customer: formData,
+          coupon: couponCode,
+          dispatchDate: calculateDispatchDate(),
+          customCouponId: customCouponId || null,
+          paymentMethod: isCod ? "cod" : "online",
+          codAdvanceAmount: isCod ? codAdvanceAmount : null,
+          codAmountDue: isCod ? totalAmount - codAdvanceAmount : null,
+        }),
       });
 
       if (!res.ok) {
@@ -684,16 +701,17 @@ const CheckoutPage = () => {
         country: formData.country,
         currency: currency,
         amount: totalAmount,
+        paymentMethod: isCod ? "cod" : "online",
+        codAdvanceAmount: isCod ? codAdvanceAmount : undefined,
       });
       setLoadingPayment(true);
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        // amount: data.amount,
-        amount: calculateTotal() * 100, // Convert to paise
+        amount: chargeAmount * 100, // Convert to paise
         currency: data.currency,
         name: "Furever Steffie",
-        description: "Order Payment",
+        description: isCod ? "COD Advance Payment" : "Order Payment",
         order_id: data.id,
         notes: {
           abandonedDocId: abandonedDocId || "",
@@ -762,21 +780,14 @@ const CheckoutPage = () => {
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   customer: formData,
-                  items: isCartCheckout
-                    ? cart.map((item) => ({
-                        ...item,
-                        measurements: item.measurements || {},
-                      }))
-                    : [
-                        {
-                          ...orderDetails,
-                          measurements: orderDetails.measurements || {},
-                        },
-                      ],
-                  amount: data.amount / 100,
+                  items: orderItems,
+                  amount: totalAmount,
                   coupon: couponCode,
                   dispatchDate: calculateDispatchDate(), // Add dispatch date (3 days from today)
                   customCouponId: customCouponId || null, // Pass custom coupon ID
+                  paymentMethod: isCod ? "cod" : "online",
+                  codAdvanceAmount: isCod ? codAdvanceAmount : null,
+                  codAmountDue: isCod ? totalAmount - codAdvanceAmount : null,
                 }),
               });
 
@@ -1426,6 +1437,65 @@ const CheckoutPage = () => {
               </div>
             </div>
 
+            {/* Payment Method */}
+            {formData.country === "india" && (
+              <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-md font-semibold text-gray-800">
+                    Payment Method
+                  </h3>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="online"
+                      checked={paymentMethod === "online"}
+                      onChange={() => setPaymentMethod("online")}
+                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                    />
+                    <div className="ml-3">
+                      <span className="block text-sm font-medium text-gray-800">
+                        Pay Online
+                      </span>
+                      <span className="block text-xs text-gray-500">
+                        Pay the full amount now via card, UPI, or netbanking
+                      </span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={paymentMethod === "cod"}
+                      onChange={() => setPaymentMethod("cod")}
+                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                    />
+                    <div className="ml-3">
+                      <span className="block text-sm font-medium text-gray-800">
+                        Cash on Delivery
+                      </span>
+                      <span className="block text-xs text-gray-500">
+                        Pay ₹{calculateCodAdvance(calculateTotal())} now (non-refundable booking amount), remaining ₹
+                        {calculateTotal() - calculateCodAdvance(calculateTotal())} in cash on delivery
+                      </span>
+                    </div>
+                  </label>
+
+                  {paymentMethod === "cod" && (
+                    <div className="text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-md px-3 py-2">
+                      The ₹{calculateCodAdvance(calculateTotal())} booking amount confirms your order and is
+                      non-refundable if delivery is declined at your doorstep.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Special Instructions */}
             <div className="bg-white rounded-lg shadow-md mb-5 overflow-hidden">
               <div className="p-4 border-b border-gray-100">
@@ -1587,7 +1657,9 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
             >
-              Place Order
+              {paymentMethod === "cod" && formData.country === "india"
+                ? `Pay ₹${calculateCodAdvance(calculateTotal())} & Place Order`
+                : "Place Order"}
             </button>
           </form>
         ) : (

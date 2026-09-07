@@ -40,6 +40,7 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
         action: "serviceability",
         deliveryPincode: pincode,
         items: (order.items || []).map((i) => ({ quantity: i.quantity || 1 })),
+        codRequired: order.paymentMethod === "cod",
       }),
     })
       .then((res) => res.json())
@@ -94,6 +95,12 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
               <X size={20} />
             </button>
           </div>
+
+          {order?.paymentMethod === "cod" && (
+            <div className="mb-4 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded px-3 py-2">
+              <strong>COD order</strong> — courier must collect ₹{order.codAmountDue ?? "?"} on delivery.
+            </div>
+          )}
 
           <div className="flex gap-2 mb-4 text-xs sm:text-sm">
             <button

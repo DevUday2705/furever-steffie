@@ -122,6 +122,11 @@ async function handleCreateOrder(req, res) {
 
         const token = await getShiprocketToken(db);
 
+        const isCod = order.paymentMethod === "cod";
+        // For a hybrid COD order the customer already paid the advance online -
+        // the courier should only collect the remaining balance at the door.
+        const collectibleAmount = isCod ? (order.codAmountDue || 0) : (order.amount || 0);
+
         const createPayload = {
             order_id: order.orderNumber,
             order_date: (order.createdAt || new Date().toISOString()).slice(0, 19).replace("T", " "),
@@ -143,8 +148,8 @@ async function handleCreateOrder(req, res) {
                 units: item.quantity || 1,
                 selling_price: item.price || 0,
             })),
-            payment_method: "Prepaid",
-            sub_total: order.amount || 0,
+            payment_method: isCod ? "COD" : "Prepaid",
+            sub_total: collectibleAmount,
             length: DEFAULT_DIMENSIONS_CM.length,
             breadth: DEFAULT_DIMENSIONS_CM.breadth,
             height: DEFAULT_DIMENSIONS_CM.height,
