@@ -33,10 +33,11 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
 
     setLoadingOptions(true);
     setOptionsError("");
-    fetch("/api/shiprocket-serviceability", {
+    fetch("/api/shiprocket", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        action: "serviceability",
         deliveryPincode: pincode,
         items: (order.items || []).map((i) => ({ quantity: i.quantity || 1 })),
       }),

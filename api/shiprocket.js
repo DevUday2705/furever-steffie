@@ -13,8 +13,7 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-const DEFAULT_ITEM_WEIGHT_KG = 0.2; // ~150-200g per outfit, averaged
-// Default package dimensions (cm) for a folded kurta in a poly bag (8in x 10in x 0.5in), rounded up slightly
+const DEFAULT_ITEM_WEIGHT_KG = 0.2;
 const DEFAULT_DIMENSIONS_CM = { length: 21, breadth: 26, height: 2 };
 
 async function shiprocketFetch(path, token, options = {}) {
@@ -36,11 +35,65 @@ async function shiprocketFetch(path, token, options = {}) {
     return json;
 }
 
-export default async function handler(req, res) {
-    if (req.method !== "POST") {
-        return res.status(405).json({ message: "Only POST method allowed" });
-    }
+async function handleServiceability(req, res) {
+    try {
+        const { deliveryPincode, items = [], codRequired = false } = req.body;
 
+        if (!deliveryPincode || !/^\d{6}$/.test(String(deliveryPincode))) {
+            return res.status(400).json({ message: "Valid 6-digit deliveryPincode is required" });
+        }
+
+        const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE;
+        if (!pickupPincode) {
+            return res.status(500).json({ message: "SHIPROCKET_PICKUP_PINCODE is not configured" });
+        }
+
+        const totalWeight = items.length
+            ? items.reduce(
+                  (sum, item) => sum + (item.weightKg || DEFAULT_ITEM_WEIGHT_KG) * (item.quantity || 1),
+                  0
+              )
+            : DEFAULT_ITEM_WEIGHT_KG;
+
+        const token = await getShiprocketToken(db);
+
+        const params = new URLSearchParams({
+            pickup_postcode: String(pickupPincode),
+            delivery_postcode: String(deliveryPincode),
+            weight: totalWeight.toFixed(2),
+            cod: codRequired ? "1" : "0",
+        });
+
+        const resp = await fetch(`${SHIPROCKET_BASE_URL}/courier/serviceability/?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const json = await resp.json();
+
+        if (!resp.ok) {
+            console.error("Shiprocket serviceability error:", json);
+            return res.status(resp.status).json({ message: "Shiprocket serviceability check failed", error: json });
+        }
+
+        const couriers = json?.data?.available_courier_companies || [];
+
+        const options = couriers
+            .filter((c) => c.blocked !== 1)
+            .map((c) => ({
+                courierId: c.courier_company_id,
+                courierName: c.courier_name,
+                etaDays: c.etd || c.estimated_delivery_days || null,
+                price: Math.round(c.rate || 0),
+            }))
+            .sort((a, b) => a.price - b.price);
+
+        return res.status(200).json({ success: true, options, weightUsedKg: Number(totalWeight.toFixed(2)) });
+    } catch (error) {
+        console.error("❌ shiprocket serviceability error:", error);
+        return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+}
+
+async function handleCreateOrder(req, res) {
     try {
         const { orderId, courierId } = req.body;
         if (!orderId) {
@@ -67,7 +120,6 @@ export default async function handler(req, res) {
 
         const token = await getShiprocketToken(db);
 
-        // 1. Create the shipment order in Shiprocket
         const createPayload = {
             order_id: order.orderNumber,
             order_date: (order.createdAt || new Date().toISOString()).slice(0, 19).replace("T", " "),
@@ -109,7 +161,6 @@ export default async function handler(req, res) {
             return res.status(502).json({ message: "Shiprocket did not return a shipment_id", details: createResult });
         }
 
-        // 2. Assign AWB - pass courier_id if admin picked one, otherwise Shiprocket auto-assigns the recommended courier
         const awbPayload = courierId ? { shipment_id: shipmentId, courier_id: courierId } : { shipment_id: shipmentId };
         const awbResult = await shiprocketFetch("/courier/assign/awb", token, {
             method: "POST",
@@ -125,7 +176,6 @@ export default async function handler(req, res) {
             return res.status(502).json({ message: "Shiprocket did not return an AWB code", details: awbResult });
         }
 
-        // 3. Schedule pickup (best-effort - don't fail the whole flow if this errors)
         try {
             await shiprocketFetch("/courier/generate/pickup", token, {
                 method: "POST",
@@ -135,7 +185,6 @@ export default async function handler(req, res) {
             console.error("⚠️ Shiprocket pickup scheduling failed (continuing):", pickupError.body || pickupError.message);
         }
 
-        // 4. Update the order in Firestore
         const updateData = {
             orderStatus: "shipped",
             tracking_id: awbCode,
@@ -145,7 +194,6 @@ export default async function handler(req, res) {
         };
         await orderRef.update(updateData);
 
-        // 5. Send shipped notification email (reuse existing handler)
         try {
             const { default: sendShippedNotification } = await import("./send-shipped-notification.js");
             const mockReq = {
@@ -177,11 +225,27 @@ export default async function handler(req, res) {
             shipmentId,
         });
     } catch (error) {
-        console.error("❌ shiprocket-create-order error:", error.body || error.message);
+        console.error("❌ shiprocket create-order error:", error.body || error.message);
         return res.status(error.status || 500).json({
             success: false,
             message: "Failed to create Shiprocket shipment",
             error: error.body || error.message,
         });
+    }
+}
+
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ message: "Only POST method allowed" });
+    }
+
+    const { action } = req.body;
+
+    if (action === "serviceability") {
+        return handleServiceability(req, res);
+    } else if (action === "create-order") {
+        return handleCreateOrder(req, res);
+    } else {
+        return res.status(400).json({ message: "action must be 'serviceability' or 'create-order'" });
     }
 }

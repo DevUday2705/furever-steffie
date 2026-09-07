@@ -24,3 +24,5 @@ firebase-admin-key.json
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*

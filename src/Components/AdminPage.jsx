@@ -362,10 +362,10 @@ const AdminPage = () => {
     if (!orderId) return;
 
     try {
-      const resp = await fetch("/api/shiprocket-create-order", {
+      const resp = await fetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, courierId }),
+        body: JSON.stringify({ action: "create-order", orderId, courierId }),
       });
 
       const data = await resp.json();
