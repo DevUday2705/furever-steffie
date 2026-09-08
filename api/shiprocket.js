@@ -253,6 +253,36 @@ async function handleCreateOrder(req, res) {
     }
 }
 
+async function handleGenerateLabels(req, res) {
+    try {
+        const { shipmentIds } = req.body;
+        if (!Array.isArray(shipmentIds) || !shipmentIds.length) {
+            return res.status(400).json({ message: "shipmentIds array is required" });
+        }
+
+        const token = await getShiprocketToken(db);
+        // Shiprocket merges all requested shipments into a single label PDF -
+        // this is what makes bulk printing possible (one link, print once).
+        const result = await shiprocketFetch("/courier/generate/label", token, {
+            method: "POST",
+            body: JSON.stringify({ shipment_id: shipmentIds }),
+        });
+
+        if (!result.label_url) {
+            return res.status(502).json({ message: "Shiprocket did not return a label_url", details: result });
+        }
+
+        return res.status(200).json({ success: true, labelUrl: result.label_url });
+    } catch (error) {
+        console.error("❌ shiprocket generate-labels error:", error.body || error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: "Failed to generate labels",
+            error: error.body || error.message,
+        });
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only POST method allowed" });
@@ -264,7 +294,9 @@ export default async function handler(req, res) {
         return handleServiceability(req, res);
     } else if (action === "create-order") {
         return handleCreateOrder(req, res);
+    } else if (action === "generate-labels") {
+        return handleGenerateLabels(req, res);
     } else {
-        return res.status(400).json({ message: "action must be 'serviceability' or 'create-order'" });
+        return res.status(400).json({ message: "action must be 'serviceability', 'create-order', or 'generate-labels'" });
     }
 }

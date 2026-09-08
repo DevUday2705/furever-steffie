@@ -11,6 +11,7 @@ import CouponManager from "./CouponManager";
 import AbandonedCartsManager from "./AbandonedCartsManager";
 import Analytics from "./Analytics";
 import ShippedDetailsModal from "./ShippedDetailsModal";
+import BulkShipModal from "./BulkShipModal";
 import { useOrderPause } from "../context/OrderPauseContext";
 
 const ADMIN_KEY = "Steffie@123";
@@ -60,6 +61,7 @@ const AdminPage = () => {
 
   // Selected orders for printing
   const [selectedOrders, setSelectedOrders] = useState(new Set());
+  const [bulkShipModalOpen, setBulkShipModalOpen] = useState(false);
 
   // Revenue visibility states for security
   const [revenueVisible, setRevenueVisible] = useState(false);
@@ -396,6 +398,17 @@ const AdminPage = () => {
       console.error("Error creating Shiprocket shipment:", err);
       toast.error("Failed to create Shiprocket shipment. Try again.");
     }
+  };
+
+  // Called by BulkShipModal as each order in the batch finishes shipping
+  const handleBulkOrderShipped = (orderId, { trackingId, courierName }) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId
+          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName }
+          : order
+      )
+    );
   };
 
   // Handle shipping type change
@@ -1327,6 +1340,15 @@ const AdminPage = () => {
                   🖨️
                 </button>
               )}
+              {selectedOrders.size > 0 && (
+                <button
+                  onClick={() => setBulkShipModalOpen(true)}
+                  className="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1"
+                  title="Bulk Ship via Shiprocket"
+                >
+                  🚚 Bulk Ship
+                </button>
+              )}
             </div>
           </div>
 
@@ -2105,6 +2127,16 @@ const AdminPage = () => {
         onCancel={() => setShippedModalOrderId(null)}
         onConfirm={handleConfirmShipment}
         onShiprocketConfirm={handleShiprocketShip}
+      />
+
+      <BulkShipModal
+        isOpen={bulkShipModalOpen}
+        orders={orders.filter((o) => selectedOrders.has(o.id))}
+        onCancel={() => {
+          setBulkShipModalOpen(false);
+          fetchOrders();
+        }}
+        onOrderShipped={handleBulkOrderShipped}
       />
     </div>
   );
