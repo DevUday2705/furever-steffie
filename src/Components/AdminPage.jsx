@@ -400,6 +400,31 @@ const AdminPage = () => {
     }
   };
 
+  // Downloads (opens) the Shiprocket label PDF for a single shipment - lets
+  // admin grab/re-print one order's label without going through bulk ship.
+  const handleDownloadLabel = async (shipmentId) => {
+    if (!shipmentId) {
+      toast.error("This order has no Shiprocket shipment ID on file");
+      return;
+    }
+    try {
+      const res = await fetch("/api/shiprocket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "generate-labels", shipmentIds: [shipmentId] }),
+      });
+      const data = await res.json();
+      if (data.success && data.labelUrl) {
+        window.open(data.labelUrl, "_blank", "noopener");
+      } else {
+        toast.error(data.message || "Failed to generate label");
+      }
+    } catch (err) {
+      console.error("Error generating label:", err);
+      toast.error("Failed to generate label");
+    }
+  };
+
   // Called by BulkShipModal as each order in the batch finishes shipping
   const handleBulkOrderShipped = (orderId, { trackingId, courierName }) => {
     setOrders((prev) =>
@@ -2050,9 +2075,20 @@ const AdminPage = () => {
 
                         <p>Payment ID: {order.razorpay_payment_id}</p>
                         {order.tracking_id && (
-                          <p>
-                            <span className="font-semibold">Tracking ID:</span>{" "}
-                            {order.tracking_id}
+                          <p className="flex items-center flex-wrap gap-2">
+                            <span>
+                              <span className="font-semibold">Tracking ID:</span>{" "}
+                              {order.tracking_id}
+                            </span>
+                            {order.shiprocketShipmentId && (
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadLabel(order.shiprocketShipmentId)}
+                                className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              >
+                                📄 Download Label
+                              </button>
+                            )}
                           </p>
                         )}
                       </div>

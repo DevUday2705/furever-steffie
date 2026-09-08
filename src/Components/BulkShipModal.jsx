@@ -109,10 +109,8 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
     setPhase("done");
   };
 
-  const handlePrintLabels = async () => {
-    const shipmentIds = rows.filter((r) => r.status === "shipped").map((r) => r.shipmentId);
+  const generateAndOpenLabels = async (shipmentIds) => {
     if (!shipmentIds.length) return;
-
     setGeneratingLabels(true);
     try {
       const res = await fetch("/api/shiprocket", {
@@ -132,6 +130,11 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
     }
   };
 
+  const handlePrintLabels = () => {
+    const shipmentIds = rows.filter((r) => r.status === "shipped").map((r) => r.shipmentId);
+    generateAndOpenLabels(shipmentIds);
+  };
+
   const statusBadge = (row) => {
     switch (row.status) {
       case "fetching":
@@ -141,7 +144,19 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
       case "shipping":
         return <Loader2 size={14} className="animate-spin text-green-600" />;
       case "shipped":
-        return <CheckCircle2 size={14} className="text-green-600" />;
+        return (
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-green-600" />
+            <button
+              type="button"
+              disabled={generatingLabels}
+              onClick={() => generateAndOpenLabels([row.shipmentId])}
+              className="text-[10px] px-1.5 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              Label
+            </button>
+          </div>
+        );
       case "already-shipped":
         return <span className="text-xs text-gray-400">Already shipped</span>;
       case "error":
