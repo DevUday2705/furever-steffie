@@ -7,14 +7,19 @@ import { CheckCircle, Clock, Heart, Ruler } from "lucide-react";
 import Lottie from "react-lottie";
 
 import success from "../../public/animation/success.json";
-// For URL parameter extraction without useRouter
 
 const ThankYouPage = () => {
   const [searchParams] = useSearchParams();
+
+  // Must be called unconditionally, above the loading return below. It used to
+  // sit after that early return, so the hook count changed between the loading
+  // and loaded renders - a Rules of Hooks violation React can crash on.
+  const { currency } = useContext(CurrencyContext);
+
   const orderId = searchParams.get("razorpay_order_id");
   const paymentId = searchParams.get("razorpay_payment_id");
 
-  const [orderData, setOrderData] = useState(null);
+  const [summary, setSummary] = useState(null);
   const [customerData, setCustomerData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,66 +33,86 @@ const ThankYouPage = () => {
   };
 
   useEffect(() => {
-    // Fetch data from localStorage
+    // Each piece is read independently on purpose. These used to sit behind a
+    // single `if (order && customer)`, so a cart checkout - which never wrote
+    // an "order" key at all - threw the customer data away too and left the
+    // whole page rendering against nulls.
     try {
-      const savedOrderData = localStorage.getItem("order");
-      const savedCustomerData = localStorage.getItem("customer");
+      const rawCustomer = localStorage.getItem("customer");
+      if (rawCustomer) setCustomerData(JSON.parse(rawCustomer));
+    } catch (error) {
+      console.error("Could not read customer from localStorage:", error);
+    }
 
-      if (savedOrderData && savedCustomerData) {
-        setOrderData(JSON.parse(savedOrderData));
-        setCustomerData(JSON.parse(savedCustomerData));
+    try {
+      const rawSummary = localStorage.getItem("orderSummary");
+      if (rawSummary) {
+        setSummary(JSON.parse(rawSummary));
+      } else {
+        // Fallbacks for anyone who began checkout on the previous build.
+        const rawLegacyOrder = localStorage.getItem("order");
+        const rawCart = localStorage.getItem("furever_cart");
+        if (rawLegacyOrder) {
+          setSummary({ items: [JSON.parse(rawLegacyOrder)], breakdown: null });
+        } else if (rawCart) {
+          const cartItems = JSON.parse(rawCart);
+          if (Array.isArray(cartItems) && cartItems.length > 0) {
+            setSummary({ items: cartItems, breakdown: null });
+          }
+        }
       }
     } catch (error) {
-      console.error("Error retrieving data from localStorage:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Could not read order from localStorage:", error);
     }
+
+    setIsLoading(false);
   }, []);
 
-  // Function to format date
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat("en-IN", {
+  const formatDate = (date) =>
+    new Intl.DateTimeFormat("en-IN", {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(date);
-  };
 
   const handleContinueShopping = () => {
     window.location.href = "/";
   };
 
+  const money = (amount) => convertCurrency(Number(amount) || 0, currency);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-gray-50 py-6 md:py-12 px-4">
+        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden animate-pulse">
+          <div className="bg-gray-200 h-40" />
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div className="h-3 bg-gray-200 rounded w-1/2" />
+            <div className="flex gap-3 pt-4">
+              <div className="h-16 w-16 bg-gray-200 rounded-lg shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-3 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+              </div>
+            </div>
+            <div className="border-t border-gray-100 pt-4 space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-full" />
+              <div className="h-3 bg-gray-200 rounded w-5/6" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // if (!orderData || !customerData) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-  //       <div className="text-center p-6 max-w-md mx-auto bg-white rounded-lg shadow-lg">
-  //         <div className="text-red-500 text-5xl mb-4">⚠️</div>
-  //         <h1 className="text-xl md:text-2xl font-bold mb-4">
-  //           Order Information Not Found
-  //         </h1>
-  //         <p className="mb-6 text-gray-600 text-sm md:text-base">
-  //           We couldn't retrieve your order information. Please contact customer
-  //           support.
-  //         </p>
-  //         <button
-  //           onClick={handleContinueShopping}
-  //           className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 inline-block"
-  //         >
-  //           Return to Homepage
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  const { currency } = useContext(CurrencyContext);
+  const items = Array.isArray(summary?.items) ? summary.items.filter(Boolean) : [];
+  const breakdown = summary?.breakdown ?? null;
+  const itemsSubtotal = items.reduce(
+    (sum, item) => sum + (Number(item?.price) || 0) * (Number(item?.quantity) || 1),
+    0
+  );
+  const subtotal = breakdown?.subtotal ?? itemsSubtotal;
+  const total = breakdown?.total ?? itemsSubtotal;
 
   return (
     <motion.div
@@ -115,7 +140,7 @@ const ThankYouPage = () => {
           </p>
         </motion.div>
 
-        {/* WhatsApp Notification Section */}
+        {/* Measurements prompt */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,8 +156,8 @@ const ThankYouPage = () => {
                 </h2>
               </div>
               <p className="text-gray-600 text-lg mb-2">
-                Congratulations! We're excited to create the perfect outfit for
-                your pup.
+                Congratulations! We&apos;re excited to create the perfect outfit
+                for your pup.
               </p>
               <p className="text-gray-500 text-sm">
                 One final step to ensure the perfect fit and maximum comfort.
@@ -147,7 +172,7 @@ const ThankYouPage = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Next Step: Provide Your Pup's Measurements
+                  Next Step: Provide Your Pup&apos;s Measurements
                 </h3>
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-gray-500" />
@@ -156,7 +181,9 @@ const ThankYouPage = () => {
                   </p>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  You can provide measurements using our detailed size guide, or update them later through the confirmation email we've sent you.
+                  You can provide measurements using our detailed size guide, or
+                  update them later through the confirmation email we&apos;ve
+                  sent you.
                 </p>
               </div>
             </div>
@@ -169,16 +196,14 @@ const ThankYouPage = () => {
                 </h4>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {[
-                  "Neck circumference",
-                  "Chest circumference",
-                  "Back length",
-                ].map((measurement, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    <span className="text-sm text-gray-700">{measurement}</span>
-                  </div>
-                ))}
+                {["Neck circumference", "Chest circumference", "Back length"].map(
+                  (measurement) => (
+                    <div key={measurement} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                      <span className="text-sm text-gray-700">{measurement}</span>
+                    </div>
+                  )
+                )}
               </div>
               <p className="text-xs text-gray-500 mt-3 italic">
                 Precise measurements ensure maximum comfort and the perfect fit
@@ -187,7 +212,9 @@ const ThankYouPage = () => {
             </div>
 
             <a
-              href={`https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(customerData?.mobileNumber || '')}`}
+              href={`https://www.fureversteffie.com/size-guide?mobileNumber=${encodeURIComponent(
+                customerData?.mobileNumber || ""
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group shadow-sm hover:shadow-md"
@@ -196,17 +223,17 @@ const ThankYouPage = () => {
               <span>Visit Size Guide</span>
             </a>
 
-            {/* Footer */}
             <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
               <Heart className="w-3 h-3" />
-              <span>You can also update measurements later via confirmation email</span>
+              <span>
+                You can also update measurements later via confirmation email
+              </span>
             </div>
           </div>
         </motion.div>
 
         {/* Order Receipt */}
         <div className="p-4 md:p-8">
-          {/* Order Details */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start border-b border-gray-100 pb-4 mb-4">
               <div>
@@ -243,215 +270,164 @@ const ThankYouPage = () => {
               </div>
             </div>
 
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-3 text-sm md:text-base">
-                Order Summary
-              </h3>
+            <h3 className="font-semibold text-gray-800 mb-3 text-sm md:text-base">
+              Order Summary
+            </h3>
 
-              {/* Product Card (Mobile) */}
-              <div className="md:hidden border rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="p-4">
-                  <div className="flex items-start">
+            {items.length === 0 ? (
+              // The payment went through - never imply otherwise just because
+              // this browser has no local copy of the basket.
+              <div className="border rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+                <p className="font-medium text-gray-800 mb-1">
+                  Your order is confirmed.
+                </p>
+                <p>
+                  We couldn&apos;t load the item list on this device, but your
+                  payment went through and your order is safely with us. The
+                  full receipt is on its way to your email and WhatsApp.
+                </p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden bg-white">
+                {items.map((item, index) => (
+                  <div
+                    key={`${item?.id ?? "item"}-${index}`}
+                    className="flex items-start gap-3 p-4 border-b last:border-b-0 border-gray-100"
+                  >
                     <div className="flex-shrink-0 h-16 w-16 rounded bg-gray-100 overflow-hidden">
-                      {orderData?.image && (
+                      {item?.image && (
                         <img
-                          src={orderData?.image}
-                          alt={orderData?.name}
+                          src={item.image}
+                          alt={item?.name || "Product"}
                           className="h-16 w-16 object-cover"
                         />
                       )}
                     </div>
-                    <div className="ml-3 flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900">
-                        {orderData.name}
+                        {item?.name || "Item"}
                       </div>
-                      <div className="text-xs text-gray-500 mb-1">
-                        {orderData.subcategory}
-                      </div>
-                      <div className="flex justify-between items-start">
-                        <div className="text-xs text-gray-600">
-                          Size: {orderData.selectedSize}
-                          <div>
-                            {orderData.isBeaded ? "Beaded" : "Not Beaded"} |
-                            {orderData.isFullSet ? " Full Set" : " Single Item"}
-                          </div>
+                      {item?.subcategory && (
+                        <div className="text-xs text-gray-500 mb-1">
+                          {item.subcategory}
                         </div>
-                        <div className="text-sm font-semibold">
-                          {convertCurrency(orderData.price, currency)}
+                      )}
+                      <div className="text-xs text-gray-600">
+                        {item?.selectedSize && <>Size: {item.selectedSize}</>}
+                        {Number(item?.quantity) > 1 && (
+                          <> &middot; Qty: {item.quantity}</>
+                        )}
+                        <div>
+                          {item?.isBeaded ? "Beaded" : "Not Beaded"} |
+                          {item?.isFullSet ? " Full Set" : " Single Item"}
                         </div>
                       </div>
                     </div>
+                    <div className="text-sm font-semibold whitespace-nowrap">
+                      {money(
+                        (Number(item?.price) || 0) * (Number(item?.quantity) || 1)
+                      )}
+                    </div>
                   </div>
-                </div>
+                ))}
 
-                <div className="bg-gray-50 px-4 py-3">
-                  <div className="flex justify-between text-xs mb-1">
+                <div className="bg-gray-50 px-4 py-3 text-sm">
+                  <div className="flex justify-between mb-1">
                     <span className="text-gray-600">Subtotal</span>
-                    <span>{convertCurrency(orderData.price, currency)}</span>
+                    <span>{money(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-xs mb-1">
+                  {Number(breakdown?.discountAmount) > 0 && (
+                    <div className="flex justify-between mb-1 text-green-700">
+                      <span>Discount</span>
+                      <span>-{money(breakdown.discountAmount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between mb-1">
                     <span className="text-gray-600">Shipping</span>
-                    <span>{currency}0</span>
+                    <span>
+                      {Number(breakdown?.deliveryCharge) > 0
+                        ? money(breakdown.deliveryCharge)
+                        : "Free"}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-sm font-semibold mt-2 pt-2 border-t border-gray-200">
+                  {Number(breakdown?.processingFee) > 0 && (
+                    <div className="flex justify-between mb-1">
+                      <span className="text-gray-600">Processing fee</span>
+                      <span>{money(breakdown.processingFee)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span>{convertCurrency(orderData.price, currency)}</span>
+                    <span>{money(total)}</span>
                   </div>
                 </div>
               </div>
-
-              {/* Desktop Table */}
-              <div className="hidden md:block border rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Item
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Details
-                      </th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-12 w-12 rounded bg-gray-100 overflow-hidden">
-                            {orderData.image && (
-                              <img
-                                src={orderData.image}
-                                alt={orderData.name}
-                                className="h-12 w-12 object-cover"
-                              />
-                            )}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {orderData.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {orderData.subcategory}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="text-sm text-gray-900">
-                          Size: {orderData.selectedSize}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {orderData.isBeaded ? "Beaded" : "Not Beaded"} |
-                          {orderData.isFullSet ? " Full Set" : " Single Item"}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-right text-sm font-medium">
-                        {convertCurrency(orderData.price, currency)}
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tfoot className="bg-gray-50">
-                    <tr>
-                      <td
-                        colSpan="2"
-                        className="px-4 py-2 text-right text-sm font-medium text-gray-900"
-                      >
-                        Subtotal
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                        {convertCurrency(orderData.price, currency)}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        className="px-4 py-2 text-right text-sm font-medium text-gray-900"
-                      >
-                        Shipping
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                        ₹0
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        className="px-4 py-2 text-right text-sm font-bold text-gray-900"
-                      >
-                        Total
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">
-                        {convertCurrency(orderData.price, currency)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Customer and Shipping Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="border rounded-lg p-4 bg-white shadow-sm"
-            >
-              <h3 className="font-semibold text-gray-800 mb-2 text-sm">
-                Customer Information
-              </h3>
-              <p className="text-gray-700 font-medium">
-                {customerData.fullName}
-              </p>
-              <p className="text-gray-600 text-sm mt-1">
-                {customerData.mobileNumber}
-              </p>
-              {customerData.alternateMobile && (
-                <p className="text-gray-600 text-sm">
-                  Alt: {customerData.alternateMobile}
+          {/* Customer and Shipping Info - only when we actually have it */}
+          {customerData && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="border rounded-lg p-4 bg-white shadow-sm"
+              >
+                <h3 className="font-semibold text-gray-800 mb-2 text-sm">
+                  Customer Information
+                </h3>
+                <p className="text-gray-700 font-medium">
+                  {customerData?.fullName}
                 </p>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="border rounded-lg p-4 bg-white shadow-sm"
-            >
-              <h3 className="font-semibold text-gray-800 mb-2 text-sm">
-                Shipping Address
-              </h3>
-              <p className="text-gray-700 text-sm">
-                {customerData.addressLine1}
-              </p>
-              <p className="text-gray-700 text-sm">
-                {customerData.addressLine2}
-              </p>
-              <p className="text-gray-700 text-sm">
-                {customerData.city}, {customerData.state} -{" "}
-                {customerData.pincode}
-              </p>
-              <p className="text-gray-600 text-xs mt-2">
-                <span className="font-medium">Delivery: </span>
-                {customerData.deliveryOption === "standard"
-                  ? "Standard Delivery"
-                  : "Express Delivery"}
-              </p>
-              {customerData.specialInstructions &&
-                customerData.specialInstructions !==
-                  "No special instructions" && (
-                  <p className="text-gray-600 text-xs mt-1">
-                    <span className="font-medium">Instructions: </span>
-                    {customerData.specialInstructions}
+                <p className="text-gray-600 text-sm mt-1">
+                  {customerData?.mobileNumber}
+                </p>
+                {customerData?.alternateMobile && (
+                  <p className="text-gray-600 text-sm">
+                    Alt: {customerData.alternateMobile}
                   </p>
                 )}
-            </motion.div>
-          </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="border rounded-lg p-4 bg-white shadow-sm"
+              >
+                <h3 className="font-semibold text-gray-800 mb-2 text-sm">
+                  Shipping Address
+                </h3>
+                <p className="text-gray-700 text-sm">
+                  {customerData?.addressLine1}
+                </p>
+                {customerData?.addressLine2 && (
+                  <p className="text-gray-700 text-sm">
+                    {customerData.addressLine2}
+                  </p>
+                )}
+                <p className="text-gray-700 text-sm">
+                  {customerData?.city}, {customerData?.state} -{" "}
+                  {customerData?.pincode}
+                </p>
+                <p className="text-gray-600 text-xs mt-2">
+                  <span className="font-medium">Delivery: </span>
+                  {customerData?.deliveryOption === "standard"
+                    ? "Standard Delivery"
+                    : "Express Delivery"}
+                </p>
+                {customerData?.specialInstructions &&
+                  customerData.specialInstructions !==
+                    "No special instructions" && (
+                    <p className="text-gray-600 text-xs mt-1">
+                      <span className="font-medium">Instructions: </span>
+                      {customerData.specialInstructions}
+                    </p>
+                  )}
+              </motion.div>
+            </div>
+          )}
 
           {/* Call to Action */}
           <motion.div

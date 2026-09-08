@@ -522,7 +522,26 @@ const CheckoutPage = () => {
       });
 
       localStorage.setItem("customer", JSON.stringify(formData));
+
+      // Snapshot EVERY line item plus the real price breakdown for the
+      // thank-you page. Previously only the single-product path wrote
+      // anything, so a cart checkout left the thank-you page with no order
+      // data at all - it read null and crashed to a blank screen after the
+      // customer had already paid. It also meant a multi-item order could
+      // only ever have shown one item's price as the total.
+      const purchasedItems = isCartCheckout ? cart : [orderDetails];
+      localStorage.setItem(
+        "orderSummary",
+        JSON.stringify({
+          items: purchasedItems,
+          breakdown: getOrderBreakdown(),
+          placedAt: new Date().toISOString(),
+        })
+      );
+
       if (!isCartCheckout) {
+        // Kept for backwards compatibility with any older tab still on the
+        // previous build; orderSummary above is what the page reads now.
         localStorage.setItem("order", JSON.stringify(orderDetails));
       }
 
@@ -909,11 +928,51 @@ const CheckoutPage = () => {
   const breakdown = getOrderBreakdown();
 
   return loadingPayment ? (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      <p className="ml-4 text-lg font-medium text-indigo-600">
-        Processing your order...Please wait. Do not refresh or close this page.
-      </p>
+    // Skeleton of the receipt the customer is about to see, rather than a bare
+    // spinner. It makes the wait feel like the page is already arriving, and
+    // the warning reads as reassurance instead of an alarm.
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-50 py-8 px-4">
+      <div className="max-w-md mx-auto">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-9 h-9 rounded-full border-2 border-gray-200 border-t-gray-800 animate-spin" />
+            <div>
+              <p className="font-semibold text-gray-900">
+                Confirming your payment
+              </p>
+              <p className="text-sm text-gray-500">
+                This usually takes a few seconds.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-4 text-sm text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+            Your payment has gone through. Please stay on this page while we
+            confirm your order &mdash; don&apos;t refresh or press back.
+          </p>
+
+          <div className="mt-6 space-y-4 animate-pulse" aria-hidden="true">
+            <div className="h-3 w-32 bg-gray-200 rounded" />
+            <div className="flex gap-3">
+              <div className="h-16 w-16 bg-gray-200 rounded-lg shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-3 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+              </div>
+            </div>
+            <div className="border-t border-gray-100 pt-4 space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-full" />
+              <div className="h-3 bg-gray-200 rounded w-5/6" />
+              <div className="h-3 bg-gray-200 rounded w-2/3" />
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Having trouble? Contact us at fureversteffie@gmail.com
+        </p>
+      </div>
     </div>
   ) : (
     <div className="bg-gray-50 pb-24">
