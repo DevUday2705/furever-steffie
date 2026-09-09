@@ -1,7 +1,16 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { waitUntil } from "@vercel/functions";
 import { getShiprocketToken, SHIPROCKET_BASE_URL } from "../lib/shiprocketAuth.js";
 import { sendShippedNotificationWhatsApp } from "../lib/whatsappNotify.js";
+
+// Creating a shipment is 2-3 sequential Shiprocket API calls plus Firestore
+// I/O - comfortably over Vercel's default 10s limit if Shiprocket is even
+// slightly slow, which is exactly what caused FUNCTION_INVOCATION_TIMEOUT
+// during bulk shipping. Hobby plan supports up to 60s when configured.
+export const config = {
+    maxDuration: 60,
+};
 
 if (!getApps().length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -115,6 +124,23 @@ async function handleCreateOrder(req, res) {
         const order = orderSnap.data();
         const customer = order.customer || {};
 
+        // Idempotency: if a previous attempt got far enough to record a
+        // shipment (e.g. it succeeded on Shiprocket's side but our function
+        // was killed by a timeout before writing that back), don't create a
+        // second shipment and burn wallet balance on a duplicate - just
+        // return what's already there.
+        if (order.shiprocketShipmentId) {
+            console.log(`ℹ️ Order ${orderId} already has a Shiprocket shipment (${order.shiprocketShipmentId}), skipping duplicate creation`);
+            return res.status(200).json({
+                success: true,
+                trackingId: order.tracking_id,
+                courierName: order.courierPartner,
+                shiprocketOrderId: order.shiprocketOrderId,
+                shipmentId: order.shiprocketShipmentId,
+                alreadyShipped: true,
+            });
+        }
+
         const totalWeight = (order.items || []).reduce(
             (sum, item) => sum + (item.weightKg || DEFAULT_ITEM_WEIGHT_KG) * (item.quantity || 1),
             0
@@ -168,11 +194,26 @@ async function handleCreateOrder(req, res) {
             return res.status(502).json({ message: "Shiprocket did not return a shipment_id", details: createResult });
         }
 
-        const awbPayload = courierId ? { shipment_id: shipmentId, courier_id: courierId } : { shipment_id: shipmentId };
-        const awbResult = await shiprocketFetch("/courier/assign/awb", token, {
-            method: "POST",
-            body: JSON.stringify(awbPayload),
-        });
+        let awbResult;
+        try {
+            awbResult = await shiprocketFetch("/courier/assign/awb", token, {
+                method: "POST",
+                body: JSON.stringify(courierId ? { shipment_id: shipmentId, courier_id: courierId } : { shipment_id: shipmentId }),
+            });
+        } catch (awbError) {
+            // Courier lists go stale fast - Shiprocket's real-time "stressed
+            // courier" filtering can drop the courier we fetched moments ago
+            // by the time we actually try to book it. Fall back to letting
+            // Shiprocket auto-assign instead of failing the whole shipment.
+            const notServiceable = courierId && /not serviceable/i.test(awbError.body?.message || "");
+            if (!notServiceable) throw awbError;
+
+            console.warn(`⚠️ Courier ${courierId} no longer serviceable for shipment ${shipmentId}, retrying with auto-assign`);
+            awbResult = await shiprocketFetch("/courier/assign/awb", token, {
+                method: "POST",
+                body: JSON.stringify({ shipment_id: shipmentId }),
+            });
+        }
 
         const awbData = awbResult?.response?.data;
         const awbCode = awbData?.awb_code;
@@ -183,14 +224,16 @@ async function handleCreateOrder(req, res) {
             return res.status(502).json({ message: "Shiprocket did not return an AWB code", details: awbResult });
         }
 
-        try {
-            await shiprocketFetch("/courier/generate/pickup", token, {
+        // Best-effort and not needed before responding - runs in the
+        // background so it can't push this request over the timeout.
+        waitUntil(
+            shiprocketFetch("/courier/generate/pickup", token, {
                 method: "POST",
                 body: JSON.stringify({ shipment_id: [shipmentId] }),
-            });
-        } catch (pickupError) {
-            console.error("⚠️ Shiprocket pickup scheduling failed (continuing):", pickupError.body || pickupError.message);
-        }
+            }).catch((pickupError) => {
+                console.error("⚠️ Shiprocket pickup scheduling failed:", pickupError.body || pickupError.message);
+            })
+        );
 
         const updateData = {
             orderStatus: "shipped",
