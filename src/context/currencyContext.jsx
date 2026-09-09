@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { mapDetectedCountryToCurrency, mapDetectedCountryToCheckout } from "../constants/geoPricing";
 
 export const CurrencyContext = createContext();
 
@@ -24,6 +25,13 @@ export const CurrencyProvider = ({ children }) => {
   });
 
   const [rate, setRate] = useState(currencyRates[currency]);
+  const [detectedCountry, setDetectedCountry] = useState(() => {
+    try {
+      return localStorage.getItem("detectedCheckoutCountry") || null;
+    } catch (error) {
+      return null;
+    }
+  });
 
   // Update rate when currency changes
   useEffect(() => {
@@ -38,8 +46,40 @@ export const CurrencyProvider = ({ children }) => {
       console.error("Failed to save currency to localStorage:", error);
     }
   }, [currency]);
+
+  // One-time IP geolocation on first-ever visit only - if the visitor has
+  // already picked a currency before (manually or from a prior detection),
+  // never override it. This is what makes foreign visitors see the marked-up
+  // price (via convertCurrency) without having to manually switch currency.
+  useEffect(() => {
+    let alreadyDecided;
+    try {
+      alreadyDecided = localStorage.getItem("selectedCurrency");
+    } catch (error) {
+      alreadyDecided = null;
+    }
+    if (alreadyDecided) return;
+
+    fetch("/api/detect-location")
+      .then((res) => res.json())
+      .then(({ countryCode }) => {
+        if (!countryCode) return;
+        setCurrency(mapDetectedCountryToCurrency(countryCode));
+        const checkoutCountry = mapDetectedCountryToCheckout(countryCode);
+        setDetectedCountry(checkoutCountry);
+        try {
+          localStorage.setItem("detectedCheckoutCountry", checkoutCountry);
+        } catch (error) {
+          // ignore
+        }
+      })
+      .catch((error) => {
+        console.error("Geo-location detection failed:", error);
+      });
+  }, []);
+
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, rate }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, rate, detectedCountry }}>
       {children}
     </CurrencyContext.Provider>
   );

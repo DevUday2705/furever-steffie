@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
 import { convertCurrency } from "../constants/currency";
+import { FOREIGN_PRICE_MULTIPLIER } from "../constants/geoPricing";
 import { CurrencyContext } from "../context/currencyContext";
 import mixpanel from "../hooks/mixpanel";
 
@@ -46,7 +47,7 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart } = useAppContext();
-  const { currency, setCurrency } = useContext(CurrencyContext);
+  const { currency, setCurrency, detectedCountry } = useContext(CurrencyContext);
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
@@ -65,7 +66,11 @@ const CheckoutPage = () => {
     mobileNumber: "",
     specialInstructions: "",
     deliveryOption: "standard",
-    country: "india", // NEW: Add country selection
+    // Defaults to whatever country was detected while browsing (see
+    // CurrencyContext) so the foreign price markup they already saw stays
+    // consistent at checkout instead of silently reverting to Indian pricing.
+    // Still fully editable - this is just the starting guess.
+    country: detectedCountry || "india",
   });
 
   // Validation state
@@ -419,6 +424,13 @@ const CheckoutPage = () => {
       subtotal = orderDetails.price;
     }
 
+    // Foreign price markup applied to the actual charge, not just the
+    // browsing display (convertCurrency) - so what a non-India visitor saw
+    // while shopping is what they're actually charged, not a lower amount.
+    if (formData.country !== "india") {
+      subtotal = Math.round(subtotal * FOREIGN_PRICE_MULTIPLIER);
+    }
+
     let discountAmount = 0;
 
     // Check if it's the special single-use coupon for flat ₹750 discount
@@ -450,6 +462,10 @@ const CheckoutPage = () => {
         ) {
           navratriSubtotal = orderDetails.price;
         }
+      }
+
+      if (formData.country !== "india") {
+        navratriSubtotal = Math.round(navratriSubtotal * FOREIGN_PRICE_MULTIPLIER);
       }
 
       // Apply 5% discount only on Navratri items
