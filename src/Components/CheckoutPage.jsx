@@ -31,10 +31,16 @@ const calculateDispatchDate = () => {
 
 // COD requires a non-refundable advance (filters low-intent orders, covers
 // forward+return shipping risk if the customer declines at the door).
+// Floor is set from real cost, not guessed: forward COD shipping runs
+// ~₹115-150, return (RTO) shipping ~₹120 on top if declined - so a declined
+// COD order can cost ~₹235-270 in shipping alone with zero revenue. The
+// floor covers that plus a small margin so a decline is a wash, not a loss,
+// on typical routes (the priciest few routes may still eat into the margin -
+// raise this further if that's not an acceptable risk).
 const COD_ADVANCE_PERCENT = 10;
-const MIN_COD_ADVANCE = 49;
+const MIN_COD_ADVANCE = 250;
 const calculateCodAdvance = (totalAmount) =>
-  Math.max(MIN_COD_ADVANCE, Math.round((totalAmount * COD_ADVANCE_PERCENT) / 100));
+  Math.min(totalAmount, Math.max(MIN_COD_ADVANCE, Math.round((totalAmount * COD_ADVANCE_PERCENT) / 100)));
 
 const CheckoutPage = () => {
   const location = useLocation();
