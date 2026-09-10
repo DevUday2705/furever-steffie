@@ -50,6 +50,14 @@ const CheckoutPage = () => {
   const { currency, setCurrency, detectedCountry } = useContext(CurrencyContext);
   const { orderDetails } = location.state || {};
   const [abandonedDocId, setAbandonedDocId] = useState(null);
+  // Generated once per page load (not per submit) so retrying a submit -
+  // slow Razorpay modal, a cancelled payment, a double-click - overwrites
+  // the same abandoned_checkouts doc instead of creating a new one each
+  // time. This was the cause of the same cart showing up multiple times in
+  // the abandoned-carts admin view.
+  const [checkoutSessionId] = useState(
+    () => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  );
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" | "cod"
 
@@ -569,7 +577,7 @@ const CheckoutPage = () => {
 
       // Track abandoned checkout for cart recovery
       try {
-        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const sessionId = checkoutSessionId;
         const trackingData = {
           sessionId,
           email: formData.email,
