@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -58,6 +58,9 @@ const CheckoutPage = () => {
   const [checkoutSessionId] = useState(
     () => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   );
+  // Ref, not state - needs to block a second click synchronously, before
+  // React has committed a state update from the first one.
+  const submitInFlightRef = useRef(false);
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" | "cod"
 
@@ -540,9 +543,18 @@ const CheckoutPage = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Guard against rapid double-clicks/re-submits while a submission is
+    // already in flight - each one used to independently track a new
+    // abandoned-checkout session and could layer on top of an in-progress
+    // payment attempt. A ref (not state) because it must block a second
+    // click synchronously, before React commits a state update from the first.
+    if (submitInFlightRef.current) return;
+
     setFormSubmitted(true);
 
     if (validateForm(formData, setErrors)) {
+      submitInFlightRef.current = true;
       // Send Mixpanel event with all customer data
       mixpanel.track("Address Submitted", {
         ...formData,
