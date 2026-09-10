@@ -1,4 +1,5 @@
 import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
+import { sendOrderConfirmationWhatsApp } from '../lib/whatsappNotify.js';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => createEmailTransport();
@@ -170,7 +171,7 @@ export default async function handler(req, res) {
 
   try {
     const orderData = req.body;
-    const { customer, orderId } = orderData;
+    const { customer, orderId, orderNumber, amount, resendWhatsApp } = orderData;
 
     if (!customer?.fullName || !customer?.email || !customer?.addressLine1) {
       return res.status(400).json({ message: 'Missing required customer information (name, email, or address)' });
@@ -196,10 +197,29 @@ export default async function handler(req, res) {
 
     console.log('✅ Order confirmation email sent:', info.messageId);
 
+    // Admin-triggered resend (e.g. a COD order whose original WhatsApp send
+    // failed silently) - reuses this same endpoint instead of a dedicated
+    // one, since Vercel's Hobby plan caps us at 12 serverless functions.
+    let whatsappResent = false;
+    if (resendWhatsApp && customer?.mobileNumber) {
+      try {
+        await sendOrderConfirmationWhatsApp({
+          phone: customer.mobileNumber,
+          customerName: customer.fullName,
+          orderNumber: orderNumber || orderId,
+          amount,
+        });
+        whatsappResent = true;
+      } catch (whatsappError) {
+        console.error('❌ Failed to resend WhatsApp confirmation:', whatsappError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: 'Order confirmation email sent successfully',
-      messageId: info.messageId
+      messageId: info.messageId,
+      whatsappResent,
     });
 
   } catch (error) {

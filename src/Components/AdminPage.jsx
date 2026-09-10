@@ -425,6 +425,42 @@ const AdminPage = () => {
     }
   };
 
+  // Manually resend the order confirmation (email + WhatsApp) - added after
+  // a bug meant COD orders never got the WhatsApp confirmation (fixed, but
+  // WhatsApp sends can also just fail transiently and go unnoticed since
+  // they run in the background), so admin can retry on request.
+  const handleResendConfirmation = async (order) => {
+    try {
+      const res = await fetch("/api/send-order-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          razorpay_order_id: order.razorpay_order_id,
+          razorpay_payment_id: order.razorpay_payment_id,
+          customer: order.customer,
+          items: order.items,
+          amount: order.amount,
+          resendWhatsApp: true,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(
+          data.whatsappResent
+            ? "Confirmation resent (email + WhatsApp)"
+            : "Email resent, but WhatsApp failed - check the customer's mobile number"
+        );
+      } else {
+        toast.error(data.message || "Failed to resend confirmation");
+      }
+    } catch (err) {
+      console.error("Error resending confirmation:", err);
+      toast.error("Failed to resend confirmation");
+    }
+  };
+
   // Called by BulkShipModal as each order in the batch finishes shipping
   const handleBulkOrderShipped = (orderId, { trackingId, courierName }) => {
     setOrders((prev) =>
@@ -2073,7 +2109,17 @@ const AdminPage = () => {
                         <p className="font-semibold">Razorpay</p>
                         <p>Order ID: {order.razorpay_order_id}</p>
 
-                        <p>Payment ID: {order.razorpay_payment_id}</p>
+                        <p className="flex items-center flex-wrap gap-2">
+                          <span>Payment ID: {order.razorpay_payment_id}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleResendConfirmation(order)}
+                            className="text-xs px-2 py-0.5 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            title="Resend order confirmation email + WhatsApp"
+                          >
+                            🔁 Resend Confirmation
+                          </button>
+                        </p>
                         {order.tracking_id && (
                           <p className="flex items-center flex-wrap gap-2">
                             <span>
