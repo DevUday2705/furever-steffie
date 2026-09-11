@@ -21,6 +21,12 @@ const AdminPage = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
+  // Internal notes per order (return/refund/exchange context) - keyed by
+  // orderId so the WhatsApp AI agent can look them up when a customer
+  // messages back about an existing order. Draft text while editing, before
+  // Save is clicked.
+  const [noteDrafts, setNoteDrafts] = useState({});
+  const [savingNoteId, setSavingNoteId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
   const { ordersArePaused, setOrdersArePaused } = useOrderPause();
@@ -458,6 +464,34 @@ const AdminPage = () => {
     } catch (err) {
       console.error("Error resending confirmation:", err);
       toast.error("Failed to resend confirmation");
+    }
+  };
+
+  // Persists an internal note on the order (return/refund/exchange context,
+  // etc.) - read by the WhatsApp AI agent so it can answer correctly if this
+  // customer messages back about this order.
+  const handleSaveNote = async (order) => {
+    const text = (noteDrafts[order.id] ?? order.adminNotes ?? "").trim();
+    setSavingNoteId(order.id);
+    try {
+      const orderRef = doc(db, "orders", order.id);
+      await updateDoc(orderRef, {
+        adminNotes: text,
+        adminNotesUpdatedAt: new Date().toISOString(),
+      });
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === order.id
+            ? { ...o, adminNotes: text, adminNotesUpdatedAt: new Date().toISOString() }
+            : o
+        )
+      );
+      toast.success("Note saved");
+    } catch (err) {
+      console.error("Error saving order note:", err);
+      toast.error("Failed to save note");
+    } finally {
+      setSavingNoteId(null);
     }
   };
 
@@ -2104,6 +2138,38 @@ const AdminPage = () => {
                             {order.customer?.deliveryOption}
                           </span>
                         </p>
+                      </div>
+                      <div className="pt-2 border-t">
+                        <p className="font-semibold mb-1">
+                          📝 Internal Notes
+                          <span className="font-normal text-gray-400 text-[10px] ml-1">
+                            (visible to the WhatsApp AI agent)
+                          </span>
+                        </p>
+                        <textarea
+                          value={noteDrafts[order.id] ?? order.adminNotes ?? ""}
+                          onChange={(e) =>
+                            setNoteDrafts((prev) => ({ ...prev, [order.id]: e.target.value }))
+                          }
+                          placeholder="e.g. Customer requested exchange for size M, approved on 12 Sep. Refund of ₹500 processed via UPI on 10 Sep for damaged item."
+                          rows={3}
+                          className="w-full text-xs border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                        <div className="flex items-center justify-between mt-1">
+                          {order.adminNotesUpdatedAt && (
+                            <span className="text-[10px] text-gray-400">
+                              Last saved: {new Date(order.adminNotesUpdatedAt).toLocaleString()}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleSaveNote(order)}
+                            disabled={savingNoteId === order.id}
+                            className="ml-auto text-xs px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                          >
+                            {savingNoteId === order.id ? "Saving..." : "Save Note"}
+                          </button>
+                        </div>
                       </div>
                       <div className="pt-2 border-t">
                         <p className="font-semibold">Razorpay</p>
