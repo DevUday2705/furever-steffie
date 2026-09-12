@@ -97,8 +97,10 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
           </div>
 
           {order?.paymentMethod === "cod" && (
-            <div className="mb-4 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded px-3 py-2">
-              <strong>COD order</strong> — courier must collect ₹{order.codAmountDue ?? "?"} on delivery.
+            <div className="mb-4 text-xs bg-red-50 border border-red-300 text-red-800 rounded px-3 py-2">
+              <strong>💰 COD order — Shiprocket ONLY.</strong> Courier must collect ₹
+              {order.codAmountDue ?? "?"} on delivery. A local/manual courier won't ask the
+              customer to pay, so manual entry is disabled for this order.
             </div>
           )}
 
@@ -113,7 +115,19 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
             <button
               type="button"
               onClick={() => setMode("manual")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded flex-1 sm:flex-none ${mode === "manual" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"}`}
+              disabled={order?.paymentMethod === "cod"}
+              title={
+                order?.paymentMethod === "cod"
+                  ? "Disabled for COD orders - the courier won't collect payment on a manual/local shipment"
+                  : undefined
+              }
+              className={`px-2.5 sm:px-3 py-1.5 rounded flex-1 sm:flex-none ${
+                order?.paymentMethod === "cod"
+                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                  : mode === "manual"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
             >
               Manual entry
             </button>

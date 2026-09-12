@@ -1603,7 +1603,14 @@ const AdminPage = () => {
                             🤝 Collaboration
                           </span>
                         )}
-                      
+                        {order.paymentMethod === "cod" && (
+                          <span
+                            className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-red-600 border border-red-700 rounded-full animate-pulse"
+                            title={`Courier must collect ₹${order.codAmountDue ?? "?"} on delivery - ship via Shiprocket only, never a local/manual courier, or the customer won't be asked to pay`}
+                          >
+                            💰 COD - Shiprocket ONLY
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm font-medium text-gray-800 mb-1">
                         📞 {order.customer?.mobileNumber}
