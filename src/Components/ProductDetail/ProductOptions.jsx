@@ -503,7 +503,6 @@ const ProductOptions = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-600 mt-0.5">{card.tagline}</p>
                     <div className="flex flex-wrap gap-x-2.5 gap-y-1 mt-2">
                       {card.items.map((item) => (
                         <span
