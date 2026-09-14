@@ -11,6 +11,7 @@ import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { getAvailableDhotisForSize, getGlobalSettings } from "../utils/dhotiInventoryUtils";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -46,10 +47,42 @@ const ProductDetail = () => {
   const [selectedStyle, setSelectedStyle] = useState("simple");
   const [selectedSize, setSelectedSize] = useState("S");
   const [isRoyalSet, setIsRoyalSet] = useState(false);
-  const [selectedDhoti, setSelectedDhoti] = useState(
-    product?.dhotis?.length ? product.dhotis[0].name : null
-  );
+  const [selectedDhoti, setSelectedDhoti] = useState(null);
   const [images, setImages] = useState([]);
+
+  // Single source of truth for dhoti color+size availability - fetched once
+  // here and shared by ProductOptions (the picker), BottomActions and
+  // SimpleSizeSelector (so cart/order records always get the same name and
+  // image as whatever the customer actually saw and picked).
+  const [globalSettings, setGlobalSettings] = useState(null);
+  const [availableDhotis, setAvailableDhotis] = useState([]);
+  const [dhotiLoading, setDhotiLoading] = useState(false);
+
+  useEffect(() => {
+    getGlobalSettings()
+      .then(setGlobalSettings)
+      .catch((error) => console.error("Error loading global settings:", error));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedSize) return;
+    let cancelled = false;
+    setDhotiLoading(true);
+    getAvailableDhotisForSize(selectedSize)
+      .then((dhotis) => {
+        if (!cancelled) setAvailableDhotis(dhotis);
+      })
+      .catch((error) => {
+        console.error("Error loading available dhotis:", error);
+        if (!cancelled) setAvailableDhotis([]);
+      })
+      .finally(() => {
+        if (!cancelled) setDhotiLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSize]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -299,6 +332,9 @@ const ProductDetail = () => {
               setIsRoyalSet={setIsRoyalSet}
               selectedStyle={selectedStyle}
               setSelectedStyle={setSelectedStyle}
+              globalSettings={globalSettings}
+              availableDhotis={availableDhotis}
+              dhotiLoading={dhotiLoading}
             />
 
             {/* Simple Size Selector - replaces smart sizing logic */}
@@ -321,6 +357,7 @@ const ProductDetail = () => {
               setIsOpen={setIsOpen}
               // Custom sizing prop
               allowCustomSizes={product.allowCustomSizes || false}
+              availableDhotis={availableDhotis}
             />
 
             {/* Trust Signals Section - now below sizing options */}
@@ -349,6 +386,7 @@ const ProductDetail = () => {
         addToCart={addToCart}
         setIsOpen={setIsOpen}
         allowCustomSizes={product.allowCustomSizes || false} // NEW: Pass custom sizing flag
+        availableDhotis={availableDhotis}
       />
     </div>
   );

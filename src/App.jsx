@@ -122,7 +122,9 @@ const App = () => {
     location.pathname.startsWith(route)
   );
   return (
-    <div className=" max-w-md mx-auto ">
+    // Admin pages are desktop management tools, not part of the mobile shop -
+    // don't squeeze them into the customer-facing phone-width shell.
+    <div className={isAdminRoute ? "" : "max-w-md mx-auto"}>
       {ready || isAdminRoute ? (
         <>
           <nav className="flex items-center justify-between px-4 py-3 sticky top-0 z-[70] bg-white">
@@ -152,7 +154,7 @@ const App = () => {
             </div>
           </nav>
 
-          <div className="max-w-md mx-auto">
+          <div className={isAdminRoute ? "" : "max-w-md mx-auto"}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/kurta" element={<KurtaListing />} />

@@ -59,7 +59,6 @@ export const initializeGlobalSettings = async () => {
       kurtaDhotiEnabled: true,  // Global toggle for Kurta + Dhoti option
       kurtaDupattaEnabled: true, // Global toggle for Kurta + Dupatta option
       royalSetEnabled: true,    // Global toggle for Royal Set option
-      dhotiManagementEnabled: true, // Enable dhoti management system
     },
     lastUpdated: new Date().toISOString(),
     updatedBy: 'system'
@@ -163,28 +162,36 @@ export const isDhotiAvailable = async (dhotiType, size, requestedQuantity = 1) =
   }
 };
 
-// Get available dhoti styles for a given size
-export const getAvailableDhtoisForSize = async (size) => {
+// All sizes a dhoti's stock can be tracked against - matches the kurta size
+// range (sizeStock / pricing.sizeIncrements) so every kurta size has real
+// dhoti availability data instead of silently having none above "L".
+export const DHOTI_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"];
+
+// Get available dhoti styles for a given size - this is the single place
+// that decides dhoti availability app-wide (outfit selector, cart, checkout).
+export const getAvailableDhotisForSize = async (size) => {
   try {
     const inventory = await getDhotiInventory();
     if (!inventory) return [];
-    
-    const availableDhtois = [];
-    
-    for (const [dhotiType, dhotiData] of Object.entries(inventory)) {
+
+    const availableDhotis = [];
+
+    for (const [dhotiId, dhotiData] of Object.entries(inventory)) {
       // Skip the metadata fields like lastUpdated, updatedBy
-      if (dhotiType === 'lastUpdated' || dhotiType === 'updatedBy') continue;
-      
-      const stock = dhotiData.inventory[size] || 0;
+      if (dhotiId === 'lastUpdated' || dhotiId === 'updatedBy') continue;
+
+      const stock = dhotiData.inventory?.[size] || 0;
       if (stock > 0) {
-        availableDhtois.push({
-          ...dhotiData,
-          availableStock: stock
+        availableDhotis.push({
+          id: dhotiId,
+          name: dhotiData.name,
+          image: dhotiData.image,
+          availableStock: stock,
         });
       }
     }
-    
-    return availableDhtois;
+
+    return availableDhotis;
   } catch (error) {
     console.error('Error getting available dhotis for size:', error);
     return [];

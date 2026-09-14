@@ -6,7 +6,6 @@ import { Check, Crown, Gift, Info, AlertCircle } from "lucide-react";
 import Lottie from "react-lottie";
 
 import confettiAnimation from "../../../public/animation/confetti.json";
-import { getAvailableDhtoisForSize, getGlobalSettings } from "../../utils/dhotiInventoryUtils";
 import { CurrencyContext } from "../../context/currencyContext";
 import { convertCurrency } from "../../constants/currency";
 
@@ -77,95 +76,43 @@ const ProductOptions = ({
   setIsRoyalSet,
   selectedStyle,
   setSelectedStyle,
+  // Single source of truth for dhoti color+size availability, fetched once
+  // in ProductDetail.jsx and shared with BottomActions/SimpleSizeSelector so
+  // every part of the page (and the cart/order record) agrees on the same data.
+  globalSettings,
+  availableDhotis,
+  dhotiLoading,
 }) => {
   const { currency } = useContext(CurrencyContext);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isShining, setIsShining] = useState(false);
-  const [availableDhtois, setAvailableDhtois] = useState([]);
-  const [globalSettings, setGlobalSettings] = useState(null);
-  const [dhotiLoading, setDhotiLoading] = useState(false);
   const [infoPanel, setInfoPanel] = useState(null); // 'beaded' | 'tassels' | null
 
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
   };
 
-  // Load global settings once
+  // Keep the selected dhoti in sync with what's actually available for the
+  // current size, and auto-pick the first option once a dhoti-inclusive tier
+  // is selected.
   useEffect(() => {
-    const loadGlobalSettings = async () => {
-      try {
-        const settings = await getGlobalSettings();
-        setGlobalSettings(settings);
-      } catch (error) {
-        console.error("Error loading global settings:", error);
-      }
-    };
-
-    loadGlobalSettings();
-  }, []);
-
-  // Load available dhotis when size changes
-  useEffect(() => {
-    const loadAvailableDhtois = async () => {
-      if (!selectedSize || !globalSettings) return;
-
-      const dhotiManagementEnabled = globalSettings?.features?.dhotiManagementEnabled;
-
-      if (dhotiManagementEnabled) {
-        setDhotiLoading(true);
-        try {
-          const dhtois = await getAvailableDhtoisForSize(selectedSize);
-          setAvailableDhtois(dhtois);
-
-          if (selectedDhoti && !dhtois.some((d) => d.id === selectedDhoti)) {
-            setSelectedDhoti(null);
-          }
-
-          if (!selectedDhoti && dhtois.length > 0 && isFullSet) {
-            setSelectedDhoti(dhtois[0].id);
-          }
-        } catch (error) {
-          console.error("Error loading available dhotis:", error);
-          setAvailableDhtois([]);
-        } finally {
-          setDhotiLoading(false);
-        }
-      } else {
-        if (product?.dhotis && product.dhotis.length > 0) {
-          const productDhotis = product.dhotis.map((dhoti) => ({
-            id: dhoti.name?.toLowerCase() || dhoti.id,
-            name: dhoti.name,
-            image: dhoti.image,
-            availableStock: 999,
-          }));
-          setAvailableDhtois(productDhotis);
-
-          if (!selectedDhoti && productDhotis.length > 0 && isFullSet) {
-            setSelectedDhoti(productDhotis[0].id);
-          }
-        } else {
-          setAvailableDhtois([]);
-        }
-      }
-    };
-
-    loadAvailableDhtois();
+    if (selectedDhoti && !availableDhotis.some((d) => d.id === selectedDhoti)) {
+      setSelectedDhoti(null);
+    }
+    if (!selectedDhoti && availableDhotis.length > 0 && isFullSet) {
+      setSelectedDhoti(availableDhotis[0].id);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSize, globalSettings, product]);
+  }, [availableDhotis, isFullSet]);
 
-  const dhotiManagementEnabled = globalSettings?.features?.dhotiManagementEnabled;
-  const kurtaDhotiEnabled =
-    globalSettings?.features?.kurtaDhotiEnabled &&
-    (dhotiManagementEnabled ? availableDhtois.length > 0 : product?.dhotis?.length > 0);
-  const kurtaDupattaEnabled = globalSettings?.features?.kurtaDupattaEnabled;
-  const royalSetEnabled =
-    globalSettings?.features?.royalSetEnabled &&
-    (dhotiManagementEnabled ? availableDhtois.length > 0 : product?.dhotis?.length > 0);
-  const dhotiAvailable = availableDhtois.length > 0;
+  const kurtaDhotiEnabled = !!globalSettings?.features?.kurtaDhotiEnabled && availableDhotis.length > 0;
+  const kurtaDupattaEnabled = !!globalSettings?.features?.kurtaDupattaEnabled;
+  const royalSetEnabled = !!globalSettings?.features?.royalSetEnabled && availableDhotis.length > 0;
+  const dhotiAvailable = availableDhotis.length > 0;
 
   // If the size changes to one with no dhoti stock, drop dhoti-dependent selections
   useEffect(() => {
-    if (availableDhtois.length === 0) {
+    if (availableDhotis.length === 0) {
       if (isRoyalSet) setIsRoyalSet(false);
       if (isFullSet) setIsFullSet(false);
       if (selectedDhoti) setSelectedDhoti(null);
@@ -175,7 +122,7 @@ const ProductOptions = ({
       setIsDupattaSet(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSize, availableDhtois.length, kurtaDhotiEnabled, royalSetEnabled, kurtaDupattaEnabled]);
+  }, [selectedSize, availableDhotis.length, kurtaDhotiEnabled, royalSetEnabled, kurtaDupattaEnabled]);
 
   useEffect(() => {
     if (!isRoyalSet && !isFullSet && selectedDhoti) {
@@ -405,7 +352,7 @@ const ProductOptions = ({
       );
     }
 
-    if (availableDhtois.length === 0) {
+    if (availableDhotis.length === 0) {
       return (
         <div className="mt-4">
           <h3 className="text-xs font-medium text-gray-900 mb-3">Dhoti Color</h3>
@@ -426,10 +373,10 @@ const ProductOptions = ({
         className="mt-4"
       >
         <h3 className="text-xs font-medium text-gray-900 mb-3">
-          Dhoti Color ({availableDhtois.length} available)
+          Dhoti Color ({availableDhotis.length} available)
         </h3>
         <div className="grid grid-cols-4 gap-2">
-          {availableDhtois.map((dhoti) => (
+          {availableDhotis.map((dhoti) => (
             <motion.div
               key={dhoti.id}
               whileTap={{ scale: 0.96 }}
@@ -598,7 +545,7 @@ const ProductOptions = ({
         </div>
       )}
 
-      {product?.dhotis?.length > 0 && renderDhotiOptions()}
+      {isFullSet && isKurtaFamily && renderDhotiOptions()}
 
       {(showBeadedToggle || showTasselsToggle) && (
         <div>

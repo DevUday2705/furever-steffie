@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  Settings, 
-  ToggleLeft,
-  Save, 
+import {
+  Settings,
+  Save,
   ArrowLeft,
   Crown,
   Shirt,
@@ -27,7 +26,6 @@ const GlobalSettings = () => {
       kurtaDhotiEnabled: true,
       kurtaDupattaEnabled: true,
       royalSetEnabled: true,
-      dhotiManagementEnabled: true,
     },
     lastUpdated: null,
     updatedBy: 'admin'
@@ -54,7 +52,6 @@ const GlobalSettings = () => {
             kurtaDhotiEnabled: true,
             kurtaDupattaEnabled: true,
             royalSetEnabled: true,
-            dhotiManagementEnabled: true,
           },
           lastUpdated: new Date().toISOString(),
           updatedBy: 'admin'
@@ -313,38 +310,6 @@ const GlobalSettings = () => {
                 </motion.button>
               </div>
 
-              {/* Dhoti Management System Toggle */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-amber-100 rounded-lg">
-                    <ToggleLeft className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">Dhoti Management System</h3>
-                    <p className="text-sm text-gray-600">
-                      Enable centralized dhoti inventory management
-                    </p>
-                  </div>
-                </div>
-                
-                <motion.button
-                  onClick={() => handleToggle('dhotiManagementEnabled')}
-                  className={`relative w-14 h-8 rounded-full transition-colors ${
-                    settings.features.dhotiManagementEnabled 
-                      ? 'bg-green-500' 
-                      : 'bg-gray-300'
-                  }`}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.div
-                    className="absolute top-1 w-6 h-6 bg-white rounded-full shadow-md"
-                    animate={{
-                      left: settings.features.dhotiManagementEnabled ? '30px' : '4px'
-                    }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                </motion.button>
-              </div>
             </div>
           </motion.div>
 
@@ -362,10 +327,9 @@ const GlobalSettings = () => {
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Changes take effect immediately across all products</li>
               <li>• Disabled options will be hidden from customers during product selection</li>
-              <li>• Dhoti inventory is managed separately from product inventory</li>
-              <li>• Royal set and dhoti options require inventory availability</li>
-              <li>• When Dhoti Management System is disabled, products use their own dhoti configurations</li>
-              <li>• Dupatta option works independently of dhoti inventory system</li>
+              <li>• Dhoti colors, sizes and stock are managed on the Dhoti Inventory page</li>
+              <li>• Royal set and dhoti options require dhoti stock for the selected size</li>
+              <li>• Dupatta option works independently of dhoti inventory</li>
             </ul>
           </motion.div>
 

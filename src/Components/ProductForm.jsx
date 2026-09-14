@@ -5,28 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 
-// Predefined dhoti options
-const predefinedDhotis = [
-  {
-    id: 1,
-    name: "White",
-    image:
-      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_02_21_PM_qqy08k.webp",
-  },
-  {
-    id: 2,
-    name: "Gold",
-    image:
-      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562595/ChatGPT_Image_May_18_2025_03_00_26_PM_olnc6g.webp",
-  },
-  {
-    id: 3,
-    name: "Black",
-    image:
-      "https://res.cloudinary.com/di6unrpjw/image/upload/v1747562594/ChatGPT_Image_May_18_2025_03_03_19_PM_vk0hbe.webp",
-  },
-];
-
 const defaultSchema = {
   name: "",
   description: "",
@@ -186,11 +164,6 @@ const ProductForm = () => {
     generateSchemaForCategory(category)
   );
 
-  // State for selected dhoti IDs
-  const [selectedDhotiIds, setSelectedDhotiIds] = useState([]);
-  // State for dhoti size availability
-  const [selectedDhotiSizes, setSelectedDhotiSizes] = useState(["XS", "S", "M"]);
-  
   // State for tag input
   const [newTag, setNewTag] = useState("");
   const [availableTags, setAvailableTags] = useState([]);
@@ -279,14 +252,6 @@ const ProductForm = () => {
 
             console.log("Final merged data:", finalData);
             setFormData(finalData);
-
-            // Initialize selected dhoti IDs from existing data
-            if (finalData.dhotis && Array.isArray(finalData.dhotis)) {
-              const selectedIds = finalData.dhotis
-                .map((dhoti) => dhoti.id)
-                .filter((id) => id);
-              setSelectedDhotiIds(selectedIds);
-            }
           } else {
             console.log("No document found!");
             setError("Product not found");
@@ -348,42 +313,6 @@ const ProductForm = () => {
     handleChange(path, newArray);
   };
 
-  // Handle dhoti selection
-  const toggleDhotiSelection = (dhodiId) => {
-    setSelectedDhotiIds((prev) => {
-      if (prev.includes(dhodiId)) {
-        // Remove from selection
-        return prev.filter((id) => id !== dhodiId);
-      } else {
-        // Add to selection
-        return [...prev, dhodiId];
-      }
-    });
-  };
-
-  // Handle dhoti size availability selection
-  const toggleDhotiSizeSelection = (size) => {
-    setSelectedDhotiSizes((prev) => {
-      if (prev.includes(size)) {
-        return prev.filter((s) => s !== size);
-      } else {
-        return [...prev, size];
-      }
-    });
-  };
-
-  // Update formData.dhotis based on selected dhoti IDs
-  useEffect(() => {
-    const selectedDhotis = predefinedDhotis.filter((dhoti) =>
-      selectedDhotiIds.includes(dhoti.id)
-    );
-    handleChange("dhotis", selectedDhotis);
-  }, [selectedDhotiIds]);
-
-  // Update formData.dhotiSizeAvailability based on selected sizes
-  useEffect(() => {
-    handleChange("dhotiSizeAvailability", selectedDhotiSizes);
-  }, [selectedDhotiSizes]);
 
   // Tag management functions
   const saveTagToCollection = async (tagName) => {
@@ -1030,95 +959,18 @@ const ProductForm = () => {
         {!schemaConfigurations[category]?.excludedFields?.includes(
           "dhotis"
         ) && (
-          <div className="border p-4 rounded">
-            <h2 className="font-semibold mb-2">Dhotis</h2>
-            <p className="text-sm text-gray-600 mb-3">
-              Select the dhoti options and sizes available for this product:
+          <div className="border p-4 rounded bg-blue-50">
+            <h2 className="font-semibold mb-1">Dhotis</h2>
+            <p className="text-sm text-gray-600">
+              Dhoti colors, sizes and stock are no longer set per product -
+              they're managed centrally on the{" "}
+              <a href="/admin/dhotis" className="text-blue-600 underline">
+                Dhoti Inventory
+              </a>{" "}
+              page, and apply to every kurta automatically.
             </p>
-
-            {/* Dhoti Size Availability */}
-            <div className="mb-4">
-              <h3 className="font-medium text-sm mb-2">Available Sizes for Dhoti:</h3>
-              <div className="flex flex-wrap gap-2">
-                {formData.sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => toggleDhotiSizeSelection(size)}
-                    className={`
-                      px-3 py-1 rounded-md text-sm border-2 font-medium transition-all duration-200
-                      ${
-                        selectedDhotiSizes.includes(size)
-                          ? "bg-green-500 text-white border-green-500 shadow-md"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-green-300 hover:bg-green-50"
-                      }
-                    `}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              {selectedDhotiSizes.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Dhoti options will be available for: {selectedDhotiSizes.join(", ")}
-                </p>
-              )}
-            </div>
-
-            {/* Dhoti Options */}
-            <div className="flex flex-wrap gap-3 mb-4">
-              {predefinedDhotis.map((dhoti) => (
-                <button
-                  key={dhoti.id}
-                  type="button"
-                  onClick={() => toggleDhotiSelection(dhoti.id)}
-                  className={`
-                    px-4 py-2 rounded-full border-2 font-medium transition-all duration-200
-                    ${
-                      selectedDhotiIds.includes(dhoti.id)
-                        ? "bg-blue-500 text-white border-blue-500 shadow-md transform scale-105"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
-                    }
-                  `}
-                >
-                  {dhoti.name}
-                </button>
-              ))}
-            </div>
-
-            {selectedDhotiIds.length > 0 && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  Selected Dhotis:
-                </p>
-                <div className="space-y-2">
-                  {selectedDhotiIds.map((id) => {
-                    const dhoti = predefinedDhotis.find((d) => d.id === id);
-                    return dhoti ? (
-                      <div
-                        key={id}
-                        className="flex items-center gap-3 bg-white p-2 rounded border"
-                      >
-                        <img
-                          src={dhoti.image}
-                          alt={dhoti.name}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div>
-                          <p className="font-medium text-sm">{dhoti.name}</p>
-                          <p className="text-xs text-gray-500">
-                            ID: {dhoti.id}
-                          </p>
-                        </div>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         )}
-        {/* Dhotis Section */}
 
         {schemaConfigurations[category]?.additionalFields?.includes(
           "colors"

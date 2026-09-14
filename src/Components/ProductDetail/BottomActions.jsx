@@ -26,6 +26,7 @@ const BottomActions = ({
   requiresMeasurements,
   selectedColor,
   allowCustomSizes = false, // NEW: for custom sizing
+  availableDhotis = [], // Single source of truth for dhoti name/image lookups
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
@@ -82,10 +83,9 @@ const BottomActions = ({
 
   const handleBuyNow = () => {
     // Find selected dhoti details if dhoti is selected
-    const selectedDhotiDetails =
-      selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
-        : null;
+    const selectedDhotiDetails = selectedDhoti
+      ? availableDhotis.find((dhoti) => dhoti.id === selectedDhoti) || null
+      : null;
 
     const orderDetails = {
       productId: product.id,
@@ -116,10 +116,9 @@ const BottomActions = ({
     }
 
     // Find selected dhoti details if dhoti is selected
-    const selectedDhotiDetails =
-      selectedDhoti && product.dhotis
-        ? product.dhotis.find((dhoti) => dhoti.id === selectedDhoti)
-        : null;
+    const selectedDhotiDetails = selectedDhoti
+      ? availableDhotis.find((dhoti) => dhoti.id === selectedDhoti) || null
+      : null;
 
     const cartItem = {
       productId: product.id,
