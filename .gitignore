@@ -26,3 +26,6 @@ firebase-admin-key.json
 *.sw?
 .vercel
 .env*
+
+# Data snapshots written by one-off scripts (e.g. scripts/update-kurta-pricing.js)
+scripts/backups/

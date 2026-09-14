@@ -153,7 +153,13 @@ const CartNav = () => {
                             <p className="text-gray-600 text-xs">
                               Size: {item.selectedSize} •{" "}
                               {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                              {item.isFullSet ? "Full Set" : item.category}
+                              {item.isRoyalSet
+                                ? "Royal Set"
+                                : item.isFullSet
+                                ? "Complete Set"
+                                : item.isDupattaSet
+                                ? "Kurta + Dupatta"
+                                : item.category}
                             </p>
                             <p className="text-gray-900 font-medium text-sm mt-1">
                               {convertCurrency(item.price, currency)}

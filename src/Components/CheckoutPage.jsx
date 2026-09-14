@@ -43,6 +43,13 @@ const MIN_COD_ADVANCE = 250;
 const calculateCodAdvance = (totalAmount) =>
   Math.min(totalAmount, Math.max(MIN_COD_ADVANCE, Math.round((totalAmount * COD_ADVANCE_PERCENT) / 100)));
 
+// COD costs more to fulfil than prepaid (cash handling, higher RTO/decline
+// risk, no immediate cash flow) - the same reason Amazon, Myntra and Flipkart
+// all charge a flat COD convenience fee. Charging it explicitly, shown as its
+// own line item, both covers that cost and nudges undecided customers toward
+// prepaid without hiding anything or touching the COD advance logic above.
+const COD_HANDLING_FEE = 50;
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -526,6 +533,16 @@ const CheckoutPage = () => {
         )
       : 0;
 
+    const isCod = paymentMethod === "cod" && !isInternational;
+    const codHandlingFee = isCod ? COD_HANDLING_FEE : 0;
+
+    // Total without the COD fee, regardless of which payment method is
+    // currently selected - lets the COD row preview its own real total
+    // ("pay X now, Y on delivery") even while "Pay Online" is still selected.
+    const totalExcludingCodFee = Math.round(
+      totalAfterDiscount + deliveryCharge + processingFee
+    );
+
     return {
       subtotal,
       discountAmount,
@@ -534,7 +551,10 @@ const CheckoutPage = () => {
       processingFee,
       isInternational,
       isBulkShipping,
-      total: Math.round(totalAfterDiscount + deliveryCharge + processingFee),
+      isCod,
+      codHandlingFee,
+      totalExcludingCodFee,
+      total: totalExcludingCodFee + codHandlingFee,
     };
   };
 
@@ -652,8 +672,8 @@ const CheckoutPage = () => {
   }
 
   const handlePayment = async () => {
-    const totalAmount = calculateTotal(); // Always in INR for Razorpay
-    const isCod = paymentMethod === "cod" && formData.country === "india";
+    const totalAmount = calculateTotal(); // Always in INR for Razorpay, includes the COD handling fee when applicable
+    const { isCod } = getOrderBreakdown();
     const codAdvanceAmount = isCod ? calculateCodAdvance(totalAmount) : 0;
     // What actually gets charged via Razorpay right now - full amount for
     // online payment, just the non-refundable advance for COD.
@@ -1060,8 +1080,10 @@ const CheckoutPage = () => {
                       </h4>
                       <div className="text-xs text-gray-600 mt-0.5">
                         {item.isBeaded ? "Hand Work" : "Simple"} •{" "}
-                        {item.isFullSet
-                          ? "Full Set"
+                        {item.isRoyalSet
+                          ? "Royal Set"
+                          : item.isFullSet
+                          ? "Complete Set"
                           : item.isDupattaSet
                           ? "Kurta + Dupatta"
                           : item.category}{" "}
@@ -1548,51 +1570,97 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="p-4 space-y-3">
-                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="online"
-                      checked={paymentMethod === "online"}
-                      onChange={() => setPaymentMethod("online")}
-                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
-                    />
-                    <div className="ml-3">
-                      <span className="block text-sm font-medium text-gray-800">
-                        Pay Online
-                      </span>
-                      <span className="block text-xs text-gray-500">
-                        Pay the full amount now via card, UPI, or netbanking
-                      </span>
-                    </div>
-                  </label>
+                  {(() => {
+                    const codPreviewTotal = breakdown.totalExcludingCodFee + COD_HANDLING_FEE;
+                    const codPreviewAdvance = calculateCodAdvance(codPreviewTotal);
+                    const codPreviewDue = codPreviewTotal - codPreviewAdvance;
 
-                  <label className="flex items-center p-3 border border-gray-200 rounded-md">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={paymentMethod === "cod"}
-                      onChange={() => setPaymentMethod("cod")}
-                      className="h-4 w-4 text-gray-800 focus:ring-gray-500"
-                    />
-                    <div className="ml-3">
-                      <span className="block text-sm font-medium text-gray-800">
-                        Cash on Delivery
-                      </span>
-                      <span className="block text-xs text-gray-500">
-                        Pay ₹{calculateCodAdvance(calculateTotal())} now (non-refundable booking amount), remaining ₹
-                        {calculateTotal() - calculateCodAdvance(calculateTotal())} in cash on delivery
-                      </span>
-                    </div>
-                  </label>
+                    return (
+                      <>
+                        <label
+                          className={`flex items-center p-3 border rounded-md transition-colors ${
+                            paymentMethod === "online"
+                              ? "border-emerald-500 bg-emerald-50"
+                              : "border-gray-200"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="online"
+                            checked={paymentMethod === "online"}
+                            onChange={() => setPaymentMethod("online")}
+                            className="h-4 w-4 text-emerald-600 focus:ring-emerald-500"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium text-gray-800">
+                                Pay Online
+                              </span>
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-600 text-white">
+                                Recommended
+                              </span>
+                            </div>
+                            <span className="block text-xs text-gray-500 mt-0.5">
+                              Pay the full amount now via card, UPI, or netbanking — no extra charges
+                            </span>
+                          </div>
+                        </label>
 
-                  {paymentMethod === "cod" && (
-                    <div className="text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-md px-3 py-2">
-                      The ₹{calculateCodAdvance(calculateTotal())} booking amount confirms your order and is
-                      non-refundable if delivery is declined at your doorstep.
-                    </div>
-                  )}
+                        <label
+                          className={`flex items-center p-3 border rounded-md transition-colors ${
+                            paymentMethod === "cod"
+                              ? "border-amber-400 bg-amber-50"
+                              : "border-gray-200"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="cod"
+                            checked={paymentMethod === "cod"}
+                            onChange={() => setPaymentMethod("cod")}
+                            className="h-4 w-4 text-gray-800 focus:ring-gray-500"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-medium text-gray-800">
+                                Cash on Delivery
+                              </span>
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                +₹{COD_HANDLING_FEE} handling fee
+                              </span>
+                            </div>
+                            <span className="block text-xs text-gray-500 mt-0.5">
+                              Pay ₹{codPreviewAdvance} now (non-refundable booking amount), remaining ₹
+                              {codPreviewDue} in cash on delivery
+                            </span>
+                          </div>
+                        </label>
+
+                        {paymentMethod === "online" ? (
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md px-3 py-2">
+                            <span>✓ No handling fee, no advance — just the order total, paid once.</span>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-md px-3 py-2">
+                              The ₹{codPreviewAdvance} booking amount confirms your order and is
+                              non-refundable if delivery is declined at your doorstep. The remaining
+                              amount includes a ₹{COD_HANDLING_FEE} COD handling fee.
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod("online")}
+                              className="w-full text-center text-xs font-medium text-emerald-700 underline underline-offset-2 py-1"
+                            >
+                              Switch to Pay Online and skip the ₹{COD_HANDLING_FEE} fee
+                            </button>
+                          </>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             )}
@@ -1691,6 +1759,15 @@ const CheckoutPage = () => {
                     </span>
                     <span className="text-gray-800">
                       {convertCurrency(breakdown.processingFee, currency)}
+                    </span>
+                  </div>
+                )}
+
+                {breakdown.codHandlingFee > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">COD Handling Fee:</span>
+                    <span className="text-gray-800">
+                      {convertCurrency(breakdown.codHandlingFee, currency)}
                     </span>
                   </div>
                 )}

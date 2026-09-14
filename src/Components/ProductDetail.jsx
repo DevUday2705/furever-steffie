@@ -186,14 +186,17 @@ const ProductDetail = () => {
 
     // Handle Royal Set pricing (takes precedence over regular full set)
     if (isRoyalSet) {
-      // Royal set includes full set cost + additional 400 premium
-      price += (product.pricing.fullSetAdditional || 0) + 300;
+      // Royal set includes full set cost + a royal premium.
+      // royalSetPremium is an optional per-product field (falls back to the
+      // previous hardcoded 300 so existing products price identically).
+      price += (product.pricing.fullSetAdditional || 0) + (product.pricing.royalSetPremium ?? 300);
     } else if (isFullSet && product.pricing.fullSetAdditional) {
       // Regular full set pricing
       price += product.pricing.fullSetAdditional;
     } else if (isDupattaSet) {
-      // Dupatta set pricing - base price + 200 INR
-      price += 200;
+      // Dupatta set pricing. dupattaAdditional is an optional per-product
+      // field (falls back to the previous hardcoded 200).
+      price += product.pricing.dupattaAdditional ?? 200;
     }
 
     // Handle style-based pricing

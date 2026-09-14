@@ -63,6 +63,15 @@ const defaultSchema = {
     basePrice: 0,
     discountPercent: 0,
     fullSetAdditional: 0,
+    // Surcharges for the Kurta+Dupatta and Royal Set outfit tiers. Default to
+    // the values these were previously hardcoded to in ProductDetail.jsx so
+    // existing products keep pricing identically once this field is present.
+    dupattaAdditional: 200,
+    royalSetPremium: 300,
+    // What a dhoti costs if bought on its own (leave 0 to hide the "Price
+    // Saver" badge on Complete Set - it only shows when this is genuinely
+    // higher than Full Set Additional, i.e. the combo is a real saving).
+    dhotiStandalonePrice: 0,
     beadedAdditional: 0,
     tasselsAdditional: 0,
     sizeIncrements: {
@@ -823,6 +832,65 @@ const ProductForm = () => {
                 }
                 className="w-full border px-3 py-1 rounded"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Kurta + Dupatta Additional
+              </label>
+              <input
+                type="number"
+                placeholder="Dupatta Additional"
+                value={formData.pricing.dupattaAdditional}
+                onChange={(e) =>
+                  handleChange(
+                    "pricing.dupattaAdditional",
+                    Number(e.target.value)
+                  )
+                }
+                className="w-full border px-3 py-1 rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Royal Set Premium
+              </label>
+              <input
+                type="number"
+                placeholder="Royal Set Premium"
+                value={formData.pricing.royalSetPremium}
+                onChange={(e) =>
+                  handleChange(
+                    "pricing.royalSetPremium",
+                    Number(e.target.value)
+                  )
+                }
+                className="w-full border px-3 py-1 rounded"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Added on top of Full Set Additional for the Royal Set tier.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Dhoti Standalone Price
+              </label>
+              <input
+                type="number"
+                placeholder="Dhoti Standalone Price"
+                value={formData.pricing.dhotiStandalonePrice}
+                onChange={(e) =>
+                  handleChange(
+                    "pricing.dhotiStandalonePrice",
+                    Number(e.target.value)
+                  )
+                }
+                className="w-full border px-3 py-1 rounded"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                What a dhoti costs bought alone. Leave 0 to hide the "Price
+                Saver" badge on Complete Set — it only shows if this is
+                genuinely more than Full Set Additional.
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">
