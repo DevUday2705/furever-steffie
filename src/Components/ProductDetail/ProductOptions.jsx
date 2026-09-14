@@ -535,17 +535,7 @@ const ProductOptions = ({
                         +{convertCurrency(card.price - tierPrice.kurta, currency)} vs Kurta Only
                       </span>
                     )}
-                    <div
-                      className={`mt-1.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        card.isSelected
-                          ? card.isPremium
-                            ? "border-[#b5892e] bg-[#b5892e]"
-                            : "border-gray-800 bg-gray-800"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      {card.isSelected && <Check className="w-3 h-3 text-white" />}
-                    </div>
+                   
                   </div>
                 </div>
 
