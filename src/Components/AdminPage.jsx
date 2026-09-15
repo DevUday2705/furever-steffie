@@ -13,6 +13,8 @@ import Analytics from "./Analytics";
 import ShippedDetailsModal from "./ShippedDetailsModal";
 import BulkShipModal from "./BulkShipModal";
 import { useOrderPause } from "../context/OrderPauseContext";
+import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
+import { downloadBlob } from "../utils/downloadBlob";
 
 const ADMIN_KEY = "Steffie@123";
 
@@ -34,6 +36,8 @@ const AdminPage = () => {
   // Tracks which order's Shiprocket document is currently being fetched, as
   // `${orderId}:${docType}` - lets each button show its own loading state.
   const [downloadingDoc, setDownloadingDoc] = useState(null);
+  // Order id whose own branded invoice (not Shiprocket's) is being generated.
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState(null);
 
   // Tab state for admin navigation
   const [activeTab, setActiveTab] = useState("orders");
@@ -448,19 +452,28 @@ const AdminPage = () => {
       }
 
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "shipping-documents.pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, "shipping-documents.pdf");
     } catch (err) {
       console.error("Error generating shipping documents:", err);
       toast.error("Failed to generate shipping documents");
     } finally {
       setDownloadingDoc(null);
+    }
+  };
+
+  // Downloads our own branded invoice (not Shiprocket's) for a single order -
+  // generated entirely client-side, so it works the moment an order exists,
+  // no shipment required, and can be regenerated any number of times.
+  const handleDownloadInvoice = async (order) => {
+    setDownloadingInvoiceId(order.id);
+    try {
+      const bytes = await generateOrderInvoicePdf(order);
+      downloadBlob(bytes, `Invoice-${order.orderNumber || order.id}.pdf`);
+    } catch (err) {
+      console.error("Error generating invoice:", err);
+      toast.error("Failed to generate invoice");
+    } finally {
+      setDownloadingInvoiceId(null);
     }
   };
 
@@ -2224,6 +2237,15 @@ const AdminPage = () => {
                             title="Resend order confirmation email + WhatsApp"
                           >
                             🔁 Resend Confirmation
+                          </button>
+                          <button
+                            type="button"
+                            disabled={downloadingInvoiceId === order.id}
+                            onClick={() => handleDownloadInvoice(order)}
+                            className="text-xs px-2 py-0.5 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+                            title="Downloads our own branded invoice for this order (not Shiprocket's)"
+                          >
+                            {downloadingInvoiceId === order.id ? "Preparing..." : "🧾 Download Invoice"}
                           </button>
                         </p>
                         {order.tracking_id && (

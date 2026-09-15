@@ -1,22 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Truck, Loader2, CheckCircle2, XCircle, Download } from "lucide-react";
+import { downloadBlob } from "../utils/downloadBlob";
 
 // Bulk-ship several orders at once: fetch the cheapest courier for each,
 // then create each shipment one at a time (kept sequential so we don't
 // slam the Shiprocket API/wallet with parallel requests), and finally offer
 // one merged PDF (label + manifest + invoice, for every shipped order) to
 // download in one click.
-const downloadBlob = (blob, filename) => {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-};
 
 const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
   const [rows, setRows] = useState([]);
