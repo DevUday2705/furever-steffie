@@ -31,6 +31,9 @@ const AdminPage = () => {
   const [productData, setProductData] = useState({}); // Store product data for dhoti lookup
   const { ordersArePaused, setOrdersArePaused } = useOrderPause();
   const [shippedModalOrderId, setShippedModalOrderId] = useState(null);
+  // Tracks which order's Shiprocket document is currently being fetched, as
+  // `${orderId}:${docType}` - lets each button show its own loading state.
+  const [downloadingDoc, setDownloadingDoc] = useState(null);
 
   // Tab state for admin navigation
   const [activeTab, setActiveTab] = useState("orders");
@@ -406,28 +409,58 @@ const AdminPage = () => {
     }
   };
 
-  // Downloads (opens) the Shiprocket label PDF for a single shipment - lets
-  // admin grab/re-print one order's label without going through bulk ship.
-  const handleDownloadLabel = async (shipmentId) => {
-    if (!shipmentId) {
+  // Downloads one merged PDF (label + manifest + invoice) for a single order -
+  // one click instead of juggling three separate documents. Label/manifest
+  // are keyed by Shiprocket's shipment_id; invoice by its own order_id.
+  const handleDownloadShippingDocs = async (orderRowId, shipmentId, shiprocketOrderId) => {
+    if (!shipmentId && !shiprocketOrderId) {
       toast.error("This order has no Shiprocket shipment ID on file");
       return;
     }
+    setDownloadingDoc(orderRowId);
     try {
       const res = await fetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "generate-labels", shipmentIds: [shipmentId] }),
+        body: JSON.stringify({
+          action: "generate-documents",
+          shipmentIds: shipmentId ? [shipmentId] : [],
+          orderIds: shiprocketOrderId ? [shiprocketOrderId] : [],
+        }),
       });
-      const data = await res.json();
-      if (data.success && data.labelUrl) {
-        window.open(data.labelUrl, "_blank", "noopener");
-      } else {
-        toast.error(data.message || "Failed to generate label");
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.message || "Failed to generate shipping documents");
+        return;
       }
+
+      const warningsHeader = res.headers.get("X-Document-Warnings");
+      if (warningsHeader) {
+        try {
+          const warnings = JSON.parse(decodeURIComponent(warningsHeader));
+          if (warnings.length) {
+            toast(`Downloaded, but missing: ${warnings.join("; ")}`, { icon: "⚠️" });
+          }
+        } catch {
+          // Ignore malformed warning header - the download itself still succeeded.
+        }
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "shipping-documents.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Error generating label:", err);
-      toast.error("Failed to generate label");
+      console.error("Error generating shipping documents:", err);
+      toast.error("Failed to generate shipping documents");
+    } finally {
+      setDownloadingDoc(null);
     }
   };
 
@@ -2199,13 +2232,21 @@ const AdminPage = () => {
                               <span className="font-semibold">Tracking ID:</span>{" "}
                               {order.tracking_id}
                             </span>
-                            {order.shiprocketShipmentId && (
+                            {(order.shiprocketShipmentId || order.shiprocketOrderId) && (
                               <button
                                 type="button"
-                                onClick={() => handleDownloadLabel(order.shiprocketShipmentId)}
-                                className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                disabled={downloadingDoc === order.id}
+                                onClick={() =>
+                                  handleDownloadShippingDocs(
+                                    order.id,
+                                    order.shiprocketShipmentId,
+                                    order.shiprocketOrderId
+                                  )
+                                }
+                                className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                                title="Downloads label + manifest + invoice merged into one PDF"
                               >
-                                📄 Download Label
+                                {downloadingDoc === order.id ? "Preparing..." : "📄 Download"}
                               </button>
                             )}
                           </p>

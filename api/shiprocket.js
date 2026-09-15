@@ -1,6 +1,7 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { waitUntil } from "@vercel/functions";
+import { PDFDocument } from "pdf-lib";
 import { getShiprocketToken, SHIPROCKET_BASE_URL } from "../lib/shiprocketAuth.js";
 import { sendShippedNotificationWhatsApp } from "../lib/whatsappNotify.js";
 
@@ -296,31 +297,177 @@ async function handleCreateOrder(req, res) {
     }
 }
 
+// Shiprocket merges all requested shipment/order ids into a single PDF per
+// document type - this is what makes bulk printing possible (one link per
+// type, covering every shipment/order passed in).
+async function fetchLabelUrl(token, shipmentIds) {
+    const result = await shiprocketFetch("/courier/generate/label", token, {
+        method: "POST",
+        body: JSON.stringify({ shipment_id: shipmentIds }),
+    });
+    if (!result.label_url) throw new Error("Shiprocket did not return a label_url");
+    return result.label_url;
+}
+
+async function fetchManifestUrl(token, shipmentIds) {
+    const result = await shiprocketFetch("/manifests/generate", token, {
+        method: "POST",
+        body: JSON.stringify({ shipment_id: shipmentIds }),
+    });
+    if (!result.manifest_url) throw new Error("Shiprocket did not return a manifest_url");
+    return result.manifest_url;
+}
+
+// Invoices are keyed by Shiprocket's own order_id, not shipment_id - a
+// different id than labels/manifests use.
+async function fetchInvoiceUrl(token, orderIds) {
+    const result = await shiprocketFetch("/orders/print/invoice", token, {
+        method: "POST",
+        body: JSON.stringify({ ids: orderIds }),
+    });
+    if (!result.invoice_url) throw new Error("Shiprocket did not return an invoice_url");
+    return result.invoice_url;
+}
+
 async function handleGenerateLabels(req, res) {
     try {
         const { shipmentIds } = req.body;
         if (!Array.isArray(shipmentIds) || !shipmentIds.length) {
             return res.status(400).json({ message: "shipmentIds array is required" });
         }
-
         const token = await getShiprocketToken(db);
-        // Shiprocket merges all requested shipments into a single label PDF -
-        // this is what makes bulk printing possible (one link, print once).
-        const result = await shiprocketFetch("/courier/generate/label", token, {
-            method: "POST",
-            body: JSON.stringify({ shipment_id: shipmentIds }),
-        });
-
-        if (!result.label_url) {
-            return res.status(502).json({ message: "Shiprocket did not return a label_url", details: result });
-        }
-
-        return res.status(200).json({ success: true, labelUrl: result.label_url });
+        const labelUrl = await fetchLabelUrl(token, shipmentIds);
+        return res.status(200).json({ success: true, labelUrl });
     } catch (error) {
         console.error("❌ shiprocket generate-labels error:", error.body || error.message);
         return res.status(error.status || 500).json({
             success: false,
             message: "Failed to generate labels",
+            error: error.body || error.message,
+        });
+    }
+}
+
+async function handleGenerateManifest(req, res) {
+    try {
+        const { shipmentIds } = req.body;
+        if (!Array.isArray(shipmentIds) || !shipmentIds.length) {
+            return res.status(400).json({ message: "shipmentIds array is required" });
+        }
+        const token = await getShiprocketToken(db);
+        const manifestUrl = await fetchManifestUrl(token, shipmentIds);
+        return res.status(200).json({ success: true, manifestUrl });
+    } catch (error) {
+        console.error("❌ shiprocket generate-manifest error:", error.body || error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: "Failed to generate manifest",
+            error: error.body || error.message,
+        });
+    }
+}
+
+async function handleGenerateInvoice(req, res) {
+    try {
+        const { orderIds } = req.body;
+        if (!Array.isArray(orderIds) || !orderIds.length) {
+            return res.status(400).json({ message: "orderIds array is required" });
+        }
+        const token = await getShiprocketToken(db);
+        const invoiceUrl = await fetchInvoiceUrl(token, orderIds);
+        return res.status(200).json({ success: true, invoiceUrl });
+    } catch (error) {
+        console.error("❌ shiprocket generate-invoice error:", error.body || error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: "Failed to generate invoice",
+            error: error.body || error.message,
+        });
+    }
+}
+
+async function fetchPdfBytes(url) {
+    const resp = await fetch(url);
+    if (!resp.ok) {
+        throw new Error(`Failed to download document from Shiprocket: ${resp.status}`);
+    }
+    return new Uint8Array(await resp.arrayBuffer());
+}
+
+// The single "Download" action: generates label + manifest (by shipment_id)
+// and invoice (by order_id), then merges all three PDFs into one file so
+// admin gets one download per click - whether that's one order or a whole
+// bulk-ship batch (Shiprocket already merges multiple ids within each
+// document type, so passing every id in the batch here gives one combined
+// PDF covering the entire batch).
+async function handleGenerateDocuments(req, res) {
+    const { shipmentIds = [], orderIds = [] } = req.body;
+    if (!shipmentIds.length && !orderIds.length) {
+        return res.status(400).json({ message: "shipmentIds and/or orderIds are required" });
+    }
+
+    try {
+        const token = await getShiprocketToken(db);
+        const pdfUrls = [];
+        const warnings = [];
+
+        if (shipmentIds.length) {
+            await Promise.all([
+                fetchLabelUrl(token, shipmentIds)
+                    .then((url) => pdfUrls.push({ type: "label", url }))
+                    .catch((e) => warnings.push(`Label: ${e.message}`)),
+                fetchManifestUrl(token, shipmentIds)
+                    .then((url) => pdfUrls.push({ type: "manifest", url }))
+                    .catch((e) => warnings.push(`Manifest: ${e.message}`)),
+            ]);
+        }
+
+        if (orderIds.length) {
+            await fetchInvoiceUrl(token, orderIds)
+                .then((url) => pdfUrls.push({ type: "invoice", url }))
+                .catch((e) => warnings.push(`Invoice: ${e.message}`));
+        }
+
+        if (!pdfUrls.length) {
+            return res.status(502).json({ message: "Shiprocket did not return any documents", warnings });
+        }
+
+        // Keep a stable label -> manifest -> invoice page order regardless of
+        // which Promise resolved first.
+        const order = { label: 0, manifest: 1, invoice: 2 };
+        pdfUrls.sort((a, b) => order[a.type] - order[b.type]);
+
+        const mergedPdf = await PDFDocument.create();
+        for (const { type, url } of pdfUrls) {
+            try {
+                const bytes = await fetchPdfBytes(url);
+                const srcPdf = await PDFDocument.load(bytes);
+                const copiedPages = await mergedPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            } catch (mergeError) {
+                warnings.push(`${type}: failed to merge (${mergeError.message})`);
+            }
+        }
+
+        if (mergedPdf.getPageCount() === 0) {
+            return res.status(502).json({ message: "Failed to merge any Shiprocket documents", warnings });
+        }
+
+        const mergedBytes = await mergedPdf.save();
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", 'attachment; filename="shipping-documents.pdf"');
+        if (warnings.length) {
+            // Non-fatal - surfaced to the admin so they know e.g. the invoice
+            // didn't make it in, without failing the whole download.
+            res.setHeader("X-Document-Warnings", encodeURIComponent(JSON.stringify(warnings)));
+        }
+        return res.status(200).send(Buffer.from(mergedBytes));
+    } catch (error) {
+        console.error("❌ shiprocket generate-documents error:", error.body || error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: "Failed to generate shipping documents",
             error: error.body || error.message,
         });
     }
@@ -339,7 +486,16 @@ export default async function handler(req, res) {
         return handleCreateOrder(req, res);
     } else if (action === "generate-labels") {
         return handleGenerateLabels(req, res);
+    } else if (action === "generate-manifest") {
+        return handleGenerateManifest(req, res);
+    } else if (action === "generate-invoice") {
+        return handleGenerateInvoice(req, res);
+    } else if (action === "generate-documents") {
+        return handleGenerateDocuments(req, res);
     } else {
-        return res.status(400).json({ message: "action must be 'serviceability', 'create-order', or 'generate-labels'" });
+        return res.status(400).json({
+            message:
+                "action must be 'serviceability', 'create-order', 'generate-labels', 'generate-manifest', 'generate-invoice', or 'generate-documents'",
+        });
     }
 }

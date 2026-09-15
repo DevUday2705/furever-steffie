@@ -1,21 +1,33 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Truck, Loader2, CheckCircle2, XCircle, Printer } from "lucide-react";
+import { X, Truck, Loader2, CheckCircle2, XCircle, Download } from "lucide-react";
 
 // Bulk-ship several orders at once: fetch the cheapest courier for each,
 // then create each shipment one at a time (kept sequential so we don't
 // slam the Shiprocket API/wallet with parallel requests), and finally offer
-// one merged label PDF to print for all of them together.
+// one merged PDF (label + manifest + invoice, for every shipped order) to
+// download in one click.
+const downloadBlob = (blob, filename) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
 const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
   const [rows, setRows] = useState([]);
   const [phase, setPhase] = useState("loading"); // "loading" | "ready" | "shipping" | "done"
-  const [labelUrl, setLabelUrl] = useState(null);
-  const [generatingLabels, setGeneratingLabels] = useState(false);
+  const [downloadError, setDownloadError] = useState(null);
+  const [downloadingIds, setDownloadingIds] = useState(null); // order.id being downloaded, or "all"
 
   useEffect(() => {
     if (!isOpen) return;
     setPhase("loading");
-    setLabelUrl(null);
+    setDownloadError(null);
 
     const initialRows = orders.map((order) => ({
       order,
@@ -96,7 +108,13 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
         setRows((prev) =>
           prev.map((r, idx) =>
             idx === i
-              ? { ...r, status: "shipped", trackingId: data.trackingId, shipmentId: data.shipmentId }
+              ? {
+                  ...r,
+                  status: "shipped",
+                  trackingId: data.trackingId,
+                  shipmentId: data.shipmentId,
+                  orderIdSR: data.shiprocketOrderId,
+                }
               : r
           )
         );
@@ -109,30 +127,53 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
     setPhase("done");
   };
 
-  const generateAndOpenLabels = async (shipmentIds) => {
-    if (!shipmentIds.length) return;
-    setGeneratingLabels(true);
+  // Downloads one merged PDF (label + manifest + invoice) covering every
+  // shipment/order id passed in - Shiprocket merges multiple ids within
+  // each document type, so this works the same for one order or a whole batch.
+  const downloadDocuments = async (downloadKey, shipmentIds, orderIds) => {
+    if (!shipmentIds.length && !orderIds.length) return;
+    setDownloadError(null);
+    setDownloadingIds(downloadKey);
     try {
       const res = await fetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "generate-labels", shipmentIds }),
+        body: JSON.stringify({ action: "generate-documents", shipmentIds, orderIds }),
       });
-      const data = await res.json();
-      if (data.success && data.labelUrl) {
-        setLabelUrl(data.labelUrl);
-        window.open(data.labelUrl, "_blank", "noopener");
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setDownloadError(data.message || "Failed to generate shipping documents");
+        return;
       }
+
+      const warningsHeader = res.headers.get("X-Document-Warnings");
+      if (warningsHeader) {
+        try {
+          const warnings = JSON.parse(decodeURIComponent(warningsHeader));
+          if (warnings.length) setDownloadError(`Downloaded, but missing: ${warnings.join("; ")}`);
+        } catch {
+          // Ignore malformed warning header - the download itself still succeeded.
+        }
+      }
+
+      const blob = await res.blob();
+      downloadBlob(blob, "shipping-documents.pdf");
     } catch (err) {
-      console.error("Failed to generate labels:", err);
+      console.error("Failed to generate shipping documents:", err);
+      setDownloadError("Failed to generate shipping documents");
     } finally {
-      setGeneratingLabels(false);
+      setDownloadingIds(null);
     }
   };
 
-  const handlePrintLabels = () => {
-    const shipmentIds = rows.filter((r) => r.status === "shipped").map((r) => r.shipmentId);
-    generateAndOpenLabels(shipmentIds);
+  const handleDownloadAll = () => {
+    const shipped = rows.filter((r) => r.status === "shipped");
+    downloadDocuments(
+      "all",
+      shipped.map((r) => r.shipmentId).filter(Boolean),
+      shipped.map((r) => r.orderIdSR).filter(Boolean)
+    );
   };
 
   const statusBadge = (row) => {
@@ -149,11 +190,12 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
             <CheckCircle2 size={14} className="text-green-600" />
             <button
               type="button"
-              disabled={generatingLabels}
-              onClick={() => generateAndOpenLabels([row.shipmentId])}
+              disabled={downloadingIds !== null}
+              onClick={() => downloadDocuments(row.order.id, [row.shipmentId].filter(Boolean), [row.orderIdSR].filter(Boolean))}
               className="text-[10px] px-1.5 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              title="Downloads label + manifest + invoice merged into one PDF"
             >
-              Label
+              {downloadingIds === row.order.id ? "..." : "Download"}
             </button>
           </div>
         );
@@ -231,23 +273,19 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
             {phase === "done" && rows.some((r) => r.status === "shipped") && (
               <button
                 type="button"
-                disabled={generatingLabels}
-                onClick={handlePrintLabels}
+                disabled={downloadingIds !== null}
+                onClick={handleDownloadAll}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                title="Downloads label + manifest + invoice for every shipped order, merged into one PDF"
               >
-                {generatingLabels ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
-                Print All Labels
+                {downloadingIds === "all" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                Download All Documents
               </button>
             )}
           </div>
 
-          {labelUrl && (
-            <div className="mt-2 text-xs text-gray-500 text-center">
-              Label PDF opened in a new tab.{" "}
-              <a href={labelUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                Open again
-              </a>
-            </div>
+          {downloadError && (
+            <div className="mt-2 text-xs text-amber-600 text-center">{downloadError}</div>
           )}
         </motion.div>
       </div>
