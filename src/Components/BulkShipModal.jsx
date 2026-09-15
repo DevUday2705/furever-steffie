@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Truck, Loader2, CheckCircle2, XCircle, Download } from "lucide-react";
-import { downloadBlob } from "../utils/downloadBlob";
 
 // Bulk-ship several orders at once: fetch the cheapest courier for each,
 // then create each shipment one at a time (kept sequential so we don't
@@ -118,41 +117,31 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
     setPhase("done");
   };
 
-  // Downloads one merged PDF (label + manifest + invoice) covering every
-  // shipment/order id passed in - Shiprocket merges multiple ids within
-  // each document type, so this works the same for one order or a whole batch.
-  const downloadDocuments = async (downloadKey, shipmentIds, orderIds) => {
-    if (!shipmentIds.length && !orderIds.length) return;
+  // Downloads one label PDF covering every shipment id passed in - Shiprocket
+  // merges multiple shipment ids into a single PDF, one label per shipment,
+  // so this works the same for one order or a whole batch. Manifest/invoice
+  // were dropped: Xpressbees didn't want a manifest at pickup, and the label
+  // itself already prints an itemized SKU/qty/price breakdown, so a separate
+  // invoice was never actually needed either.
+  const downloadLabels = async (downloadKey, shipmentIds) => {
+    if (!shipmentIds.length) return;
     setDownloadError(null);
     setDownloadingIds(downloadKey);
     try {
       const res = await fetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "generate-documents", shipmentIds, orderIds }),
+        body: JSON.stringify({ action: "generate-labels", shipmentIds }),
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setDownloadError(data.message || "Failed to generate shipping documents");
-        return;
+      const data = await res.json();
+      if (data.success && data.labelUrl) {
+        window.open(data.labelUrl, "_blank", "noopener");
+      } else {
+        setDownloadError(data.message || "Failed to generate label");
       }
-
-      const warningsHeader = res.headers.get("X-Document-Warnings");
-      if (warningsHeader) {
-        try {
-          const warnings = JSON.parse(decodeURIComponent(warningsHeader));
-          if (warnings.length) setDownloadError(`Downloaded, but missing: ${warnings.join("; ")}`);
-        } catch {
-          // Ignore malformed warning header - the download itself still succeeded.
-        }
-      }
-
-      const blob = await res.blob();
-      downloadBlob(blob, "shipping-documents.pdf");
     } catch (err) {
-      console.error("Failed to generate shipping documents:", err);
-      setDownloadError("Failed to generate shipping documents");
+      console.error("Failed to generate label:", err);
+      setDownloadError("Failed to generate label");
     } finally {
       setDownloadingIds(null);
     }
@@ -160,11 +149,7 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
 
   const handleDownloadAll = () => {
     const shipped = rows.filter((r) => r.status === "shipped");
-    downloadDocuments(
-      "all",
-      shipped.map((r) => r.shipmentId).filter(Boolean),
-      shipped.map((r) => r.orderIdSR).filter(Boolean)
-    );
+    downloadLabels("all", shipped.map((r) => r.shipmentId).filter(Boolean));
   };
 
   const statusBadge = (row) => {
@@ -182,11 +167,11 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
             <button
               type="button"
               disabled={downloadingIds !== null}
-              onClick={() => downloadDocuments(row.order.id, [row.shipmentId].filter(Boolean), [row.orderIdSR].filter(Boolean))}
+              onClick={() => downloadLabels(row.order.id, [row.shipmentId].filter(Boolean))}
               className="text-[10px] px-1.5 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-              title="Downloads label + manifest + invoice merged into one PDF"
+              title="Downloads the Shiprocket shipping label"
             >
-              {downloadingIds === row.order.id ? "..." : "Download"}
+              {downloadingIds === row.order.id ? "..." : "Label"}
             </button>
           </div>
         );
@@ -267,10 +252,10 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
                 disabled={downloadingIds !== null}
                 onClick={handleDownloadAll}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                title="Downloads label + manifest + invoice for every shipped order, merged into one PDF"
+                title="Downloads one label PDF covering every shipped order in this batch"
               >
                 {downloadingIds === "all" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-                Download All Documents
+                Download All Labels
               </button>
             )}
           </div>
