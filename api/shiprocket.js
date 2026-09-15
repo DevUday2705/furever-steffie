@@ -309,13 +309,33 @@ async function fetchLabelUrl(token, shipmentIds) {
     return result.label_url;
 }
 
-async function fetchManifestUrl(token, shipmentIds) {
-    const result = await shiprocketFetch("/manifests/generate", token, {
-        method: "POST",
-        body: JSON.stringify({ shipment_id: shipmentIds }),
-    });
-    if (!result.manifest_url) throw new Error("Shiprocket did not return a manifest_url");
-    return result.manifest_url;
+// Unlike labels/invoices, manifest generation is a one-time action per
+// shipment - a second call to /manifests/generate fails with "Manifest
+// already generated" instead of just returning the same URL again. When
+// that happens, fall back to /manifests/print, which retrieves the existing
+// manifest instead of trying to create a new one (and is keyed by
+// order_id, not shipment_id, unlike /manifests/generate).
+async function fetchManifestUrl(token, shipmentIds, orderIds = []) {
+    try {
+        const result = await shiprocketFetch("/manifests/generate", token, {
+            method: "POST",
+            body: JSON.stringify({ shipment_id: shipmentIds }),
+        });
+        if (!result.manifest_url) throw new Error("Shiprocket did not return a manifest_url");
+        return result.manifest_url;
+    } catch (error) {
+        const alreadyGenerated = /already generated/i.test(error.body?.message || error.message || "");
+        if (!alreadyGenerated || !orderIds.length) throw error;
+
+        const printResult = await shiprocketFetch("/manifests/print", token, {
+            method: "POST",
+            body: JSON.stringify({ order_ids: orderIds }),
+        });
+        if (!printResult.manifest_url) {
+            throw new Error("Shiprocket did not return a manifest_url when printing the existing manifest");
+        }
+        return printResult.manifest_url;
+    }
 }
 
 // Invoices are keyed by Shiprocket's own order_id, not shipment_id - a
@@ -350,12 +370,12 @@ async function handleGenerateLabels(req, res) {
 
 async function handleGenerateManifest(req, res) {
     try {
-        const { shipmentIds } = req.body;
+        const { shipmentIds, orderIds = [] } = req.body;
         if (!Array.isArray(shipmentIds) || !shipmentIds.length) {
             return res.status(400).json({ message: "shipmentIds array is required" });
         }
         const token = await getShiprocketToken(db);
-        const manifestUrl = await fetchManifestUrl(token, shipmentIds);
+        const manifestUrl = await fetchManifestUrl(token, shipmentIds, orderIds);
         return res.status(200).json({ success: true, manifestUrl });
     } catch (error) {
         console.error("❌ shiprocket generate-manifest error:", error.body || error.message);
@@ -416,7 +436,7 @@ async function handleGenerateDocuments(req, res) {
                 fetchLabelUrl(token, shipmentIds)
                     .then((url) => pdfUrls.push({ type: "label", url }))
                     .catch((e) => warnings.push(`Label: ${e.message}`)),
-                fetchManifestUrl(token, shipmentIds)
+                fetchManifestUrl(token, shipmentIds, orderIds)
                     .then((url) => pdfUrls.push({ type: "manifest", url }))
                     .catch((e) => warnings.push(`Manifest: ${e.message}`)),
             ]);
