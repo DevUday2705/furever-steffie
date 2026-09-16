@@ -278,6 +278,31 @@ const AdminPage = () => {
         // Ask admin for shipping type, courier partner & tracking number via modal
         setShippedModalOrderId(orderId);
         return;
+      } else if (newStatus === "cancelled") {
+        if (!window.confirm("Cancel this order? This restores every item's stock and logs it.")) {
+          return;
+        }
+        const res = await fetch("/api/stock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "cancel-order", orderId }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          toast.error(data.message || "Failed to cancel order");
+          return;
+        }
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId ? { ...order, orderStatus: "cancelled", stockRestored: true } : order
+          )
+        );
+        if (data.failures?.length) {
+          toast(`Cancelled, but some stock couldn't auto-restore: ${data.failures.join("; ")}`, { icon: "⚠️" });
+        } else {
+          toast.success("Order cancelled and stock restored");
+        }
+        fetchOrders();
       } else {
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, {
@@ -1642,6 +1667,14 @@ const AdminPage = () => {
                             💰 COD - Shiprocket ONLY
                           </span>
                         )}
+                        {order.stockConflict && (
+                          <span
+                            className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-orange-600 border border-orange-700 rounded-full"
+                            title={order.stockConflict}
+                          >
+                            ⚠️ Stock conflict - check before fulfilling
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm font-medium text-gray-800 mb-1">
                         📞 {order.customer?.mobileNumber}
@@ -1751,6 +1784,7 @@ const AdminPage = () => {
                             Tracking Pending
                           </option>
                           <option value="shipped">shipped</option>
+                          <option value="cancelled">Cancelled</option>
                         </select>
                       </div>
                     </div>

@@ -23,6 +23,11 @@ const tiles = [
     description: "Manage centralized dhoti inventory and stock levels",
     route: "/admin/dhotis",
   },
+  {
+    title: "Stock & Reservations",
+    description: "Hold stock for a customer, release it, and see the full stock change log",
+    route: "/admin/reservations",
+  },
 ];
 
 const AdminHome = () => {

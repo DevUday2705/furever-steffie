@@ -16,6 +16,15 @@ if (!getApps().length) {
 // same shared createOrderFromPayment logic as a server-side safety net in
 // case this call never fires (e.g. the customer's network drops right after
 // paying) - both are idempotent on razorpay_order_id.
+//
+// Stock is now adjusted via one Firestore transaction per line item (was one
+// shared batch) so concurrent orders for the same size can't both oversell -
+// a multi-item cart can take longer than the default limit to clear all of
+// them.
+export const config = {
+    maxDuration: 30,
+};
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only POST method allowed" });

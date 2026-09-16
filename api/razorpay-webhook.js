@@ -16,11 +16,13 @@ const db = getFirestore();
 
 // Vercel parses req.body as JSON by default, but signature verification
 // needs the exact raw bytes Razorpay signed - so we opt out of that and
-// read+verify the raw body ourselves before parsing it.
+// read+verify the raw body ourselves before parsing it. maxDuration is
+// generous because stock is adjusted via one transaction per line item.
 export const config = {
     api: {
         bodyParser: false,
     },
+    maxDuration: 30,
 };
 
 function readRawBody(req) {
