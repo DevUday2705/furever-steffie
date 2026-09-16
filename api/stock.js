@@ -187,6 +187,7 @@ async function handleCancelOrder(req, res) {
                     orderId,
                     orderNumber: order.orderNumber,
                     customerName: order.customer?.fullName,
+                    customerPhone: order.customer?.mobileNumber,
                     actor: "admin",
                 });
                 restored.push({ productId: item.productId, size: item.selectedSize, quantity });

@@ -50,7 +50,6 @@ import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
 import GlobalSettings from "./Components/GlobalSettings";
 import DhotiManagement from "./Components/DhotiManagement";
-import StockReservations from "./Components/StockReservations";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
 import OrderUtility from "./Components/OrderUtility";
 import OrderPauseModal from "./Components/OrderPauseModal";
@@ -202,7 +201,6 @@ const App = () => {
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/settings" element={<GlobalSettings />} />
               <Route path="/admin/dhotis" element={<DhotiManagement />} />
-              <Route path="/admin/reservations" element={<StockReservations />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/order-utility" element={<OrderUtility />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />

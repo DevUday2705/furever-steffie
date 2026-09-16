@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
+import ProductStockLog from "./ProductStockLog";
 
 const defaultSchema = {
   name: "",
@@ -172,6 +173,11 @@ const ProductForm = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("details");
+  // Snapshot of sizeStock as loaded (or all-zero for a brand new product) -
+  // diffed against formData.sizeStock on save so admin-side stock edits get
+  // logged too, not just what orders consume automatically.
+  const [originalSizeStock, setOriginalSizeStock] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -252,6 +258,7 @@ const ProductForm = () => {
 
             console.log("Final merged data:", finalData);
             setFormData(finalData);
+            setOriginalSizeStock({ ...finalData.sizeStock });
           } else {
             console.log("No document found!");
             setError("Product not found");
@@ -261,8 +268,12 @@ const ProductForm = () => {
           setError("Failed to fetch product data");
         }
       } else {
-        // For new products, set the category from URL params
+        // For new products, set the category from URL params. There's no
+        // stock yet, so any size the admin sets before first save is a
+        // change from zero - matches the "I add a new product and set XS to
+        // 5" case being logged, not just later edits.
         setFormData((prev) => ({ ...prev, category, type: category }));
+        setOriginalSizeStock({});
       }
       setIsLoading(false);
     };
@@ -404,6 +415,44 @@ const ProductForm = () => {
     }
   };
 
+  // Writes one stockLedger row per size whose stock actually changed in this
+  // save, so admin-side stock edits (new stock arriving, a manual recount,
+  // restoring for a cancelled order) show up in the same trail as
+  // order-driven changes instead of only the latter being logged.
+  const logSizeStockChanges = async (productId, productName, newSizeStock) => {
+    if (!originalSizeStock) return;
+    const changedSizes = Object.keys(newSizeStock || {}).filter(
+      (size) => (newSizeStock[size] || 0) !== (originalSizeStock[size] || 0)
+    );
+    if (!changedSizes.length) return;
+
+    await Promise.all(
+      changedSizes.map((size) => {
+        const previousStock = originalSizeStock[size] || 0;
+        const newStock = newSizeStock[size] || 0;
+        return addDoc(collection(db, "stockLedger"), {
+          kind: "product",
+          productId,
+          collectionName: `${category}s`,
+          productName: productName || null,
+          size,
+          change: newStock - previousStock,
+          previousStock,
+          newStock,
+          reason: "admin_stock_set",
+          orderId: null,
+          orderNumber: null,
+          reservationId: null,
+          customerName: null,
+          customerPhone: null,
+          note: null,
+          actor: "admin",
+          createdAt: new Date().toISOString(),
+        }).catch((err) => console.error(`Failed to log stock change for size ${size}:`, err));
+      })
+    );
+  };
+
   const handleSubmit = async () => {
     try {
       setError(null);
@@ -415,9 +464,11 @@ const ProductForm = () => {
 
       if (isEditMode) {
         await setDoc(doc(db, `${category}s`, id), dataToSave);
+        await logSizeStockChanges(id, formData.name, formData.sizeStock);
         console.log("Product updated successfully");
       } else {
         const docRef = await addDoc(collection(db, `${category}s`), dataToSave);
+        await logSizeStockChanges(docRef.id, formData.name, formData.sizeStock);
         console.log("Product added successfully with ID:", docRef.id);
       }
       navigate(`/admin/product?category=${category}s`);
@@ -441,6 +492,41 @@ const ProductForm = () => {
         {isEditMode ? formData.name : "New Product"}
       </h1>
 
+      {isEditMode && (
+        <div className="flex gap-1 border-b mb-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab("details")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+              activeTab === "details"
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Product Details
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("log")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+              activeTab === "log"
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Stock Log
+          </button>
+        </div>
+      )}
+
+      {activeTab === "log" && isEditMode ? (
+        <ProductStockLog
+          category={category}
+          productId={id}
+          productName={formData.name}
+          currentSizeStock={formData.sizeStock}
+        />
+      ) : (
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Product Name</label>
@@ -1114,6 +1200,7 @@ const ProductForm = () => {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 };
