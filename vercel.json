@@ -7,7 +7,7 @@
   ],
   "crons": [
     {
-      "path": "/api/cron/expire-reservations",
+      "path": "/api/stock",
       "schedule": "30 21 * * *"
     }
   ]

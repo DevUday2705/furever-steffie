@@ -621,8 +621,8 @@ const CheckoutPage = () => {
           marketingOptIn: whatsappOptIn
         };
 
-        // Call track-address API 
-        await fetch('/api/track-address', {
+        // Call abandoned-checkout API (default action = track)
+        await fetch('/api/abandoned-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(trackingData)
@@ -702,10 +702,10 @@ const CheckoutPage = () => {
         try {
           const sessionId = abandonedDocId || localStorage.getItem('abandonedSessionId');
           if (sessionId) {
-            await fetch('/api/mark-converted', {
+            await fetch('/api/abandoned-checkout', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ sessionId })
+              body: JSON.stringify({ action: 'mark-converted', sessionId })
             });
             console.log('✅ Abandoned checkout marked as converted (collaboration):', sessionId);
             localStorage.removeItem('abandonedSessionId');
@@ -820,10 +820,10 @@ const CheckoutPage = () => {
               try {
                 const sessionId = abandonedDocId || localStorage.getItem('abandonedSessionId');
                 if (sessionId) {
-                  await fetch('/api/mark-converted', {
+                  await fetch('/api/abandoned-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId })
+                    body: JSON.stringify({ action: 'mark-converted', sessionId })
                   });
                   console.log('✅ Abandoned checkout marked as converted:', sessionId);
                   localStorage.removeItem('abandonedSessionId');
