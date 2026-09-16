@@ -1242,6 +1242,7 @@ const CheckoutPage = () => {
                     <option value="southkorea">🇰🇷 South Korea</option>
                     <option value="hongkong">�� Hong Kong</option>
                     <option value="thailand">🇹🇭 Thailand</option>
+                    <option value="ireland">Ireland</option>
                   </select>
                   {errors.country && formSubmitted && (
                     <p className="mt-1 text-xs text-red-500">
