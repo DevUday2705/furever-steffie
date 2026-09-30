@@ -12,8 +12,8 @@ const OrderFilters = ({
   setMeasurementFilter,
   collaborationFilter,
   setCollaborationFilter,
-  shippingTypeFilter,
-  setShippingTypeFilter,
+  processedFilter,
+  setProcessedFilter,
   onDateRangeChange,
 }) => {
   // Get current month start and today's date as defaults
@@ -128,21 +128,19 @@ const OrderFilters = ({
           </select>
         </div>
 
-        {/* Shipping Type filter */}
+        {/* Shipped checkbox filter */}
         <div>
           <label className="block text-xs text-gray-500 mb-1">
-            📦 Shipping Method
+            ✅ Shipped
           </label>
           <select
-            value={shippingTypeFilter}
-            onChange={(e) => setShippingTypeFilter(e.target.value)}
+            value={processedFilter}
+            onChange={(e) => setProcessedFilter(e.target.value)}
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
           >
-            <option value="all">All Methods</option>
-            <option value="standard">📦 Standard</option>
-            <option value="air">✈️ Air</option>
-            <option value="express">🚀 Express</option>
-            <option value="not-set">⚠️ Not Set</option>
+            <option value="all">All Orders</option>
+            <option value="not-shipped">⏳ Not shipped yet</option>
+            <option value="shipped">✅ Shipped</option>
           </select>
         </div>
 

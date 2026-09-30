@@ -36,8 +36,19 @@ const OrderUtility = () => {
       razorpay_payment_id: razorpayIds.razorpay_payment_id,
       razorpay_order_id: razorpayIds.razorpay_order_id,
       orderStatus: "pending",
-      items: properties.cart || [],
+      // Cart events aren't always in the exact shape orders use (abandoned
+      // carts store size/qty) - normalise so the stock check sees them.
+      items: (properties.cart || []).map((item) => ({
+        ...item,
+        productId: item.productId || item.id,
+        selectedSize: item.selectedSize || item.size,
+        quantity: item.quantity || item.qty || 1,
+      })),
       orderSource: "manual-entry",
+      // Nobody has paid through the site for this one, so refuse it
+      // outright if anything is out of stock instead of creating an order
+      // we can't fulfil.
+      strictStock: true,
       dispatchDate: dispatchDate.toISOString(),
       paymentStatus: "paid",
       orderNumber: "",
@@ -106,8 +117,10 @@ const OrderUtility = () => {
         setJsonInput("");
         setAmount("");
       } else {
-        const error = await response.text();
-        toast.error(`API Error: ${error}`);
+        const error = await response.json().catch(() => ({}));
+        toast.error(error.message || `API Error: ${response.status}`, {
+          duration: 10000,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -235,6 +248,10 @@ const OrderUtility = () => {
                 • Sets order status to &quot;pending&quot; and payment status to
                 &quot;paid&quot;
               </li>
+              <li>
+                • Refuses the order if any item (or set dhoti) is out of stock
+                - each cart item needs its &quot;productId&quot;
+              </li>
             </ul>
           </div>
 
@@ -253,6 +270,7 @@ const OrderUtility = () => {
     "email": "aarya.tickoo@live.com",
     "cart": [
       {
+        "productId": "vOBcoUjcAGZ6MChjmZkC",
         "category": "kurta",
         "name": "Blue SeaShell Tails",
         "price": 2399,

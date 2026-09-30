@@ -111,8 +111,17 @@ export default async function handler(req, res) {
             codAmountDue: pending.codAmountDue,
         });
 
-        // Clean up regardless of outcome - either the order now exists, or
-        // something's wrong with this pending record and retrying won't help.
+        // The browser's save-order call is creating this same order right
+        // now, or saving failed - answer 500 so Razorpay retries later. The
+        // retry either finds the order done (no-op) or finishes it, and the
+        // pending record has to still be here for that.
+        if (result.body.inProgress || result.statusCode >= 500) {
+            console.log(`ℹ️ Order for ${razorpay_order_id} not finished yet (${result.statusCode}) - asking Razorpay to retry`);
+            return res.status(500).json({ message: "Order not finished yet, retry later", result: result.body });
+        }
+
+        // Done (created now or already existed) - the pending stash has
+        // served its purpose.
         await pendingSnap.ref.delete().catch((err) => console.error("⚠️ Failed to delete pendingOrders doc:", err.message));
 
         console.log(`✅ Webhook created/confirmed order for ${razorpay_order_id}:`, result.body);

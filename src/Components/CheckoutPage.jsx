@@ -732,6 +732,13 @@ const CheckoutPage = () => {
           }),
         });
 
+        if (saveRes.status === 409) {
+          const outOfStock = await saveRes.json().catch(() => ({}));
+          setLoadingPayment(false);
+          toast.error(outOfStock.message || "Some items are out of stock.", { duration: 8000 });
+          return;
+        }
+
         if (!saveRes.ok) {
           throw new Error(`Failed to save collaboration order: ${saveRes.status}`);
         }
@@ -772,6 +779,20 @@ const CheckoutPage = () => {
           codAmountDue: isCod ? totalAmount - codAdvanceAmount : null,
         }),
       });
+
+      if (res.status === 409) {
+        // Something in the cart sold out (or was removed) since it was
+        // added - stop before payment rather than taking money for it.
+        const outOfStock = await res.json().catch(() => ({}));
+        mixpanel.track("Checkout Blocked - Out Of Stock", {
+          problems: (outOfStock.problems || []).map((p) => p.item).join(", "),
+        });
+        toast.error(
+          outOfStock.message || "Some items in your order are out of stock.",
+          { duration: 8000 }
+        );
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(`Failed to create order: ${res.status}`);

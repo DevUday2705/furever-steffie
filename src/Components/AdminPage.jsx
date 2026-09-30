@@ -18,6 +18,12 @@ import { downloadBlob } from "../utils/downloadBlob";
 
 const ADMIN_KEY = "Steffie@123";
 
+// An order counts as done once the "Shipped" checkbox is ticked. Orders
+// shipped before the checkbox existed have no `processed` field, so fall
+// back to their status for those.
+const isOrderProcessed = (order) =>
+  order?.processed ?? (order?.orderStatus === "shipped" || order?.orderStatus === "tracking-pending");
+
 const AdminPage = () => {
   const [passkey, setPasskey] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -59,7 +65,7 @@ const AdminPage = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [measurementFilter, setMeasurementFilter] = useState("all");
   const [collaborationFilter, setCollaborationFilter] = useState("all");
-  const [shippingTypeFilter, setShippingTypeFilter] = useState("all");
+  const [processedFilter, setProcessedFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -304,14 +310,20 @@ const AdminPage = () => {
         }
         fetchOrders();
       } else {
+        // "Tracking Pending" means the parcel has already gone out, we're
+        // just waiting on the courier's tracking number - so it counts as
+        // shipped for the checkbox too.
+        const update = { orderStatus: newStatus };
+        if (newStatus === "tracking-pending") {
+          update.processed = true;
+          update.processedAt = new Date().toISOString();
+        }
         const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, {
-          orderStatus: newStatus,
-        });
+        await updateDoc(orderRef, update);
 
         setOrders((prev) =>
           prev.map((order) =>
-            order.id === orderId ? { ...order, orderStatus: newStatus } : order
+            order.id === orderId ? { ...order, ...update } : order
           )
         );
         toast.success("Status updated");
@@ -330,12 +342,15 @@ const AdminPage = () => {
 
     try {
       const orderRef = doc(db, "orders", orderId);
+      const processedAt = new Date().toISOString();
       await updateDoc(orderRef, {
         orderStatus: "shipped",
         tracking_id: trackingId,
         shippingType,
         courierPartner,
         expectedDelivery,
+        processed: true,
+        processedAt,
       });
 
       setOrders((prev) =>
@@ -348,6 +363,8 @@ const AdminPage = () => {
                 shippingType,
                 courierPartner,
                 expectedDelivery,
+                processed: true,
+                processedAt,
               }
             : order
         )
@@ -424,6 +441,7 @@ const AdminPage = () => {
                 orderStatus: "shipped",
                 tracking_id: data.trackingId,
                 courierPartner: data.courierName,
+                processed: true,
               }
             : order
         )
@@ -556,29 +574,32 @@ const AdminPage = () => {
     setOrders((prev) =>
       prev.map((order) =>
         order.id === orderId
-          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName }
+          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName, processed: true }
           : order
       )
     );
   };
 
-  // Handle shipping type change
-  const handleShippingTypeChange = async (orderId, newShippingType) => {
+  // "Shipped" checkbox - a manual "this one's done, stop worrying about it"
+  // marker for orders that went out without an immediate tracking number
+  // (international, local couriers etc). Ticked automatically whenever the
+  // order is shipped through the app.
+  const handleProcessedToggle = async (orderId) => {
+    const order = orders.find((o) => o.id === orderId);
+    const newProcessed = !isOrderProcessed(order);
+    const update = {
+      processed: newProcessed,
+      processedAt: newProcessed ? new Date().toISOString() : null,
+    };
     try {
-      const orderRef = doc(db, "orders", orderId);
-      await updateDoc(orderRef, {
-        shippingType: newShippingType,
-      });
-
+      await updateDoc(doc(db, "orders", orderId), update);
       setOrders((prev) =>
-        prev.map((order) =>
-          order.id === orderId ? { ...order, shippingType: newShippingType } : order
-        )
+        prev.map((o) => (o.id === orderId ? { ...o, ...update } : o))
       );
-      toast.success("Shipping type updated successfully");
+      toast.success(newProcessed ? "Marked as shipped" : "Marked as not shipped");
     } catch (error) {
-      console.error("Error updating shipping type:", error);
-      toast.error("Failed to update shipping type. Please try again.");
+      console.error("Error updating shipped checkbox:", error);
+      toast.error("Failed to update. Please try again.");
     }
   };
 
@@ -589,6 +610,33 @@ const AdminPage = () => {
     
     if (!confirmDelete) {
       return;
+    }
+
+    // Deleting an order (e.g. a test or duplicate) doesn't by itself give
+    // its stock back - offer to, so the counts don't silently drift.
+    const order = orders.find((o) => o.id === orderId);
+    const holdsStock =
+      order?.orderStatus !== "cancelled" && order?.stockConsumption?.length > 0;
+    if (
+      holdsStock &&
+      window.confirm(
+        "Put this order's items back into stock before deleting?\n\nOK = yes, return the stock (duplicate/test order)\nCancel = no, the items really went out"
+      )
+    ) {
+      const res = await fetch("/api/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel-order", orderId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || data.failures?.length) {
+        toast.error(
+          `Couldn't return all stock, order NOT deleted: ${
+            data.failures?.join("; ") || data.message || res.status
+          }`
+        );
+        return;
+      }
     }
 
     try {
@@ -1088,19 +1136,17 @@ const AdminPage = () => {
         }
       }
 
-      // Shipping Type filter
-      let matchesShippingType = true;
-      if (shippingTypeFilter !== "all") {
-        if (shippingTypeFilter === "not-set") {
-          matchesShippingType = !order.shippingType;
-        } else {
-          matchesShippingType = order.shippingType === shippingTypeFilter;
-        }
+      // Shipped checkbox filter
+      let matchesProcessed = true;
+      if (processedFilter === "shipped") {
+        matchesProcessed = isOrderProcessed(order);
+      } else if (processedFilter === "not-shipped") {
+        matchesProcessed = !isOrderProcessed(order);
       }
 
       return (
         matchesSearch && matchesStatus && matchesDate && matchesMeasurement && 
-        matchesCollaboration && matchesShippingType
+        matchesCollaboration && matchesProcessed
       );
     })
     .sort((a, b) => {
@@ -1159,10 +1205,10 @@ const AdminPage = () => {
     ).length,
     shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
       .length,
-    // Shipping type stats
-    standardShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "standard").length,
-    airShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "air").length,
-    expressShipping: filteredAndSortedOrders.filter((o) => o.shippingType === "express").length,
+    notShippedYet: filteredAndSortedOrders.filter(
+      (o) => o.orderStatus !== "cancelled" && !isOrderProcessed(o)
+    ).length,
+    shippedChecked: filteredAndSortedOrders.filter((o) => isOrderProcessed(o)).length,
     internationalOrders: filteredAndSortedOrders.filter((o) => o.customer?.country && o.customer.country.toLowerCase() !== "india").length,
     totalAmount: filteredAndSortedOrders.reduce(
       (sum, order) => sum + (Number(order.amount) || 0),
@@ -1367,24 +1413,18 @@ const AdminPage = () => {
             </div>
           </div>
 
-          {/* Shipping Type Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">📦 Standard Shipping</p>
-              <p className="text-lg font-bold text-blue-600">
-                {orderStats.standardShipping}
+          {/* Shipped checkbox stats */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-orange-200">
+              <p className="text-xs text-orange-600">⏳ Not shipped yet</p>
+              <p className="text-lg font-bold text-orange-600">
+                {orderStats.notShippedYet}
               </p>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">✈️ Air Shipping</p>
-              <p className="text-lg font-bold text-purple-600">
-                {orderStats.airShipping}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">🚀 Express Shipping</p>
-              <p className="text-lg font-bold text-red-600">
-                {orderStats.expressShipping}
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-green-200">
+              <p className="text-xs text-green-700">✅ Shipped</p>
+              <p className="text-lg font-bold text-green-600">
+                {orderStats.shippedChecked}
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-blue-200">
@@ -1448,8 +1488,8 @@ const AdminPage = () => {
             setMeasurementFilter={setMeasurementFilter}
             collaborationFilter={collaborationFilter}
             setCollaborationFilter={setCollaborationFilter}
-            shippingTypeFilter={shippingTypeFilter}
-            setShippingTypeFilter={setShippingTypeFilter}
+            processedFilter={processedFilter}
+            setProcessedFilter={setProcessedFilter}
             onDateRangeChange={handleDateRangeChange}
           />
 
@@ -1617,10 +1657,8 @@ const AdminPage = () => {
                       ? "bg-blue-50 border-blue-300"
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
-                      : !order.shippingType
-                      ? "border-l-4 border-l-orange-400 bg-orange-50/20"
                       : "border-gray-200"
-                  } ${
+                  } ${isOrderProcessed(order) ? "opacity-60" : ""} ${
                     selectedOrders.has(order.id)
                       ? "ring-2 ring-blue-500 bg-blue-50/50"
                       : ""
@@ -1672,10 +1710,19 @@ const AdminPage = () => {
                             className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-orange-600 border border-orange-700 rounded-full"
                             title={order.stockConflict}
                           >
-                            ⚠️ Stock conflict - check before fulfilling
+                            ⚠️ Stock not deducted - check
                           </span>
                         )}
                       </div>
+                      {order.stockConflict && (
+                        <div className="text-xs text-orange-800 bg-orange-50 border border-orange-200 rounded px-2 py-1 mb-1">
+                          Paid, but stock wasn&apos;t taken for:{" "}
+                          {order.stockIssues?.length
+                            ? order.stockIssues.map((i) => `${i.item} - ${i.message}`).join("; ")
+                            : order.stockConflict}
+                          . Check you actually have it before making/shipping.
+                        </div>
+                      )}
                       <div className="text-sm font-medium text-gray-800 mb-1">
                         📞 {order.customer?.mobileNumber}
                       </div>
@@ -1706,6 +1753,22 @@ const AdminPage = () => {
                     </div>
                     <div className="text-right">
                       <div className="flex items-center gap-2 justify-end mb-2">
+                        <label
+                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold cursor-pointer select-none ${
+                            isOrderProcessed(order)
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                          title="Tick once this order has been sent out - even if there's no tracking number yet"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isOrderProcessed(order)}
+                            onChange={() => handleProcessedToggle(order.id)}
+                            className="w-4 h-4 accent-green-600 cursor-pointer"
+                          />
+                          Shipped
+                        </label>
                         <button
                           onClick={() => handlePinToggle(order.id)}
                           className={`p-2 rounded-full transition-colors ${
@@ -1799,43 +1862,6 @@ const AdminPage = () => {
                       </span>
                     </div>
 
-                    {/* Admin Shipping Type Selection */}
-                    <div className="mt-3 text-xs">
-                      <label className="text-gray-500 font-semibold"> 📦 Shipping Method: </label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className={`px-2 py-1 rounded-full text-white text-[10px] font-bold
-                      ${
-                        order.shippingType === "standard"
-                          ? "bg-blue-500"
-                          : order.shippingType === "air"
-                          ? "bg-purple-500"
-                          : order.shippingType === "express"
-                          ? "bg-red-500"
-                          : "bg-gray-400"
-                      }
-                    `}
-                        >
-                          {order.shippingType ? order.shippingType.toUpperCase() : "⚠️ NOT SET"}
-                        </span>
-
-                        <select
-                          value={order.shippingType || ""}
-                          onChange={(e) =>
-                            handleShippingTypeChange(order.id, e.target.value)
-                          }
-                          className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
-                        >
-                          <option value="">⚠️ Select Shipping Method</option>
-                          <option value="standard">📦 Standard Shipping</option>
-                          <option value="air">✈️ Air Shipping</option>
-                          <option value="express">🚀 Express Shipping</option>
-                        </select>
-                      </div>
-                      <p className="text-xs text-gray-400 mt-1">
-                        💡 This is how YOU will ship the package (independent of customer's choice)
-                      </p>
-                    </div>
                   </div>
 
                   {expandedOrderId === order.id && (

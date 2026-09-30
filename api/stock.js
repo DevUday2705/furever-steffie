@@ -1,6 +1,6 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { resolveProductRef, adjustProductStock } from "../lib/stockLedger.js";
+import { resolveProductRef, adjustProductStock, adjustDhotiStock } from "../lib/stockLedger.js";
 import { releaseReservation } from "../lib/reservations.js";
 
 // Vercel Hobby caps a deployment at 12 serverless functions - this used to
@@ -152,13 +152,68 @@ async function handleCancelOrder(req, res) {
         if (!orderSnap.exists) return res.status(404).json({ message: "Order not found" });
 
         const order = orderSnap.data();
-        if (order.orderStatus === "cancelled") {
+        // stockRestored === false means an earlier cancel couldn't give
+        // everything back - let it be retried (already-restored lines are
+        // skipped via their idempotency keys).
+        if (order.orderStatus === "cancelled" && order.stockRestored !== false) {
             return res.status(200).json({ success: true, alreadyCancelled: true });
         }
         if (order.stockRestored) {
             await orderRef.update({ orderStatus: "cancelled" });
             return res.status(200).json({ success: true, note: "Status set to cancelled; stock was already restored previously" });
         }
+
+        // Orders created since per-item stock tracking record exactly what
+        // they took (products AND set dhotis) - give back precisely that.
+        // Each give-back is keyed on the order, so a retry after a partial
+        // failure can't restock the same line twice.
+        if (Array.isArray(order.stockConsumption)) {
+            const restored = [];
+            const failures = [];
+            const context = {
+                reason: "order_cancelled",
+                orderId,
+                orderNumber: order.orderNumber,
+                customerName: order.customer?.fullName,
+                customerPhone: order.customer?.mobileNumber,
+                actor: "admin",
+            };
+
+            for (const [index, entry] of order.stockConsumption.entries()) {
+                const idempotencyKey = `cancel_${orderId}_${index}`;
+                try {
+                    if (entry.kind === "dhoti") {
+                        await adjustDhotiStock(db, {
+                            ...context,
+                            dhotiId: entry.dhotiId,
+                            size: entry.size,
+                            delta: +entry.quantity,
+                            idempotencyKey,
+                        });
+                    } else {
+                        await adjustProductStock(db, {
+                            ...context,
+                            productRef: db.collection(entry.collectionName).doc(entry.productId),
+                            size: entry.size,
+                            delta: +entry.quantity,
+                            idempotencyKey,
+                        });
+                    }
+                    restored.push(entry);
+                } catch (entryError) {
+                    failures.push(`${entry.name || entry.productId || entry.dhotiId} (${entry.size}): ${entryError.message}`);
+                }
+            }
+
+            await orderRef.update({
+                orderStatus: "cancelled",
+                stockRestored: failures.length === 0,
+                cancelledAt: new Date().toISOString(),
+            });
+            return res.status(200).json({ success: true, restored, failures });
+        }
+
+        // --- Older orders (before stockConsumption was recorded) ---
         if (order.stockConflict) {
             // Stock consumption failed and was fully rolled back when this
             // order was created (see stockConflict on lib/orderCreation.js) -

@@ -241,6 +241,9 @@ async function handleCreateOrder(req, res) {
             courierPartner: courierName,
             shiprocketOrderId,
             shiprocketShipmentId: shipmentId,
+            // Ticks the "Shipped" checkbox on the admin orders page.
+            processed: true,
+            processedAt: new Date().toISOString(),
         };
         await orderRef.update(updateData);
 

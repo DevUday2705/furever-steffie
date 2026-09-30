@@ -1,6 +1,7 @@
 import Razorpay from "razorpay";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { checkStockAvailability } from "../lib/stockLedger.js";
 
 if (!getApps().length) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -38,6 +39,26 @@ export default async function handler(req, res) {
     // Validate amount
     if (!amount || isNaN(amount)) {
         return res.status(400).json({ message: "Valid amount is required" });
+    }
+
+    // Refuse before the customer pays, not after: once Razorpay captures
+    // the money the order has to be accepted even if the stock is gone.
+    // Catches carts that went stale (someone else bought the last one,
+    // product was removed) while sitting in the customer's browser.
+    if (items.length) {
+        try {
+            const problems = await checkStockAvailability(db, items);
+            if (problems.length) {
+                return res.status(409).json({
+                    message: `Sorry, some items are no longer available: ${problems.map((p) => p.message).join("; ")}`,
+                    problems,
+                });
+            }
+        } catch (stockCheckError) {
+            // Don't block a sale because the check itself broke - the order
+            // path still records any shortfall for admin.
+            console.error("⚠️ Pre-payment stock check failed, continuing:", stockCheckError.message);
+        }
     }
 
     // Create Razorpay instance
