@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, runTransaction } from "firebase/firestore";
 import { db } from "../firebase";
 import ProductStockLog from "./ProductStockLog";
 
@@ -463,8 +463,51 @@ const ProductForm = () => {
       };
 
       if (isEditMode) {
-        await setDoc(doc(db, `${category}s`, id), dataToSave);
-        await logSizeStockChanges(id, formData.name, formData.sizeStock);
+        // Stock is applied as "what admin changed on this form" on top of
+        // the LIVE counts, in one transaction with its log rows. Orders keep
+        // deducting while this form sits open - saving the stock numbers as
+        // they were when the form loaded (as this used to) silently undid
+        // every one of those deductions.
+        const productRef = doc(db, `${category}s`, id);
+        await runTransaction(db, async (tx) => {
+          const liveSnap = await tx.get(productRef);
+          const liveSizeStock = liveSnap.exists() ? liveSnap.data().sizeStock || {} : {};
+          const sizeStock = { ...liveSizeStock };
+          const now = new Date().toISOString();
+
+          for (const size of Object.keys(formData.sizeStock || {})) {
+            const change =
+              (formData.sizeStock[size] || 0) - (originalSizeStock?.[size] || 0);
+            if (!change) {
+              if (sizeStock[size] === undefined) sizeStock[size] = 0;
+              continue;
+            }
+            const previousStock = liveSizeStock[size] || 0;
+            const newStock = Math.max(0, previousStock + change);
+            sizeStock[size] = newStock;
+            tx.set(doc(collection(db, "stockLedger")), {
+              kind: "product",
+              productId: id,
+              collectionName: `${category}s`,
+              productName: formData.name || null,
+              size,
+              change: newStock - previousStock,
+              previousStock,
+              newStock,
+              reason: "admin_stock_set",
+              orderId: null,
+              orderNumber: null,
+              reservationId: null,
+              customerName: null,
+              customerPhone: null,
+              note: null,
+              actor: "admin",
+              createdAt: now,
+            });
+          }
+
+          tx.set(productRef, { ...dataToSave, sizeStock });
+        });
         console.log("Product updated successfully");
       } else {
         const docRef = await addDoc(collection(db, `${category}s`), dataToSave);
@@ -972,6 +1015,15 @@ const ProductForm = () => {
             </div>
           </div>
 
+          {category === "dhotis" ? (
+            <div className="mt-4 border p-3 rounded bg-blue-50 text-sm text-gray-700">
+              Dhoti stock isn&apos;t set here - it comes from the{" "}
+              <a href="/admin/dhotis" className="text-blue-600 underline">
+                Dhoti Inventory
+              </a>{" "}
+              page (per colour and size), shared with Complete/Royal set dhotis.
+            </div>
+          ) : (
           <div className="mt-4">
             <label className="block text-sm font-medium mb-2">Size Stock</label>
             <div className="grid grid-cols-4 gap-2">
@@ -994,6 +1046,7 @@ const ProductForm = () => {
               ))}
             </div>
           </div>
+          )}
         </div>
 
         {/* Beaded / Non-Beaded Images */}

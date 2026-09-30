@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase"; // adjust path
+import {
+  getDhotiInventory,
+  withDhotiInventoryStock,
+} from "../utils/dhotiInventoryUtils";
 
 import ProductListing from "./ProductListing";
 import ProductCardSkeleton from "./ProductCardSkeleton";
@@ -8,8 +10,14 @@ import { useFirestoreCollection } from "../hooks/fetchCollection";
 
 const KurtaListing = () => {
   const { data: kurtas, isLoading } = useFirestoreCollection("kurtas");
-  const { data: dhotis, isLoadingDhoti } = useFirestoreCollection("dhotiss");
-  if (isLoading || isLoadingDhoti) {
+  const { data: dhotis, isLoading: isLoadingDhoti } = useFirestoreCollection("dhotiss");
+  // Dhoti stock comes from Dhoti Management, not the dhoti product itself.
+  const [dhotiInventory, setDhotiInventory] = useState(undefined);
+  useEffect(() => {
+    getDhotiInventory().then(setDhotiInventory);
+  }, []);
+
+  if (isLoading || isLoadingDhoti || dhotiInventory === undefined) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header section */}
@@ -48,7 +56,10 @@ const KurtaListing = () => {
       bannerImage="https://res.cloudinary.com/di6unrpjw/video/upload/f_mp4,vc_h264/v1785873386/Whatsapp_Video_2026-08-05_At_1.19.35_Am_tunfr3.mp4"
       bannerTitle="Kurtas & Dhotis"
       bannerSubtitle="Traditional wear crafted for your furry friend"
-      products={[...kurtas, ...dhotis]} // Combine kurtas and dhotis into one array
+      products={[
+        ...kurtas,
+        ...dhotis.map((dhoti) => withDhotiInventoryStock(dhoti, dhotiInventory)),
+      ]}
     />
   );
 };

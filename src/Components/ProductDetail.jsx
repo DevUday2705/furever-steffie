@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import { useAppContext } from "../context/AppContext";
@@ -11,7 +11,13 @@ import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import { getAvailableDhotisForSize, getGlobalSettings } from "../utils/dhotiInventoryUtils";
+import {
+  getAvailableDhotisForSize,
+  getGlobalSettings,
+  getDhotiInventory,
+  isStandaloneDhotiProduct,
+  withDhotiInventoryStock,
+} from "../utils/dhotiInventoryUtils";
 const ProductDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -83,6 +89,17 @@ const ProductDetail = () => {
       cancelled = true;
     };
   }, [selectedSize]);
+
+  // A standalone dhoti's stock lives in Dhoti Management, per colour.
+  const [dhotiInventory, setDhotiInventory] = useState(null);
+  useEffect(() => {
+    if (!isStandaloneDhotiProduct(product)) return;
+    getDhotiInventory().then(setDhotiInventory);
+  }, [product]);
+  const stockedProduct = useMemo(
+    () => withDhotiInventoryStock(product, dhotiInventory, selectedColor),
+    [product, dhotiInventory, selectedColor]
+  );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -315,7 +332,7 @@ const ProductDetail = () => {
           <div className="">
             <ProductInfo product={product} calculatePrice={calculatePrice} />
             <ProductOptions
-              product={product}
+              product={stockedProduct}
               isBeaded={isBeaded}
               setIsBeaded={setIsBeaded}
               isFullSet={isFullSet}
@@ -341,7 +358,7 @@ const ProductDetail = () => {
             <SimpleSizeSelector
               selectedSize={selectedSize}
               setSelectedSize={setSelectedSize}
-              product={product}
+              product={stockedProduct}
               // Action button props
               images={images}
               isBeaded={isBeaded}
@@ -371,7 +388,7 @@ const ProductDetail = () => {
       </div>
 
       <BottomActions
-        product={product}
+        product={stockedProduct}
         images={images}
         isBeaded={isBeaded}
         isFullSet={isFullSet}

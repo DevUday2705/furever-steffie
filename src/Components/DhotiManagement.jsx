@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, runTransaction } from "firebase/firestore";
 import { db } from "../firebase";
 import { DHOTI_SIZES } from "../utils/dhotiInventoryUtils";
 
@@ -155,13 +155,74 @@ const DhotiManagement = () => {
   const saveInventory = async () => {
     try {
       setSaving(true);
-      const updatedInventory = {
-        ...inventory,
-        lastUpdated: new Date().toISOString(),
-        updatedBy: "admin",
-      };
+      const inventoryRef = doc(db, "dhotis", "inventory");
 
-      await setDoc(doc(db, "dhotis", "inventory"), updatedInventory);
+      // Apply only what admin changed on this screen, on top of the LIVE
+      // counts. Orders keep deducting dhotis while this page sits open -
+      // writing back the whole snapshot from page load (as this used to)
+      // silently undid every one of those deductions. Each change is also
+      // written to the stock log, like product stock edits are.
+      const updatedInventory = await runTransaction(db, async (tx) => {
+        const liveSnap = await tx.get(inventoryRef);
+        const live = liveSnap.exists() ? liveSnap.data() : {};
+        const next = { ...live };
+        const now = new Date().toISOString();
+        const ledgerEntries = [];
+
+        Object.keys(originalInventory)
+          .filter((id) => !META_KEYS.includes(id) && !inventory[id])
+          .forEach((id) => delete next[id]);
+
+        for (const id of dhotiIds) {
+          const edited = inventory[id];
+          const original = originalInventory[id];
+          const stock = { ...emptyStock(), ...(live[id]?.inventory || {}) };
+
+          for (const size of DHOTI_SIZES) {
+            const change =
+              (edited.inventory?.[size] || 0) - (original?.inventory?.[size] || 0);
+            if (!change) continue;
+            const previousStock = stock[size] || 0;
+            const newStock = Math.max(0, previousStock + change);
+            stock[size] = newStock;
+            ledgerEntries.push({
+              kind: "dhoti",
+              productId: id,
+              collectionName: "dhotis",
+              productName: edited.name || id,
+              size,
+              change: newStock - previousStock,
+              previousStock,
+              newStock,
+              reason: "admin_stock_set",
+              orderId: null,
+              orderNumber: null,
+              reservationId: null,
+              customerName: null,
+              customerPhone: null,
+              note: null,
+              actor: "admin",
+              createdAt: now,
+            });
+          }
+
+          next[id] = {
+            ...(live[id] || {}),
+            id,
+            name: edited.name,
+            image: edited.image || "",
+            inventory: stock,
+          };
+        }
+
+        next.lastUpdated = now;
+        next.updatedBy = "admin";
+        tx.set(inventoryRef, next);
+        ledgerEntries.forEach((entry) =>
+          tx.set(doc(collection(db, "stockLedger")), entry)
+        );
+        return next;
+      });
       setInventory(updatedInventory);
       setOriginalInventory(updatedInventory);
       setLastUpdated(updatedInventory.lastUpdated);

@@ -197,3 +197,30 @@ export const getAvailableDhotisForSize = async (size) => {
     return [];
   }
 };
+// Standalone dhoti products (the "dhotiss" collection, sold on their own in
+// the kurta listing) are the same physical dhotis as the set dhotis above,
+// so their stock comes from Dhoti Management too - never from the product's
+// own sizeStock, which would be a second, drifting count of the same items.
+// The product's colour ids match the Dhoti Management ids (gold/black/white).
+export const isStandaloneDhotiProduct = (product) =>
+  product?.type === "dhotis" || product?.category === "dhotis";
+
+// Returns the product with sizeStock replaced by Dhoti Management stock:
+// for one colour when colorId is given (product page), or summed across the
+// product's colours otherwise (listing - "is any colour in stock?").
+export const withDhotiInventoryStock = (product, inventory, colorId = null) => {
+  if (!isStandaloneDhotiProduct(product) || !inventory) return product;
+
+  const colorIds = colorId
+    ? [colorId]
+    : (product.colors || []).map((color) => color.id);
+
+  const sizeStock = {};
+  for (const size of DHOTI_SIZES) {
+    sizeStock[size] = colorIds.reduce(
+      (sum, id) => sum + (inventory[id]?.inventory?.[size] || 0),
+      0
+    );
+  }
+  return { ...product, sizeStock };
+};
