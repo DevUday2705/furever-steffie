@@ -7,7 +7,7 @@ export const COURIER_OPTIONS = [
 
 export const SHIPPING_TYPE_OPTIONS = [
   { value: "standard", label: "📦 Standard" },
-  { value: "air", label: "✈️ Air " },
+  { value: "air", label: "✈️ Air" },
   { value: "express", label: "🚀 Express" },
 ];
 
