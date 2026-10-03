@@ -1095,7 +1095,11 @@ const AdminPage = () => {
 
       // Status filter
       const matchesStatus =
-        statusFilter === "all" || order.orderStatus === statusFilter;
+        statusFilter === "all" ||
+        (order.orderStatus === statusFilter &&
+          // An order with the Shipped checkbox ticked is already out the
+          // door, so it isn't "pending" any more.
+          !(statusFilter === "pending" && isOrderProcessed(order)));
 
       // Date filter
       const orderDate = new Date(order.createdAt);
