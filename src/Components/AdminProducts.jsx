@@ -9,7 +9,7 @@ import {
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -68,6 +68,8 @@ const SortableTile = ({ item, rank }) => {
         transform: CSS.Transform.toString(transform),
         transition,
         touchAction: "manipulation",
+        WebkitTouchCallout: "none",
+        WebkitUserSelect: "none",
         zIndex: isDragging ? 10 : undefined,
       }}
       className={`relative select-none rounded-md overflow-hidden border bg-white cursor-grab ${
@@ -106,7 +108,7 @@ const AdminProducts = () => {
   const [orderedItems, setOrderedItems] = useState([]);
   const [savingOrder, setSavingOrder] = useState(false);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, {
       activationConstraint: { delay: 200, tolerance: 8 },
     })
