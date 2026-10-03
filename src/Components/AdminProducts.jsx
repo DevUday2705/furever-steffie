@@ -1,5 +1,26 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  writeBatch,
+} from "firebase/firestore";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { db } from "../firebase";
 import {
@@ -25,6 +46,51 @@ const collections = [
   "pathanis",
 ];
 
+const isInStock = (product) => {
+  const sizeStock = product.sizeStock || {};
+  return (
+    Object.values(sizeStock).some((stock) => stock > 0) ||
+    product.availableStock > 0
+  );
+};
+
+// Tile that can be dragged to a new position in reorder mode
+/* eslint-disable react/prop-types */
+const SortableTile = ({ item, rank }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: item.id });
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: "manipulation",
+        zIndex: isDragging ? 10 : undefined,
+      }}
+      className={`relative select-none rounded-md overflow-hidden border bg-white cursor-grab ${
+        isDragging
+          ? "border-rose-400 shadow-xl scale-105 opacity-90"
+          : "border-amber-200"
+      }`}
+    >
+      <img
+        src={item.mainImage}
+        alt={item.name}
+        draggable={false}
+        className="w-full aspect-square object-cover pointer-events-none"
+      />
+      <span className="absolute top-0 left-0 bg-rose-600 text-white text-[9px] font-bold leading-none px-1 py-0.5 rounded-br">
+        {rank}
+      </span>
+    </div>
+  );
+};
+
+/* eslint-enable react/prop-types */
+
 const AdminProducts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCollection, setSelectedCollection] = useState(
@@ -36,6 +102,15 @@ const AdminProducts = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [reorderMode, setReorderMode] = useState(false);
+  const [orderedItems, setOrderedItems] = useState([]);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    })
+  );
   const [passkey, setPasskey] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -50,6 +125,7 @@ const AdminProducts = () => {
   // Helper function to handle collection selection
   const handleCollectionSelect = (collectionName) => {
     setSelectedCollection(collectionName);
+    setReorderMode(false);
     setSearchParams({ category: collectionName });
   };
 
@@ -84,13 +160,7 @@ const AdminProducts = () => {
         icon: FaCheck,
         color: "bg-green-100 text-green-800 border-green-200",
         activeColor: "bg-green-500 text-white border-green-500",
-        filterFn: (product) => {
-          const sizeStock = product.sizeStock || {};
-          return (
-            Object.values(sizeStock).some((stock) => stock > 0) ||
-            product.availableStock > 0
-          );
-        },
+        filterFn: isInStock,
       },
       {
         id: "low-stock",
@@ -256,6 +326,49 @@ const AdminProducts = () => {
     }
   }, [selectedCollection]);
 
+  // Enter reorder mode: in-stock products only, highest popularity first
+  const startReorder = () => {
+    setOrderedItems(
+      products
+        .filter(isInStock)
+        .sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0))
+    );
+    setReorderMode(true);
+  };
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    setOrderedItems((items) => {
+      const from = items.findIndex((i) => i.id === active.id);
+      const to = items.findIndex((i) => i.id === over.id);
+      return arrayMove(items, from, to);
+    });
+  };
+
+  // First position gets the highest score (N), last gets 1
+  const saveOrder = async () => {
+    setSavingOrder(true);
+    try {
+      const total = orderedItems.length;
+      for (let i = 0; i < total; i += 400) {
+        const batch = writeBatch(db);
+        orderedItems.slice(i, i + 400).forEach((item, j) => {
+          batch.update(doc(db, selectedCollection, item.id), {
+            priorityScore: total - (i + j),
+          });
+        });
+        await batch.commit();
+      }
+      await fetchProducts(selectedCollection);
+      setReorderMode(false);
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert("Failed to save order");
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
   const handleDelete = async (id) => {
     const confirm = window.confirm(
       "Are you sure you want to delete this item?"
@@ -298,65 +411,38 @@ const AdminProducts = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="p-4 sm:p-6 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-3 sm:mb-8">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
             Manage Products
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-xs sm:text-base hidden sm:block">
             Select a collection to view and manage products
           </p>
         </div>
 
-        {/* Collection Selection Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        {/* Collection Selection */}
+        <div className="flex flex-wrap gap-1.5 sm:gap-4 mb-3 sm:mb-8">
           {collections.map((col) => (
-            <div
+            <button
               key={col}
               onClick={() => handleCollectionSelect(col)}
-              className={`
-                relative cursor-pointer p-6 rounded-2xl border-2 transition-all duration-300
-                ${
-                  selectedCollection === col
-                    ? "border-blue-500 bg-blue-50 shadow-lg"
-                    : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md"
-                }
-              `}
+              className={`capitalize rounded-full border px-2.5 py-1 text-[11px] font-medium sm:rounded-2xl sm:border-2 sm:px-6 sm:py-5 sm:text-xl sm:font-semibold transition-colors ${
+                selectedCollection === col
+                  ? "border-rose-500 bg-rose-500 text-white sm:bg-rose-50 sm:text-gray-900"
+                  : "border-amber-200 bg-amber-50 text-amber-800 hover:border-rose-300"
+              }`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold capitalize text-gray-900 mb-1">
-                    {col}
-                  </h2>
-                </div>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                  <svg
-                    className="w-5 h-5 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </div>
-              {selectedCollection === col && (
-                <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 pointer-events-none opacity-50"></div>
-              )}
-            </div>
+              {col}
+            </button>
           ))}
         </div>
 
         {/* Back Button and Add Button */}
         {selectedCollection && (
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-3 sm:mb-6">
             <button
               onClick={() => handleBackToCollections()}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -378,7 +464,7 @@ const AdminProducts = () => {
               onClick={() =>
                 navigate(`/admin/add/${selectedCollection.slice(0, -1)}`)
               }
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-white bg-rose-600 rounded-lg hover:bg-rose-700 transition-colors"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -401,9 +487,9 @@ const AdminProducts = () => {
         {/* Product List */}
         {selectedCollection && (
           <>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-6">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900 capitalize">
+                <h2 className="text-lg sm:text-2xl font-semibold text-gray-900 capitalize">
                   {selectedCollection}
                 </h2>
                 <div className="text-sm text-gray-500 mt-1">
@@ -429,17 +515,17 @@ const AdminProducts = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="mb-6">
+            <div className="mb-3 sm:mb-6">
               <div className="relative max-w-md">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearch className="h-4 w-4 text-gray-400" />
+                  <FaSearch className="h-4 w-4 text-amber-600" />
                 </div>
                 <input
                   type="text"
                   placeholder="Search products by name, ID, or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-amber-200 rounded-lg leading-5 bg-amber-50 text-amber-900 placeholder-amber-700/50 focus:outline-none focus:ring-1 focus:ring-rose-400 focus:border-rose-400 text-sm"
                 />
                 {searchQuery && (
                   <button
@@ -452,8 +538,42 @@ const AdminProducts = () => {
               </div>
             </div>
 
+            {/* Reorder toolbar */}
+            {reorderMode ? (
+              <div className="mb-3 flex items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
+                <p className="text-[11px] sm:text-sm text-amber-800">
+                  Hold &amp; drag a tile. #1 is shown first on the website.
+                </p>
+                <div className="flex gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setReorderMode(false)}
+                    disabled={savingOrder}
+                    className="px-2.5 py-1 text-xs rounded-lg border border-amber-300 bg-white text-amber-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveOrder}
+                    disabled={savingOrder}
+                    className="px-2.5 py-1 text-xs rounded-lg bg-rose-600 text-white disabled:opacity-60"
+                  >
+                    {savingOrder ? "Saving..." : "Save order"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={startReorder}
+                disabled={loading || products.length === 0}
+                className="mb-3 px-3 py-1 text-xs sm:text-sm font-medium rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50"
+              >
+                Reorder popularity (in stock)
+              </button>
+            )}
+
             {/* Quick Filters */}
-            <div className="mb-6">
+            {!reorderMode && (
+            <div className="mb-3 sm:mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <FaFilter className="text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">
@@ -505,13 +625,31 @@ const AdminProducts = () => {
                 })}
               </div>
             </div>
+            )}
 
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
+            ) : reorderMode ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={orderedItems.map((i) => i.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-1.5">
+                    {orderedItems.map((item, idx) => (
+                      <SortableTile key={item.id} item={item} rank={idx + 1} />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             ) : (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 sm:grid-cols-3 gap-1.5 sm:gap-4">
                 {filteredProducts.map((item) => (
                   <div
                     key={item.id}
@@ -531,7 +669,7 @@ const AdminProducts = () => {
                         <img
                           src={item.mainImage}
                           alt={item.name}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full aspect-square sm:aspect-auto sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                         {getLastPieceSizes(item).length > 0 && (
@@ -539,7 +677,7 @@ const AdminProducts = () => {
                             title={`Only 1 left in size: ${getLastPieceSizes(
                               item
                             ).join(", ")}`}
-                            className="absolute top-2 left-2 flex items-center gap-1 bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow"
+                            className="absolute top-0.5 left-0.5 sm:top-2 sm:left-2 flex items-center gap-1 bg-amber-500 text-white text-[8px] sm:text-[10px] font-semibold px-1 sm:px-2 py-0.5 rounded-full shadow"
                           >
                             <FaExclamationTriangle className="w-2.5 h-2.5" />
                             <span>
@@ -548,8 +686,8 @@ const AdminProducts = () => {
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
-                        <h3 className="font-medium text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                      <div className="p-1 sm:p-4">
+                        <h3 className="text-[9px] leading-tight sm:text-base truncate font-medium text-gray-900 sm:mb-1 group-hover:text-blue-600 transition-colors">
                           {item.name} {item.isRoyal && "R"}
                         </h3>
                       </div>
@@ -557,7 +695,7 @@ const AdminProducts = () => {
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="absolute top-2 right-2  text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+                      className="absolute top-0 right-0 sm:top-2 sm:right-2 text-[10px] sm:text-xs px-1 sm:px-2 sm:py-1 rounded hover:bg-red-600 transition"
                     >
                       🗑️
                     </button>
