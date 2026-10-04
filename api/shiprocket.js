@@ -27,14 +27,19 @@ const DEFAULT_ITEM_WEIGHT_KG = 0.2;
 const DEFAULT_DIMENSIONS_CM = { length: 21, breadth: 26, height: 2 };
 
 async function shiprocketFetch(path, token, options = {}) {
-    const resp = await fetch(`${SHIPROCKET_BASE_URL}${path}`, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            ...(options.headers || {}),
-        },
-    });
+    const doFetch = (t) =>
+        fetch(`${SHIPROCKET_BASE_URL}${path}`, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${t}`,
+                ...(options.headers || {}),
+            },
+        });
+    let resp = await doFetch(token);
+    if (resp.status === 401) {
+        resp = await doFetch(await getShiprocketToken(db, true));
+    }
     const json = await resp.json().catch(() => ({}));
     if (!resp.ok) {
         const err = new Error(json?.message || `Shiprocket request failed: ${resp.status}`);
@@ -74,10 +79,20 @@ async function handleServiceability(req, res) {
             cod: codRequired ? "1" : "0",
         });
 
-        const resp = await fetch(`${SHIPROCKET_BASE_URL}/courier/serviceability/?${params.toString()}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        const json = await resp.json();
+        const url = `${SHIPROCKET_BASE_URL}/courier/serviceability/?${params.toString()}`;
+        let resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        if (resp.status === 401) {
+            // Cached token was rejected ("Invalid Token") - re-login and retry once
+            const fresh = await getShiprocketToken(db, true);
+            resp = await fetch(url, { headers: { Authorization: `Bearer ${fresh}` } });
+        }
+        const text = await resp.text();
+        let json;
+        try {
+            json = JSON.parse(text);
+        } catch {
+            json = { message: text.trim() };
+        }
 
         if (!resp.ok) {
             console.error("Shiprocket serviceability error:", json);
