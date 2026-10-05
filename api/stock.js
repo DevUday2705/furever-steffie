@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { resolveProductRef, adjustProductStock, adjustDhotiStock } from "../lib/stockLedger.js";
@@ -316,6 +317,22 @@ async function handleExpireReservationsCron(req, res) {
     }
 }
 
+// Signed params for ImageKit's browser-side upload (used by the admin Image
+// Compressor). Lives here, not in its own file, for the same 12-function cap
+// reason as the cron above. The private key never leaves the server - the
+// browser only gets a short-lived token+signature.
+function handleImageKitAuth(req, res) {
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+    const publicKey = process.env.IMAGEKIT_PUBLIC_KEY;
+    if (!privateKey || !publicKey) {
+        return res.status(500).json({ message: "IMAGEKIT_PRIVATE_KEY / IMAGEKIT_PUBLIC_KEY not set" });
+    }
+    const token = crypto.randomUUID();
+    const expire = Math.floor(Date.now() / 1000) + 30 * 60;
+    const signature = crypto.createHmac("sha1", privateKey).update(token + expire).digest("hex");
+    return res.status(200).json({ token, expire, signature, publicKey });
+}
+
 export default async function handler(req, res) {
     if (req.method === "GET") {
         return handleExpireReservationsCron(req, res);
@@ -331,8 +348,9 @@ export default async function handler(req, res) {
     if (action === "release-reservation") return handleReleaseReservation(req, res);
     if (action === "convert-reservation") return handleConvertReservation(req, res);
     if (action === "cancel-order") return handleCancelOrder(req, res);
+    if (action === "imagekit-auth") return handleImageKitAuth(req, res);
 
     return res.status(400).json({
-        message: "action must be 'reserve', 'release-reservation', 'convert-reservation', or 'cancel-order'",
+        message: "action must be 'reserve', 'release-reservation', 'convert-reservation', 'cancel-order', or 'imagekit-auth'",
     });
 }

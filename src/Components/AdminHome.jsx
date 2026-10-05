@@ -23,6 +23,11 @@ const tiles = [
     description: "Manage centralized dhoti inventory and stock levels",
     route: "/admin/dhotis",
   },
+  {
+    title: "Image Compressor",
+    description: "Compress photos to WebP and upload to ImageKit for product pages",
+    route: "/admin/images",
+  },
 ];
 
 const AdminHome = () => {

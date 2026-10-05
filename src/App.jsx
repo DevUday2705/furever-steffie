@@ -48,6 +48,7 @@ import UploadKurtasPage from "./Components/UploadKurtasPage";
 import UniversalSearchBar from "./Components/UniversalSearch";
 import ProductForm from "./Components/ProductForm";
 import AdminHome from "./Components/AdminHome";
+import ImageCompressor from "./Components/ImageCompressor";
 import GlobalSettings from "./Components/GlobalSettings";
 import DhotiManagement from "./Components/DhotiManagement";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
@@ -199,6 +200,7 @@ const App = () => {
               <Route path="/admin/product" element={<AdminProducts />} />
               <Route path="/admin/settings" element={<GlobalSettings />} />
               <Route path="/admin/dhotis" element={<DhotiManagement />} />
+              <Route path="/admin/images" element={<ImageCompressor />} />
               <Route path="/admin/add/:category" element={<ProductForm />} />
               <Route path="/order-utility" element={<OrderUtility />} />
               <Route path="/daily-task" element={<DailyTaskSheet />} />
