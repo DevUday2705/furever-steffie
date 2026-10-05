@@ -56,13 +56,25 @@ async function compress(file, maxBytes) {
   }
 }
 
+// res.json() throws a cryptic "Unexpected end of JSON input" on an empty body,
+// which is what /api/stock returns under plain `vite dev` (no API there).
+async function readJson(res, what) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    const hint = what === "Auth" ? " The /api routes only exist on Vercel or 'vercel dev', not 'npm run dev'." : "";
+    throw new Error(`${what} returned an empty/invalid response (HTTP ${res.status}).${hint}`);
+  }
+}
+
 async function uploadToImageKit(blob, fileName, folder) {
   const authRes = await fetch("/api/stock", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "imagekit-auth" }),
   });
-  const auth = await authRes.json();
+  const auth = await readJson(authRes, "Auth");
   if (!authRes.ok) throw new Error(auth.message || "Auth failed");
 
   const form = new FormData();
@@ -75,7 +87,7 @@ async function uploadToImageKit(blob, fileName, folder) {
   form.append("expire", auth.expire);
   form.append("signature", auth.signature);
   const res = await fetch("https://upload.imagekit.io/api/v1/files/upload", { method: "POST", body: form });
-  const data = await res.json();
+  const data = await readJson(res, "ImageKit upload");
   if (!res.ok) throw new Error(data.message || "Upload failed");
   return data.url;
 }
