@@ -11,9 +11,18 @@ const isHeic = (f) => /\.(heic|heif)$/i.test(f.name) || /hei[cf]/i.test(f.type);
 
 async function toDecodable(file) {
   if (!isHeic(file)) return file;
-  const { default: heic2any } = await import("heic2any");
-  const out = await heic2any({ blob: file, toType: "image/jpeg", quality: 1 });
-  return Array.isArray(out) ? out[0] : out;
+  // heic-to ships a newer libheif that reads recent iPhone HEICs; heic2any's
+  // older build throws "ERR_LIBHEIF format not supported" on those, so it's
+  // only the fallback.
+  try {
+    const { heicTo } = await import("heic-to");
+    return await heicTo({ blob: file, type: "image/jpeg", quality: 1 });
+  } catch (err) {
+    console.warn("heic-to failed, trying heic2any", err);
+    const { default: heic2any } = await import("heic2any");
+    const out = await heic2any({ blob: file, toType: "image/jpeg", quality: 1 });
+    return Array.isArray(out) ? out[0] : out;
+  }
 }
 
 const canvasToWebp = (canvas, quality) =>
