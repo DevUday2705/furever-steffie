@@ -80,7 +80,7 @@ async function uploadToImageKit(blob, fileName, folder) {
   const form = new FormData();
   form.append("file", blob, fileName);
   form.append("fileName", fileName);
-  form.append("folder", `/${folder}`);
+  form.append("folder", folder ? `/${folder}` : "/");
   form.append("useUniqueFileName", "false");
   form.append("publicKey", auth.publicKey);
   form.append("token", auth.token);
@@ -132,7 +132,6 @@ const ImageCompressor = () => {
 
   const start = async () => {
     const safeFolder = folder.trim().replace(/^\/+|\/+$/g, "").replace(/[^\w/-]+/g, "-");
-    if (!safeFolder) return toast.error("Enter an ImageKit folder name first");
     const pending = items.filter((it) => it.status === "queued" || it.status === "error");
     if (!pending.length) return;
     setRunning(true);
@@ -169,7 +168,7 @@ const ImageCompressor = () => {
             <input
               value={folder}
               onChange={(e) => setFolder(e.target.value)}
-              placeholder="e.g. kurtas-oct"
+              placeholder="e.g. kurtas-oct (blank = ImageKit root)"
               className="mt-1 w-full border rounded-lg px-3 py-2"
             />
           </label>

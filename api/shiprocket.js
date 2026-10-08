@@ -222,12 +222,27 @@ async function handleCreateOrder(req, res) {
       billing_email: customer.email || "",
       billing_phone: customer.mobileNumber || "",
       shipping_is_billing: true,
-      order_items: (order.items || []).map((item) => ({
-        name: item.name || "Kurta",
-        sku: item.productId || item.name || "SKU",
-        units: item.quantity || 1,
-        selling_price: item.price || 0,
-      })),
+      order_items: (order.items || []).map((item, index, items) => {
+        // Shiprocket rejects duplicate SKUs within one order, which happens when
+        // the same product is ordered in several sizes. Include the size, and
+        // fall back to the line index if it's still not unique.
+        const baseSku = [item.productId || item.name || "SKU", item.selectedSize]
+          .filter(Boolean)
+          .join("-");
+        const isDuplicate = items.some(
+          (other, otherIndex) =>
+            otherIndex < index &&
+            [other.productId || other.name || "SKU", other.selectedSize]
+              .filter(Boolean)
+              .join("-") === baseSku,
+        );
+        return {
+          name: item.name || "Kurta",
+          sku: isDuplicate ? `${baseSku}-${index + 1}` : baseSku,
+          units: item.quantity || 1,
+          selling_price: item.price || 0,
+        };
+      }),
       payment_method: isCod ? "COD" : "Prepaid",
       sub_total: collectibleAmount,
       length: DEFAULT_DIMENSIONS_CM.length,
