@@ -17,6 +17,7 @@
     "@fontsource/open-sans": "^5.2.5",
     "@fontsource/share-tech": "^5.2.5",
     "@headlessui/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.117.3",
     "@tailwindcss/vite": "^4.0.0",
     "@vercel/functions": "^3.9.5",
     "dom-to-image": "^2.6.0",

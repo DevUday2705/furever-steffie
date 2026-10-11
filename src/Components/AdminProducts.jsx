@@ -35,7 +35,6 @@ import {
   FaFilter,
   FaSearch,
 } from "react-icons/fa";
-const ADMIN_KEY = "What@270598";
 const collections = [
   "kurtas",
   "frocks",
@@ -113,17 +112,6 @@ const AdminProducts = () => {
       activationConstraint: { delay: 200, tolerance: 8 },
     })
   );
-  const [passkey, setPasskey] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
-
-  const handleLogin = () => {
-    if (passkey === ADMIN_KEY) {
-      setIsAuthorized(true);
-    } else {
-      alert("Wrong admin key!");
-    }
-  };
-
   // Helper function to handle collection selection
   const handleCollectionSelect = (collectionName) => {
     setSelectedCollection(collectionName);
@@ -387,27 +375,6 @@ const AdminProducts = () => {
       alert("Failed to delete item");
     }
   };
-
-  // if (!isAuthorized) {
-  //   return (
-  //     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-  //       <h2 className="text-xl font-bold mb-4">Admin Access</h2>
-  //       <input
-  //         type="password"
-  //         placeholder="Enter admin passkey"
-  //         value={passkey}
-  //         onChange={(e) => setPasskey(e.target.value)}
-  //         className="border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full max-w-xs"
-  //       />
-  //       <button
-  //         onClick={handleLogin}
-  //         className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 w-full max-w-xs"
-  //       >
-  //         Enter
-  //       </button>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-gray-50">

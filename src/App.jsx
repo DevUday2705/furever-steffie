@@ -54,7 +54,7 @@ import DhotiManagement from "./Components/DhotiManagement";
 import InternationalPaymentPage from "./Components/InternationalPaymentPage";
 import OrderUtility from "./Components/OrderUtility";
 import OrderPauseModal from "./Components/OrderPauseModal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useOrderPause } from "./context/OrderPauseContext";
 import { initializeOrderPauseSettings } from "./utils/orderPauseUtils";
 import WhyUs from "./Components/WhyUs";
@@ -71,6 +71,10 @@ import WhatsAppTest from "./Components/WhatsAppTest";
 import SizeGuide from "./Components/SizeGuide";
 import PopupPoster from "./Components/PopupPoster";
 import AnniversaryApp from "./Components/AnniversaryApp";
+
+// Staff sign-in for the admin pages, loaded only when one is opened.
+const AdminGate = lazy(() => import("./Components/AdminGate"));
+
 const App = () => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
@@ -195,25 +199,33 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/thank-you" element={<ThankYouPage />} />
               <Route path="/search" element={<UniversalSearchBar/>} />
-              <Route path="/admin" element={<AdminHome />} />
-              <Route path="/admin/orders" element={<AdminPage />} />
-              <Route path="/admin/product" element={<AdminProducts />} />
-              <Route path="/admin/settings" element={<GlobalSettings />} />
-              <Route path="/admin/dhotis" element={<DhotiManagement />} />
-              <Route path="/admin/images" element={<ImageCompressor />} />
-              <Route path="/admin/add/:category" element={<ProductForm />} />
-              <Route path="/order-utility" element={<OrderUtility />} />
-              <Route path="/daily-task" element={<DailyTaskSheet />} />
-              <Route path="/test-email" element={<EmailTest />} />
-              <Route path="/test-whatsapp" element={<WhatsAppTest />} />
+              {/* Staff only - AdminGate asks for a sign-in first. */}
+              <Route
+                element={
+                  <Suspense fallback={null}>
+                    <AdminGate />
+                  </Suspense>
+                }
+              >
+                <Route path="/admin" element={<AdminHome />} />
+                <Route path="/admin/orders" element={<AdminPage />} />
+                <Route path="/admin/product" element={<AdminProducts />} />
+                <Route path="/admin/settings" element={<GlobalSettings />} />
+                <Route path="/admin/dhotis" element={<DhotiManagement />} />
+                <Route path="/admin/images" element={<ImageCompressor />} />
+                <Route path="/admin/add/:category" element={<ProductForm />} />
+                <Route
+                  path="/admin/edit/:category/:id"
+                  element={<ProductForm />}
+                />
+                <Route path="/order-utility" element={<OrderUtility />} />
+                <Route path="/daily-task" element={<DailyTaskSheet />} />
+                <Route path="/test-email" element={<EmailTest />} />
+                <Route path="/test-whatsapp" element={<WhatsAppTest />} />
+                <Route path="/fabric-management" element={<FabricManagementSystem />} />
+              </Route>
               <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="/anniversary" element={<AnniversaryApp />} />
-              <Route path="/fabric-management" element={<FabricManagementSystem />} />
-
-              <Route
-                path="/admin/edit/:category/:id"
-                element={<ProductForm />}
-              />
               <Route path="/payment-failed" element={<PaymentFailed />} />
             </Routes>
           </div>

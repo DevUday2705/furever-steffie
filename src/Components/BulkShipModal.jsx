@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Truck, Loader2, CheckCircle2, XCircle, Download } from "lucide-react";
+import { adminFetch } from "../utils/adminFetch";
 
 // Bulk-ship several orders at once: fetch the cheapest courier for each,
 // then create each shipment one at a time (kept sequential so we don't
@@ -39,7 +40,7 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
         }
 
         try {
-          const res = await fetch("/api/shiprocket", {
+          const res = await adminFetch("/api/shiprocket", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -77,7 +78,7 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
       setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "shipping" } : r)));
 
       try {
-        const resp = await fetch("/api/shiprocket", {
+        const resp = await adminFetch("/api/shiprocket", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -128,7 +129,7 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
     setDownloadError(null);
     setDownloadingIds(downloadKey);
     try {
-      const res = await fetch("/api/shiprocket", {
+      const res = await adminFetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "generate-labels", shipmentIds }),

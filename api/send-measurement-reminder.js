@@ -1,4 +1,5 @@
 import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
+import { requireAdmin } from '../lib/adminAuth.js';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => createEmailTransport();
@@ -131,6 +132,8 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Only POST method allowed' });
     }
+
+    if (!(await requireAdmin(req, res))) return;
 
     try {
         const { orderId, orderNumber, customer, items } = req.body;

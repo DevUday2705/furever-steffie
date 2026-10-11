@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { adminFetch } from "../utils/adminFetch";
 
 // Compresses images to WebP in the browser (highest quality that fits under the
 // size cap), then uploads them to ImageKit using a short-lived signature from
@@ -69,7 +70,7 @@ async function readJson(res, what) {
 }
 
 async function uploadToImageKit(blob, fileName, folder) {
-  const authRes = await fetch("/api/stock", {
+  const authRes = await adminFetch("/api/stock", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "imagekit-auth" }),

@@ -3,6 +3,7 @@ import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { resolveProductRef, adjustProductStock, adjustDhotiStock } from "../lib/stockLedger.js";
 import { releaseReservation } from "../lib/reservations.js";
+import { requireAdmin } from "../lib/adminAuth.js";
 
 // Vercel Hobby caps a deployment at 12 serverless functions - this used to
 // be its own file at api/cron/expire-reservations.js, folded in here (under
@@ -341,6 +342,9 @@ export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only GET (cron) or POST (actions) allowed" });
     }
+
+    // Every POST action is staff-only: the admin pages and the Steffie Admin app.
+    if (!(await requireAdmin(req, res))) return;
 
     const { action } = req.body;
 

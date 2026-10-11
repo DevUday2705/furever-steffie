@@ -1,5 +1,6 @@
 import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
 import { sendOrderConfirmationWhatsApp } from '../lib/whatsappNotify.js';
+import { requireAdmin } from '../lib/adminAuth.js';
 
 // Create transporter using Gmail SMTP
 const createTransporter = () => createEmailTransport();
@@ -168,6 +169,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Only POST method allowed' });
   }
+
+  // Order creation calls this directly (req.internal). Over HTTP it's the
+  // admin's "resend confirmation", so staff only.
+  if (!req.internal && !(await requireAdmin(req, res))) return;
 
   try {
     const orderData = req.body;

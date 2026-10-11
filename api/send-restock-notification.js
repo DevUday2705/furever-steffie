@@ -1,9 +1,12 @@
 import { createEmailTransport, getEmailFromAddress } from '../lib/emailTransport.js';
+import { requireAdmin } from '../lib/adminAuth.js';
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Only POST method allowed" });
     }
+
+    if (!(await requireAdmin(req, res))) return;
 
     try {
         const {

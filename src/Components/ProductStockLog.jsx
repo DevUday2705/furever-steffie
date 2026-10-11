@@ -3,6 +3,7 @@ import { collection, query, where, onSnapshot, limit } from "firebase/firestore"
 import toast from "react-hot-toast";
 import { CheckCircle2, RotateCcw, Clock } from "lucide-react";
 import { db } from "../firebase";
+import { adminFetch } from "../utils/adminFetch";
 
 const ALL_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "4XL", "6XL", "8XL"];
 
@@ -139,7 +140,7 @@ const ProductStockLog = ({ category, productId, productName, currentSizeStock })
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/stock", {
+      const res = await adminFetch("/api/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -176,7 +177,7 @@ const ProductStockLog = ({ category, productId, productName, currentSizeStock })
     if (confirmMessage && !window.confirm(confirmMessage)) return;
     setActingReservationId(reservationId);
     try {
-      const res = await fetch("/api/stock", {
+      const res = await adminFetch("/api/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, reservationId }),

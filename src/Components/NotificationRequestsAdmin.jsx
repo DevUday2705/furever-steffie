@@ -23,6 +23,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { adminFetch } from "../utils/adminFetch";
 
 const NotificationRequestsAdmin = () => {
   const [requests, setRequests] = useState([]);
@@ -89,7 +90,7 @@ const NotificationRequestsAdmin = () => {
     setSendingNotifications((prev) => new Set([...prev, requestId]));
 
     try {
-      const response = await fetch("/api/send-restock-notification", {
+      const response = await adminFetch("/api/send-restock-notification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -172,7 +173,7 @@ const NotificationRequestsAdmin = () => {
 
     for (const request of pendingRequests) {
       try {
-        const response = await fetch("/api/send-restock-notification", {
+        const response = await adminFetch("/api/send-restock-notification", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

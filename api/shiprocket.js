@@ -6,6 +6,7 @@ import {
   SHIPROCKET_BASE_URL,
 } from "../lib/shiprocketAuth.js";
 import { sendShippedNotificationWhatsApp } from "../lib/whatsappNotify.js";
+import { requireAdmin } from "../lib/adminAuth.js";
 
 // Creating a shipment is 2-3 sequential Shiprocket API calls plus Firestore
 // I/O - comfortably over Vercel's default 10s limit if Shiprocket is even
@@ -443,6 +444,9 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST method allowed" });
   }
+
+  // Every action here is staff-only (shipments cost money).
+  if (!(await requireAdmin(req, res))) return;
 
   const { action } = req.body;
 

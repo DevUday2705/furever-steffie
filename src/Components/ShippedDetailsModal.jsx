@@ -6,6 +6,7 @@ import {
   SHIPPING_TYPE_OPTIONS,
   getDeliveryEstimate,
 } from "../utils/courierInfo";
+import { adminFetch } from "../utils/adminFetch";
 
 const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onConfirm, onShiprocketConfirm }) => {
   const [mode, setMode] = useState("shiprocket"); // "shiprocket" | "manual"
@@ -33,7 +34,7 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
 
     setLoadingOptions(true);
     setOptionsError("");
-    fetch("/api/shiprocket", {
+    adminFetch("/api/shiprocket", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -15,8 +15,7 @@ import BulkShipModal from "./BulkShipModal";
 import { useOrderPause } from "../context/OrderPauseContext";
 import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
 import { downloadBlob } from "../utils/downloadBlob";
-
-const ADMIN_KEY = "Steffie@123";
+import { adminFetch } from "../utils/adminFetch";
 
 // An order counts as done once the "Shipped" checkbox is ticked. Orders
 // shipped before the checkbox existed have no `processed` field, so fall
@@ -25,8 +24,6 @@ const isOrderProcessed = (order) =>
   order?.processed ?? (order?.orderStatus === "shipped" || order?.orderStatus === "tracking-pending");
 
 const AdminPage = () => {
-  const [passkey, setPasskey] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
   // Internal notes per order (return/refund/exchange context) - keyed by
@@ -82,10 +79,9 @@ const AdminPage = () => {
   const [selectedOrders, setSelectedOrders] = useState(new Set());
   const [bulkShipModalOpen, setBulkShipModalOpen] = useState(false);
 
-  // Revenue visibility states for security
+  // Revenue stays hidden until toggled on, for when the screen is in view of
+  // others. Signing in to the admin is the security check.
   const [revenueVisible, setRevenueVisible] = useState(false);
-  const [revenuePassword, setRevenuePassword] = useState("");
-  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
 
   // Helper function to get dhoti details from product data
   const normalizeCollectionName = (rawCategory) => {
@@ -199,47 +195,14 @@ const AdminPage = () => {
     return styleMap[selectedStyle] || selectedStyle;
   };
 
-  const handleLogin = () => {
-    if (passkey === ADMIN_KEY) {
-      setIsAuthorized(true);
-    } else {
-      alert("Wrong admin key!");
-    }
-  };
-
-  // Revenue visibility handlers
-  const handleRevenuePasswordSubmit = () => {
-    if (revenuePassword === ADMIN_KEY) {
-      setRevenueVisible(true);
-      setShowPasswordPrompt(false);
-      setRevenuePassword("");
-      toast.success("Revenue data unlocked");
-    } else {
-      toast.error("Incorrect password");
-      setRevenuePassword("");
-    }
-  };
-
   const toggleRevenueVisibility = () => {
-    if (revenueVisible) {
-      setRevenueVisible(false);
-    } else {
-      setShowPasswordPrompt(true);
-    }
-  };
-
-  const handlePasswordKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleRevenuePasswordSubmit();
-    }
+    setRevenueVisible((visible) => !visible);
   };
 
   useEffect(() => {
-    if (isAuthorized) {
-      fetchOrders();
-      fetchProductData(); // Fetch product data for dhoti lookup
-    }
-  }, [isAuthorized]);
+    fetchOrders();
+    fetchProductData(); // Fetch product data for dhoti lookup
+  }, []);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -288,7 +251,7 @@ const AdminPage = () => {
         if (!window.confirm("Cancel this order? This restores every item's stock and logs it.")) {
           return;
         }
-        const res = await fetch("/api/stock", {
+        const res = await adminFetch("/api/stock", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "cancel-order", orderId }),
@@ -376,7 +339,7 @@ const AdminPage = () => {
       try {
         const order = orders.find((o) => o.id === orderId) || {};
 
-        const resp = await fetch("/api/send-shipped-notification", {
+        const resp = await adminFetch("/api/send-shipped-notification", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -419,7 +382,7 @@ const AdminPage = () => {
     if (!orderId) return;
 
     try {
-      const resp = await fetch("/api/shiprocket", {
+      const resp = await adminFetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "create-order", orderId, courierId }),
@@ -470,7 +433,7 @@ const AdminPage = () => {
     }
     setDownloadingDoc(orderRowId);
     try {
-      const res = await fetch("/api/shiprocket", {
+      const res = await adminFetch("/api/shiprocket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "generate-labels", shipmentIds: [shipmentId] }),
@@ -511,7 +474,7 @@ const AdminPage = () => {
   // they run in the background), so admin can retry on request.
   const handleResendConfirmation = async (order) => {
     try {
-      const res = await fetch("/api/send-order-confirmation", {
+      const res = await adminFetch("/api/send-order-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -623,7 +586,7 @@ const AdminPage = () => {
         "Put this order's items back into stock before deleting?\n\nOK = yes, return the stock (duplicate/test order)\nCancel = no, the items really went out"
       )
     ) {
-      const res = await fetch("/api/stock", {
+      const res = await adminFetch("/api/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "cancel-order", orderId }),
@@ -996,7 +959,7 @@ const AdminPage = () => {
         return;
       }
 
-      const response = await fetch("/api/send-measurement-reminder", {
+      const response = await adminFetch("/api/send-measurement-reminder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1292,27 +1255,6 @@ const AdminPage = () => {
     XLSX.writeFile(workbook, fileName);
     toast.success("Excel export downloaded");
   };
-
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-        <h2 className="text-xl font-bold mb-4">Admin Access</h2>
-        <input
-          type="password"
-          placeholder="Enter admin passkey"
-          value={passkey}
-          onChange={(e) => setPasskey(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-md shadow-sm w-full max-w-xs"
-        />
-        <button
-          onClick={handleLogin}
-          className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 w-full max-w-xs"
-        >
-          Enter
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white p-4">
@@ -2338,46 +2280,6 @@ const AdminPage = () => {
       
       {/* Analytics Tab */}
       {activeTab === "analytics" && <Analytics />}
-
-      {/* Password Prompt Modal */}
-      {showPasswordPrompt && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-w-[90%]">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              Enter Password to View Revenue Data
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              This information is sensitive and requires password verification.
-            </p>
-            <input
-              type="password"
-              value={revenuePassword}
-              onChange={(e) => setRevenuePassword(e.target.value)}
-              onKeyPress={handlePasswordKeyPress}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter admin password"
-              autoFocus
-            />
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => {
-                  setShowPasswordPrompt(false);
-                  setRevenuePassword("");
-                }}
-                className="px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRevenuePasswordSubmit}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Unlock
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <ShippedDetailsModal
         isOpen={!!shippedModalOrderId}
