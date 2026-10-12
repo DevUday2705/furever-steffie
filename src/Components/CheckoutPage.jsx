@@ -510,7 +510,7 @@ const CheckoutPage = () => {
     } else {
       // Domestic delivery charges
       if (formData.deliveryOption === "express") {
-        deliveryCharge = 399;
+        deliveryCharge = 299;
       } else if (formData.deliveryOption === "air") {
         deliveryCharge = 199;
       } else {
