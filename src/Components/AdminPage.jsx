@@ -273,14 +273,10 @@ const AdminPage = () => {
         }
         fetchOrders();
       } else {
-        // "Tracking Pending" means the parcel has already gone out, we're
-        // just waiting on the courier's tracking number - so it counts as
-        // shipped for the checkbox too.
-        const update = { orderStatus: newStatus };
-        if (newStatus === "tracking-pending") {
-          update.processed = true;
-          update.processedAt = new Date().toISOString();
-        }
+        // The Shipped checkbox is only ever ticked by hand. Write its current
+        // value explicitly so the legacy status fallback doesn't tick it.
+        const current = orders.find((o) => o.id === orderId);
+        const update = { orderStatus: newStatus, processed: current?.processed ?? false };
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, update);
 
@@ -305,15 +301,15 @@ const AdminPage = () => {
 
     try {
       const orderRef = doc(db, "orders", orderId);
-      const processedAt = new Date().toISOString();
+      // Keep the Shipped checkbox as it was; it's only ticked by hand.
+      const processed = orders.find((o) => o.id === orderId)?.processed ?? false;
       await updateDoc(orderRef, {
         orderStatus: "shipped",
         tracking_id: trackingId,
         shippingType,
         courierPartner,
         expectedDelivery,
-        processed: true,
-        processedAt,
+        processed,
       });
 
       setOrders((prev) =>
@@ -326,8 +322,7 @@ const AdminPage = () => {
                 shippingType,
                 courierPartner,
                 expectedDelivery,
-                processed: true,
-                processedAt,
+                processed,
               }
             : order
         )
@@ -404,7 +399,7 @@ const AdminPage = () => {
                 orderStatus: "shipped",
                 tracking_id: data.trackingId,
                 courierPartner: data.courierName,
-                processed: true,
+                processed: order.processed ?? false,
               }
             : order
         )
@@ -537,7 +532,7 @@ const AdminPage = () => {
     setOrders((prev) =>
       prev.map((order) =>
         order.id === orderId
-          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName, processed: true }
+          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName, processed: order.processed ?? false }
           : order
       )
     );
