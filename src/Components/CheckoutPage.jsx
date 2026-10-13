@@ -21,6 +21,7 @@ import { convertCurrency } from "../constants/currency";
 import { FOREIGN_PRICE_MULTIPLIER } from "../constants/geoPricing";
 import { CurrencyContext } from "../context/currencyContext";
 import mixpanel from "../hooks/mixpanel";
+import { NAVRATRI100_COUPON, isNavratri100Active } from "./NavratriBanner";
 
 // Utility function to calculate dispatch date (3 days from today)
 const calculateDispatchDate = () => {
@@ -119,6 +120,8 @@ const CheckoutPage = () => {
     FLAT100: "any", // ₹100 flat off for any customer
     WELCOME100: "first", // ₹100 flat off for first-time customers
     RETURN100: "repeat", // ₹100 flat off for repeat customers
+    // NAVRATRI100 - ₹100 flat off for anyone, unlimited uses, until NAVRATRI100_EXPIRY
+    ...(isNavratri100Active() ? { [NAVRATRI100_COUPON]: "any" } : {}),
   };
 
   // Special Navratri coupon - 5% discount on Navratri outfits only
@@ -215,7 +218,17 @@ const CheckoutPage = () => {
     setCustomCouponData(null);
     setCustomCouponId(null);
 
-    if (code === SINGLE_USE_COUPON) {
+    if (code === NAVRATRI100_COUPON) {
+      if (!isNavratri100Active()) {
+        setDiscount(0);
+        setCouponError("This coupon has expired.");
+        toast.error("❌ Coupon expired");
+        return;
+      }
+      setDiscount(0); // flat ₹100 handled via CUSTOMER_VALIDATION_COUPONS
+      setCouponError("");
+      toast.success("🎉 Navratri offer applied: ₹100 off");
+    } else if (code === SINGLE_USE_COUPON) {
       // Apply flat ₹750 discount without checking usage status
       setDiscount(0); // Set to 0 for percentage discount as we'll handle flat discount separately
       setCouponError("");

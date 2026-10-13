@@ -70,6 +70,7 @@ import EmailTest from "./Components/EmailTest";
 import WhatsAppTest from "./Components/WhatsAppTest";
 import SizeGuide from "./Components/SizeGuide";
 import PopupPoster from "./Components/PopupPoster";
+import NavratriBanner from "./Components/NavratriBanner";
 import AnniversaryApp from "./Components/AnniversaryApp";
 
 // Staff sign-in for the admin pages, loaded only when one is opened.
@@ -233,6 +234,8 @@ const App = () => {
       ) : (
         <ComingSoonPage />
       )}
+      {location.pathname === "/" && <NavratriBanner />}
+
       {/* {(ready || isAdminRoute) && location.pathname === "/" ? (
         <PopupPoster />
       ) : null} */}
