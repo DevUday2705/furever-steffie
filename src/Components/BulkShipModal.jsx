@@ -22,7 +22,9 @@ const BulkShipModal = ({ isOpen, orders, onCancel, onOrderShipped }) => {
 
     const initialRows = orders.map((order) => ({
       order,
-      status: order.orderStatus === "shipped" ? "already-shipped" : "fetching",
+      status: ["shipped", "shipping-booked", "tracking-pending"].includes(order.orderStatus)
+        ? "already-shipped"
+        : "fetching",
       courier: null,
       error: null,
       trackingId: null,

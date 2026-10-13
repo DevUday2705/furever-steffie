@@ -169,6 +169,7 @@ const TrackOrder = () => {
       case "cutting":
         return "text-purple-600 bg-purple-100";
       case "tracking-pending":
+      case "shipping-booked":
         return "text-amber-600 bg-amber-100";
       case "shipped":
         return "text-green-600 bg-green-100";
@@ -243,7 +244,8 @@ const TrackOrder = () => {
                       ? "bg-gray-400"
                       : order.orderStatus === "cutting"
                       ? "bg-yellow-500"
-                      : order.orderStatus === "tracking-pending"
+                      : order.orderStatus === "tracking-pending" ||
+                        order.orderStatus === "shipping-booked"
                       ? "bg-amber-500"
                       : order.orderStatus === "shipped"
                       ? "bg-green-600"
@@ -268,7 +270,8 @@ const TrackOrder = () => {
               )}
 
               {/* Shipping Information - Only show if order is shipped */}
-              {order.orderStatus === "shipped" && (
+              {(order.orderStatus === "shipped" ||
+                order.orderStatus === "shipping-booked") && (
                 <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center mb-2">
                     <svg

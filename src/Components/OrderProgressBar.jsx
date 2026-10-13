@@ -15,6 +15,10 @@ const OrderProgressBar = ({ status }) => {
     if (currentStatus === "tracking-pending") {
       return steps.findIndex((step) => step.key === "shipped");
     }
+    // Courier is booked but hasn't picked the parcel up yet
+    if (currentStatus === "shipping-booked") {
+      return steps.findIndex((step) => step.key === "ready-to-ship");
+    }
     return steps.findIndex((step) => step.key === currentStatus);
   };
 

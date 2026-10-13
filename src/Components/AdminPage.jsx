@@ -17,11 +17,18 @@ import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
 import { downloadBlob } from "../utils/downloadBlob";
 import { adminFetch } from "../utils/adminFetch";
 
-// An order counts as done once the "Shipped" checkbox is ticked. Orders
-// shipped before the checkbox existed have no `processed` field, so fall
-// back to their status for those.
-const isOrderProcessed = (order) =>
-  order?.processed ?? (order?.orderStatus === "shipped" || order?.orderStatus === "tracking-pending");
+// Orders only move pending -> shipping-booked -> shipped now. Older orders
+// can still carry retired statuses, so map those onto the three that are
+// left: the old in-progress ones are still pending, and an old "shipped"
+// whose Shipped checkbox was never ticked was only booked, not sent out.
+const getOrderStatus = (order) => {
+  const status = order?.orderStatus;
+  if (status === "cancelled" || status === "shipping-booked") return status;
+  if (status === "shipped" || status === "tracking-pending") {
+    return order?.processed === false ? "shipping-booked" : "shipped";
+  }
+  return "pending";
+};
 
 const AdminPage = () => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
@@ -62,7 +69,6 @@ const AdminPage = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [measurementFilter, setMeasurementFilter] = useState("all");
   const [collaborationFilter, setCollaborationFilter] = useState("all");
-  const [processedFilter, setProcessedFilter] = useState("all");
 
   // Measurements editing states
   const [editingMeasurements, setEditingMeasurements] = useState(null); // {orderId, itemIndex}
@@ -241,56 +247,28 @@ const AdminPage = () => {
     }
   };
 
+  // Moving between pending / shipping-booked / shipped by hand. Booking a
+  // shipment goes through the "Book Shipment" button instead, since it needs
+  // courier details. `processed` is kept in step so getOrderStatus reads it
+  // the same way it reads older orders.
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      if (newStatus === "shipped") {
-        // Ask admin for shipping type, courier partner & tracking number via modal
-        setShippedModalOrderId(orderId);
-        return;
-      } else if (newStatus === "cancelled") {
-        if (!window.confirm("Cancel this order? This restores every item's stock and logs it.")) {
-          return;
-        }
-        const res = await adminFetch("/api/stock", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "cancel-order", orderId }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          toast.error(data.message || "Failed to cancel order");
-          return;
-        }
-        setOrders((prev) =>
-          prev.map((order) =>
-            order.id === orderId ? { ...order, orderStatus: "cancelled", stockRestored: true } : order
-          )
-        );
-        if (data.failures?.length) {
-          toast(`Cancelled, but some stock couldn't auto-restore: ${data.failures.join("; ")}`, { icon: "⚠️" });
-        } else {
-          toast.success("Order cancelled and stock restored");
-        }
-        fetchOrders();
-      } else {
-        // The Shipped checkbox is only ever ticked by hand. Write its current
-        // value explicitly so the legacy status fallback doesn't tick it.
-        const current = orders.find((o) => o.id === orderId);
-        const update = { orderStatus: newStatus, processed: current?.processed ?? false };
-        const orderRef = doc(db, "orders", orderId);
-        await updateDoc(orderRef, update);
+      const update = {
+        orderStatus: newStatus,
+        processed: newStatus === "shipped",
+        processedAt: newStatus === "shipped" ? new Date().toISOString() : null,
+      };
+      await updateDoc(doc(db, "orders", orderId), update);
 
-        setOrders((prev) =>
-          prev.map((order) =>
-            order.id === orderId ? { ...order, ...update } : order
-          )
-        );
-        toast.success("Status updated");
-        fetchOrders();
-      }
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, ...update } : order
+        )
+      );
+      toast.success("Status updated");
     } catch (err) {
       console.error("Error updating status:", err);
-      alert("Failed to update status. Try again.");
+      toast.error("Failed to update status. Try again.");
     }
   };
 
@@ -301,15 +279,13 @@ const AdminPage = () => {
 
     try {
       const orderRef = doc(db, "orders", orderId);
-      // Keep the Shipped checkbox as it was; it's only ticked by hand.
-      const processed = orders.find((o) => o.id === orderId)?.processed ?? false;
       await updateDoc(orderRef, {
-        orderStatus: "shipped",
+        orderStatus: "shipping-booked",
         tracking_id: trackingId,
         shippingType,
         courierPartner,
         expectedDelivery,
-        processed,
+        processed: false,
       });
 
       setOrders((prev) =>
@@ -317,17 +293,17 @@ const AdminPage = () => {
           order.id === orderId
             ? {
                 ...order,
-                orderStatus: "shipped",
+                orderStatus: "shipping-booked",
                 tracking_id: trackingId,
                 shippingType,
                 courierPartner,
                 expectedDelivery,
-                processed,
+                processed: false,
               }
             : order
         )
       );
-      toast.success("Tracking details saved & status updated");
+      toast.success("Shipment booked & tracking details saved");
       setShippedModalOrderId(null);
 
       // Send shipped notification email to customer
@@ -396,16 +372,16 @@ const AdminPage = () => {
           order.id === orderId
             ? {
                 ...order,
-                orderStatus: "shipped",
+                orderStatus: "shipping-booked",
                 tracking_id: data.trackingId,
                 courierPartner: data.courierName,
-                processed: order.processed ?? false,
+                processed: false,
               }
             : order
         )
       );
 
-      toast.success(`Shipped via ${data.courierName} — tracking ${data.trackingId}. Customer notified.`);
+      toast.success(`Booked with ${data.courierName} — tracking ${data.trackingId}. Customer notified.`);
       setShippedModalOrderId(null);
       fetchOrders();
     } catch (err) {
@@ -532,33 +508,10 @@ const AdminPage = () => {
     setOrders((prev) =>
       prev.map((order) =>
         order.id === orderId
-          ? { ...order, orderStatus: "shipped", tracking_id: trackingId, courierPartner: courierName, processed: order.processed ?? false }
+          ? { ...order, orderStatus: "shipping-booked", tracking_id: trackingId, courierPartner: courierName, processed: false }
           : order
       )
     );
-  };
-
-  // "Shipped" checkbox - a manual "this one's done, stop worrying about it"
-  // marker for orders that went out without an immediate tracking number
-  // (international, local couriers etc). Ticked automatically whenever the
-  // order is shipped through the app.
-  const handleProcessedToggle = async (orderId) => {
-    const order = orders.find((o) => o.id === orderId);
-    const newProcessed = !isOrderProcessed(order);
-    const update = {
-      processed: newProcessed,
-      processedAt: newProcessed ? new Date().toISOString() : null,
-    };
-    try {
-      await updateDoc(doc(db, "orders", orderId), update);
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, ...update } : o))
-      );
-      toast.success(newProcessed ? "Marked as shipped" : "Marked as not shipped");
-    } catch (error) {
-      console.error("Error updating shipped checkbox:", error);
-      toast.error("Failed to update. Please try again.");
-    }
   };
 
   const handleDeleteOrder = async (orderId, customerName) => {
@@ -1053,11 +1006,7 @@ const AdminPage = () => {
 
       // Status filter
       const matchesStatus =
-        statusFilter === "all" ||
-        (order.orderStatus === statusFilter &&
-          // An order with the Shipped checkbox ticked is already out the
-          // door, so it isn't "pending" any more.
-          !(statusFilter === "pending" && isOrderProcessed(order)));
+        statusFilter === "all" || getOrderStatus(order) === statusFilter;
 
       // Date filter
       const orderDate = new Date(order.createdAt);
@@ -1098,17 +1047,9 @@ const AdminPage = () => {
         }
       }
 
-      // Shipped checkbox filter
-      let matchesProcessed = true;
-      if (processedFilter === "shipped") {
-        matchesProcessed = isOrderProcessed(order);
-      } else if (processedFilter === "not-shipped") {
-        matchesProcessed = !isOrderProcessed(order);
-      }
-
       return (
-        matchesSearch && matchesStatus && matchesDate && matchesMeasurement && 
-        matchesCollaboration && matchesProcessed
+        matchesSearch && matchesStatus && matchesDate && matchesMeasurement &&
+        matchesCollaboration
       );
     })
     .sort((a, b) => {
@@ -1152,25 +1093,9 @@ const AdminPage = () => {
     total: filteredAndSortedOrders.length,
     pinned: filteredAndSortedOrders.filter((o) => o.pinned).length,
     collaboration: filteredAndSortedOrders.filter((o) => o.isCollaboration === true).length,
-    pending: filteredAndSortedOrders.filter((o) => o.orderStatus === "pending")
-      .length,
-    workInProgress: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "work-in-progress"
-    ).length,
-    cutting: filteredAndSortedOrders.filter((o) => o.orderStatus === "cutting")
-      .length,
-    readyToShip: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "ready-to-ship"
-    ).length,
-    shippedTrackingPending: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus === "tracking-pending"
-    ).length,
-    shipped: filteredAndSortedOrders.filter((o) => o.orderStatus === "shipped")
-      .length,
-    notShippedYet: filteredAndSortedOrders.filter(
-      (o) => o.orderStatus !== "cancelled" && !isOrderProcessed(o)
-    ).length,
-    shippedChecked: filteredAndSortedOrders.filter((o) => isOrderProcessed(o)).length,
+    pending: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "pending").length,
+    shippingBooked: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "shipping-booked").length,
+    shipped: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "shipped").length,
     internationalOrders: filteredAndSortedOrders.filter((o) => o.customer?.country && o.customer.country.toLowerCase() !== "india").length,
     totalAmount: filteredAndSortedOrders.reduce(
       (sum, order) => sum + (Number(order.amount) || 0),
@@ -1329,49 +1254,27 @@ const AdminPage = () => {
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">In Progress</p>
-              <p className="text-lg font-bold text-yellow-500">
-                {orderStats.workInProgress}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Cutting</p>
-              <p className="text-lg font-bold text-orange-500">
-                {orderStats.cutting}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-xs text-gray-500">Ready </p>
+              <p className="text-xs text-gray-500">Shipping Booked</p>
               <p className="text-lg font-bold text-indigo-500">
-                {orderStats.readyToShip}
+                {orderStats.shippingBooked}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">Shipped</p>
+              <p className="text-lg font-bold text-green-600">
+                {orderStats.shipped}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">🌍 International</p>
+              <p className="text-lg font-bold text-blue-500">
+                {orderStats.internationalOrders}
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
               <p className="text-xs text-gray-500">Revenue</p>
               <p className="text-lg font-bold text-green-600">
                 ₹{orderStats.totalAmount.toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          {/* Shipped checkbox stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-orange-200">
-              <p className="text-xs text-orange-600">⏳ Not shipped yet</p>
-              <p className="text-lg font-bold text-orange-600">
-                {orderStats.notShippedYet}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-green-200">
-              <p className="text-xs text-green-700">✅ Shipped</p>
-              <p className="text-lg font-bold text-green-600">
-                {orderStats.shippedChecked}
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-blue-200">
-              <p className="text-xs text-blue-600">🌍 International Orders</p>
-              <p className="text-lg font-bold text-blue-500">
-                {orderStats.internationalOrders}
               </p>
             </div>
           </div>
@@ -1429,8 +1332,6 @@ const AdminPage = () => {
             setMeasurementFilter={setMeasurementFilter}
             collaborationFilter={collaborationFilter}
             setCollaborationFilter={setCollaborationFilter}
-            processedFilter={processedFilter}
-            setProcessedFilter={setProcessedFilter}
             onDateRangeChange={handleDateRangeChange}
           />
 
@@ -1599,7 +1500,7 @@ const AdminPage = () => {
                       : order.pinned
                       ? "border-l-4 border-l-amber-400 bg-amber-50/30"
                       : "border-gray-200"
-                  } ${isOrderProcessed(order) ? "opacity-60" : ""} ${
+                  } ${getOrderStatus(order) === "shipped" ? "opacity-60" : ""} ${
                     selectedOrders.has(order.id)
                       ? "ring-2 ring-blue-500 bg-blue-50/50"
                       : ""
@@ -1694,22 +1595,6 @@ const AdminPage = () => {
                     </div>
                     <div className="text-right">
                       <div className="flex items-center gap-2 justify-end mb-2">
-                        <label
-                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold cursor-pointer select-none ${
-                            isOrderProcessed(order)
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                          title="Tick once this order has been sent out - even if there's no tracking number yet"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isOrderProcessed(order)}
-                            onChange={() => handleProcessedToggle(order.id)}
-                            className="w-4 h-4 accent-green-600 cursor-pointer"
-                          />
-                          Shipped
-                        </label>
                         <button
                           onClick={() => handlePinToggle(order.id)}
                           className={`p-2 rounded-full transition-colors ${
@@ -1750,46 +1635,48 @@ const AdminPage = () => {
                       <label className="text-gray-500"> Order Status: </label>
                       <div className="flex items-center gap-2 mt-1">
                         <span
-                          className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold
-                      ${
-                        order.orderStatus === "pending"
-                          ? "bg-gray-400"
-                          : order.orderStatus === "work-in-progress"
-                          ? "bg-yellow-500"
-                          : order.orderStatus === "cutting"
-                          ? "bg-orange-500"
-                          : order.orderStatus === "ready-to-ship"
-                          ? "bg-indigo-500"
-                          : order.orderStatus === "tracking-pending"
-                          ? "bg-amber-500"
-                          : order.orderStatus === "shipped"
-                          ? "bg-green-600"
-                          : "bg-gray-300"
-                      }
-                    `}
+                          className={`px-2 py-1 rounded-full text-white text-[10px] font-semibold ${
+                            getOrderStatus(order) === "shipped"
+                              ? "bg-green-600"
+                              : getOrderStatus(order) === "shipping-booked"
+                              ? "bg-indigo-500"
+                              : getOrderStatus(order) === "cancelled"
+                              ? "bg-red-500"
+                              : "bg-gray-400"
+                          }`}
                         >
-                          {order.orderStatus}
+                          {getOrderStatus(order)}
                         </span>
 
-                        <select
-                          value={order.orderStatus}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value)
-                          }
-                          className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="work-in-progress">
-                            Work in Progress
-                          </option>
-                          <option value="cutting">Cutting</option>
-                          <option value="ready-to-ship">Ready to Ship</option>
-                          <option value="tracking-pending">
-                            Tracking Pending
-                          </option>
-                          <option value="shipped">shipped</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
+                        {getOrderStatus(order) !== "cancelled" && (
+                          <select
+                            value={getOrderStatus(order)}
+                            onChange={(e) =>
+                              handleStatusChange(order.id, e.target.value)
+                            }
+                            className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
+                          >
+                            <option value="pending">Pending</option>
+                            {/* Only reachable through Book Shipment, which
+                                collects the courier/tracking details. */}
+                            <option
+                              value="shipping-booked"
+                              disabled={getOrderStatus(order) !== "shipping-booked"}
+                            >
+                              Shipping Booked
+                            </option>
+                            <option value="shipped">Shipped</option>
+                          </select>
+                        )}
+
+                        {getOrderStatus(order) === "pending" && (
+                          <button
+                            onClick={() => setShippedModalOrderId(order.id)}
+                            className="text-xs font-semibold bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                          >
+                            🚚 Book Shipment
+                          </button>
+                        )}
                       </div>
                     </div>
 

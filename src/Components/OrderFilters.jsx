@@ -12,8 +12,6 @@ const OrderFilters = ({
   setMeasurementFilter,
   collaborationFilter,
   setCollaborationFilter,
-  processedFilter,
-  setProcessedFilter,
   onDateRangeChange,
 }) => {
   // Get current month start and today's date as defaults
@@ -119,28 +117,8 @@ const OrderFilters = ({
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
-            <option value="cutting">Cutting</option>
-            <option value="ready-to-ship">Ready to Ship</option>
-            <option value="tracking-pending">
-              Tracking Pending
-            </option>
+            <option value="shipping-booked">Shipping Booked</option>
             <option value="shipped">Shipped</option>
-          </select>
-        </div>
-
-        {/* Shipped checkbox filter */}
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">
-            ✅ Shipped
-          </label>
-          <select
-            value={processedFilter}
-            onChange={(e) => setProcessedFilter(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-          >
-            <option value="all">All Orders</option>
-            <option value="not-shipped">⏳ Not shipped yet</option>
-            <option value="shipped">✅ Shipped</option>
           </select>
         </div>
 

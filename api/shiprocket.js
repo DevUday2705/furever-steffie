@@ -332,15 +332,14 @@ async function handleCreateOrder(req, res) {
     );
 
     const updateData = {
-      orderStatus: "shipped",
+      // Booked, not yet handed over - the admin moves it to "shipped" by
+      // hand once it's actually picked up.
+      orderStatus: "shipping-booked",
       tracking_id: awbCode,
       courierPartner: courierName,
       shiprocketOrderId,
       shiprocketShipmentId: shipmentId,
-      // The admin page's "Shipped" checkbox is ticked by hand only. Write
-      // the current value explicitly, because a missing field makes a
-      // "shipped" order show as ticked.
-      processed: order.processed ?? false,
+      processed: false,
     };
     await orderRef.update(updateData);
 
