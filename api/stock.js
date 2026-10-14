@@ -357,6 +357,17 @@ const PUBLIC_DOCS = {
 // an on/off switch staff flip and expect to bite quickly, so it's short.
 const CATALOG_CDN_SECONDS = 15 * 60;
 const ORDER_PAUSE_CDN_SECONDS = 60;
+// When Firestore refuses (e.g. quota used up), the admin SDK keeps retrying
+// until Vercel kills the function at 10s - give up first and answer cleanly.
+const CATALOG_FIRESTORE_TIMEOUT_MS = 6000;
+
+function withinCatalogTimeout(promise) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("Firestore took too long")), CATALOG_FIRESTORE_TIMEOUT_MS);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 async function handlePublicCatalog(req, res) {
     const name = String(req.query.catalog);
@@ -368,10 +379,10 @@ async function handlePublicCatalog(req, res) {
     try {
         let body;
         if (docPath) {
-            const snap = await db.collection(docPath[0]).doc(docPath[1]).get();
+            const snap = await withinCatalogTimeout(db.collection(docPath[0]).doc(docPath[1]).get());
             body = snap.exists ? snap.data() : null;
         } else {
-            const snap = await db.collection(name).get();
+            const snap = await withinCatalogTimeout(db.collection(name).get());
             body = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         }
 
