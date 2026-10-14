@@ -1,9 +1,14 @@
-import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
-import { db } from "../firebase";
+import { getCatalog } from "../utils/catalog";
 
+// Highest priorityScore first, like Firestore's orderBy("priorityScore",
+// "desc") - which also leaves out products that have no score at all.
+const byPriority = (products) =>
+  products
+    .filter((p) => p.priorityScore !== undefined)
+    .sort((a, b) => b.priorityScore - a.priorityScore || (a.id < b.id ? 1 : -1));
 
-
-
+// Home page, trending strip and cart recommendations all call this, so it
+// works from the shared cached catalog rather than querying Firestore.
 export const getTopProductsByGender = async (gender) => {
   const collectionMap = {
     male: ['kurtas', 'pathanis'],
@@ -14,42 +19,13 @@ export const getTopProductsByGender = async (gender) => {
   const topProducts = [];
 
   for (const category of categories) {
-    let q;
+    const ranked = byPriority(await getCatalog(category)).map((product) => ({ ...product, category }));
 
     if (gender === "male") {
-      // Fetch more documents and filter client-side
-      q = query(
-        collection(db, category),
-        orderBy("priorityScore", "desc"),
-        limit(20) // Fetch more to account for filtering
-      );
-
-      const snapshot = await getDocs(q);
-      const products = snapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          category,
-        }))
-        .filter(product => product.isRoyal === true) // Filter for royal products
-        .slice(0, 4); // Take only top 4
-
-      topProducts.push(...products);
+      // Royal products from the top 20
+      topProducts.push(...ranked.slice(0, 20).filter((product) => product.isRoyal === true).slice(0, 4));
     } else {
-      // For female products, keep original query
-      q = query(
-        collection(db, category),
-        orderBy("priorityScore", "desc"),
-        limit(4)
-      );
-
-      const snapshot = await getDocs(q);
-      const products = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        category,
-      }));
-      topProducts.push(...products);
+      topProducts.push(...ranked.slice(0, 4));
     }
   }
 

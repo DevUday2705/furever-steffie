@@ -334,8 +334,60 @@ function handleImageKitAuth(req, res) {
     return res.status(200).json({ token, expire, signature, publicKey });
 }
 
+// The storefront's product data, served through Vercel's CDN. Every visitor
+// used to read whole collections straight from Firestore - roughly 80-120
+// reads to open the home page or a product - so one viral reel used up the
+// free 50k-a-day read quota before lunch. Cached here, all visitors share
+// one Firestore read of each collection per cache window, however many
+// there are. Lives in this file for the same 12-function cap reason.
+//
+// Stale stock for a few minutes is safe: create-order re-checks live stock
+// before taking payment. Only names listed here can be read - never orders,
+// customers or anything else.
+const PUBLIC_COLLECTIONS = new Set([
+    "kurtas", "pathanis", "tuxedos", "frocks", "lehengas", "tuts", "dhotiss",
+    "male-bandanas", "female-bandanas", "bandanas", "bow-tie", "bowss",
+]);
+const PUBLIC_DOCS = {
+    "dhoti-inventory": ["dhotis", "inventory"],
+    "settings": ["settings", "global"],
+    "order-pause": ["settings", "orderPause"],
+};
+// Seconds the CDN serves a copy before fetching a fresh one. Order pause is
+// an on/off switch staff flip and expect to bite quickly, so it's short.
+const CATALOG_CDN_SECONDS = 15 * 60;
+const ORDER_PAUSE_CDN_SECONDS = 60;
+
+async function handlePublicCatalog(req, res) {
+    const name = String(req.query.catalog);
+    const docPath = PUBLIC_DOCS[name];
+    if (!docPath && !PUBLIC_COLLECTIONS.has(name)) {
+        return res.status(404).json({ message: `No public catalog called "${name}"` });
+    }
+
+    try {
+        let body;
+        if (docPath) {
+            const snap = await db.collection(docPath[0]).doc(docPath[1]).get();
+            body = snap.exists ? snap.data() : null;
+        } else {
+            const snap = await db.collection(name).get();
+            body = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        }
+
+        const seconds = name === "order-pause" ? ORDER_PAUSE_CDN_SECONDS : CATALOG_CDN_SECONDS;
+        res.setHeader("Cache-Control", `public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=86400`);
+        return res.status(200).json(body);
+    } catch (error) {
+        console.error(`❌ catalog ${name} error:`, error.message);
+        res.setHeader("Cache-Control", "no-store");
+        return res.status(503).json({ message: "Catalog temporarily unavailable" });
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method === "GET") {
+        if (req.query?.catalog) return handlePublicCatalog(req, res);
         return handleExpireReservationsCron(req, res);
     }
 

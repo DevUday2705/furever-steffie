@@ -9,8 +9,7 @@ import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
 import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { getCatalog, getLiveProduct } from "../utils/catalog";
 import {
   getAvailableDhotisForSize,
   getGlobalSettings,
@@ -139,12 +138,14 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const snapshot = await getDocs(collection(db, typePart + "s")); // e.g. "kurtas"
-        const allProducts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        const foundProduct = allProducts.find((p) => p.id === idPart);
+        const collectionName = typePart + "s"; // e.g. "kurtas"
+        // The cached category - the same copy the listing pages use, so this
+        // usually costs nothing. Only a product too new to be in the cache
+        // yet (a link shared minutes after adding it) is read live, alone.
+        const allProducts = await getCatalog(collectionName);
+        const foundProduct =
+          allProducts.find((p) => p.id === idPart) ??
+          (await getLiveProduct(collectionName, idPart));
 
         if (foundProduct) {
           setProduct(foundProduct);

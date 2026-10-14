@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { getCatalog } from "../utils/catalog";
 
+// Storefront listings - served from the cached catalog, not Firestore.
 export const useFirestoreCollection = (collectionName) => {
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -11,12 +11,7 @@ export const useFirestoreCollection = (collectionName) => {
         const fetchCollection = async () => {
             setIsLoading(true);
             try {
-                const snapshot = await getDocs(collection(db, collectionName));
-                const documents = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setData(documents);
+                setData(await getCatalog(collectionName));
             } catch (err) {
                 console.error(`Error fetching ${collectionName}:`, err);
                 setError(err);

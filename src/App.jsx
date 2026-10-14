@@ -56,7 +56,6 @@ import OrderUtility from "./Components/OrderUtility";
 import OrderPauseModal from "./Components/OrderPauseModal";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useOrderPause } from "./context/OrderPauseContext";
-import { initializeOrderPauseSettings } from "./utils/orderPauseUtils";
 import WhyUs from "./Components/WhyUs";
 import AboutUs from "./Components/AboutUs";
 import AdminProducts from "./Components/AdminProducts";
@@ -82,11 +81,6 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const ready = true; // Set to false to show coming soon for non-admin pages
-
-  // Initialize Firebase order pause settings on app start
-  useEffect(() => {
-    initializeOrderPauseSettings();
-  }, []);
 
   // Order pause modal state
   const [showOrderPauseModal, setShowOrderPauseModal] = useState(false);

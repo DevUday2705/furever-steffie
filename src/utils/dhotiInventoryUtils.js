@@ -3,6 +3,7 @@
 
 import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getCatalog } from './catalog';
 
 // Centralized dhoti inventory structure
 export const initializeDhotiInventory = async () => {
@@ -72,18 +73,13 @@ export const initializeGlobalSettings = async () => {
   }
 };
 
-// Utility functions for dhoti inventory management
+// Utility functions for dhoti inventory management. These two are only used
+// by storefront pages, so they come from the cached catalog (see
+// utils/catalog.js) - a few minutes stale at most, and create-order re-checks
+// live stock before payment. Admin screens read these documents directly.
 export const getDhotiInventory = async () => {
   try {
-    const docRef = doc(db, 'dhotis', 'inventory');
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      return docSnap.data();
-    } else {
-      console.log('No dhoti inventory found');
-      return null;
-    }
+    return await getCatalog('dhoti-inventory');
   } catch (error) {
     console.error('Error fetching dhoti inventory:', error);
     return null;
@@ -92,15 +88,7 @@ export const getDhotiInventory = async () => {
 
 export const getGlobalSettings = async () => {
   try {
-    const docRef = doc(db, 'settings', 'global');
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      return docSnap.data();
-    } else {
-      console.log('No global settings found');
-      return null;
-    }
+    return await getCatalog('settings');
   } catch (error) {
     console.error('Error fetching global settings:', error);
     return null;

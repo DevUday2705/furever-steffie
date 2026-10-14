@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { getCatalog } from "../utils/catalog";
 
 const OrderPauseContext = createContext();
 
@@ -12,44 +13,64 @@ export const useOrderPause = () => {
   return context;
 };
 
+// Customers get the switch from the CDN-cached catalog (at most a minute
+// old) instead of a live Firestore listener each - those listeners were a
+// read per visitor. It's checked again whenever they come back to the tab.
+// Staff on admin pages read it live so the toggle always shows the truth.
+async function readOrderPause() {
+  if (window.location.pathname.startsWith("/admin")) {
+    const snap = await getDoc(doc(db, "settings", "orderPause"));
+    return snap.exists() ? snap.data() : null;
+  }
+  return getCatalog("order-pause", { fresh: true });
+}
+
 export const OrderPauseProvider = ({ children }) => {
   const [ordersArePaused, setOrdersArePausedState] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Listen to Firebase for real-time updates
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, "settings", "orderPause"),
-      (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          setOrdersArePausedState(data.ordersArePaused || false);
-        } else {
-          // If document doesn't exist, orders are not paused by default
-          setOrdersArePausedState(false);
-        }
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error listening to order pause status:", error);
-        // On error, assume orders are not paused
-        setOrdersArePausedState(false);
-        setLoading(false);
-      }
-    );
+    let cancelled = false;
+    const load = () =>
+      readOrderPause()
+        .then((data) => {
+          // No document means orders are not paused
+          if (!cancelled) setOrdersArePausedState(data?.ordersArePaused || false);
+        })
+        .catch((error) => {
+          console.error("Error loading order pause status:", error);
+          // On error, assume orders are not paused
+          if (!cancelled) setOrdersArePausedState(false);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
 
-    return () => unsubscribe();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+
+    load();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   // Function to update Firebase
   const setOrdersArePaused = async (pauseStatus) => {
     try {
-      await updateDoc(doc(db, "settings", "orderPause"), {
-        ordersArePaused: pauseStatus,
-        updatedAt: new Date().toISOString(),
-        updatedBy: "admin", // You can make this dynamic based on who's updating
-      });
-      // State will be updated automatically via the listener
+      await setDoc(
+        doc(db, "settings", "orderPause"),
+        {
+          ordersArePaused: pauseStatus,
+          updatedAt: new Date().toISOString(),
+          updatedBy: "admin", // You can make this dynamic based on who's updating
+        },
+        { merge: true }
+      );
+      setOrdersArePausedState(pauseStatus);
     } catch (error) {
       console.error("Error updating order pause status:", error);
       throw error; // Re-throw so the UI can handle the error

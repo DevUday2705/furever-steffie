@@ -1,6 +1,5 @@
 // useSearchSuggestions.js
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import { getCatalog } from "../utils/catalog";
 
 export const useSearchSuggestions = () => {
     const collections = ["kurtas", "frocks", "bandanas", "tuxedos", "tuts", "lehengas"];
@@ -18,20 +17,21 @@ export const useSearchSuggestions = () => {
             return totalStock > 0;
         };
 
+        // Runs on every keystroke, so it searches the cached catalog (loaded
+        // once per visit) - it used to re-read all six collections from
+        // Firestore for each letter typed.
         await Promise.all(
             collections.map(async (col) => {
-                const snapshot = await getDocs(collection(db, col));
-                const matches = snapshot.docs.filter((doc) => {
-                    const productData = doc.data();
-                    return productData.name.toLowerCase().includes(lowerQuery) && 
+                const products = await getCatalog(col);
+                const matches = products.filter((productData) => {
+                    return (productData.name || "").toLowerCase().includes(lowerQuery) &&
                            isProductInStock(productData);
                 });
                 if (matches.length > 0) {
                     // Return product data with thumbnails instead of just count
-                    result[col.slice(0, -1)] = matches.map(doc => {
-                        const productData = doc.data();
+                    result[col.slice(0, -1)] = matches.map((productData) => {
                         return {
-                            id: doc.id,
+                            id: productData.id,
                             name: productData.name,
                             mainImage: productData.mainImage,
                             type: productData.type || col.slice(0, -1), // fallback to category name
