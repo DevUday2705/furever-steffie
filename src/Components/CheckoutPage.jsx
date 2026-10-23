@@ -17,7 +17,7 @@ import { db } from "../firebase";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 import { validateForm } from "../constants/constant";
-import { convertCurrency } from "../constants/currency";
+import { convertCurrency, formatAmount } from "../constants/currency";
 import { FOREIGN_PRICE_MULTIPLIER } from "../constants/geoPricing";
 import { CurrencyContext } from "../context/currencyContext";
 import mixpanel from "../hooks/mixpanel";
@@ -88,8 +88,10 @@ const CheckoutPage = () => {
     // Defaults to whatever country was detected while browsing (see
     // CurrencyContext) so the foreign price markup they already saw stays
     // consistent at checkout instead of silently reverting to Indian pricing.
-    // Still fully editable - this is just the starting guess.
-    country: detectedCountry || "india",
+    // Still fully editable - this is just the starting guess. Only trusted
+    // while the visitor is still browsing in a foreign currency; anyone on
+    // INR starts at India.
+    country: currency !== "INR" && detectedCountry ? detectedCountry : "india",
   });
 
   // Validation state
@@ -167,14 +169,32 @@ const CheckoutPage = () => {
     newzealand: "NZD",
     canada: "CAD",
     dubai: "AED",
-    australia: "AUD",
-    germany: "EUR",
-    france: "EUR",
-    netherlands: "EUR",
-    japan: "JPY",
-    southkorea: "KRW",
-    hongkong: "HKD",
-    thailand: "THB",
+    // No native currency support for these yet (see src/constants/currency.js),
+    // so show USD like geoPricing does - an unsupported code rendered the INR
+    // number with no symbol.
+    australia: "USD",
+    germany: "USD",
+    france: "USD",
+    netherlands: "USD",
+    japan: "USD",
+    southkorea: "USD",
+    hongkong: "USD",
+    thailand: "USD",
+    ireland: "USD",
+  };
+
+  // One-click way back from a foreign country to India that keeps the PIN
+  // code the customer already typed (handleChange clears it on a country
+  // change).
+  const switchToIndia = () => {
+    setFormData((prev) => ({
+      ...prev,
+      country: "india",
+      deliveryOption: "standard",
+      state: "",
+      pincode: /^\d{6}$/.test(prev.pincode) ? prev.pincode : "",
+    }));
+    setCurrency("INR");
   };
 
   // Function to check customer's purchase history
@@ -1283,6 +1303,25 @@ const CheckoutPage = () => {
                       {errors.country}
                     </p>
                   )}
+                  {formData.country !== "india" && (
+                    <div className="mt-2 p-3 bg-amber-50 border-2 border-amber-400 rounded-md text-sm">
+                      <p className="font-semibold text-amber-900 flex items-center gap-1">
+                        <AlertTriangle size={16} /> You&apos;re shipping outside India
+                      </p>
+                      <p className="mt-1 text-amber-800">
+                        International delivery, a 4% payment processing fee and
+                        international pricing apply. Delivering to an Indian
+                        address?
+                      </p>
+                      <button
+                        type="button"
+                        onClick={switchToIndia}
+                        className="mt-2 px-3 py-1.5 bg-gray-800 text-white text-sm font-medium rounded-md"
+                      >
+                        🇮🇳 Change country to India
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -1758,13 +1797,7 @@ const CheckoutPage = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Product Price:</span>
                   <span className="text-gray-800">
-                    {convertCurrency(
-                      (isCartCheckout
-                        ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                        : orderDetails.price
-                      ).toFixed(2),
-                      currency
-                    )}
+                    {formatAmount(breakdown.subtotal, currency)}
                   </span>
                 </div>
 
@@ -1780,7 +1813,7 @@ const CheckoutPage = () => {
                   </span>
                   <span className="text-gray-800">
                     {breakdown.deliveryCharge > 0
-                      ? convertCurrency(breakdown.deliveryCharge, currency)
+                      ? formatAmount(breakdown.deliveryCharge, currency)
                       : breakdown.isInternational
                       ? "International"
                       : "Free"}
@@ -1793,7 +1826,7 @@ const CheckoutPage = () => {
                       Payment Processing Fee (4%):
                     </span>
                     <span className="text-gray-800">
-                      {convertCurrency(breakdown.processingFee, currency)}
+                      {formatAmount(breakdown.processingFee, currency)}
                     </span>
                   </div>
                 )}
@@ -1802,7 +1835,7 @@ const CheckoutPage = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">COD Handling Fee:</span>
                     <span className="text-gray-800">
-                      {convertCurrency(breakdown.codHandlingFee, currency)}
+                      {formatAmount(breakdown.codHandlingFee, currency)}
                     </span>
                   </div>
                 )}
@@ -1813,36 +1846,14 @@ const CheckoutPage = () => {
                   <div className="flex justify-between text-green-600">
                     <span>Coupon Discount:</span>
                     <span>
-                      {(() => {
-                        if (
-                          couponCode.trim().toUpperCase() === SINGLE_USE_COUPON
-                        ) {
-                          // Flat ₹750 discount
-                          return convertCurrency(750, currency);
-                        } else if (CUSTOMER_VALIDATION_COUPONS[couponCode.trim().toUpperCase()]) {
-                          // Customer validation coupons - ₹100 flat discount
-                          return convertCurrency(100, currency);
-                        } else if (customCouponData) {
-                          // Custom coupon discount
-                          return convertCurrency(customCouponData.discountAmount, currency);
-                        } else {
-                          // Percentage discount
-                          let subtotal = isCartCheckout
-                            ? cart.reduce((t, i) => t + i.price * i.quantity, 0)
-                            : orderDetails.price;
-                          return convertCurrency(
-                            ((subtotal * discount) / 100).toFixed(2),
-                            currency
-                          );
-                        }
-                      })()}
+                      -{formatAmount(breakdown.discountAmount, currency)}
                     </span>
                   </div>
                 )}
                 <div className="border-t border-gray-100 my-2 pt-2 flex justify-between font-bold">
                   <span className="text-gray-800">Total:</span>
                   <span className="text-gray-800">
-                    {convertCurrency(breakdown.total, currency)}
+                    {formatAmount(breakdown.total, currency)}
                   </span>
                 </div>
               </div>

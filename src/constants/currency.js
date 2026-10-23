@@ -35,3 +35,13 @@ export const convertCurrency = (value, targetCurrency = "INR", round = true) => 
 
     return `${symbol}${finalAmount}`;
 };
+
+// For amounts that are already final INR charges (CheckoutPage's
+// getOrderBreakdown output) - converts for display WITHOUT applying the
+// foreign markup again. Passing those through convertCurrency marked them up
+// twice, so the checkout total shown was higher than what Razorpay charged.
+export const formatAmount = (value, targetCurrency = "INR") => {
+    const rate = currencyRates[targetCurrency] || 1;
+    const symbol = currencySymbols[targetCurrency] || "";
+    return `${symbol}${Math.round(value * rate)}`;
+};

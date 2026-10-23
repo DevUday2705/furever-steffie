@@ -1547,6 +1547,14 @@ const AdminPage = () => {
                             💰 COD - Shiprocket ONLY
                           </span>
                         )}
+                        {order.customer?.specialInstructions?.trim() && (
+                          <span
+                            className="inline-flex items-center px-2 py-1 text-xs font-bold text-yellow-900 bg-yellow-300 border-2 border-yellow-600 rounded-full"
+                            title={order.customer.specialInstructions}
+                          >
+                            ⚠️ Special Instructions
+                          </span>
+                        )}
                         {order.stockConflict && (
                           <span
                             className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-orange-600 border border-orange-700 rounded-full"
@@ -1620,7 +1628,11 @@ const AdminPage = () => {
                         ₹{order.amount}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {order.items?.length} item(s)
+                        {order.items?.reduce(
+                          (count, item) => count + (Number(item.quantity) || 1),
+                          0
+                        )}{" "}
+                        pc(s)
                       </div>
                     </div>
                   </div>
@@ -1694,6 +1706,16 @@ const AdminPage = () => {
 
                   {expandedOrderId === order.id && (
                     <div className="mt-4 border-t pt-3 text-xs text-gray-700 space-y-2">
+                      {order.customer?.specialInstructions?.trim() && (
+                        <div className="p-4 bg-yellow-100 border-4 border-red-500 rounded-lg shadow-md">
+                          <p className="text-sm font-extrabold uppercase tracking-wide text-red-700">
+                            ⚠️ Special Instructions - read before making this order
+                          </p>
+                          <p className="mt-2 text-base font-semibold text-gray-900 whitespace-pre-wrap">
+                            {order.customer.specialInstructions}
+                          </p>
+                        </div>
+                      )}
                       <div>
                         <p className="font-semibold mt-2">Items Ordered</p>
                         <div className="space-y-1">
@@ -1748,9 +1770,20 @@ const AdminPage = () => {
 
                                   {/* Product Details */}
                                   <div className="flex-1">
-                                    <p className="font-medium text-base">
-                                      {item.name}
-                                    </p>
+                                    <div className="flex items-start justify-between gap-2">
+                                      <p className="font-medium text-base">
+                                        {item.name}
+                                      </p>
+                                      <span
+                                        className={`flex-shrink-0 px-3 py-1 rounded-md text-sm font-extrabold ${
+                                          (Number(item.quantity) || 1) > 1
+                                            ? "bg-red-600 text-white"
+                                            : "bg-gray-800 text-white"
+                                        }`}
+                                      >
+                                        Qty: {Number(item.quantity) || 1}
+                                      </span>
+                                    </div>
                                     <p className="text-sm">
                                       Size:{" "}
                                       <span className="font-medium">
@@ -2052,7 +2085,13 @@ const AdminPage = () => {
                         </p>
                         <p>
                           <span className="font-bold">Instructions:</span>{" "}
-                          {order.customer?.specialInstructions}
+                          {order.customer?.specialInstructions?.trim() ? (
+                            <span className="font-bold text-red-700 bg-yellow-200 px-1">
+                              {order.customer.specialInstructions}
+                            </span>
+                          ) : (
+                            "None"
+                          )}
                         </p>
                         <p>
                           <span className="font-bold">Delivery:</span>{" "}

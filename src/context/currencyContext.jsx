@@ -47,6 +47,21 @@ export const CurrencyProvider = ({ children }) => {
     }
   }, [currency]);
 
+  // Switching to INR means the visitor is shopping as an Indian customer, so
+  // a foreign country detected earlier (VPN, travel, a misread IP) must not
+  // keep pre-selecting a foreign checkout country. That stale value was
+  // making Indian customers check out as "United States" with international
+  // delivery, the 4% processing fee and the foreign markup.
+  useEffect(() => {
+    if (currency !== "INR" || !detectedCountry || detectedCountry === "india") return;
+    setDetectedCountry(null);
+    try {
+      localStorage.removeItem("detectedCheckoutCountry");
+    } catch (error) {
+      // ignore
+    }
+  }, [currency, detectedCountry]);
+
   // One-time IP geolocation on first-ever visit only - if the visitor has
   // already picked a currency before (manually or from a prior detection),
   // never override it. This is what makes foreign visitors see the marked-up
