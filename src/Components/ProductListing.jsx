@@ -660,15 +660,17 @@ const ProductListing = ({
                       </div>
                     )} */}
                     {product.isOnSale && (
+                      // Diagonal ribbon across the top-left corner; the
+                      // image box's overflow-hidden trims its ends.
                       <div
                         style={{
                           background:
                             "linear-gradient(90deg, #e53935, #c62828)",
                           boxShadow: "0 2px 6px rgba(229, 57, 53, 0.35)",
                         }}
-                        className="absolute overflow-hidden top-0 left-0 px-2 py-1 text-white text-xs rounded-br-lg"
+                        className="absolute z-10 overflow-hidden top-[18px] left-[-36px] w-[130px] -rotate-45 py-1 flex items-center justify-center gap-1 text-white text-xs font-semibold"
                       >
-                        <Tag size={10} className="inline-block mr-1" />
+                        <Tag size={10} />
                         Sale
                         <motion.div
                           className="absolute left-[-30%] top-0 w-[60%] h-full bg-white opacity-10 rotate-60"
@@ -737,13 +739,6 @@ const ProductListing = ({
                           </>
                         )}
                       </div>
-
-                      {product.isOnSale && (
-                        <span className="mt-1.5 self-start inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-red-50 text-red-600 border border-red-200">
-                          <Tag size={10} />
-                          Stock Clearance Sale
-                        </span>
-                      )}
 
                       {/* Stock Status Information */}
                     </div>
