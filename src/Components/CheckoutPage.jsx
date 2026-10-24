@@ -51,6 +51,11 @@ const calculateCodAdvance = (totalAmount) =>
 // prepaid without hiding anything or touching the COD advance logic above.
 const COD_HANDLING_FEE = 50;
 
+// Standard domestic shipping is free from ₹1000 (after discounts); smaller
+// orders pay a flat charge so clearance-priced items don't ship at a loss.
+const FREE_SHIPPING_THRESHOLD = 1000;
+const LOW_ORDER_SHIPPING_CHARGE = 70;
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -547,7 +552,8 @@ const CheckoutPage = () => {
       } else if (formData.deliveryOption === "air") {
         deliveryCharge = 199;
       } else {
-        deliveryCharge = totalAfterDiscount > 1499 ? 0 : 0;
+        deliveryCharge =
+          totalAfterDiscount < FREE_SHIPPING_THRESHOLD ? LOW_ORDER_SHIPPING_CHARGE : 0;
       }
     }
 
@@ -1557,7 +1563,10 @@ const CheckoutPage = () => {
                             Standard Shipping
                           </span>
                           <span className="block text-xs text-green-500">
-                            7-10 working days • ₹Free
+                            7-10 working days •{" "}
+                            {breakdown.totalAfterDiscount < FREE_SHIPPING_THRESHOLD
+                              ? `₹${LOW_ORDER_SHIPPING_CHARGE} (free from ₹${FREE_SHIPPING_THRESHOLD})`
+                              : "Free"}
                           </span>
                         </div>
                       </label>

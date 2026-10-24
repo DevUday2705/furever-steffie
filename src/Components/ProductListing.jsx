@@ -24,13 +24,14 @@ import {
   DollarSign,
   Percent,
   Bell,
+  Tag,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { CurrencyContext } from "../context/currencyContext";
 import ProductCardSkeleton from "./ProductCardSkeleton";
+import SaleCountdown from "./SaleCountdown";
 
 const ProductListing = ({
-
   category,
   bannerImage,
   bannerTitle,
@@ -78,7 +79,7 @@ const ProductListing = ({
 
     const totalManagedStock = stockInfo.reduce(
       (sum, item) => sum + item.stock,
-      0
+      0,
     );
     const inStockSizes = stockInfo.filter((item) => item.inStock);
 
@@ -131,9 +132,17 @@ const ProductListing = ({
   // Function to check if the file is a video
   const isVideo = (url) => {
     if (!url) return false;
-    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v'];
+    const videoExtensions = [
+      ".mp4",
+      ".webm",
+      ".ogg",
+      ".mov",
+      ".avi",
+      ".mkv",
+      ".m4v",
+    ];
     const urlPath = url.toLowerCase();
-    return videoExtensions.some(ext => urlPath.includes(ext));
+    return videoExtensions.some((ext) => urlPath.includes(ext));
   };
 
   // Define quick filters with classy gray theme
@@ -152,9 +161,15 @@ const ProductListing = ({
           }
           // If sizes selected, show products with those specific sizes in stock
           return selectedSizes.some(
-            (size) => (product.sizeStock?.[size] || 0) > 0
+            (size) => (product.sizeStock?.[size] || 0) > 0,
           );
         },
+      },
+      {
+        id: "sale",
+        label: "Sale",
+        icon: Tag,
+        filterFn: (product) => product.isOnSale === true,
       },
       {
         id: "royal",
@@ -193,7 +208,7 @@ const ProductListing = ({
         filterFn: (product) => (product.pricing?.discountPercent || 0) >= 40,
       },
     ],
-    [selectedSizes]
+    [selectedSizes],
   );
 
   // Quick filter toggle handler
@@ -207,7 +222,7 @@ const ProductListing = ({
     setQuickFilters((prev) =>
       prev.includes(filterId)
         ? prev.filter((id) => id !== filterId)
-        : [...prev, filterId]
+        : [...prev, filterId],
     );
   };
 
@@ -233,7 +248,7 @@ const ProductListing = ({
 
   // Apply regular filters first
   const regularFiltered = useProductFilter(baseList, filters, searchQuery);
-  
+
   // Filter out products with no stock for any size
   const stockFiltered = useMemo(() => {
     return regularFiltered.filter((product) => {
@@ -249,11 +264,11 @@ const ProductListing = ({
     }
 
     const activeQuickFilters = quickFilterOptions.filter((filter) =>
-      quickFilters.includes(filter.id)
+      quickFilters.includes(filter.id),
     );
 
     return stockFiltered.filter((product) =>
-      activeQuickFilters.every((filter) => filter.filterFn(product))
+      activeQuickFilters.every((filter) => filter.filterFn(product)),
     );
   }, [stockFiltered, quickFilters, quickFilterOptions]);
   const activeFilterCount = useMemo(() => {
@@ -286,10 +301,10 @@ const ProductListing = ({
         searchParams.get("sort") === "asc"
           ? "price-asc"
           : searchParams.get("sort") === "desc"
-          ? "price-desc"
-          : searchParams.get("sort") === "popularity"
-          ? "popularity"
-          : "",
+            ? "price-desc"
+            : searchParams.get("sort") === "popularity"
+              ? "popularity"
+              : "",
 
       categories: searchParams.get("type") ? [searchParams.get("type")] : [],
 
@@ -315,18 +330,21 @@ const ProductListing = ({
         <div className="relative h-48 sm:h-64 bg-gradient-to-r from-gray-300 to-gray-400 animate-pulse">
           <div className="absolute inset-0 bg-black/20"></div>
         </div>
-        
+
         {/* Filter section skeleton */}
         <div className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-4 py-3">
             <div className="flex gap-2 overflow-x-auto">
-              {[1,2,3,4,5].map(i => (
-                <div key={i} className="h-8 w-20 bg-gray-200 rounded-full animate-pulse flex-shrink-0" />
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="h-8 w-20 bg-gray-200 rounded-full animate-pulse flex-shrink-0"
+                />
               ))}
             </div>
           </div>
         </div>
-        
+
         {/* Products grid skeleton */}
         <div className="container mx-auto px-4 py-6">
           <div className="grid grid-cols-2 gap-5">
@@ -412,11 +430,12 @@ const ProductListing = ({
               className="flex items-center space-x-2 px-4 py-2 bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
             >
               <Sliders size={16} />
-             
             </button>
           </div>
         </div>
       </div>
+
+      <SaleCountdown />
 
       {/* Quick Filters */}
       <div className="bg-white border-b border-gray-100">
@@ -439,7 +458,7 @@ const ProductListing = ({
                 onClick={() => {
                   setSelectedSizes([]);
                   setQuickFilters((prev) =>
-                    prev.filter((id) => id !== "in-stock")
+                    prev.filter((id) => id !== "in-stock"),
                   );
                 }}
                 className="text-xs text-rose-600 hover:text-rose-700 font-medium ml-2"
@@ -522,7 +541,7 @@ const ProductListing = ({
 
             // Get stock status
             const stockStatus = getProductStockStatus(product);
-           
+
             return (
               <motion.div
                 key={product.id}
@@ -640,6 +659,28 @@ const ProductListing = ({
                         </div>
                       </div>
                     )} */}
+                    {product.isOnSale && (
+                      <div
+                        style={{
+                          background:
+                            "linear-gradient(90deg, #e53935, #c62828)",
+                          boxShadow: "0 2px 6px rgba(229, 57, 53, 0.35)",
+                        }}
+                        className="absolute overflow-hidden top-0 left-0 px-2 py-1 text-white text-xs rounded-br-lg"
+                      >
+                        <Tag size={10} className="inline-block mr-1" />
+                        Sale
+                        <motion.div
+                          className="absolute left-[-30%] top-0 w-[60%] h-full bg-white opacity-10 rotate-60"
+                          animate={{ left: "130%" }}
+                          transition={{
+                            duration: 3,
+                            ease: "easeInOut",
+                            repeat: Infinity,
+                          }}
+                        />
+                      </div>
+                    )}
                     {product.isRoyal && (
                       <div
                         style={{
@@ -672,7 +713,13 @@ const ProductListing = ({
                     </h3>
                     <div className="flex flex-col ">
                       <div className="flex items-baseline flex-wrap">
-                        <span className="text-sm font-semibold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+                        <span
+                          className={`text-sm font-semibold ${
+                            product.isOnSale
+                              ? "text-green-600"
+                              : "text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text"
+                          }`}
+                        >
                           {currencySymbols[currency] || currency} {currentPrice}
                         </span>
                         {discountPercent > 0 && (
@@ -690,6 +737,13 @@ const ProductListing = ({
                           </>
                         )}
                       </div>
+
+                      {product.isOnSale && (
+                        <span className="mt-1.5 self-start inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-red-50 text-red-600 border border-red-200">
+                          <Tag size={10} />
+                          Stock Clearance Sale
+                        </span>
+                      )}
 
                       {/* Stock Status Information */}
                     </div>

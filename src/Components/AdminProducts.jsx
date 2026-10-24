@@ -34,6 +34,7 @@ import {
   FaRupeeSign,
   FaFilter,
   FaSearch,
+  FaTag,
 } from "react-icons/fa";
 const collections = [
   "kurtas",
@@ -200,6 +201,14 @@ const AdminProducts = () => {
         color: "bg-orange-100 text-orange-800 border-orange-200",
         activeColor: "bg-orange-500 text-white border-orange-500",
         filterFn: (product) => product.isTrending === true,
+      },
+      {
+        id: "sale",
+        label: "On Sale",
+        icon: FaTag,
+        color: "bg-red-100 text-red-800 border-red-200",
+        activeColor: "bg-red-500 text-white border-red-500",
+        filterFn: (product) => product.isOnSale === true,
       },
       {
         id: "top-rated",
@@ -657,7 +666,7 @@ const AdminProducts = () => {
                       </div>
                       <div className="p-1 sm:p-4">
                         <h3 className="text-[9px] leading-tight sm:text-base truncate font-medium text-gray-900 sm:mb-1 group-hover:text-blue-600 transition-colors">
-                          {item.name} {item.isRoyal && "R"}
+                          {item.name} {item.isRoyal && "R"} {item.isOnSale && "S"}
                         </h3>
                       </div>
                     </div>

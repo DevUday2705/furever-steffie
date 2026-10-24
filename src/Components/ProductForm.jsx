@@ -23,6 +23,7 @@ const defaultSchema = {
   disableTasselsOption: false,
   isRoyal: false, // Add this line
   isTrending: false, // Add trending status
+  isOnSale: false, // Clearance sale - shows a Sale tag and the countdown on the listing
   tags: [], // Custom tags for filtering and organization
   sizeStock: {
     XS: 0,
@@ -743,6 +744,14 @@ const ProductForm = () => {
             onChange={(e) => handleChange("isTrending", e.target.checked)}
           />
           <span>🔥 Is Trending</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={!!formData.isOnSale}
+            onChange={(e) => handleChange("isOnSale", e.target.checked)}
+          />
+          <span>🏷️ Is On Sale</span>
         </label>
         <div>
           <label className="block text-sm font-medium mb-1">Category</label>
