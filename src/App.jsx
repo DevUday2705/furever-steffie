@@ -15,6 +15,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import MaintenanceNotice from "./Components/MaintenanceNotice";
 import Home from "./Components/Home";
 import OrderReviewPage from "./Components/OrderReviewPage";
 import CheckoutPage from "./Components/CheckoutPage";
@@ -246,6 +247,7 @@ const App = () => {
         }}
       />
 
+      {!isAdminRoute && <MaintenanceNotice />}
       <Toaster />
     </div>
   );
