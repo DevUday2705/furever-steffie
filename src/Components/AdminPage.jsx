@@ -1555,6 +1555,14 @@ const AdminPage = () => {
                             ⚠️ Special Instructions
                           </span>
                         )}
+                        {order.adminNotes?.trim() && (
+                          <span
+                            className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-purple-600 border-2 border-purple-800 rounded-full"
+                            title={order.adminNotes}
+                          >
+                            📝 Internal Note
+                          </span>
+                        )}
                         {order.stockConflict && (
                           <span
                             className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-orange-600 border border-orange-700 rounded-full"
@@ -1713,6 +1721,16 @@ const AdminPage = () => {
                           </p>
                           <p className="mt-2 text-base font-semibold text-gray-900 whitespace-pre-wrap">
                             {order.customer.specialInstructions}
+                          </p>
+                        </div>
+                      )}
+                      {order.adminNotes?.trim() && (
+                        <div className="p-4 bg-purple-50 border-4 border-purple-600 rounded-lg shadow-md">
+                          <p className="text-sm font-extrabold uppercase tracking-wide text-purple-800">
+                            📝 Internal Note - read before handling this order
+                          </p>
+                          <p className="mt-2 text-base font-semibold text-gray-900 whitespace-pre-wrap">
+                            {order.adminNotes}
                           </p>
                         </div>
                       )}
