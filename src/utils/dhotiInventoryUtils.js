@@ -12,7 +12,7 @@ export const initializeDhotiInventory = async () => {
     white: {
       id: 'white',
       name: 'White',
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/white-dhoti.jpg', // Update with actual image URL
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260223_085145.webp', // Update with actual image URL
       inventory: {
         XS: 5,
         S: 10,
@@ -23,7 +23,7 @@ export const initializeDhotiInventory = async () => {
     black: {
       id: 'black',
       name: 'Black',
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/black-dhoti.jpg', // Update with actual image URL
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260223_085207.webp', // Update with actual image URL
       inventory: {
         XS: 0, // Not mentioned in requirement
         S: 10,  // Example quantity
@@ -34,7 +34,7 @@ export const initializeDhotiInventory = async () => {
     gold: {
       id: 'gold',
       name: 'Gold',
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/gold-dhoti.jpg', // Update with actual image URL
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260216_162102.webp', // Update with actual image URL
       inventory: {
         XS: 0, // Not mentioned in requirement
         S: 10,  // Not mentioned

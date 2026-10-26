@@ -25,7 +25,7 @@ const initializeDhotiInventory = async () => {
       id: 'white',
       name: 'White',
       // Update with actual image URLs from your Cloudinary
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/white-dhoti.jpg',
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260223_085145.webp',
       inventory: {
         XS: 5,
         S: 10,
@@ -36,7 +36,7 @@ const initializeDhotiInventory = async () => {
     black: {
       id: 'black',
       name: 'Black',
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/black-dhoti.jpg',
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260223_085207.webp',
       inventory: {
         XS: 0, // Set according to your requirement
         S: 5,  // Set according to your requirement
@@ -47,7 +47,7 @@ const initializeDhotiInventory = async () => {
     gold: {
       id: 'gold',
       name: 'Gold',
-      image: 'https://res.cloudinary.com/di6unrpjw/image/upload/v1737398143/gold-dhoti.jpg',
+      image: 'https://ik.imagekit.io/cp9tee6jz/Dhotis/Photoroom_20260216_162102.webp',
       inventory: {
         XS: 0, // Set according to your requirement
         S: 0,  // Set according to your requirement
