@@ -19,7 +19,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { uploadToCloudinary } from "../constants/uploadToCloudinary";
+import { uploadToImageKit } from "../constants/uploadToImageKit";
 
 const StockManager = () => {
   const [items, setItems] = useState([]);
@@ -65,7 +65,7 @@ const StockManager = () => {
 
       // Upload image to Cloudinary if there's a file
       if (item.imageFile) {
-        imageUrl = await uploadToCloudinary(item.imageFile);
+        imageUrl = await uploadToImageKit(item.imageFile, { folder: "stock" });
       }
 
       // Save to Firebase with Cloudinary URL
@@ -88,7 +88,7 @@ const StockManager = () => {
 
       // If there's a new image file, upload it to Cloudinary
       if (updates.imageFile) {
-        const imageUrl = await uploadToCloudinary(updates.imageFile);
+        const imageUrl = await uploadToImageKit(updates.imageFile, { folder: "stock" });
         updates.image = imageUrl;
         delete updates.imageFile; // Remove file object before saving to Firebase
       }

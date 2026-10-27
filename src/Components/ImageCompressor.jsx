@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { adminFetch } from "../utils/adminFetch";
+import { uploadToImageKit } from "../constants/uploadToImageKit";
 
 // Compresses images to WebP in the browser (highest quality that fits under the
 // size cap), then uploads them to ImageKit using a short-lived signature from
@@ -57,42 +57,6 @@ async function compress(file, maxBytes) {
   }
 }
 
-// res.json() throws a cryptic "Unexpected end of JSON input" on an empty body,
-// which is what /api/stock returns under plain `vite dev` (no API there).
-async function readJson(res, what) {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    const hint = what === "Auth" ? " The /api routes only exist on Vercel or 'vercel dev', not 'npm run dev'." : "";
-    throw new Error(`${what} returned an empty/invalid response (HTTP ${res.status}).${hint}`);
-  }
-}
-
-async function uploadToImageKit(blob, fileName, folder) {
-  const authRes = await adminFetch("/api/stock", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "imagekit-auth" }),
-  });
-  const auth = await readJson(authRes, "Auth");
-  if (!authRes.ok) throw new Error(auth.message || "Auth failed");
-
-  const form = new FormData();
-  form.append("file", blob, fileName);
-  form.append("fileName", fileName);
-  form.append("folder", folder ? `/${folder}` : "/");
-  form.append("useUniqueFileName", "false");
-  form.append("publicKey", auth.publicKey);
-  form.append("token", auth.token);
-  form.append("expire", auth.expire);
-  form.append("signature", auth.signature);
-  const res = await fetch("https://upload.imagekit.io/api/v1/files/upload", { method: "POST", body: form });
-  const data = await readJson(res, "ImageKit upload");
-  if (!res.ok) throw new Error(data.message || "Upload failed");
-  return data.url;
-}
-
 const kb = (b) => `${Math.round(b / 1024)} KB`;
 
 const ImageCompressor = () => {
@@ -123,7 +87,7 @@ const ImageCompressor = () => {
       const { blob, quality, width } = await compress(item.file, maxKb * 1024);
       const name = item.file.name.replace(/\.[^.]+$/, "").replace(/[^\w.-]+/g, "-") + ".webp";
       patch(item.id, { status: "uploading", newSize: blob.size, quality, width, name });
-      const url = await uploadToImageKit(blob, name, safeFolder);
+      const url = await uploadToImageKit(blob, { folder: safeFolder, fileName: name, uniqueName: false });
       patch(item.id, { status: "done", url });
     } catch (err) {
       console.error(item.file.name, err);

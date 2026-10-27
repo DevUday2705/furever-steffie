@@ -45,7 +45,7 @@ const LehengaListing = () => {
       title="All Kurtas"
       subtitle="Explore our exclusive range of handcrafted kurtas for pets!"
       category="lehenga"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1757398143/0540a2ed-145f-40c4-8ddd-d258dfef4303.png"
+      bannerImage="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/0540a2ed-145f-40c4-8ddd-d258dfef4303.png"
       products={lehengas}
       bannerTitle="Elegant Kurtas for Every Pet Personality"
     />

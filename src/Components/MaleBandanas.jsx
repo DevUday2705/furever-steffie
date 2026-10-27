@@ -24,7 +24,7 @@ const MaleBandanas = () => {
       title="Bandanas"
       subtitle="Explore our exclusive range of handcrafted  bandanas for pets!"
       category="male-bandanas"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1755713281/Photoroom_20250817_100242_abrmwu.webp"
+      bannerImage="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Photoroom_20250817_100242_abrmwu.webp"
       products={maleBandanas}
       bannerTitle="Elegant  Bandanas for Every Pet Personality"
     />

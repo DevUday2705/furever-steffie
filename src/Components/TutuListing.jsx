@@ -40,7 +40,7 @@ const TutuListing = () => {
       title="All Tutu Dress"
       subtitle="Explore our exclusive range of handcrafted Tutu Dresses for pets!"
       category="tutu-dress"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1753034319/Twilight_pastel_purple_Tutu_dress_t8jxtv.webp"
+      bannerImage="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Twilight_pastel_purple_Tutu_dress_t8jxtv.webp"
       products={tutu}
       bannerTitle="Elegant Tutu Dresses for your princess"
     />

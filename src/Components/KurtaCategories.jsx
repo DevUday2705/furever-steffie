@@ -103,7 +103,7 @@ const KurtaCategories = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744101346/ChatGPT_Image_Apr_8_2025_02_03_51_PM_qgz786.png"
+            src="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_8_2025_02_03_51_PM_qgz786.png?tr=w-600"
             alt="Kurta Collection"
             className="w-full h-full object-cover"
           />

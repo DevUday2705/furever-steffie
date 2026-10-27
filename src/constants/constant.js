@@ -63,7 +63,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913539/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -92,7 +92,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913539/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Joy_with_Elephants_Bow_Tie_vxcbtm_hmyqmk.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -121,7 +121,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913516/Adorable_Shih_Tzu_with_Bow_Tie_szepeo_xe85qr.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Adorable_Shih_Tzu_with_Bow_Tie_szepeo_xe85qr.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -150,7 +150,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913512/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw_fafcn8.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_02_38_AM_bnjtxw_fafcn8.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -179,7 +179,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913511/Fluffy_Pup_with_a_Stylish_Bow_Tie_u0dwbf_yegmxs.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Pup_with_a_Stylish_Bow_Tie_u0dwbf_yegmxs.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -208,7 +208,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913511/Fluffy_Elegance_in_Blue_Polka_Dot_yoi6r6_bupeuu.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Elegance_in_Blue_Polka_Dot_yoi6r6_bupeuu.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -237,7 +237,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913510/Fluffy_Dog_with_Elephant_Bow_Tie_rdwjpd_fczksv.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Dog_with_Elephant_Bow_Tie_rdwjpd_fczksv.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -266,7 +266,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913510/ChatGPT_Image_Apr_17_2025_12_11_53_AM_fklx3f_f8omgt.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_11_53_AM_fklx3f_f8omgt.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -295,7 +295,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913508/Fluffy_Shih_Tzu_with_Bow_Tie_glcg9k_ckl4sx.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Shih_Tzu_with_Bow_Tie_glcg9k_ckl4sx.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -324,7 +324,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913507/Fluffy_Shih_Tzu_in_Bow_Tie_wbwvlc_jpxp26.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Shih_Tzu_in_Bow_Tie_wbwvlc_jpxp26.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -353,7 +353,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913505/Joyful_Shih_Tzu_with_Bow_Tie_hruwlp_ihizad.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Joyful_Shih_Tzu_with_Bow_Tie_hruwlp_ihizad.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -382,7 +382,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913504/Fluffy_Shih_Tzu_in_Bow_Tie_1_le97id_xlop2i.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Fluffy_Shih_Tzu_in_Bow_Tie_1_le97id_xlop2i.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -411,7 +411,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913502/ChatGPT_Image_Apr_16_2025_11_54_35_PM_vqzuo9_tyaj6j.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_16_2025_11_54_35_PM_vqzuo9_tyaj6j.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -440,7 +440,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913502/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4_kkmpna.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_16_2025_11_51_23_PM_mggtv4_kkmpna.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -469,7 +469,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913500/ChatGPT_Image_Apr_17_2025_12_20_28_AM_ijs5hw_ma9ugd.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_20_28_AM_ijs5hw_ma9ugd.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -498,7 +498,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913500/ChatGPT_Image_Apr_17_2025_12_30_37_AM_rl5k84_rdh4dw.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_30_37_AM_rl5k84_rdh4dw.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -531,7 +531,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_10_42_AM_ludkga.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_10_42_AM_ludkga.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -560,7 +560,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_06_54_AM_cdpiof.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_06_54_AM_cdpiof.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -589,7 +589,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913360/ChatGPT_Image_Apr_17_2025_01_00_56_AM_kfwhws.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_00_56_AM_kfwhws.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -618,7 +618,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_02_11_AM_sp7jye.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_02_11_AM_sp7jye.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -647,7 +647,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_01_03_20_AM_iiqxyb.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_03_20_AM_iiqxyb.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -676,7 +676,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_12_57_09_AM_qgahgw.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_57_09_AM_qgahgw.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -705,7 +705,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913361/ChatGPT_Image_Apr_17_2025_12_59_44_AM_uijz1m.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_59_44_AM_uijz1m.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -734,7 +734,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913362/ChatGPT_Image_Apr_17_2025_01_05_21_AM_ikyodz.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_01_05_21_AM_ikyodz.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -763,7 +763,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913362/ChatGPT_Image_Apr_17_2025_12_42_40_AM_dw2xx6.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_17_2025_12_42_40_AM_dw2xx6.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:
@@ -792,7 +792,7 @@ export const bowData = {
             size: "S",
           },
           mainImage:
-            "https://res.cloudinary.com/di6unrpjw/image/upload/v1744913363/Apr_17_2025_12_54_14_AM_aet4jv.png",
+            "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Apr_17_2025_12_54_14_AM_aet4jv.png",
           sizes: ["S", "M", "L"],
           contactForCustomColors: true,
           description:

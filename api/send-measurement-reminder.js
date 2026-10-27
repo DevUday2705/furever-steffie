@@ -38,7 +38,7 @@ const generateMeasurementReminderHTML = (orderData) => {
         
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-            <img src="https://res.cloudinary.com/di6unrpjw/image/upload/v1726659361/logo_transparent_background_ckgiar.png" alt="Furever Steffie" style="height: 60px; margin-bottom: 20px;">
+            <img src="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/logo.png" alt="Furever Steffie" style="height: 60px; margin-bottom: 20px;">
             <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">📏 Measurement Reminder</h1>
             <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 16px;">We need your pet's measurements to ensure the perfect fit!</p>
         </div>

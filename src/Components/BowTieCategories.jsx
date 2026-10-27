@@ -24,7 +24,7 @@ const BowTieCategories = () => {
       title="Bow Ties"
       subtitle="Explore our exclusive range of handcrafted bow ties for pets!"
       category="bow-tie"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1744105473/ChatGPT_Image_Apr_8_2025_02_57_58_PM_bu60ao.png"
+      bannerImage="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_8_2025_02_57_58_PM_bu60ao.png"
       products={bowTieCategories}
       bannerTitle="Elegant Bow Ties for Every Pet Personality"
     />

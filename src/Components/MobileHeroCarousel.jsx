@@ -13,7 +13,7 @@ const MobileHeroCarousel = () => {
       id: 1,
       type: "video",
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165575/V3_egjbpb.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/V3_egjbpb.mp4",
       title: "Timeless Attire",
       subtitle: "Curated styles for the season",
       cta: "Discover More",
@@ -23,7 +23,7 @@ const MobileHeroCarousel = () => {
       id: 2,
       type: "video",
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V2_c9vqud.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/V2_c9vqud.mp4",
       title: "Tradition Tailored",
       subtitle: "Timeless wardrobe staples",
       cta: "View Collection",
@@ -33,7 +33,7 @@ const MobileHeroCarousel = () => {
       id: 3,
       type: "video",
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1761165574/V1_w0zflf.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/V1_w0zflf.mp4",
       title: "Modern Heritage",
       subtitle: "Explore our latest arrivals",
       cta: "Shop Now",
@@ -46,7 +46,7 @@ const MobileHeroCarousel = () => {
       id: 4,
       type: "image",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9666_1_j33uu0.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_9666_1_j33uu0.webp",
       title: "Festive Vibes",
       subtitle: "Celebrate with grace",
       cta: "Explore Now",
@@ -56,7 +56,7 @@ const MobileHeroCarousel = () => {
       id: 5,
       type: "image",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/IMG_9657_1_sz78s0.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_9657_1_sz78s0.webp",
       title: "Elegant Threads",
       subtitle: "Chic. Comfortable. Classy.",
       cta: "View Range",
@@ -66,7 +66,7 @@ const MobileHeroCarousel = () => {
       id: 6,
       type: "image",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1746702948/blue-frock_lhb0ge.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/blue-frock_lhb0ge.webp",
       title: "Summer Breeze",
       subtitle: "Light looks for warm days",
       cta: "See Collection",

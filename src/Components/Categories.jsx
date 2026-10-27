@@ -14,7 +14,7 @@ const Categories = () => {
       link: "kurta",
       description: "Contemporary Styles",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773726481/IMG_2179_wmypnr.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_2179_wmypnr.webp",
     },
      {
       id: 5,
@@ -22,7 +22,7 @@ const Categories = () => {
       link: "Pathani",
       description: "Suit Up!",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1768739245/IMG_0079_sdnofh.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_0079_sdnofh.webp",
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ const Categories = () => {
       link: "tuxedo",
       description: "Classic Fits",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1778151677/IMG_3843_dqyl4d.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_3843_dqyl4d.webp",
     },
     {
       id: 3,
@@ -38,7 +38,7 @@ const Categories = () => {
       link: "Male Bandanas",
       description: "Trendy Accessories",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1755713280/IMG_9469_txpsl9.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_9469_txpsl9.webp",
     },
     // {
     //   id: 4,
@@ -46,7 +46,7 @@ const Categories = () => {
     //   link: "Bow Tie",
     //   description: "Suit Up!",
     //   image:
-    //     "https://res.cloudinary.com/di6unrpjw/image/upload/f_auto,q_auto,w_600/v1744099695/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png",
+    //     "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_8_2025_01_37_49_PM_mqrwhi.png?tr=w-600",
     // },
        
   ];
@@ -58,7 +58,7 @@ const Categories = () => {
       name: "Lehenga",
       description: "Cute Touch",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1766770954/IMG_9443_tz3nkr.webp",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/IMG_9443_tz3nkr.webp",
     },
     {
       id: 6,
@@ -66,7 +66,7 @@ const Categories = () => {
       link: "Tutu Dress",
       description: "Traditional Elegance",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1772440735/Photoroom_20260302_004028_n5lw3g.jpg",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Photoroom_20260302_004028_n5lw3g.jpg",
     },
       {
       id: 7,
@@ -74,7 +74,7 @@ const Categories = () => {
       link: "Frock",
       description: "Playful Frills",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1773775880/Photoroom_20260317_014033_yxvgv3.jpg",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Photoroom_20260317_014033_yxvgv3.jpg",
     },
     {
       id: 8,
@@ -82,7 +82,7 @@ const Categories = () => {
       link: "Female Bandanas",
       description: "Trendy Accessories",
       image:
-        "https://res.cloudinary.com/di6unrpjw/image/upload/v1745436600/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/ChatGPT_Image_Apr_24_2025_12_54_24_AM_1_siiyl6.png",
     },
   
   ];

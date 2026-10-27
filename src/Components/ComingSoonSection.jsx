@@ -22,11 +22,11 @@ const ComingSoonSection = () => {
   const comingSoonItems = [
     {
       id: "yellow-denim",
-      url: "https://res.cloudinary.com/di6unrpjw/image/upload/v1753816465/F115A0D5-00AD-4A2B-A242-5CBF2B2F1B50_trtatm.webp",
+      url: "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/F115A0D5-00AD-4A2B-A242-5CBF2B2F1B50_trtatm.webp",
     },
     {
       id: "black-white-checks-butterfly-frock",
-      url: "https://res.cloudinary.com/di6unrpjw/image/upload/v1753816722/WhatsApp_Image_2025-07-30_at_00.44.57_79416629_gy08xr.webp",
+      url: "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/WhatsApp_Image_2025-07-30_at_00.44.57_79416629_gy08xr.webp",
     },
   ];
 

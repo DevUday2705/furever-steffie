@@ -45,7 +45,7 @@ const PathaniListing = () => {
       title="All Pathanis"
       subtitle="Explore our exclusive range of handcrafted pathanis for pets!"
       category="pathani"
-      bannerImage="https://res.cloudinary.com/di6unrpjw/image/upload/v1757398143/0540a2ed-145f-40c4-8ddd-d258dfef4303.png"
+      bannerImage="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/0540a2ed-145f-40c4-8ddd-d258dfef4303.png"
       products={pathanis}
       bannerTitle="Classic Pathanis for Every Pet Personality"
     />

@@ -30,7 +30,7 @@ const WatchAndBuy = () => {
       name: "Classic Black Tuxedo",
       price: 12999,
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692424/vid-1_cndyer.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/vid-1_cndyer.mp4",
       link: "/product/sk001+kurta",
     },
     {
@@ -39,7 +39,7 @@ const WatchAndBuy = () => {
       link: "/product/sk002+kurta",
       price: 15999,
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692423/vid-2_qabxnr.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/vid-2_qabxnr.mp4",
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ const WatchAndBuy = () => {
       link: "/product/sk003+kurta",
       price: 8999,
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692420/vid-4_dr6q2f.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/vid-4_dr6q2f.mp4",
     },
     {
       id: 4,
@@ -55,7 +55,7 @@ const WatchAndBuy = () => {
       link: "/product/sk004+kurta",
       price: 1499,
       video:
-        "https://res.cloudinary.com/di6unrpjw/video/upload/v1745692420/vid-3_fimt2h.mp4",
+        "https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/vid-3_fimt2h.mp4",
     },
   ];
 

@@ -63,7 +63,7 @@ const PopupPoster = () => {
           {/* Poster Image */}
           <div className="relative">
             <img
-              src="https://res.cloudinary.com/di6unrpjw/image/upload/v1757757237/Poster_2_xhtqai.jpg"
+              src="https://ik.imagekit.io/cp9tee6jz/cloudinary-migration/Poster_2_xhtqai.jpg"
               alt="Special Offer"
               className="w-full h-auto object-cover"
               style={{ maxHeight: "500px" }}

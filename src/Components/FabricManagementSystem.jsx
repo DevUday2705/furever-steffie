@@ -28,7 +28,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { uploadToCloudinary } from "../constants/uploadToCloudinary";
+import { uploadToImageKit } from "../constants/uploadToImageKit";
 import toast from "react-hot-toast";
 export default function FabricManagementSystem() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -119,7 +119,7 @@ export default function FabricManagementSystem() {
     try {
       let imageUrl = null;
       if (formData.image) {
-        imageUrl = await uploadToCloudinary(formData.image);
+        imageUrl = await uploadToImageKit(formData.image, { folder: "fabrics" });
       }
 
       const fabricId = await generateUniqueFabricId(); // new line
