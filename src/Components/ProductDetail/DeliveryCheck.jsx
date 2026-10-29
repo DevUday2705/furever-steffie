@@ -3,6 +3,7 @@ import { MapPin, Truck, Zap } from "lucide-react";
 import { CurrencyContext } from "../../context/currencyContext";
 import { useDeliveryEstimate } from "../../hooks/useDeliveryEstimate";
 import { EXPRESS_DELIVERY_TEXT, loadSavedPincode, savePincode } from "../../constants/shipping";
+import DispatchCountdown from "./DispatchCountdown";
 
 // "Check delivery" on the product page: pincode -> area plus Standard
 // (Shiprocket estimate) and Express delivery times. Prices are left to
@@ -25,6 +26,7 @@ const DeliveryCheck = () => {
       <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
         <MapPin size={16} /> Check delivery
       </h3>
+      <DispatchCountdown />
       <input
         type="text"
         inputMode="numeric"
