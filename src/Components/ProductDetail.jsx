@@ -8,6 +8,7 @@ import ProductOptions from "../Components/ProductDetail/ProductOptions";
 import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
 import TrustSignals from "../Components/ProductDetail/TrustSignals";
+import DeliveryCheck from "../Components/ProductDetail/DeliveryCheck";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { getCatalog, getLiveProduct } from "../utils/catalog";
 import {
@@ -377,6 +378,8 @@ const ProductDetail = () => {
               allowCustomSizes={product.allowCustomSizes || false}
               availableDhotis={availableDhotis}
             />
+
+            <DeliveryCheck />
 
             {/* Trust Signals Section - now below sizing options */}
             <TrustSignals />

@@ -56,6 +56,111 @@ async function shiprocketFetch(path, token, options = {}) {
   return json;
 }
 
+// Best-value courier rule (how we pick by hand in Shiprocket):
+//  - ignore poorly rated couriers (< MIN_COURIER_RATING) when a decent one exists
+//  - take the cheapest of the rest as the baseline
+//  - a pricier courier is only worth it if it's faster AND costs at most
+//    max(₹15, 25%) more - e.g. India Post ₹50 vs Blue Dart ₹60 a day sooner
+//    -> Blue Dart; but ₹90-100 for the same speed -> no.
+// Among couriers inside that budget: fastest, then cheapest, then best rated.
+const MIN_COURIER_RATING = 3.5;
+const PREMIUM_FLAT = 15;
+const PREMIUM_PERCENT = 0.25;
+
+function pickBestCourier(options) {
+  if (!options.length) return null;
+  const rated = options.filter((o) => (o.rating ?? 0) >= MIN_COURIER_RATING);
+  const pool = rated.length ? rated : options;
+  const cheapest = Math.min(...pool.map((o) => o.price));
+  const budget = cheapest + Math.max(PREMIUM_FLAT, cheapest * PREMIUM_PERCENT);
+  const days = (o) => o.etaDays ?? Infinity;
+  return pool
+    .filter((o) => o.price <= budget)
+    .sort((a, b) => days(a) - days(b) || a.price - b.price || (b.rating ?? 0) - (a.rating ?? 0))[0];
+}
+
+// Shiprocket's courier list -> our options, the best-value pick first
+// (marked recommended) and the rest cheapest-first. Bulk ship and the ship
+// modal both default to options[0].
+function rankCouriers(couriers) {
+  const options = couriers
+    .filter((c) => c.blocked !== 1)
+    .map((c) => ({
+      courierId: c.courier_company_id,
+      courierName: c.courier_name,
+      // estimated_delivery_days is a day count ("3"); etd is a date string
+      etaDays: Number(c.estimated_delivery_days) || null,
+      etaDate: c.etd || null,
+      price: Math.round(c.rate || 0),
+      rating: c.rating || null,
+    }))
+    .sort((a, b) => a.price - b.price);
+  const best = pickBestCourier(options);
+  if (!best) return options;
+  return [{ ...best, recommended: true }, ...options.filter((o) => o !== best)];
+}
+
+async function fetchServiceability(token, params) {
+  const url = `${SHIPROCKET_BASE_URL}/courier/serviceability/?${params.toString()}`;
+  let resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (resp.status === 401) {
+    // Cached token was rejected ("Invalid Token") - re-login and retry once
+    const fresh = await getShiprocketToken(db, true);
+    resp = await fetch(url, { headers: { Authorization: `Bearer ${fresh}` } });
+  }
+  return resp;
+}
+
+// Public (no admin sign-in): checkout shows "delivery in N days" once the
+// customer types a pincode. Only the courier days of our best-value pick go
+// out - never prices or courier names. GET so Vercel's CDN caches it per
+// pincode and repeat visitors don't each hit Shiprocket.
+async function handleDeliveryEstimate(req, res) {
+  const pincode = String(req.query.pincode || "");
+  if (!/^\d{6}$/.test(pincode)) {
+    return res.status(400).json({ message: "Valid 6-digit pincode is required" });
+  }
+  const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE;
+  if (!pickupPincode) {
+    return res.status(500).json({ message: "SHIPROCKET_PICKUP_PINCODE is not configured" });
+  }
+  try {
+    const params = new URLSearchParams({
+      pickup_postcode: String(pickupPincode),
+      delivery_postcode: pincode,
+      weight: DEFAULT_ITEM_WEIGHT_KG.toFixed(2),
+      cod: "0",
+    });
+    const token = await getShiprocketToken(db);
+    const [resp, place] = await Promise.all([
+      fetchServiceability(token, params),
+      // Clean city/state for the pincode. The courier rows carry a city too,
+      // but it's whatever the courier calls its hub ("VFS-VISA FACILATION
+      // SERV" for 110001) - only used as a fallback.
+      shiprocketFetch(`/open/postcode/details?postcode=${pincode}`, token)
+        .then((j) => j?.postcode_details || null)
+        .catch(() => null),
+    ]);
+    const json = await resp.json().catch(() => ({}));
+    const couriers = resp.ok ? json?.data?.available_courier_companies || [] : [];
+    const best = rankCouriers(couriers)[0];
+
+    if (!best?.etaDays) {
+      res.setHeader("Cache-Control", "s-maxage=3600");
+      return res.status(200).json({ success: true, serviceable: false });
+    }
+    // Shown on the product page ("Delivering to Pune, Maharashtra") and
+    // used to pre-fill checkout.
+    const city = place?.city || couriers[0].city || null;
+    const state = place?.state || couriers[0].state || null;
+    res.setHeader("Cache-Control", "s-maxage=43200, stale-while-revalidate=86400");
+    return res.status(200).json({ success: true, serviceable: true, courierDays: best.etaDays, city, state });
+  } catch (error) {
+    console.error("❌ shiprocket delivery-estimate error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
 async function handleServiceability(req, res) {
   try {
     const { deliveryPincode, items = [], codRequired = false } = req.body;
@@ -91,17 +196,7 @@ async function handleServiceability(req, res) {
       cod: codRequired ? "1" : "0",
     });
 
-    const url = `${SHIPROCKET_BASE_URL}/courier/serviceability/?${params.toString()}`;
-    let resp = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (resp.status === 401) {
-      // Cached token was rejected ("Invalid Token") - re-login and retry once
-      const fresh = await getShiprocketToken(db, true);
-      resp = await fetch(url, {
-        headers: { Authorization: `Bearer ${fresh}` },
-      });
-    }
+    const resp = await fetchServiceability(token, params);
     const text = await resp.text();
     let json;
     try {
@@ -120,18 +215,7 @@ async function handleServiceability(req, res) {
         });
     }
 
-    const couriers = json?.data?.available_courier_companies || [];
-
-    const options = couriers
-      .filter((c) => c.blocked !== 1)
-      .map((c) => ({
-        courierId: c.courier_company_id,
-        courierName: c.courier_name,
-        etaDays: c.etd || c.estimated_delivery_days || null,
-        price: Math.round(c.rate || 0),
-        rating: c.rating || null,
-      }))
-      .sort((a, b) => a.price - b.price);
+    const options = rankCouriers(json?.data?.available_courier_companies || []);
 
     return res
       .status(200)
@@ -441,11 +525,14 @@ async function handleGenerateLabels(req, res) {
 }
 
 export default async function handler(req, res) {
+  if (req.method === "GET" && req.query.action === "delivery-estimate") {
+    return handleDeliveryEstimate(req, res);
+  }
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST method allowed" });
   }
 
-  // Every action here is staff-only (shipments cost money).
+  // Every POST action is staff-only (shipments cost money).
   if (!(await requireAdmin(req, res))) return;
 
   const { action } = req.body;

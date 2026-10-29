@@ -41,6 +41,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: "Valid amount is required" });
     }
 
+    // COD only ships Standard - Express/Air are prepaid only.
+    if (paymentMethod === "cod" && (customer?.deliveryOption || "standard") !== "standard") {
+        return res.status(400).json({ message: "Cash on Delivery is only available with Standard Shipping" });
+    }
+
     // Refuse before the customer pays, not after: once Razorpay captures
     // the money the order has to be accepted even if the stock is gone.
     // Catches carts that went stale (someone else bought the last one,

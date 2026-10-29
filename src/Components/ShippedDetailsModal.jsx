@@ -154,7 +154,7 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
 
               {!loadingOptions && courierOptions.length > 0 && (
                 <div className="space-y-2 max-h-[45vh] sm:max-h-64 overflow-y-auto -mx-1 px-1">
-                  {courierOptions.map((opt, idx) => (
+                  {courierOptions.map((opt) => (
                     <label
                       key={opt.courierId}
                       className={`flex items-start gap-2 border rounded px-3 py-2.5 text-sm cursor-pointer ${
@@ -171,15 +171,20 @@ const ShippedDetailsModal = ({ isOpen, order, defaultShippingType, onCancel, onC
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-medium text-gray-800 truncate">{opt.courierName}</span>
-                          {idx === 0 && (
+                          {opt.recommended && (
                             <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded shrink-0">
-                              Cheapest
+                              Best value
                             </span>
                           )}
                         </div>
                         <div className="flex items-center flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-gray-500">
                           <span className="font-semibold text-gray-700 text-sm">₹{opt.price}</span>
-                          {opt.etaDays && <span>ETA: {opt.etaDays}</span>}
+                          {opt.etaDays && (
+                            <span>
+                              ETA: {opt.etaDays} {opt.etaDays === 1 ? "day" : "days"}
+                              {opt.etaDate && ` (${opt.etaDate})`}
+                            </span>
+                          )}
                           {opt.rating && (
                             <span className="flex items-center gap-0.5">
                               <Star size={12} className="fill-amber-400 text-amber-400" />

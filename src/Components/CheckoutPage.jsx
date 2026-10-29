@@ -1,4 +1,4 @@
-import { useState, useContext, useRef } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -20,6 +20,16 @@ import { validateForm } from "../constants/constant";
 import { convertCurrency, formatAmount } from "../constants/currency";
 import { FOREIGN_PRICE_MULTIPLIER } from "../constants/geoPricing";
 import { CurrencyContext } from "../context/currencyContext";
+import { useDeliveryEstimate } from "../hooks/useDeliveryEstimate";
+import {
+  FREE_SHIPPING_THRESHOLD,
+  LOW_ORDER_SHIPPING_CHARGE,
+  EXPRESS_SHIPPING_CHARGE,
+  EXPRESS_DELIVERY_TEXT,
+  INDIAN_STATES,
+  matchIndianState,
+  loadSavedPincode,
+} from "../constants/shipping";
 import mixpanel from "../hooks/mixpanel";
 import { NAVRATRI100_COUPON, isNavratri100Active } from "./NavratriBanner";
 
@@ -51,11 +61,6 @@ const calculateCodAdvance = (totalAmount) =>
 // prepaid without hiding anything or touching the COD advance logic above.
 const COD_HANDLING_FEE = 50;
 
-// Standard domestic shipping is free from ₹1000 (after discounts); smaller
-// orders pay a flat charge so clearance-priced items don't ship at a loss.
-const FREE_SHIPPING_THRESHOLD = 1000;
-const LOW_ORDER_SHIPPING_CHARGE = 70;
-
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,6 +83,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" | "cod"
 
   const isCartCheckout = !orderDetails;
+  const initialCountry = currency !== "INR" && detectedCountry ? detectedCountry : "india";
   // Form state
   const [formData, setFormData] = useState({
     fullName: "",
@@ -86,7 +92,8 @@ const CheckoutPage = () => {
     addressLine2: "",
     city: "",
     state: "",
-    pincode: "",
+    // Pre-filled from the product page's delivery check, if they used it
+    pincode: initialCountry === "india" ? loadSavedPincode() : "",
     mobileNumber: "",
     specialInstructions: "",
     deliveryOption: "standard",
@@ -96,8 +103,25 @@ const CheckoutPage = () => {
     // Still fully editable - this is just the starting guess. Only trusted
     // while the visitor is still browsing in a foreign currency; anyone on
     // INR starts at India.
-    country: currency !== "INR" && detectedCountry ? detectedCountry : "india",
+    country: initialCountry,
   });
+
+  const standardDelivery = useDeliveryEstimate(
+    formData.country === "india" ? formData.pincode : null
+  );
+
+  // Fill city/state from the pincode lookup - only empty fields, never
+  // overwriting what the customer typed.
+  const pincodeCity = standardDelivery?.city;
+  const pincodeState = matchIndianState(standardDelivery?.state);
+  useEffect(() => {
+    if (!pincodeCity && !pincodeState) return;
+    setFormData((prev) => ({
+      ...prev,
+      city: prev.city || pincodeCity || "",
+      state: prev.state || pincodeState,
+    }));
+  }, [pincodeCity, pincodeState]);
 
   // Validation state
   const [errors, setErrors] = useState({});
@@ -448,6 +472,11 @@ const CheckoutPage = () => {
       setCurrency(newCurrency);
     }
 
+    // COD is only offered with Standard shipping - faster options are prepaid
+    if (name === "deliveryOption" && value !== "standard") {
+      setPaymentMethod("online");
+    }
+
     setFormData(updatedFormData);
 
     // Clear error when field is edited
@@ -548,7 +577,7 @@ const CheckoutPage = () => {
     } else {
       // Domestic delivery charges
       if (formData.deliveryOption === "express") {
-        deliveryCharge = 299;
+        deliveryCharge = EXPRESS_SHIPPING_CHARGE;
       } else if (formData.deliveryOption === "air") {
         deliveryCharge = 199;
       } else {
@@ -572,7 +601,8 @@ const CheckoutPage = () => {
         )
       : 0;
 
-    const isCod = paymentMethod === "cod" && !isInternational;
+    const isCod =
+      paymentMethod === "cod" && !isInternational && formData.deliveryOption === "standard";
     const codHandlingFee = isCod ? COD_HANDLING_FEE : 0;
 
     // Total without the COD fee, regardless of which payment method is
@@ -1374,53 +1404,11 @@ const CheckoutPage = () => {
                         } rounded-md text-sm`}
                       >
                         <option value="">Select State</option>
-                        {/* Indian States */}
-                        <option value="Andaman and Nicobar Islands">
-                          Andaman and Nicobar Islands
-                        </option>
-                        <option value="Andhra Pradesh">Andhra Pradesh</option>
-                        <option value="Arunachal Pradesh">
-                          Arunachal Pradesh
-                        </option>
-                        <option value="Assam">Assam</option>
-                        <option value="Bihar">Bihar</option>
-                        <option value="Chandigarh">Chandigarh</option>
-                        <option value="Chhattisgarh">Chhattisgarh</option>
-                        <option value="Dadra and Nagar Haveli and Daman and Diu">
-                          Dadra and Nagar Haveli and Daman and Diu
-                        </option>
-                        <option value="Delhi">Delhi</option>
-                        <option value="Goa">Goa</option>
-                        <option value="Gujarat">Gujarat</option>
-                        <option value="Haryana">Haryana</option>
-                        <option value="Himachal Pradesh">
-                          Himachal Pradesh
-                        </option>
-                        <option value="Jammu and Kashmir">
-                          Jammu and Kashmir
-                        </option>
-                        <option value="Jharkhand">Jharkhand</option>
-                        <option value="Karnataka">Karnataka</option>
-                        <option value="Kerala">Kerala</option>
-                        <option value="Ladakh">Ladakh</option>
-                        <option value="Lakshadweep">Lakshadweep</option>
-                        <option value="Madhya Pradesh">Madhya Pradesh</option>
-                        <option value="Maharashtra">Maharashtra</option>
-                        <option value="Manipur">Manipur</option>
-                        <option value="Meghalaya">Meghalaya</option>
-                        <option value="Mizoram">Mizoram</option>
-                        <option value="Nagaland">Nagaland</option>
-                        <option value="Odisha">Odisha</option>
-                        <option value="Puducherry">Puducherry</option>
-                        <option value="Punjab">Punjab</option>
-                        <option value="Rajasthan">Rajasthan</option>
-                        <option value="Sikkim">Sikkim</option>
-                        <option value="Tamil Nadu">Tamil Nadu</option>
-                        <option value="Telangana">Telangana</option>
-                        <option value="Tripura">Tripura</option>
-                        <option value="Uttar Pradesh">Uttar Pradesh</option>
-                        <option value="Uttarakhand">Uttarakhand</option>
-                        <option value="West Bengal">West Bengal</option>
+                        {INDIAN_STATES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
                       </select>
                     ) : (
                       <input
@@ -1563,7 +1551,12 @@ const CheckoutPage = () => {
                             Standard Shipping
                           </span>
                           <span className="block text-xs text-green-500">
-                            7-10 working days •{" "}
+                            {standardDelivery?.loading
+                              ? "Checking delivery time…"
+                              : standardDelivery
+                                ? `Delivery in ${standardDelivery.minDays}-${standardDelivery.maxDays} days (by ${standardDelivery.byDate})`
+                                : "7-10 working days"}{" "}
+                            •{" "}
                             {breakdown.totalAfterDiscount < FREE_SHIPPING_THRESHOLD
                               ? `₹${LOW_ORDER_SHIPPING_CHARGE} (free from ₹${FREE_SHIPPING_THRESHOLD})`
                               : "Free"}
@@ -1585,7 +1578,7 @@ const CheckoutPage = () => {
                             Air Shipping
                           </span>
                           <span className="block text-xs text-blue-500">
-                            5-6 working days • ₹149
+                            5-6 working days • ₹149 • Prepaid only
                           </span>
                         </div>
                       </label>
@@ -1604,7 +1597,7 @@ const CheckoutPage = () => {
                             Express Shipping
                           </span>
                           <span className="block text-xs text-red-500">
-                            3-4 working days • ₹299
+                            {EXPRESS_DELIVERY_TEXT} • ₹{EXPRESS_SHIPPING_CHARGE} • Prepaid only
                           </span>
                         </div>
                       </label>
@@ -1690,6 +1683,12 @@ const CheckoutPage = () => {
                           </div>
                         </label>
 
+                        {formData.deliveryOption !== "standard" ? (
+                          <div className="text-xs bg-gray-50 border border-gray-200 text-gray-600 rounded-md px-3 py-2">
+                            Cash on Delivery is available with Standard Shipping only.
+                          </div>
+                        ) : (
+                        <>
                         <label
                           className={`flex items-center p-3 border rounded-md transition-colors ${
                             paymentMethod === "cod"
@@ -1740,6 +1739,8 @@ const CheckoutPage = () => {
                               Switch to Pay Online and skip the ₹{COD_HANDLING_FEE} fee
                             </button>
                           </>
+                        )}
+                        </>
                         )}
                       </>
                     );
@@ -1890,7 +1891,7 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full py-3 bg-gray-800 text-white font-medium rounded-md"
             >
-              {paymentMethod === "cod" && formData.country === "india"
+              {breakdown.isCod
                 ? `Pay ₹${calculateCodAdvance(calculateTotal())} & Place Order`
                 : "Place Order"}
             </button>
