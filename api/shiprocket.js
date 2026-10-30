@@ -232,6 +232,15 @@ async function handleServiceability(req, res) {
   }
 }
 
+// Shiprocket spells it "CANCELED" (plus "CANCELLATION REQUESTED" etc.).
+const isCancelledStatus = (status) => /cancel/i.test(String(status || ""));
+const MAX_REBOOK_TRIES = 5;
+
+async function fetchShiprocketOrderStatus(token, shiprocketOrderId) {
+  const result = await shiprocketFetch(`/orders/show/${shiprocketOrderId}`, token);
+  return result?.data?.status;
+}
+
 async function handleCreateOrder(req, res) {
   try {
     const { orderId, courierId } = req.body;
@@ -254,23 +263,40 @@ async function handleCreateOrder(req, res) {
     const order = orderSnap.data();
     const customer = order.customer || {};
 
+    const token = await getShiprocketToken(db);
+
+    // Which re-booking this is - 0 for the first. Shiprocket keeps cancelled
+    // orders around and won't take a new one under the same order_id, so
+    // every re-booking after a cancellation goes in as ORDERNUMBER-R1, -R2...
+    let bookingAttempt = order.shiprocketBookingAttempt || 0;
+
     // Idempotency: if a previous attempt got far enough to record a
     // shipment (e.g. it succeeded on Shiprocket's side but our function
     // was killed by a timeout before writing that back), don't create a
     // second shipment and burn wallet balance on a duplicate - just
-    // return what's already there.
+    // return what's already there. The exception is a shipment that has
+    // since been cancelled in Shiprocket - that one is re-booked.
     if (order.shiprocketShipmentId) {
+      const previousStatus = order.shiprocketOrderId
+        ? await fetchShiprocketOrderStatus(token, order.shiprocketOrderId)
+        : null;
+      if (!isCancelledStatus(previousStatus)) {
+        console.log(
+          `ℹ️ Order ${orderId} already has a Shiprocket shipment (${order.shiprocketShipmentId}), skipping duplicate creation`,
+        );
+        return res.status(200).json({
+          success: true,
+          trackingId: order.tracking_id,
+          courierName: order.courierPartner,
+          shiprocketOrderId: order.shiprocketOrderId,
+          shipmentId: order.shiprocketShipmentId,
+          alreadyShipped: true,
+        });
+      }
       console.log(
-        `ℹ️ Order ${orderId} already has a Shiprocket shipment (${order.shiprocketShipmentId}), skipping duplicate creation`,
+        `ℹ️ Order ${orderId}'s previous Shiprocket shipment (${order.shiprocketShipmentId}) was cancelled, re-booking`,
       );
-      return res.status(200).json({
-        success: true,
-        trackingId: order.tracking_id,
-        courierName: order.courierPartner,
-        shiprocketOrderId: order.shiprocketOrderId,
-        shipmentId: order.shiprocketShipmentId,
-        alreadyShipped: true,
-      });
+      bookingAttempt += 1;
     }
 
     const totalWeight =
@@ -281,8 +307,6 @@ async function handleCreateOrder(req, res) {
         0,
       ) || DEFAULT_ITEM_WEIGHT_KG;
 
-    const token = await getShiprocketToken(db);
-
     const isCod = order.paymentMethod === "cod";
     // For a hybrid COD order the customer already paid the advance online -
     // the courier should only collect the remaining balance at the door.
@@ -291,7 +315,6 @@ async function handleCreateOrder(req, res) {
       : order.amount || 0;
 
     const createPayload = {
-      order_id: order.orderNumber,
       order_date: (order.createdAt || new Date().toISOString())
         .slice(0, 19)
         .replace("T", " "),
@@ -336,10 +359,39 @@ async function handleCreateOrder(req, res) {
       weight: Number(totalWeight.toFixed(2)),
     };
 
-    const createResult = await shiprocketFetch("/orders/create/adhoc", token, {
-      method: "POST",
-      body: JSON.stringify(createPayload),
-    });
+    // A cancelled order can also be sitting in Shiprocket without us knowing
+    // (e.g. it was created but AWB assignment failed, then cancelled there).
+    // Shiprocket then either refuses the order_id or hands back the
+    // cancelled order - either way, move on to the next -R suffix.
+    let createResult;
+    for (let tries = 0; ; tries++) {
+      const channelOrderId = bookingAttempt
+        ? `${order.orderNumber}-R${bookingAttempt}`
+        : order.orderNumber;
+      try {
+        createResult = await shiprocketFetch("/orders/create/adhoc", token, {
+          method: "POST",
+          body: JSON.stringify({ ...createPayload, order_id: channelOrderId }),
+        });
+      } catch (createError) {
+        const message = JSON.stringify(createError.body || createError.message);
+        if (!isCancelledStatus(message) || tries >= MAX_REBOOK_TRIES) {
+          throw createError;
+        }
+        createResult = null;
+      }
+      if (createResult && !isCancelledStatus(createResult.status)) break;
+      if (tries >= MAX_REBOOK_TRIES) {
+        return res.status(502).json({
+          message: `Shiprocket still has cancelled orders for ${channelOrderId}`,
+          details: createResult,
+        });
+      }
+      console.warn(
+        `⚠️ Shiprocket order ${channelOrderId} is cancelled, retrying under the next re-booking suffix`,
+      );
+      bookingAttempt += 1;
+    }
 
     const shipmentId = createResult.shipment_id;
     const shiprocketOrderId = createResult.order_id;
@@ -423,6 +475,7 @@ async function handleCreateOrder(req, res) {
       courierPartner: courierName,
       shiprocketOrderId,
       shiprocketShipmentId: shipmentId,
+      shiprocketBookingAttempt: bookingAttempt,
       processed: false,
     };
     await orderRef.update(updateData);
