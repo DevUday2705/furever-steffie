@@ -1152,6 +1152,9 @@ const AdminPage = () => {
         "Delivery Option": order.customer?.deliveryOption || "",
         "Special Instructions": order.customer?.specialInstructions || "",
         "Payment Status": order.paymentStatus || "",
+        "Payment Method": order.paymentMethod === "cod" ? "COD" : "Prepaid",
+        "COD Advance Paid": order.paymentMethod === "cod" ? order.codAdvanceAmount || 0 : "",
+        "COD Amount Due": order.paymentMethod === "cod" ? order.codAmountDue || 0 : "",
         "Order Status": order.orderStatus || "",
         "Shipping Type": order.shippingType || "",
         "Collaboration": order.isCollaboration ? "Yes" : "No",
@@ -1171,6 +1174,28 @@ const AdminPage = () => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    // Prepaid vs COD at a glance. For COD, "Collected Online" is the advance
+    // and "To Collect on Delivery" is what the courier still has to bring in.
+    const codOrders = filteredAndSortedOrders.filter((o) => o.paymentMethod === "cod");
+    const prepaidOrders = filteredAndSortedOrders.filter((o) => o.paymentMethod !== "cod");
+    const sumOf = (list, pick) => list.reduce((sum, o) => sum + (Number(pick(o)) || 0), 0);
+    const summaryRow = (label, list, collectedOnline, toCollect) => ({
+      "Payment Method": label,
+      "Orders": list.length,
+      "Total Bill": sumOf(list, (o) => o.amount),
+      "Collected Online": collectedOnline,
+      "To Collect on Delivery": toCollect,
+    });
+    const codAdvance = sumOf(codOrders, (o) => o.codAdvanceAmount);
+    const codDue = sumOf(codOrders, (o) => o.codAmountDue);
+    const prepaidTotal = sumOf(prepaidOrders, (o) => o.amount);
+    const summaryRows = [
+      summaryRow("Prepaid", prepaidOrders, prepaidTotal, 0),
+      summaryRow("COD", codOrders, codAdvance, codDue),
+      summaryRow("Total", filteredAndSortedOrders, prepaidTotal + codAdvance, codDue),
+    ];
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(summaryRows), "Summary");
 
     const fileName = `furever-steffie-orders-${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(workbook, fileName);
