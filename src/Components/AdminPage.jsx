@@ -675,9 +675,10 @@ const AdminPage = () => {
         <head>
           <title>Print Addresses</title>
           <style>
+            /* 4" x 6" thermal label - one label per page */
             @page {
-              size: A4;
-              margin: 10mm;
+              size: 101.6mm 152.4mm;
+              margin: 0;
             }
             * {
               -webkit-print-color-adjust: exact !important;
@@ -686,61 +687,30 @@ const AdminPage = () => {
             }
             body {
               font-family: Arial, sans-serif;
-              font-size: 14px;
-              line-height: 1.6;
+              font-size: 11pt;
+              line-height: 1.4;
               margin: 0;
               padding: 0;
-            }
-            .grid-container {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              grid-template-rows: 1fr 1fr;
-              gap: 8mm;
-              height: 277mm;
-              width: 190mm;
-              position: relative;
-            }
-            .cutting-guide-horizontal {
-              position: absolute;
-              left: 0;
-              right: 0;
-              top: 50%;
-              height: 2px;
-              background-color: #ff6b35 !important;
-              z-index: 10;
-              transform: translateY(-1px);
-              border: none !important;
-            }
-            .cutting-guide-vertical {
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              left: 50%;
-              width: 2px;
-              background-color: #ff6b35 !important;
-              z-index: 10;
-              transform: translateX(-1px);
-              border: none !important;
+              width: 101.6mm;
             }
             .address-box {
-              border: 2px solid #333;
-              padding: 12px;
+              width: 101.6mm;
+              height: 152.4mm;
+              padding: 5mm;
               box-sizing: border-box;
-              page-break-inside: avoid;
               display: flex;
               flex-direction: column;
-              height: 100%;
+              overflow: hidden;
               position: relative;
+              page-break-inside: avoid;
+              break-inside: avoid;
+              page-break-after: always;
+              break-after: page;
             }
-            .address-box::before {
-              content: '';
-              position: absolute;
-              top: -5px;
-              left: -5px;
-              right: -5px;
-              bottom: -5px;
-              border: 1px dotted #999;
-              pointer-events: none;
+            /* No trailing blank label after the last order */
+            .address-box:last-child {
+              page-break-after: auto;
+              break-after: auto;
             }
             .header-message {
               text-align: center;
@@ -755,13 +725,13 @@ const AdminPage = () => {
               margin-right: 5px;
             }
             .name {
-              font-size: 18px;
+              font-size: 15pt;
               font-weight: bold;
-             
-           
+              line-height: 1.2;
             }
             .address-line {
-              margin-bottom: 8px;
+              margin-bottom: 1.8mm;
+              font-size: 10.5pt;
             }
             .order-id {
               margin-top: auto;
@@ -771,37 +741,37 @@ const AdminPage = () => {
               color: #666;
             }
             .name-n-rectangle{
-            border-bottom: 2px solid #000;
-                margin-top: 50px;
-            margin-bottom: 10px;
+              border-bottom: 2px solid #000;
+              margin-top: 3mm;
+              margin-bottom: 3mm;
               display: flex;
               align-items: end;
               justify-content: space-between;
             }
             .rectangle {
-              width: 130px;
-              height: 50px;
+              width: 34mm;
+              height: 13mm;
               margin-left: auto;
-              margin-bottom: 5px;
-              border: 0.5px solid #000;
+              margin-bottom: 1.5mm;
+              border: 0.3mm solid #000;
             }
             .business-footer {
               margin-top: auto;
               text-align: center;
-              padding: 8px;
+              padding-top: 2mm;
               border-top: 1px solid #ddd;
               display: flex;
               flex-direction: column;
               align-items: center;
-              gap: 4px;
+              gap: 1mm;
             }
             .business-logo {
-              height: 35px;
+              height: 10mm;
               width: auto;
-              max-width: 250px;
+              max-width: 55mm;
             }
             .business-number {
-              font-size: 11px;
+              font-size: 8pt;
               color: #666;
               font-weight: 500;
             }
@@ -847,27 +817,25 @@ const AdminPage = () => {
           </style>
         </head>
         <body>
-          <div class="grid-container">
- 
             ${selectedOrdersData
               .map(
                 (order) => `
               <div class="address-box">
               <div class="rectangle"></div>
-                
+
                   <div class="name-n-rectangle">
                   <div class="name">${order.customer?.fullName || "N/A"}</div>
                   </div>
                 <div class="address-line"><span class="label">Phone:</span>${order.customer?.mobileNumber || "N/A"}</div>
                 ${order.customer?.alternateMobile ? `<div class="address-line"><span class="label">WhatsApp:</span>${order.customer.alternateMobile}</div>` : ""}
                 <div class="address-line"><span class="label">Address:</span>${order.customer?.addressLine1 || ""}</div>
-                ${order.customer?.addressLine2 ? `<div class="address-line" style="margin-left: 60px;">${order.customer.addressLine2}</div>` : ""}
+                ${order.customer?.addressLine2 ? `<div class="address-line" style="margin-left: 18mm;">${order.customer.addressLine2}</div>` : ""}
                 <div class="address-line"><span class="label">City:</span>${order.customer?.city || ""}</div>
                 <div class="address-line"><span class="label">State:</span>${order.customer?.state || ""}</div>
                 <div class="address-line"><span class="label">Country:</span>${order.customer?.country || ""}</div>
                 <div class="address-line"><span class="label">Pincode:</span>${order.customer?.pincode || ""}</div>
                 ${order.customer?.deliveryOption ? `
-                <div class="address-line" style="font-size: 10px; color: #666;"><span class="label">Customer requested:</span>${order.customer.deliveryOption} delivery</div>
+                <div class="address-line" style="font-size: 8pt; color: #666;"><span class="label">Customer requested:</span>${order.customer.deliveryOption} delivery</div>
                 ` : ""}
                 
                 <div class="business-footer">
@@ -880,7 +848,6 @@ const AdminPage = () => {
             `
               )
               .join("")}
-          </div>
         </body>
       </html>
     `;
