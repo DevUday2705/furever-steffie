@@ -18,13 +18,13 @@ import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
 import { downloadBlob } from "../utils/downloadBlob";
 import { adminFetch } from "../utils/adminFetch";
 
-// Orders only move pending -> shipping-booked -> shipped now. Older orders
-// can still carry retired statuses, so map those onto the three that are
-// left: the old in-progress ones are still pending, and an old "shipped"
-// whose Shipped checkbox was never ticked was only booked, not sent out.
+// Orders only move pending -> ready-to-ship -> shipping-booked -> shipped now.
+// Older orders can still carry retired statuses, so map those onto the ones
+// that are left: the old in-progress ones are still pending, and an old
+// "shipped" whose Shipped checkbox was never ticked was only booked, not sent out.
 const getOrderStatus = (order) => {
   const status = order?.orderStatus;
-  if (status === "cancelled" || status === "shipping-booked") return status;
+  if (status === "cancelled" || status === "ready-to-ship" || status === "shipping-booked") return status;
   if (status === "shipped" || status === "tracking-pending") {
     return order?.processed === false ? "shipping-booked" : "shipped";
   }
@@ -248,7 +248,7 @@ const AdminPage = () => {
     }
   };
 
-  // Moving between pending / shipping-booked / shipped by hand. Booking a
+  // Moving between pending / ready-to-ship / shipping-booked / shipped by hand. Booking a
   // shipment goes through the "Book Shipment" button instead, since it needs
   // courier details. `processed` is kept in step so getOrderStatus reads it
   // the same way it reads older orders.
@@ -1095,6 +1095,7 @@ const AdminPage = () => {
     pinned: filteredAndSortedOrders.filter((o) => o.pinned).length,
     collaboration: filteredAndSortedOrders.filter((o) => o.isCollaboration === true).length,
     pending: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "pending").length,
+    readyToShip: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "ready-to-ship").length,
     shippingBooked: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "shipping-booked").length,
     shipped: filteredAndSortedOrders.filter((o) => getOrderStatus(o) === "shipped").length,
     internationalOrders: filteredAndSortedOrders.filter((o) => o.customer?.country && o.customer.country.toLowerCase() !== "india").length,
@@ -1266,7 +1267,7 @@ const AdminPage = () => {
       {activeTab === "orders" && (
         <>
           {/* Stats Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-3 mb-6">
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
               <p className="text-xs text-gray-500">📌 Pinned</p>
               <p className="text-lg font-bold text-amber-600">
@@ -1277,6 +1278,12 @@ const AdminPage = () => {
               <p className="text-xs text-gray-500">Pending</p>
               <p className="text-lg font-bold text-gray-600">
                 {orderStats.pending}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-xs text-gray-500">Ready to Ship</p>
+              <p className="text-lg font-bold text-teal-600">
+                {orderStats.readyToShip}
               </p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -1686,6 +1693,8 @@ const AdminPage = () => {
                               ? "bg-green-600"
                               : getOrderStatus(order) === "shipping-booked"
                               ? "bg-indigo-500"
+                              : getOrderStatus(order) === "ready-to-ship"
+                              ? "bg-teal-600"
                               : getOrderStatus(order) === "cancelled"
                               ? "bg-red-500"
                               : "bg-gray-400"
@@ -1703,6 +1712,7 @@ const AdminPage = () => {
                             className="text-xs bg-white border border-gray-300 px-2 py-1 rounded"
                           >
                             <option value="pending">Pending</option>
+                            <option value="ready-to-ship">Ready to Ship</option>
                             {/* Only reachable through Book Shipment, which
                                 collects the courier/tracking details. */}
                             <option
@@ -1715,7 +1725,8 @@ const AdminPage = () => {
                           </select>
                         )}
 
-                        {getOrderStatus(order) === "pending" && (
+                        {(getOrderStatus(order) === "pending" ||
+                          getOrderStatus(order) === "ready-to-ship") && (
                           <button
                             onClick={() => setShippedModalOrderId(order.id)}
                             className="text-xs font-semibold bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"

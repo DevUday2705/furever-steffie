@@ -168,6 +168,8 @@ const TrackOrder = () => {
         return "text-blue-600 bg-blue-100";
       case "cutting":
         return "text-purple-600 bg-purple-100";
+      case "ready-to-ship":
+        return "text-teal-600 bg-teal-100";
       case "tracking-pending":
       case "shipping-booked":
         return "text-amber-600 bg-amber-100";
@@ -244,6 +246,8 @@ const TrackOrder = () => {
                       ? "bg-gray-400"
                       : order.orderStatus === "cutting"
                       ? "bg-yellow-500"
+                      : order.orderStatus === "ready-to-ship"
+                      ? "bg-teal-600"
                       : order.orderStatus === "tracking-pending" ||
                         order.orderStatus === "shipping-booked"
                       ? "bg-amber-500"

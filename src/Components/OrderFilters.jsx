@@ -117,6 +117,7 @@ const OrderFilters = ({
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
+            <option value="ready-to-ship">Ready to Ship</option>
             <option value="shipping-booked">Shipping Booked</option>
             <option value="shipped">Shipped</option>
           </select>
