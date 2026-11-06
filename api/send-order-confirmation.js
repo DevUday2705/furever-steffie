@@ -21,6 +21,7 @@ const generateOrderDetailsHTML = (orderData) => {
               ${item.isBeaded ? "Hand Work" : "Simple"} • 
               ${item.isFullSet ? "Full Set" : item.isDupattaSet ? "Kurta + Dupatta" : "Kurta Only"} • 
               Size ${item.selectedSize}
+              ${item.selectedDhotiDetails?.name ? ` • Dhoti: ${item.selectedDhotiDetails.name}` : ""}
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import CustomColorEnquiry from "../Components/ProductDetail/CustomColorEnquiry";
 import BottomActions from "../Components/ProductDetail/BottomActions";
 import TrustSignals from "../Components/ProductDetail/TrustSignals";
 import DeliveryCheck from "../Components/ProductDetail/DeliveryCheck";
+import { toast } from "react-hot-toast";
 import SimpleSizeSelector from "../Components/ModernSizeSelector";
 import { getCatalog, getLiveProduct } from "../utils/catalog";
 import {
@@ -286,6 +287,19 @@ const ProductDetail = () => {
     return price;
   };
   console.log(selectedStyle);
+
+  // Sets on a kurta/pathani need a dhoti the customer chose themselves. Other
+  // product types have no dhoti picker, so there's nothing for them to choose.
+  const ensureDhotiChosen = () => {
+    const hasDhotiPicker = product?.type === "kurta" || product?.type === "pathani";
+    if (!hasDhotiPicker || !isFullSet || selectedDhoti || availableDhotis.length === 0) {
+      return true;
+    }
+    toast.error("Please choose a dhoti color first.", { position: "top-center" });
+    document.getElementById("dhoti-picker")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return false;
+  };
+
   const handleGoBack = () => navigate(-1);
 
   if (isLoading) {
@@ -377,6 +391,7 @@ const ProductDetail = () => {
               // Custom sizing prop
               allowCustomSizes={product.allowCustomSizes || false}
               availableDhotis={availableDhotis}
+              ensureDhotiChosen={ensureDhotiChosen}
             />
 
             <DeliveryCheck />
@@ -408,6 +423,7 @@ const ProductDetail = () => {
         setIsOpen={setIsOpen}
         allowCustomSizes={product.allowCustomSizes || false} // NEW: Pass custom sizing flag
         availableDhotis={availableDhotis}
+        ensureDhotiChosen={ensureDhotiChosen}
       />
     </div>
   );

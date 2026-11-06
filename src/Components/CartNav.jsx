@@ -161,6 +161,11 @@ const CartNav = () => {
                                 ? "Kurta + Dupatta"
                                 : item.category}
                             </p>
+                            {item.selectedDhotiDetails?.name && (
+                              <p className="text-gray-800 text-xs font-medium">
+                                Dhoti: {item.selectedDhotiDetails.name}
+                              </p>
+                            )}
                             <p className="text-gray-900 font-medium text-sm mt-1">
                               {convertCurrency(item.price, currency)}
                             </p>

@@ -87,23 +87,23 @@ const ProductOptions = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [isShining, setIsShining] = useState(false);
   const [infoPanel, setInfoPanel] = useState(null); // 'beaded' | 'tassels' | null
+  const [dhotiUnavailableNotice, setDhotiUnavailableNotice] = useState(false);
 
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
   };
 
-  // Keep the selected dhoti in sync with what's actually available for the
-  // current size, and auto-pick the first option once a dhoti-inclusive tier
-  // is selected.
+  // Drop a selected dhoti that isn't stocked in the current size. Never pick a
+  // replacement here: the colour must always be the customer's own choice.
+  // Auto-picking the first option swapped customers' White/Gold for Black when
+  // they moved between sizes, and that wrong colour went into their order.
   useEffect(() => {
     if (selectedDhoti && !availableDhotis.some((d) => d.id === selectedDhoti)) {
       setSelectedDhoti(null);
-    }
-    if (!selectedDhoti && availableDhotis.length > 0 && isFullSet) {
-      setSelectedDhoti(availableDhotis[0].id);
+      setDhotiUnavailableNotice(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableDhotis, isFullSet]);
+  }, [availableDhotis]);
 
   const kurtaDhotiEnabled = !!globalSettings?.features?.kurtaDhotiEnabled && availableDhotis.length > 0;
   const kurtaDupattaEnabled = !!globalSettings?.features?.kurtaDupattaEnabled;
@@ -183,6 +183,7 @@ const ProductOptions = ({
     setIsRoyalSet(false);
     setIsFullSet(isFullSetOption);
     setIsDupattaSet(isDupattaOption);
+    setDhotiUnavailableNotice(false);
     if (!isFullSetOption && selectedDhoti) {
       setSelectedDhoti(null);
     }
@@ -367,22 +368,40 @@ const ProductOptions = ({
 
     return (
       <motion.div
+        id="dhoti-picker"
         initial={{ opacity: 0, height: 0 }}
         animate={{ opacity: 1, height: "auto" }}
         transition={{ duration: 0.3 }}
-        className="mt-4"
+        className="mt-4 scroll-mt-20"
       >
-        <h3 className="text-xs font-medium text-gray-900 mb-3">
-          Dhoti Color ({availableDhotis.length} available)
+        <h3 className="text-xs font-medium text-gray-900 mb-1">
+          Choose Dhoti Color ({availableDhotis.length} available)
         </h3>
+        {selectedDhoti ? (
+          <p className="text-xs text-gray-600 mb-3">
+            Selected:{" "}
+            <span className="font-semibold text-gray-900">
+              {availableDhotis.find((d) => d.id === selectedDhoti)?.name}
+            </span>
+          </p>
+        ) : (
+          <p className="text-xs font-medium text-orange-600 mb-3">
+            {dhotiUnavailableNotice
+              ? `Your dhoti color isn't available in size ${selectedSize}. Please choose again.`
+              : "Please choose a dhoti color."}
+          </p>
+        )}
         <div className="grid grid-cols-4 gap-2">
           {availableDhotis.map((dhoti) => (
             <motion.div
               key={dhoti.id}
               whileTap={{ scale: 0.96 }}
-              onClick={() => setSelectedDhoti(dhoti.id)}
+              onClick={() => {
+                setSelectedDhoti(dhoti.id);
+                setDhotiUnavailableNotice(false);
+              }}
               className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
-                selectedDhoti === dhoti.id ? "border-gray-800" : "border-transparent"
+                selectedDhoti === dhoti.id ? "border-gray-800" : "border-gray-200"
               }`}
             >
               <div className="relative pb-3/4 h-16">

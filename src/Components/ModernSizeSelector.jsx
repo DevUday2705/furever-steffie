@@ -77,6 +77,7 @@ const SimpleSizeSelector = ({
   isRoyalSet = false,
   selectedDhoti = null,
   availableDhotis = [], // Single source of truth for dhoti name/image lookups
+  ensureDhotiChosen = () => true,
   selectedStyle = "simple",
   selectedColor = null,
   calculatePrice = () => 0,
@@ -121,6 +122,11 @@ const SimpleSizeSelector = ({
 
   // Action button functions (copied from BottomActions)
   const handleBuyNow = () => {
+    if (!ensureDhotiChosen()) {
+      setShowSizeGuide(false); // Close modal so the dhoti picker is visible
+      return;
+    }
+
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails = selectedDhoti
       ? availableDhotis.find((dhoti) => dhoti.id === selectedDhoti) || null
@@ -149,6 +155,11 @@ const SimpleSizeSelector = ({
   };
 
   const handleAddToCart = () => {
+    if (!ensureDhotiChosen()) {
+      setShowSizeGuide(false); // Close modal so the dhoti picker is visible
+      return;
+    }
+
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails = selectedDhoti
       ? availableDhotis.find((dhoti) => dhoti.id === selectedDhoti) || null

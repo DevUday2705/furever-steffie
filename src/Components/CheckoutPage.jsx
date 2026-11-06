@@ -1179,6 +1179,11 @@ const CheckoutPage = () => {
                           : item.category}{" "}
                         • Size {item.selectedSize}
                       </div>
+                      {item.selectedDhotiDetails?.name && (
+                        <div className="text-xs font-medium text-gray-800 mt-0.5">
+                          Dhoti: {item.selectedDhotiDetails.name}
+                        </div>
+                      )}
                       {item.quantity && (
                         <div className="text-xs text-gray-500 mt-0.5">
                           Qty: {item.quantity}

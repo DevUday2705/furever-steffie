@@ -27,6 +27,7 @@ const BottomActions = ({
   selectedColor,
   allowCustomSizes = false, // NEW: for custom sizing
   availableDhotis = [], // Single source of truth for dhoti name/image lookups
+  ensureDhotiChosen = () => true,
 }) => {
   const { currency, setCurrency } = useContext(CurrencyContext);
   const { ordersArePaused } = useOrderPause();
@@ -82,6 +83,8 @@ const BottomActions = ({
   };
 
   const handleBuyNow = () => {
+    if (!ensureDhotiChosen()) return;
+
     // Find selected dhoti details if dhoti is selected
     const selectedDhotiDetails = selectedDhoti
       ? availableDhotis.find((dhoti) => dhoti.id === selectedDhoti) || null
@@ -109,6 +112,8 @@ const BottomActions = ({
   };
 
   const handleAddToCart = () => {
+    if (!ensureDhotiChosen()) return;
+
     // If product is already in cart, open cart instead of adding
     if (productInCart) {
       setIsOpen(true);
