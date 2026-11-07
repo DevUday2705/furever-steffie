@@ -75,7 +75,7 @@ export default function AdminGate() {
           Sign out
         </button>
       </div>
-      <Outlet />
+      <Outlet context={{ staffEmail: auth.session.user.email }} />
     </>
   );
 }

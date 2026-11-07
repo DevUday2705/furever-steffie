@@ -3,7 +3,8 @@ import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { resolveProductRef, adjustProductStock, adjustDhotiStock } from "../lib/stockLedger.js";
 import { releaseReservation } from "../lib/reservations.js";
-import { requireAdmin } from "../lib/adminAuth.js";
+import { getAdminEmail, requireAdmin } from "../lib/adminAuth.js";
+import { addOrderComment, transferOrder } from "../lib/orderActivity.js";
 
 // Vercel Hobby caps a deployment at 12 serverless functions - this used to
 // be its own file at api/cron/expire-reservations.js, folded in here (under
@@ -396,6 +397,23 @@ async function handlePublicCatalog(req, res) {
     }
 }
 
+// Comments and owner changes on an order, recorded under the signed-in
+// staff member's own email.
+async function handleOrderActivity(req, res, action) {
+    try {
+        const author = await getAdminEmail(req);
+        const { orderId, text, toEmail } = req.body;
+        const { status, body } =
+            action === "add-order-comment"
+                ? await addOrderComment(db, { orderId, author, text })
+                : await transferOrder(db, { orderId, author, toEmail, text });
+        return res.status(status).json(body);
+    } catch (error) {
+        console.error(`Order activity (${action}) failed:`, error);
+        return res.status(500).json({ message: "Couldn't save that. Try again." });
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method === "GET") {
         if (req.query?.catalog) return handlePublicCatalog(req, res);
@@ -416,8 +434,11 @@ export default async function handler(req, res) {
     if (action === "convert-reservation") return handleConvertReservation(req, res);
     if (action === "cancel-order") return handleCancelOrder(req, res);
     if (action === "imagekit-auth") return handleImageKitAuth(req, res);
+    if (action === "add-order-comment" || action === "transfer-order") {
+        return handleOrderActivity(req, res, action);
+    }
 
     return res.status(400).json({
-        message: "action must be 'reserve', 'release-reservation', 'convert-reservation', 'cancel-order', or 'imagekit-auth'",
+        message: "action must be 'reserve', 'release-reservation', 'convert-reservation', 'cancel-order', 'imagekit-auth', 'add-order-comment', or 'transfer-order'",
     });
 }

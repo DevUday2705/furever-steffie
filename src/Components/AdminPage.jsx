@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase"; // make sure path is correct
 import { motion } from "framer-motion";
@@ -17,6 +18,14 @@ import { useOrderPause } from "../context/OrderPauseContext";
 import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
 import { downloadBlob } from "../utils/downloadBlob";
 import { adminFetch } from "../utils/adminFetch";
+import OrderCollaboration from "./OrderCollaboration";
+import {
+  ORDER_TEAM,
+  getOrderOwner,
+  getStaffName,
+  isOrderTeamMember,
+  normalizeEmail,
+} from "../../lib/orderTeam";
 
 // Orders only move pending -> ready-to-ship -> shipping-booked -> shipped now.
 // Older orders can still carry retired statuses, so map those onto the ones
@@ -32,6 +41,11 @@ const getOrderStatus = (order) => {
 };
 
 const AdminPage = () => {
+  const staffEmail = normalizeEmail(useOutletContext()?.staffEmail);
+  // Everyone opens on their own orders; "all" is for staff outside the team.
+  const [ownerFilter, setOwnerFilter] = useState(
+    isOrderTeamMember(staffEmail) ? staffEmail : "all"
+  );
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
   // Internal notes per order (return/refund/exchange context) - keyed by
@@ -252,6 +266,12 @@ const AdminPage = () => {
   // shipment goes through the "Book Shipment" button instead, since it needs
   // courier details. `processed` is kept in step so getOrderStatus reads it
   // the same way it reads older orders.
+  const handleOrderActivityUpdate = (orderId, update) => {
+    setOrders((prev) =>
+      prev.map((order) => (order.id === orderId ? { ...order, ...update } : order))
+    );
+  };
+
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const update = {
@@ -988,6 +1008,16 @@ const AdminPage = () => {
         matchesDate = orderDate >= startDateObj && orderDate <= endDateObj;
       }
 
+      // Owner filter
+      const matchesOwner = ownerFilter === "all" || getOrderOwner(order) === ownerFilter;
+
+      // A transferred order stays on its owner's list until it's finished,
+      // even when it falls outside the date range (which defaults to this month).
+      const isOpenTransfer =
+        ownerFilter !== "all" &&
+        !!order.assignedBy &&
+        !["shipped", "cancelled"].includes(getOrderStatus(order));
+
       // Measurement filter
       let matchesMeasurement = true;
       if (measurementFilter !== "all") {
@@ -1016,8 +1046,8 @@ const AdminPage = () => {
       }
 
       return (
-        matchesSearch && matchesStatus && matchesDate && matchesMeasurement &&
-        matchesCollaboration
+        matchesSearch && matchesStatus && (matchesDate || isOpenTransfer) && matchesMeasurement &&
+        matchesCollaboration && matchesOwner
       );
     })
     .sort((a, b) => {
@@ -1321,6 +1351,31 @@ const AdminPage = () => {
           </div>
 
           {/* Search and filters */}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-gray-700">Orders with:</span>
+            {[
+              ...ORDER_TEAM.map((member) => ({
+                value: member.email,
+                label: member.email === staffEmail ? `Me (${member.name})` : member.name,
+              })),
+              { value: "all", label: "Everyone" },
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={ownerFilter === value}
+                onClick={() => setOwnerFilter(value)}
+                className={`px-3 py-1.5 text-sm rounded-full border ${
+                  ownerFilter === value
+                    ? "bg-gray-800 border-gray-800 text-white"
+                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <OrderFilters
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -1529,6 +1584,14 @@ const AdminPage = () => {
                         >
                           {order.customer?.fullName}
                         </button>
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 border border-blue-200 rounded-full">
+                          👤 {getStaffName(getOrderOwner(order))}
+                        </span>
+                        {order.orderActivity?.some((entry) => entry.type === "comment") && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-full">
+                            💬 {order.orderActivity.filter((entry) => entry.type === "comment").length}
+                          </span>
+                        )}
                         {order.pinned && (
                           <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
                             📌 Pinned
@@ -2126,6 +2189,7 @@ const AdminPage = () => {
                           </span>
                         </p>
                       </div>
+                      <OrderCollaboration order={order} onUpdate={handleOrderActivityUpdate} />
                       <div className="pt-2 border-t">
                         <p className="font-semibold mb-1">
                           📝 Internal Notes
