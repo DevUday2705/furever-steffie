@@ -1764,6 +1764,18 @@ const AdminPage = () => {
                             🚚 Book Shipment
                           </button>
                         )}
+
+                        {order.shiprocketShipmentId && getOrderStatus(order) !== "cancelled" && (
+                          <button
+                            type="button"
+                            disabled={downloadingDoc === order.id}
+                            onClick={() => handleDownloadLabel(order.id, order.shiprocketShipmentId)}
+                            className="text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+                            title="Downloads the Shiprocket shipping label"
+                          >
+                            {downloadingDoc === order.id ? "Preparing..." : "📄 Download Label"}
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -2247,22 +2259,9 @@ const AdminPage = () => {
                           </button>
                         </p>
                         {order.tracking_id && (
-                          <p className="flex items-center flex-wrap gap-2">
-                            <span>
-                              <span className="font-semibold">Tracking ID:</span>{" "}
-                              {order.tracking_id}
-                            </span>
-                            {order.shiprocketShipmentId && (
-                              <button
-                                type="button"
-                                disabled={downloadingDoc === order.id}
-                                onClick={() => handleDownloadLabel(order.id, order.shiprocketShipmentId)}
-                                className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                                title="Downloads the Shiprocket shipping label"
-                              >
-                                {downloadingDoc === order.id ? "Preparing..." : "📄 Download Label"}
-                              </button>
-                            )}
+                          <p>
+                            <span className="font-semibold">Tracking ID:</span>{" "}
+                            {order.tracking_id}
                           </p>
                         )}
                       </div>
