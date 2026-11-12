@@ -19,6 +19,7 @@ import { generateOrderInvoicePdf } from "../utils/generateOrderInvoicePdf";
 import { downloadBlob } from "../utils/downloadBlob";
 import { adminFetch } from "../utils/adminFetch";
 import OrderCollaboration from "./OrderCollaboration";
+import CourierProof from "./CourierProof";
 import {
   ORDER_TEAM,
   getOrderOwner,
@@ -1777,6 +1778,15 @@ const AdminPage = () => {
                           </button>
                         )}
                       </div>
+                      {getOrderStatus(order) !== "cancelled" && (
+                        <div className="mt-2">
+                          <CourierProof
+                            order={order}
+                            staffEmail={staffEmail}
+                            onUpdate={handleOrderActivityUpdate}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Customer's Original Delivery Preference */}
