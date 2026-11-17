@@ -650,6 +650,14 @@ const AdminProducts = () => {
                           className="w-full aspect-square sm:aspect-auto sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                        {!isInStock(item) && (
+                          <div
+                            title="Out of stock in all sizes"
+                            className="absolute top-0.5 left-0.5 sm:top-2 sm:left-2 flex items-center gap-1 bg-red-600 text-white text-[8px] sm:text-[10px] font-semibold px-1 sm:px-2 py-0.5 rounded-full shadow"
+                          >
+                            <span>Out of stock</span>
+                          </div>
+                        )}
                         {getLastPieceSizes(item).length > 0 && (
                           <div
                             title={`Only 1 left in size: ${getLastPieceSizes(
