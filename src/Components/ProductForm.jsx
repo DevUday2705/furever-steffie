@@ -848,10 +848,18 @@ const ProductForm = () => {
           )}
         </div>
 
-        {/* Pricing Section */}
-        <div className="border p-4 rounded">
-          <h2 className="font-semibold mb-2">Pricing</h2>
-          <div className="grid grid-cols-2 gap-4">
+        {/* Pricing Section - collapsed by default so its Size Increments grid
+            isn't mistaken for the Size Stock grid below it. */}
+        <details className="border p-4 rounded bg-amber-50/40 group">
+          <summary className="font-semibold cursor-pointer select-none flex items-center justify-between">
+            <span>💰 Pricing</span>
+            <span className="text-sm font-normal text-gray-500">
+              Base ₹{formData.pricing.basePrice || 0} ·{" "}
+              <span className="group-open:hidden">tap to edit</span>
+              <span className="hidden group-open:inline">tap to close</span>
+            </span>
+          </summary>
+          <div className="grid grid-cols-2 gap-4 mt-3">
             <div>
               <label className="block text-sm font-medium mb-1">
                 Base Price
@@ -1023,9 +1031,13 @@ const ProductForm = () => {
               )}
             </div>
           </div>
+        </details>
 
+        {/* Size Stock Section */}
+        <div className="border p-4 rounded">
+          <h2 className="font-semibold mb-2">📦 Size Stock</h2>
           {category === "dhotis" ? (
-            <div className="mt-4 border p-3 rounded bg-blue-50 text-sm text-gray-700">
+            <div className="border p-3 rounded bg-blue-50 text-sm text-gray-700">
               Dhoti stock isn&apos;t set here - it comes from the{" "}
               <a href="/admin/dhotis" className="text-blue-600 underline">
                 Dhoti Inventory
@@ -1033,8 +1045,8 @@ const ProductForm = () => {
               page (per colour and size), shared with Complete/Royal set dhotis.
             </div>
           ) : (
-          <div className="mt-4">
-            <label className="block text-sm font-medium mb-2">Size Stock</label>
+          <div>
+            <p className="text-xs text-gray-500 mb-2">Pieces in stock for each size.</p>
             <div className="grid grid-cols-4 gap-2">
               {Object.entries(formData.sizeStock).map(([size, stock]) => (
                 <div key={size}>
